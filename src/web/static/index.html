@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Investment Assistant</title>
-  <link rel="stylesheet" href="/static/style.css?v=final-answer-20260813h" />
+  <link rel="stylesheet" href="/static/style.css?v=expenses-20260820a" />
 </head>
 <body>
   <!-- Sidebar -->
@@ -122,6 +122,7 @@
       <nav class="view-tabs" aria-label="Primary views">
         <button class="view-tab active" data-view="chat" onclick="switchView('chat')">Assistant</button>
         <button class="view-tab" data-view="portfolio" onclick="switchView('portfolio')">Portfolio</button>
+        <button class="view-tab" data-view="expenses" onclick="switchView('expenses')">Expenses</button>
         <button class="view-tab" data-view="simulation" onclick="switchView('simulation')">Simulation</button>
       </nav>
       <span id="connection-status" class="conn-status offline">Connecting…</span>
@@ -271,6 +272,124 @@
       </div>
     </section>
 
+    <section id="expenses-view" class="main-view portfolio-view expenses-view" aria-label="Expenses dashboard" hidden>
+      <div class="portfolio-toolbar">
+        <div>
+          <div class="eyebrow">LIVE CASHFLOW</div>
+          <h1>Where your money goes</h1>
+          <p id="expenses-updated" class="portfolio-subtitle">Connect a bank-data provider to see categorised spending.</p>
+        </div>
+        <div class="portfolio-toolbar-actions">
+          <span id="expenses-status" class="portfolio-status neutral" aria-live="polite">Not loaded</span>
+          <button id="expenses-refresh" class="dashboard-btn" onclick="loadExpenses(true)">↻ Refresh</button>
+        </div>
+      </div>
+
+      <div id="expenses-alerts" class="portfolio-alerts" aria-live="polite"></div>
+
+      <div class="expenses-controls dashboard-card">
+        <div>
+          <div class="eyebrow">WINDOW</div>
+          <h2>Spending period</h2>
+        </div>
+        <div class="expenses-filter-row">
+          <label class="filter-control">Period
+            <select id="expenses-period" onchange="loadExpenses(true)">
+              <option value="month">This month</option>
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="90d">Last 90 days</option>
+              <option value="year">Last 12 months</option>
+            </select>
+          </label>
+          <label class="filter-control">Category
+            <select id="expenses-category" onchange="loadExpenses(true)">
+              <option value="">All categories</option>
+            </select>
+          </label>
+          <button class="text-btn expenses-help-btn" onclick="showExpenseSyncHelp()">How bank sync works</button>
+        </div>
+      </div>
+
+      <div class="portfolio-kpis" aria-label="Expense summary">
+        <article class="kpi-card kpi-primary">
+          <span class="kpi-label">Spent this period</span>
+          <strong id="expenses-total" class="kpi-value">—</strong>
+          <span id="expenses-count" class="kpi-note">No transactions yet</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-label">Income received</span>
+          <strong id="expenses-income" class="kpi-value up">—</strong>
+          <span class="kpi-note">Credits in the same period</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-label">Net cashflow</span>
+          <strong id="expenses-net" class="kpi-value">—</strong>
+          <span class="kpi-note">Income less spending</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-label">Top category</span>
+          <strong id="expenses-top-category" class="kpi-value">—</strong>
+          <span id="expenses-top-category-note" class="kpi-note">Waiting for data</span>
+        </article>
+      </div>
+
+      <div id="expenses-empty" class="portfolio-empty" hidden>
+        <div class="empty-icon">€</div>
+        <h2>No bank transactions yet</h2>
+        <p id="expenses-empty-copy">The dashboard is ready for a consented bank-data connection. Once a provider imports transactions, categories and cashflow will update here automatically.</p>
+        <button class="dashboard-btn primary" onclick="showExpenseSyncHelp()">See connection options</button>
+      </div>
+
+      <div id="expenses-content" class="portfolio-content">
+        <div class="portfolio-grid expenses-top-grid">
+          <section class="dashboard-card category-card">
+            <div class="dashboard-card-header">
+              <div>
+                <div class="eyebrow">BREAKDOWN</div>
+                <h2>Spending by category</h2>
+              </div>
+              <span id="expenses-category-count" class="count-badge">0</span>
+            </div>
+            <div id="expenses-category-bars" class="expense-category-bars"></div>
+          </section>
+          <aside class="dashboard-card sync-card">
+            <div class="dashboard-card-header">
+              <div>
+                <div class="eyebrow">AUTOMATION</div>
+                <h2>Bank feed</h2>
+              </div>
+              <span id="expenses-stream-state" class="account-state">Ready</span>
+            </div>
+            <div id="expenses-sync-message" class="detail-body">Connect a provider to receive transaction updates.</div>
+            <div class="sync-detail-list">
+              <div><span>Updates</span><strong>Instant in this view</strong></div>
+              <div><span>Duplicate protection</span><strong>Provider transaction ID</strong></div>
+              <div><span>Classification</span><strong>Automatic + normalized</strong></div>
+            </div>
+            <p class="card-note">Bank availability, consent duration, and transaction timing are controlled by the provider and your bank.</p>
+          </aside>
+        </div>
+
+        <section class="dashboard-card expenses-transactions-card">
+          <div class="dashboard-card-header">
+            <div>
+              <div class="eyebrow">RECENT ACTIVITY</div>
+              <h2>Transactions</h2>
+            </div>
+            <span id="expenses-transaction-count" class="muted-label">0 records</span>
+          </div>
+          <div class="holdings-table-wrap">
+            <table class="holdings-table expenses-table">
+              <thead><tr><th>Merchant</th><th>Category</th><th>Account</th><th>Date</th><th>Amount</th></tr></thead>
+              <tbody id="expenses-transactions-body"></tbody>
+            </table>
+            <div id="expenses-transactions-empty" class="table-empty">No transactions match this period.</div>
+          </div>
+        </section>
+      </div>
+    </section>
+
     <section id="simulation-view" class="main-view simulation-view" aria-label="Paper simulation dashboard" hidden>
       <div class="portfolio-toolbar">
         <div>
@@ -341,6 +460,6 @@
     </section>
   </main>
 
-  <script src="/static/app.js?v=final-answer-20260813h"></script>
+  <script src="/static/app.js?v=expenses-20260820a"></script>
 </body>
 </html>

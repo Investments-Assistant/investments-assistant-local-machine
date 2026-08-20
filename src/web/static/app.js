@@ -22,6 +22,9 @@ let portfolioSortKey = 'value_usd';
 let portfolioSortDirection = 'desc';
 let portfolioVisiblePositions = [];
 let selectedPortfolioPosition = null;
+let expenseSnapshot = null;
+let expensesLoading = false;
+let expenseStream = null;
 const simulationRuns = new Map();
 const SIDEBAR_WIDTH_KEY = 'ia_sidebar_width';
 const SIDEBAR_WIDTH_MIN = 220;
@@ -349,9 +352,11 @@ async function loadSnapshot() {
 
 function switchView(view) {
   const isPortfolio = view === 'portfolio';
+  const isExpenses = view === 'expenses';
   const isSimulation = view === 'simulation';
-  document.getElementById('chat-view').hidden = isPortfolio || isSimulation;
+  document.getElementById('chat-view').hidden = isPortfolio || isExpenses || isSimulation;
   document.getElementById('portfolio-view').hidden = !isPortfolio;
+  document.getElementById('expenses-view').hidden = !isExpenses;
   document.getElementById('simulation-view').hidden = !isSimulation;
   document.querySelectorAll('.view-tab').forEach((button) => {
     const active = button.dataset.view === view;
@@ -360,6 +365,9 @@ function switchView(view) {
   });
   if (isPortfolio) {
     loadPortfolio();
+  } else if (isExpenses) {
+    loadExpenses();
+    connectExpenseStream();
   } else if (isSimulation) {
     loadSimulations();
   } else {
@@ -1244,6 +1252,170 @@ async function loadReports() {
   }
 }
 
+// ── Expense dashboard ────────────────────────────────────────────────────────
+
+function formatExpenseMoney(value, currency = 'EUR') {
+  if (value == null || Number.isNaN(Number(value))) return '—';
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: currency || 'EUR',
+    maximumFractionDigits: 2,
+  }).format(Number(value));
+}
+
+async function loadExpenseCategories() {
+  const select = document.getElementById('expenses-category');
+  if (!select || select.options.length > 1) return;
+  try {
+    const resp = await fetch('/api/expenses/categories');
+    if (!resp.ok) return;
+    const data = await resp.json();
+    select.innerHTML = '<option value="">All categories</option>'
+      + (data.categories || []).map((category) => `<option value="${escapeHtml(category.key)}">${escapeHtml(category.label)}</option>`).join('');
+  } catch (error) {
+    console.error('Expense category load failed', error);
+  }
+}
+
+async function loadExpenses(force = false) {
+  if (expensesLoading || (!force && expenseSnapshot)) return;
+  expensesLoading = true;
+  const status = document.getElementById('expenses-status');
+  const refreshButton = document.getElementById('expenses-refresh');
+  if (status) {
+    status.className = 'portfolio-status neutral';
+    status.textContent = 'Loading…';
+  }
+  if (refreshButton) refreshButton.disabled = true;
+  await loadExpenseCategories();
+  const period = document.getElementById('expenses-period')?.value || 'month';
+  const category = document.getElementById('expenses-category')?.value || '';
+  const query = new URLSearchParams({period});
+  if (category) query.set('category', category);
+  try {
+    const resp = await fetch(`/api/expenses?${query.toString()}`, {cache: 'no-store'});
+    if (resp.status === 401) { window.location.assign('/login'); return; }
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(data.detail || 'Expenses could not be loaded.');
+    renderExpenses(data);
+  } catch (error) {
+    console.error('Expense load failed', error);
+    renderExpensesError(error.message);
+  } finally {
+    expensesLoading = false;
+    if (refreshButton) refreshButton.disabled = false;
+  }
+}
+
+function renderExpensesError(message) {
+  const status = document.getElementById('expenses-status');
+  if (status) {
+    status.className = 'portfolio-status error';
+    status.textContent = 'Unavailable';
+  }
+  document.getElementById('expenses-updated').textContent = message;
+  document.getElementById('expenses-alerts').innerHTML = `<div class="portfolio-alert error">${escapeHtml(message)}</div>`;
+}
+
+function renderExpenseCategoryBars(categories, currency) {
+  const el = document.getElementById('expenses-category-bars');
+  const count = document.getElementById('expenses-category-count');
+  if (!el) return;
+  count.textContent = String(categories.length);
+  if (!categories.length) {
+    el.innerHTML = '<div class="table-empty">No spending categories in this period.</div>';
+    return;
+  }
+  const max = Math.max(...categories.map((item) => Number(item.amount) || 0), 1);
+  el.innerHTML = categories.map((item) => {
+    const width = Math.max(4, Math.round((Number(item.amount) / max) * 100));
+    return `<div class="expense-category-row">
+      <div class="expense-category-head"><span>${escapeHtml(item.label)}</span><strong>${formatExpenseMoney(item.amount, currency)}</strong></div>
+      <div class="expense-category-track"><span style="width:${width}%"></span></div>
+      <div class="expense-category-meta">${Number(item.percentage || 0).toFixed(1)}% · ${item.transaction_count} transaction${item.transaction_count === 1 ? '' : 's'}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderExpenseTransactions(transactions, currency) {
+  const body = document.getElementById('expenses-transactions-body');
+  const empty = document.getElementById('expenses-transactions-empty');
+  const count = document.getElementById('expenses-transaction-count');
+  if (!body) return;
+  const rows = (transactions || []).slice(0, 200);
+  count.textContent = `${rows.length} record${rows.length === 1 ? '' : 's'}`;
+  body.innerHTML = rows.map((transaction) => {
+    const isIncome = transaction.transaction_type === 'income';
+    const isTransfer = transaction.transaction_type === 'transfer';
+    const amountClass = isIncome ? 'up' : isTransfer ? '' : 'down';
+    const amountPrefix = isIncome ? '+' : isTransfer ? '' : '−';
+    const date = new Date(transaction.occurred_at);
+    const dateLabel = Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString([], {month: 'short', day: 'numeric'});
+    return `<tr>
+      <td><div class="asset-cell"><span class="asset-symbol">${escapeHtml(transaction.merchant)}</span><span class="asset-meta">${escapeHtml(transaction.description || transaction.provider || '')}</span></div></td>
+      <td><span class="expense-category-pill">${escapeHtml(transaction.category_label || transaction.category)}</span><span class="asset-meta">${escapeHtml(transaction.subcategory || '')}</span></td>
+      <td>${escapeHtml(transaction.account_name || 'Bank account')}</td>
+      <td>${escapeHtml(dateLabel)}${transaction.pending ? ' · pending' : ''}</td>
+      <td class="${amountClass}">${amountPrefix}${formatExpenseMoney(transaction.amount, transaction.currency || currency)}</td>
+    </tr>`;
+  }).join('');
+  empty.hidden = rows.length > 0;
+}
+
+function renderExpenses(data) {
+  expenseSnapshot = data;
+  const currency = data.currency || 'EUR';
+  const categories = data.category_totals || [];
+  const transactions = data.transactions || [];
+  const sync = data.sync || {};
+  const hasData = transactions.length > 0 || Number(data.total_expenses || 0) > 0 || Number(data.total_income || 0) > 0;
+  const status = document.getElementById('expenses-status');
+  status.className = `portfolio-status ${hasData ? 'ready' : 'neutral'}`;
+  status.textContent = hasData ? 'Live-ready' : 'Not connected';
+  document.getElementById('expenses-updated').textContent = sync.last_synced_at
+    ? `Last bank sync ${formatMessageTime(sync.last_synced_at)} · ${data.period_start} → ${data.period_end}`
+    : `${data.period_start} → ${data.period_end} · ${sync.message || 'Waiting for a bank feed'}`;
+  document.getElementById('expenses-total').textContent = formatExpenseMoney(data.total_expenses, currency);
+  document.getElementById('expenses-income').textContent = formatExpenseMoney(data.total_income, currency);
+  const net = document.getElementById('expenses-net');
+  net.textContent = formatExpenseMoney(data.net_cashflow, currency);
+  net.classList.toggle('up', Number(data.net_cashflow) > 0);
+  net.classList.toggle('down', Number(data.net_cashflow) < 0);
+  document.getElementById('expenses-count').textContent = `${data.transaction_count || 0} expense transaction${data.transaction_count === 1 ? '' : 's'}`;
+  const top = categories[0];
+  document.getElementById('expenses-top-category').textContent = top?.label || '—';
+  document.getElementById('expenses-top-category-note').textContent = top
+    ? formatExpenseMoney(top.amount, currency)
+    : 'Waiting for data';
+  document.getElementById('expenses-sync-message').textContent = sync.message || 'Connect a provider to receive transaction updates.';
+  document.getElementById('expenses-stream-state').textContent = expenseStream?.readyState === EventSource.OPEN ? 'Streaming' : 'Ready';
+  document.getElementById('expenses-stream-state').className = `account-state ${hasData ? '' : 'error'}`;
+  renderExpenseCategoryBars(categories, currency);
+  renderExpenseTransactions(transactions, currency);
+  document.getElementById('expenses-empty').hidden = hasData;
+  document.getElementById('expenses-content').hidden = !hasData;
+  document.getElementById('expenses-alerts').innerHTML = '';
+}
+
+function connectExpenseStream() {
+  if (expenseStream && [EventSource.OPEN, EventSource.CONNECTING].includes(expenseStream.readyState)) return;
+  if (expenseStream) expenseStream.close();
+  expenseStream = new EventSource('/api/expenses/stream');
+  expenseStream.onopen = () => {
+    const state = document.getElementById('expenses-stream-state');
+    if (state) { state.textContent = 'Streaming'; state.className = 'account-state'; }
+  };
+  expenseStream.addEventListener('expenses_updated', () => loadExpenses(true));
+  expenseStream.onerror = () => {
+    const state = document.getElementById('expenses-stream-state');
+    if (state) { state.textContent = 'Reconnecting'; state.className = 'account-state error'; }
+  };
+}
+
+function showExpenseSyncHelp() {
+  document.getElementById('expenses-alerts').innerHTML = '<div class="portfolio-alert"><strong>How this becomes live:</strong> a bank-data provider asks you to consent at your bank, fetches transactions, and sends them through the expense import contract. GoCardless Bank Account Data is the first provider boundary, covering EEA PSD2 banks; bank rate limits and consent renewal still apply. <a href="https://developer.gocardless.com/bank-account-data/overview/" target="_blank" rel="noopener">Read the provider docs ↗</a></div>';
+}
+
 // ── Fake-money simulation dashboard ─────────────────────────────────────────
 
 function updateSimulationFields() {
@@ -1561,5 +1733,8 @@ globalThis.addEventListener('DOMContentLoaded', async () => {
   if (startInput) startInput.value = defaultSimulationStart();
   updateSimulationFields();
   setInterval(loadSnapshot, 5 * 60 * 1000); // auto-refresh every 5 min
+  setInterval(() => {
+    if (!document.getElementById('expenses-view')?.hidden) loadExpenses(true);
+  }, 30 * 1000); // bank feeds are refreshed as often as provider limits allow
   setSendEnabled(true);
 });

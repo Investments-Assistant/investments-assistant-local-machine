@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 import json
 import math
 from pathlib import Path
@@ -12,7 +12,13 @@ import secrets
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import (
+    FileResponse,
+    HTMLResponse,
+    JSONResponse,
+    RedirectResponse,
+    StreamingResponse,
+)
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import delete, or_, select, text
 from sqlalchemy.exc import IntegrityError
@@ -25,12 +31,15 @@ from src.db.models import (
     ChatMessage,
     Conversation,
     DailyPnL,
+    ExpenseTransaction,
     Project,
     Report,
     SimulationResult,
     Trade,
     User,
 )
+from src.expenses.categories import CATEGORY_TAXONOMY, category_label
+from src.expenses.sync import normalise_transaction
 from src.scheduler.jobs import get_latest_snapshot
 from src.tools.broker_accounts import (
     BROKER_FIELDS,
@@ -67,6 +76,12 @@ from src.web.auth import (
 logger = get_logger(__name__)
 
 router = APIRouter()
+
+# The local deployment runs a single app process. This in-process fan-out keeps
+# the dashboard responsive when a sync adapter imports new rows. A future
+# multi-worker deployment can replace this registry with Redis/Postgres NOTIFY
+# without changing the browser contract.
+_expense_streams: dict[str, set[asyncio.Queue[dict]]] = {}
 
 STATIC_DIR = Path(__file__).parent / "static"
 templates = Jinja2Templates(directory=str(STATIC_DIR))
@@ -1527,6 +1542,338 @@ async def logout() -> JSONResponse:
     return response
 
 
+def _expense_date(value: str, label: str) -> datetime:
+    """Parse a dashboard date filter as a UTC midnight."""
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"{label} must be YYYY-MM-DD") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def _expense_window(
+    period: str, from_date: str | None, to_date: str | None
+) -> tuple[datetime, datetime]:
+    now = datetime.now(UTC)
+    if from_date or to_date:
+        start = _expense_date(from_date, "from_date") if from_date else now - timedelta(days=30)
+        end = (
+            _expense_date(to_date, "to_date") + timedelta(days=1)
+            if to_date
+            else now + timedelta(days=1)
+        )
+        if start >= end:
+            raise HTTPException(status_code=400, detail="from_date must be before to_date")
+        return start, end
+
+    period_days = {"7d": 7, "30d": 30, "90d": 90, "year": 365}
+    if period == "month":
+        return now.replace(day=1, hour=0, minute=0, second=0, microsecond=0), now + timedelta(
+            days=1
+        )
+    if period not in period_days:
+        raise HTTPException(status_code=400, detail="period must be month, 7d, 30d, 90d, or year")
+    return now - timedelta(days=period_days[period]), now + timedelta(days=1)
+
+
+def _expense_payload(row: ExpenseTransaction) -> dict:
+    return {
+        "id": row.id,
+        "provider": row.provider,
+        "external_id": row.external_id,
+        "account_name": row.account_name,
+        "merchant": row.merchant,
+        "description": row.description,
+        "amount": round(float(row.amount), 2),
+        "currency": row.currency,
+        "transaction_type": row.transaction_type,
+        "category": row.category,
+        "category_label": category_label(row.category),
+        "subcategory": row.subcategory,
+        "occurred_at": row.occurred_at.isoformat(),
+        "pending": bool(row.pending),
+    }
+
+
+def _expense_provider_payload() -> dict:
+    return {
+        "providers": {
+            "gocardless": {
+                "name": "GoCardless Bank Account Data",
+                "configured": False,
+                "coverage": "EEA / PSD2 banks",
+                "history": "Up to 24 months where the bank supports it",
+                "access": "Bank-controlled access, commonly up to 90 days before consent renewal",
+                "mode": "Consent link + transaction sync",
+                "message": (
+                    "The expense data contract and live-update channel are ready. "
+                    "Add a provider consent flow before storing bank credentials."
+                ),
+            }
+        }
+    }
+
+
+async def _publish_expense_event(user_id: str, event: dict) -> None:
+    for queue in list(_expense_streams.get(user_id, set())):
+        try:
+            queue.put_nowait(event)
+        except asyncio.QueueFull:
+            # The next normal dashboard refresh will recover a slow client.
+            continue
+
+
+@router.get(
+    "/api/expenses/categories",
+    dependencies=[Depends(require_allowed_ip), Depends(require_authenticated)],
+)
+async def expense_categories() -> dict:
+    """Return the stable category taxonomy used by the expense dashboard."""
+    return {
+        "categories": [
+            {
+                "key": key,
+                "label": str(definition["label"]),
+                "icon": str(definition["icon"]),
+                "subcategories": [str(item) for item in definition["subcategories"]],
+            }
+            for key, definition in CATEGORY_TAXONOMY.items()
+        ]
+    }
+
+
+@router.get(
+    "/api/expenses/providers",
+    dependencies=[Depends(require_allowed_ip), Depends(require_authenticated)],
+)
+async def expense_providers() -> dict:
+    """Describe supported bank-feed options without exposing any secrets."""
+    return _expense_provider_payload()
+
+
+@router.get(
+    "/api/expenses",
+    dependencies=[Depends(require_allowed_ip), Depends(require_authenticated)],
+)
+async def list_expenses(
+    request: Request,
+    period: str = "month",
+    from_date: str | None = None,
+    to_date: str | None = None,
+    category: str | None = None,
+    limit: int = 200,
+) -> dict:
+    """Return user-scoped expenses, category totals, and sync metadata."""
+    principal = require_authenticated(request)
+    if not principal.user_id:
+        raise HTTPException(status_code=503, detail="Expense persistence is unavailable")
+    start, end = _expense_window(period, from_date, to_date)
+    limit = min(max(1, limit), 500)
+    try:
+        async with async_session() as session:
+            result = await session.execute(
+                select(ExpenseTransaction)
+                .where(
+                    ExpenseTransaction.user_id == principal.user_id,
+                    ExpenseTransaction.occurred_at >= start,
+                    ExpenseTransaction.occurred_at < end,
+                    *(
+                        [ExpenseTransaction.category == category.strip().lower()]
+                        if category and category.strip()
+                        else []
+                    ),
+                )
+                .order_by(ExpenseTransaction.occurred_at.desc())
+            )
+            rows = result.scalars().all()
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error("Could not load expenses: %s", exc)
+        raise HTTPException(status_code=503, detail="Expense service unavailable") from exc
+
+    expenses = [row for row in rows if row.transaction_type == "expense"]
+    income = [row for row in rows if row.transaction_type == "income"]
+    transfers = [row for row in rows if row.transaction_type == "transfer"]
+    total_expenses = round(sum(float(row.amount) for row in expenses), 2)
+    total_income = round(sum(float(row.amount) for row in income), 2)
+    category_buckets: dict[str, dict[str, float | int]] = {}
+    day_buckets: dict[str, float] = {}
+    for row in expenses:
+        bucket = category_buckets.setdefault(row.category, {"amount": 0.0, "transaction_count": 0})
+        bucket["amount"] = round(float(bucket["amount"]) + float(row.amount), 2)
+        bucket["transaction_count"] = int(bucket["transaction_count"]) + 1
+        day_key = row.occurred_at.date().isoformat()
+        day_buckets[day_key] = round(day_buckets.get(day_key, 0.0) + float(row.amount), 2)
+    category_totals = [
+        {
+            "category": key,
+            "label": category_label(key),
+            "amount": values["amount"],
+            "transaction_count": values["transaction_count"],
+            "percentage": round((float(values["amount"]) / total_expenses) * 100, 1)
+            if total_expenses
+            else 0.0,
+        }
+        for key, values in sorted(
+            category_buckets.items(), key=lambda item: float(item[1]["amount"]), reverse=True
+        )
+    ]
+    last_synced = max((row.synced_at for row in rows if row.synced_at), default=None)
+    currencies = [row.currency for row in rows if row.currency]
+    currency = max(set(currencies), key=currencies.count) if currencies else "EUR"
+    provider_payload = _expense_provider_payload()
+    provider_names = [row.provider for row in rows if row.provider]
+    sync_status = "imported" if rows else "not_configured"
+    return {
+        "period": period,
+        "period_start": start.date().isoformat(),
+        "period_end": (end - timedelta(days=1)).date().isoformat(),
+        "currency": currency,
+        "total_expenses": total_expenses,
+        "total_income": total_income,
+        "net_cashflow": round(total_income - total_expenses, 2),
+        "transaction_count": len(expenses),
+        "income_count": len(income),
+        "transfer_count": len(transfers),
+        "category_totals": category_totals,
+        "daily_totals": [
+            {"date": key, "amount": value} for key, value in sorted(day_buckets.items())
+        ],
+        "transactions": [_expense_payload(row) for row in rows[:limit]],
+        "sync": {
+            "status": sync_status,
+            "provider": provider_names[0] if provider_names else None,
+            "last_synced_at": last_synced.isoformat() if last_synced else None,
+            "stream": "sse",
+            "poll_interval_seconds": 30,
+            "provider_options": provider_payload["providers"],
+            "message": (
+                "Transactions will update in this view as a connected provider imports them."
+                if rows
+                else "Connect a bank-data provider to start receiving transactions."
+            ),
+        },
+    }
+
+
+@router.get(
+    "/api/expenses/stream",
+    dependencies=[Depends(require_allowed_ip), Depends(require_authenticated)],
+)
+async def expense_stream(request: Request) -> StreamingResponse:
+    """Stream expense-import events to the current user's open dashboard."""
+    principal = require_authenticated(request)
+    if not principal.user_id:
+        raise HTTPException(status_code=503, detail="Expense streaming is unavailable")
+    user_id = principal.user_id
+    queue: asyncio.Queue[dict] = asyncio.Queue(maxsize=10)
+    _expense_streams.setdefault(user_id, set()).add(queue)
+
+    async def event_generator():
+        try:
+            yield 'event: ready\ndata: {"stream":"expenses"}\n\n'
+            while True:
+                try:
+                    event = await asyncio.wait_for(queue.get(), timeout=25)
+                except TimeoutError:
+                    yield ": keep-alive\n\n"
+                    continue
+                yield f"event: expenses_updated\ndata: {json.dumps(event)}\n\n"
+        finally:
+            subscribers = _expense_streams.get(user_id)
+            if subscribers is not None:
+                subscribers.discard(queue)
+                if not subscribers:
+                    _expense_streams.pop(user_id, None)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@router.post(
+    "/api/expenses/import",
+    dependencies=[
+        Depends(require_allowed_ip),
+        Depends(require_authenticated),
+        Depends(require_csrf),
+    ],
+)
+async def import_expenses(request: Request) -> dict:
+    """Import provider-normalised transactions idempotently for one user.
+
+    This is the adapter boundary used by a future GoCardless/Enable Banking
+    sync job. It also makes local fixture imports possible without pretending
+    that a bank API is already connected.
+    """
+    principal = require_authenticated(request)
+    if not principal.user_id:
+        raise HTTPException(status_code=503, detail="Expense persistence is unavailable")
+    try:
+        body = await request.json()
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="Invalid JSON body") from exc
+    if not isinstance(body, dict):
+        raise HTTPException(status_code=400, detail="Invalid JSON body")
+    provider = str(body.get("provider") or "bank_feed").strip().lower()
+    if not re.fullmatch(r"[a-z0-9_-]{2,32}", provider):
+        raise HTTPException(
+            status_code=400, detail="provider must be 2-32 letters, numbers, _ or -"
+        )
+    transactions = body.get("transactions")
+    if not isinstance(transactions, list) or not transactions or len(transactions) > 500:
+        raise HTTPException(status_code=400, detail="transactions must contain 1-500 items")
+    account_name = str(body.get("account_name") or "Bank account").strip()[:128]
+    try:
+        normalised = [normalise_transaction(item, provider, account_name) for item in transactions]
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    synced_at = datetime.now(UTC)
+    imported = 0
+    updated = 0
+    try:
+        async with async_session() as session:
+            for item in normalised:
+                result = await session.execute(
+                    select(ExpenseTransaction).where(
+                        ExpenseTransaction.user_id == principal.user_id,
+                        ExpenseTransaction.provider == item["provider"],
+                        ExpenseTransaction.external_id == item["external_id"],
+                    )
+                )
+                row = result.scalar_one_or_none()
+                if row is None:
+                    row = ExpenseTransaction(
+                        id=str(uuid.uuid4()), user_id=principal.user_id, **item
+                    )
+                    session.add(row)
+                    imported += 1
+                else:
+                    for key, value in item.items():
+                        setattr(row, key, value)
+                    updated += 1
+                row.synced_at = synced_at
+            await session.commit()
+    except Exception as exc:
+        logger.error("Could not import expenses: %s", exc)
+        raise HTTPException(status_code=503, detail="Expense import failed") from exc
+
+    event = {
+        "synced_at": synced_at.isoformat(),
+        "provider": provider,
+        "imported": imported,
+        "updated": updated,
+    }
+    await _publish_expense_event(principal.user_id, event)
+    return {"success": True, **event}
+
+
 @router.get(
     "/api/market/snapshot",
     dependencies=[Depends(require_allowed_ip), Depends(require_authenticated)],
@@ -1692,11 +2039,7 @@ def _validate_simulation_body(body: object) -> dict:
         initial_capital = float(body.get("initial_capital", 10_000))
     except (TypeError, ValueError) as exc:
         raise HTTPException(status_code=400, detail="initial_capital must be numeric") from exc
-    if (
-        not math.isfinite(initial_capital)
-        or initial_capital <= 0
-        or initial_capital > 100_000_000
-    ):
+    if not math.isfinite(initial_capital) or initial_capital <= 0 or initial_capital > 100_000_000:
         raise HTTPException(
             status_code=400,
             detail="initial_capital must be between 0 and 100,000,000",
@@ -1799,17 +2142,12 @@ async def list_reports(request: Request) -> list[dict]:
     """List all generated reports."""
     principal = require_authenticated(request)
     report_filter = (
-        Report.user_id == principal.user_id
-        if principal.user_id
-        else Report.user_id.is_(None)
+        Report.user_id == principal.user_id if principal.user_id else Report.user_id.is_(None)
     )
     try:
         async with async_session() as session:
             result = await session.execute(
-                select(Report)
-                .where(report_filter)
-                .order_by(Report.created_at.desc())
-                .limit(20)
+                select(Report).where(report_filter).order_by(Report.created_at.desc()).limit(20)
             )
             reports = result.scalars().all()
             return [
@@ -1839,9 +2177,7 @@ async def download_report_pdf(report_id: str, request: Request) -> FileResponse:
     """Download a report as PDF."""
     principal = require_authenticated(request)
     report_filter = (
-        Report.user_id == principal.user_id
-        if principal.user_id
-        else Report.user_id.is_(None)
+        Report.user_id == principal.user_id if principal.user_id else Report.user_id.is_(None)
     )
     try:
         async with async_session() as session:
@@ -1879,9 +2215,7 @@ async def list_trades(request: Request, limit: int = 50) -> list[dict]:
     principal = require_authenticated(request)
     limit = min(max(1, limit), 100)
     user_filter = (
-        Trade.user_id == principal.user_id
-        if principal.user_id
-        else Trade.user_id.is_(None)
+        Trade.user_id == principal.user_id if principal.user_id else Trade.user_id.is_(None)
     )
     try:
         async with async_session() as session:

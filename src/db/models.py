@@ -277,3 +277,44 @@ class SimulationResult(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_now, server_default=func.now()
     )
+
+
+class ExpenseTransaction(Base):
+    """A user-owned bank transaction normalised for expense analytics."""
+
+    __tablename__ = "expense_transactions"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "provider",
+            "external_id",
+            name="uq_expense_transactions_user_provider_external",
+        ),
+        Index("ix_expense_transactions_user_occurred", "user_id", "occurred_at"),
+        Index("ix_expense_transactions_user_category", "user_id", "category", "occurred_at"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), index=True)
+    provider: Mapped[str] = mapped_column(String(32))
+    external_id: Mapped[str] = mapped_column(String(256))
+    account_name: Mapped[str] = mapped_column(String(128), default="Bank account")
+    merchant: Mapped[str] = mapped_column(String(256))
+    description: Mapped[str] = mapped_column(Text, default="")
+    amount: Mapped[float] = mapped_column(Float)
+    currency: Mapped[str] = mapped_column(String(3), default="EUR")
+    transaction_type: Mapped[str] = mapped_column(String(16), default="expense")
+    category: Mapped[str] = mapped_column(String(64), default="other", index=True)
+    subcategory: Mapped[str] = mapped_column(String(96), default="uncategorised")
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    pending: Mapped[bool] = mapped_column(Boolean, default=False)
+    raw_data: Mapped[dict] = mapped_column(JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now, server_default=func.now()
+    )
+    synced_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now, server_default=func.now()
+    )

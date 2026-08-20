@@ -35,6 +35,7 @@ html,
 .market-snapshot,
 .messages,
 .portfolio-view,
+.expenses-view,
 .simulation-view,
 .holdings-table-wrap,
 .simulation-equity-curve {
@@ -48,6 +49,7 @@ html::-webkit-scrollbar,
 .market-snapshot::-webkit-scrollbar,
 .messages::-webkit-scrollbar,
 .portfolio-view::-webkit-scrollbar,
+.expenses-view::-webkit-scrollbar,
 .simulation-view::-webkit-scrollbar,
 .holdings-table-wrap::-webkit-scrollbar,
 .simulation-equity-curve::-webkit-scrollbar {
@@ -60,6 +62,7 @@ html::-webkit-scrollbar-track,
 .market-snapshot::-webkit-scrollbar-track,
 .messages::-webkit-scrollbar-track,
 .portfolio-view::-webkit-scrollbar-track,
+.expenses-view::-webkit-scrollbar-track,
 .simulation-view::-webkit-scrollbar-track,
 .holdings-table-wrap::-webkit-scrollbar-track,
 .simulation-equity-curve::-webkit-scrollbar-track {
@@ -72,6 +75,7 @@ html::-webkit-scrollbar-thumb,
 .market-snapshot::-webkit-scrollbar-thumb,
 .messages::-webkit-scrollbar-thumb,
 .portfolio-view::-webkit-scrollbar-thumb,
+.expenses-view::-webkit-scrollbar-thumb,
 .simulation-view::-webkit-scrollbar-thumb,
 .holdings-table-wrap::-webkit-scrollbar-thumb,
 .simulation-equity-curve::-webkit-scrollbar-thumb {
@@ -86,6 +90,7 @@ html::-webkit-scrollbar-thumb:hover,
 .market-snapshot::-webkit-scrollbar-thumb:hover,
 .messages::-webkit-scrollbar-thumb:hover,
 .portfolio-view::-webkit-scrollbar-thumb:hover,
+.expenses-view::-webkit-scrollbar-thumb:hover,
 .simulation-view::-webkit-scrollbar-thumb:hover,
 .holdings-table-wrap::-webkit-scrollbar-thumb:hover,
 .simulation-equity-curve::-webkit-scrollbar-thumb:hover {
@@ -607,6 +612,34 @@ header {
 .empty-icon { color: var(--accent-lit); font-size: 2.2rem; margin-bottom: 8px; }
 .portfolio-empty h2 { font-size: 1.05rem; margin-bottom: 8px; }
 .portfolio-empty p { color: var(--text-muted); font-size: 0.78rem; max-width: 440px; margin: 0 auto 16px; line-height: 1.5; }
+
+/* ── Expense dashboard ─────────────────────────────────────────────────────── */
+.expenses-view { background: radial-gradient(circle at 78% -15%, rgba(34, 197, 94, 0.1), transparent 32%), var(--bg-deep); }
+.expenses-controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.expenses-controls h2 { font-size: 0.98rem; margin-top: 4px; }
+.expenses-filter-row { display: flex; align-items: end; gap: 9px; }
+.expenses-filter-row .filter-control { display: flex; flex-direction: column; gap: 5px; width: 150px; color: var(--text-muted); font-size: 0.68rem; }
+.expenses-filter-row .filter-control select { width: 100%; }
+.expenses-help-btn { height: 34px; white-space: nowrap; }
+.expenses-top-grid { grid-template-columns: minmax(0, 1.35fr) minmax(270px, 0.65fr); }
+.expense-category-bars { display: flex; flex-direction: column; gap: 13px; }
+.expense-category-row { min-width: 0; }
+.expense-category-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.76rem; }
+.expense-category-head strong { font-variant-numeric: tabular-nums; }
+.expense-category-track { height: 8px; margin-top: 6px; border-radius: 999px; background: rgba(148, 163, 184, 0.12); overflow: hidden; }
+.expense-category-track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--green), #67e8f9); }
+.expense-category-meta { color: var(--text-muted); font-size: 0.64rem; margin-top: 4px; }
+.sync-card { min-height: 100%; }
+.sync-detail-list { display: flex; flex-direction: column; gap: 9px; margin-top: 17px; }
+.sync-detail-list div { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 9px; border-radius: 7px; background: rgba(10, 14, 26, 0.32); font-size: 0.68rem; }
+.sync-detail-list span { color: var(--text-muted); }
+.sync-detail-list strong { font-size: 0.67rem; text-align: right; }
+.expenses-transactions-card { margin-top: 16px; }
+.expenses-table { min-width: 730px; }
+.expenses-table td:nth-child(2) { text-align: left; }
+.expenses-table td:nth-child(3), .expenses-table td:nth-child(4) { color: var(--text-muted); font-size: 0.7rem; }
+.expense-category-pill { display: block; color: var(--text-main); }
+.expenses-alerts a, .portfolio-alert a { color: var(--accent-lit); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 /* ── Responsive ──────────────────────────────────────────────────────────────── */
@@ -618,6 +651,10 @@ header {
   .portfolio-toolbar-actions { width: 100%; justify-content: space-between; }
   .portfolio-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .portfolio-grid, .lower-grid { grid-template-columns: minmax(0, 1fr); }
+  .expenses-controls { align-items: stretch; flex-direction: column; }
+  .expenses-filter-row { align-items: stretch; flex-wrap: wrap; }
+  .expenses-filter-row .filter-control { flex: 1 1 145px; }
+  .expenses-help-btn { flex: 1 1 100%; }
   .view-tabs { margin-left: auto; }
   .simulation-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .simulation-form-actions { align-items: stretch; flex-direction: column; }
@@ -633,5 +670,7 @@ header {
   .kpi-value { font-size: 1.15rem; }
   .holdings-controls { flex-direction: column; }
   .filter-control { width: 100%; }
+  .expenses-filter-row { flex-direction: column; }
+  .expenses-filter-row .filter-control { width: 100%; }
   .simulation-form-grid { grid-template-columns: minmax(0, 1fr); }
 }
