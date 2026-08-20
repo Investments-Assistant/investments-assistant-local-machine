@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Investment Assistant</title>
+  <link rel="stylesheet" href="/static/style.css?v=final-answer-20260813h" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <span class="logo">📈 InvestAI</span>
+    </div>
+
+    <div class="conversation-workspace sidebar-section">
+      <button class="new-chat-btn" onclick="startNewConversation()">＋ New chat</button>
+      <div class="conversation-section-heading">
+        <div class="section-title">Projects</div>
+        <button class="add-project-btn" onclick="createProject()" aria-label="Create project">＋</button>
+      </div>
+      <label class="conversation-search-wrap">
+        <span class="sr-only">Search chats</span>
+        <span class="conversation-search-icon">⌕</span>
+        <input id="conversation-search" class="conversation-search" type="search" placeholder="Search chats" oninput="scheduleConversationSearch()" />
+      </label>
+      <div id="conversation-history-error" class="conversation-history-error" aria-live="polite"></div>
+      <div id="conversation-projects" class="conversation-list"></div>
+      <div id="conversation-unassigned" class="conversation-list"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-title">Trading Mode</div>
+      <div class="mode-toggle">
+        <button id="btn-recommend" class="mode-btn active" onclick="setMode('recommend')">Recommend</button>
+        <button id="btn-auto" class="mode-btn" onclick="setMode('auto')">Auto</button>
+      </div>
+      <div id="mode-status" class="mode-status">Recommend mode — agent proposes, you confirm.</div>
+      <button class="kill-switch" onclick="activateKillSwitch()">Halt auto-trading today</button>
+    </div>
+
+    <div class="sidebar-section profile-section">
+      <div class="section-title">Your Assistant Profile</div>
+      <input id="profile-display-name" class="profile-input" placeholder="Display name" maxlength="128" />
+      <textarea id="profile-description" class="profile-input" rows="3" maxlength="4000" placeholder="Describe your goals, experience, and constraints…"></textarea>
+      <textarea id="profile-preferences" class="profile-input profile-json" rows="5" placeholder='{"risk_tolerance":"moderate","base_currency":"EUR"}'></textarea>
+      <button class="profile-save" onclick="saveProfile()">Save profile</button>
+      <div id="profile-status" class="profile-status"></div>
+    </div>
+
+    <div id="broker-section" class="sidebar-section broker-section">
+      <div class="section-title">Brokerage Accounts</div>
+      <div class="broker-help">Credentials are encrypted locally and never shown to the assistant.</div>
+      <div id="broker-accounts-list" class="broker-accounts-list">Loading…</div>
+      <select id="broker-provider" class="profile-input" onchange="renderBrokerFields()">
+        <option value="alpaca">Alpaca</option>
+        <option value="ibkr">Interactive Brokers</option>
+        <option value="coinbase">Coinbase</option>
+        <option value="binance">Binance</option>
+      </select>
+      <input id="broker-display-name" class="profile-input" placeholder="Account name (e.g. Long-term)" maxlength="128" />
+      <div id="broker-fields" class="broker-fields"></div>
+      <div class="broker-actions">
+        <button class="profile-save" onclick="saveBrokerAccount()">Save account</button>
+        <button id="broker-cancel" class="broker-cancel" onclick="resetBrokerForm()" hidden>Cancel edit</button>
+      </div>
+      <div id="broker-status" class="profile-status"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-title">Market Snapshot</div>
+      <div id="market-snapshot" class="market-snapshot">Loading…</div>
+      <button class="refresh-btn" onclick="loadSnapshot()">↻ Refresh</button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-title">Quick Prompts</div>
+      <div class="quick-prompts">
+        <button onclick="sendQuick('Give me a full market overview right now.')">Market Overview</button>
+        <button onclick="sendQuick('Analyse my portfolio and suggest any rebalancing.')">Portfolio Analysis</button>
+        <button onclick="sendQuick('Review BTC, ETH, and SOL with current market data, recent news, and explicit risk limits. Do not trade.')">Crypto Risk Review</button>
+        <button onclick="sendQuick('Run a buy-and-hold simulation on AAPL, MSFT, NVDA from 2022-01-01.')">Backtest</button>
+        <button onclick="sendQuick('Generate my weekly investment report for the past 7 days.')">Weekly Report</button>
+        <button onclick="sendQuick('Search for news about Federal Reserve and analyse sentiment.')">Fed News</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-title">Recent Reports</div>
+      <div id="reports-list" class="reports-list">Loading…</div>
+    </div>
+  </aside>
+  <div
+    id="sidebar-resizer"
+    class="panel-resizer sidebar-resizer"
+    role="separator"
+    aria-label="Resize left panel"
+    aria-orientation="vertical"
+    aria-valuemin="220"
+    aria-valuemax="480"
+    aria-valuenow="280"
+    tabindex="0"
+  ></div>
+
+  <!-- Main Chat Area -->
+  <main id="main">
+    <header>
+      <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="header-title-wrap">
+        <span class="header-title">Investment Assistant</span>
+        <div class="conversation-header-meta">
+          <span id="conversation-title">New chat</span>
+          <span id="conversation-subtitle">Personal workspace</span>
+        </div>
+      </div>
+      <div class="conversation-header-actions">
+        <select id="conversation-project" onchange="moveActiveConversation(this.value)" aria-label="Conversation project">
+          <option value="">No project</option>
+        </select>
+        <button class="rename-conversation-btn" onclick="renameActiveConversation()" aria-label="Rename conversation" title="Rename conversation">✎</button>
+      </div>
+      <nav class="view-tabs" aria-label="Primary views">
+        <button class="view-tab active" data-view="chat" onclick="switchView('chat')">Assistant</button>
+        <button class="view-tab" data-view="portfolio" onclick="switchView('portfolio')">Portfolio</button>
+        <button class="view-tab" data-view="simulation" onclick="switchView('simulation')">Simulation</button>
+      </nav>
+      <span id="connection-status" class="conn-status offline">Connecting…</span>
+    </header>
+
+    <section id="chat-view" class="main-view" aria-label="Assistant chat">
+      <div id="messages" class="messages"></div>
+
+      <div class="input-area">
+        <textarea
+          id="user-input"
+          placeholder="Ask about markets, request analysis, run simulations…"
+          rows="3"
+          onkeydown="handleKey(event)"
+        ></textarea>
+        <span id="queue-status" class="queue-status" aria-live="polite"></span>
+        <button id="send-btn" onclick="sendMessage()">Send ↵</button>
+      </div>
+
+      <div class="disclaimer">
+        ⚠️ For informational purposes only. Not financial advice. Always consult a qualified advisor.
+      </div>
+    </section>
+
+    <section id="portfolio-view" class="main-view portfolio-view" aria-label="Portfolio dashboard" hidden>
+      <div class="portfolio-toolbar">
+        <div>
+          <div class="eyebrow">LIVE PORTFOLIO</div>
+          <h1>Portfolio command center</h1>
+          <p id="portfolio-updated" class="portfolio-subtitle">Connect a brokerage account to see live holdings.</p>
+        </div>
+        <div class="portfolio-toolbar-actions">
+          <span id="portfolio-status" class="portfolio-status neutral" aria-live="polite">Not loaded</span>
+          <button id="portfolio-refresh" class="dashboard-btn" onclick="loadPortfolio(true)">↻ Refresh</button>
+        </div>
+      </div>
+
+      <div id="portfolio-alerts" class="portfolio-alerts" aria-live="polite"></div>
+
+      <div class="portfolio-kpis" aria-label="Portfolio summary">
+        <article class="kpi-card kpi-primary">
+          <span class="kpi-label">Total equity</span>
+          <strong id="portfolio-equity" class="kpi-value">—</strong>
+          <span id="portfolio-equity-note" class="kpi-note">Awaiting broker data</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-label">Market value</span>
+          <strong id="portfolio-market-value" class="kpi-value">—</strong>
+          <span class="kpi-note">Live positions only</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-label">Unrealized P&amp;L</span>
+          <strong id="portfolio-pnl" class="kpi-value">—</strong>
+          <span id="portfolio-pnl-note" class="kpi-note">Broker-reported</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-label">Cash</span>
+          <strong id="portfolio-cash" class="kpi-value">—</strong>
+          <span class="kpi-note">USD cash reported</span>
+        </article>
+      </div>
+
+      <div id="portfolio-empty" class="portfolio-empty" hidden>
+        <div class="empty-icon">◎</div>
+        <h2 id="portfolio-empty-title">Connect a brokerage account</h2>
+        <p id="portfolio-empty-copy">Your live portfolio will appear here after an active broker account is configured.</p>
+        <button class="dashboard-btn primary" onclick="focusBrokerAccounts()">Manage brokerage accounts</button>
+      </div>
+
+      <div id="portfolio-content" class="portfolio-content">
+        <div class="portfolio-grid">
+          <section class="dashboard-card holdings-card">
+            <div class="dashboard-card-header">
+              <div>
+                <div class="eyebrow">POSITIONS</div>
+                <h2>Holdings</h2>
+              </div>
+              <span id="portfolio-position-count" class="count-badge">0</span>
+            </div>
+            <div class="holdings-controls">
+              <label class="search-control">
+                <span class="sr-only">Search holdings</span>
+                <input id="portfolio-search" type="search" placeholder="Search symbol or broker…" oninput="renderPortfolioHoldings()" />
+              </label>
+              <label class="filter-control">
+                <span class="sr-only">Filter holdings by broker</span>
+                <select id="portfolio-broker-filter" onchange="renderPortfolioHoldings()">
+                  <option value="all">All brokers</option>
+                </select>
+              </label>
+            </div>
+            <div class="holdings-table-wrap">
+              <table class="holdings-table">
+                <thead>
+                  <tr>
+                    <th><button class="sort-btn" data-sort="symbol" onclick="sortPortfolioBy('symbol')">Asset <span>↕</span></button></th>
+                    <th><button class="sort-btn" data-sort="quantity" onclick="sortPortfolioBy('quantity')">Quantity <span>↕</span></button></th>
+                    <th><button class="sort-btn" data-sort="price_usd" onclick="sortPortfolioBy('price_usd')">Price <span>↕</span></button></th>
+                    <th><button class="sort-btn" data-sort="value_usd" onclick="sortPortfolioBy('value_usd')">Value <span>↕</span></button></th>
+                    <th><button class="sort-btn" data-sort="pnl_usd" onclick="sortPortfolioBy('pnl_usd')">P&amp;L <span>↕</span></button></th>
+                  </tr>
+                </thead>
+                <tbody id="portfolio-holdings-body"></tbody>
+              </table>
+              <div id="portfolio-holdings-empty" class="table-empty">No holdings match this view.</div>
+            </div>
+          </section>
+
+          <aside class="dashboard-card allocation-card">
+            <div class="dashboard-card-header">
+              <div>
+                <div class="eyebrow">EXPOSURE</div>
+                <h2>Allocation</h2>
+              </div>
+              <span class="muted-label">By asset</span>
+            </div>
+            <div class="allocation-visual">
+              <div id="portfolio-donut" class="allocation-donut"><span id="portfolio-donut-label">—</span></div>
+              <div id="portfolio-allocation-legend" class="allocation-legend"></div>
+            </div>
+            <p id="portfolio-allocation-note" class="card-note">Allocation is based on broker-provided USD values.</p>
+          </aside>
+        </div>
+
+        <div class="portfolio-grid lower-grid">
+          <section class="dashboard-card accounts-card">
+            <div class="dashboard-card-header">
+              <div>
+                <div class="eyebrow">CONNECTIONS</div>
+                <h2>Broker accounts</h2>
+              </div>
+              <button class="text-btn" onclick="focusBrokerAccounts()">Manage</button>
+            </div>
+            <div id="portfolio-accounts-list" class="portfolio-accounts-list"></div>
+          </section>
+          <section id="portfolio-detail" class="dashboard-card detail-card">
+            <div class="dashboard-card-header">
+              <div>
+                <div class="eyebrow">SELECTED POSITION</div>
+                <h2 id="portfolio-detail-title">Select a holding</h2>
+              </div>
+              <span id="portfolio-detail-broker" class="muted-label">—</span>
+            </div>
+            <div id="portfolio-detail-body" class="detail-body">Choose a row above to inspect its broker-reported details.</div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section id="simulation-view" class="main-view simulation-view" aria-label="Paper simulation dashboard" hidden>
+      <div class="portfolio-toolbar">
+        <div>
+          <div class="eyebrow">FAKE-MONEY LAB</div>
+          <h1>Investment simulation</h1>
+          <p class="portfolio-subtitle">Backtest a portfolio with historical prices. No broker orders are created.</p>
+        </div>
+        <span id="simulation-status" class="portfolio-status neutral" aria-live="polite">Ready</span>
+      </div>
+
+      <form id="simulation-form" class="dashboard-card simulation-form" onsubmit="submitSimulation(event)">
+            <div class="simulation-form-grid">
+              <label>Symbols
+                <input id="simulation-symbols" required placeholder="AAPL, MSFT, SPY" autocomplete="off" />
+              </label>
+              <label>Fake starting capital
+                <input id="simulation-capital" type="number" min="1" step="0.01" value="10000" required />
+              </label>
+              <label>Strategy
+                <select id="simulation-strategy" onchange="updateSimulationFields()">
+                  <option value="buy_and_hold">Buy and hold</option>
+                  <option value="sma_crossover">SMA crossover</option>
+                  <option value="rsi_mean_reversion">RSI mean reversion</option>
+                  <option value="momentum">Momentum rotation</option>
+                </select>
+              </label>
+              <label>Start date
+                <input id="simulation-start" type="date" required />
+              </label>
+              <label>End date <span class="muted-label">optional</span>
+                <input id="simulation-end" type="date" />
+              </label>
+              <label id="simulation-fast-wrap" hidden>Fast SMA
+                <input id="simulation-fast" type="number" min="2" value="20" />
+              </label>
+              <label id="simulation-slow-wrap" hidden>Slow SMA
+                <input id="simulation-slow" type="number" min="3" value="50" />
+              </label>
+              <label id="simulation-lookback-wrap" hidden>Momentum lookback days
+                <input id="simulation-lookback" type="number" min="2" value="60" />
+              </label>
+              <label id="simulation-topn-wrap" hidden>Momentum top N
+                <input id="simulation-topn" type="number" min="1" value="3" />
+              </label>
+            </div>
+            <div class="simulation-form-actions">
+              <span class="card-note">Historical data may require internet access. Results are not forecasts.</span>
+              <button class="dashboard-btn primary" id="simulation-run-btn" type="submit">Run simulation</button>
+            </div>
+      </form>
+
+      <div id="simulation-result" class="simulation-result" hidden>
+            <div class="portfolio-kpis simulation-kpis">
+              <article class="kpi-card"><span class="kpi-label">Ending value</span><strong id="sim-final-value" class="kpi-value">—</strong></article>
+              <article class="kpi-card"><span class="kpi-label">Total return</span><strong id="sim-return" class="kpi-value">—</strong></article>
+              <article class="kpi-card"><span class="kpi-label">Maximum drawdown</span><strong id="sim-drawdown" class="kpi-value">—</strong></article>
+              <article class="kpi-card"><span class="kpi-label">Trades</span><strong id="sim-trades" class="kpi-value">—</strong></article>
+            </div>
+            <section class="dashboard-card">
+              <div class="dashboard-card-header"><div><div class="eyebrow">EQUITY CURVE</div><h2 id="simulation-result-title">Latest run</h2></div><span id="sim-result-period" class="muted-label"></span></div>
+              <div id="simulation-equity-curve" class="simulation-equity-curve"></div>
+            </section>
+      </div>
+      <section class="dashboard-card simulation-history-card">
+          <div class="dashboard-card-header"><div><div class="eyebrow">SAVED RUNS</div><h2>Simulation history</h2></div><button class="text-btn" onclick="loadSimulations()">↻ Refresh</button></div>
+          <div id="simulation-history" class="simulation-history">Loading…</div>
+      </section>
+    </section>
+  </main>
+
+  <script src="/static/app.js?v=final-answer-20260813h"></script>
+</body>
+</html>

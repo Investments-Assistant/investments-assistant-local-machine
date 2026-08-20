@@ -1,0 +1,121 @@
+repos:
+
+  # GENERIC
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-builtin-literals
+        name: Check Builtin Literals
+        description: Ensures builtin literals are used correctly
+      - id: check-case-conflict
+        name: Check Case Conflict
+        description: Detects files with names differing only in case
+      - id: check-executables-have-shebangs
+        name: Check Executables Have Shebangs
+        description: Ensures executable scripts have a shebang line
+      - id: check-illegal-windows-names
+        name: Check Illegal Windows Names
+        description: Prevents files with names illegal on Windows
+      - id: check-json
+        name: Check JSON
+        description: Checks JSON files for syntax errors
+      - id: check-merge-conflict
+        name: Check Merge Conflict
+        description: Detects merge conflict markers
+        args:
+          - --assume-in-merge
+      - id: check-shebang-scripts-are-executable
+        name: Check Shebang Scripts Are Executable
+        description: Ensures scripts with shebangs are executable
+      - id: check-symlinks
+        name: Check Symlinks
+        description: Ensures symlinks are valid
+      - id: check-toml
+        name: Check TOML
+        description: Checks TOML files for syntax errors
+      - id: check-vcs-permalinks
+        name: Check VCS Permalinks
+        description: Prevents VCS permalinks in code
+      - id: check-yaml
+        args:
+          - --allow-multiple-documents
+        name: Check YAML
+        description: Checks YAML files for syntax errors
+      - id: debug-statements
+        name: Debug Statements
+        description: Prevents debug statements from being committed
+      - id: destroyed-symlinks
+        name: Destroyed Symlinks
+        description: Detects destroyed symlinks
+      - id: detect-private-key
+        name: Detect Private Key
+        description: Prevents committing private keys
+      - id: end-of-file-fixer
+        name: End of File Fixer
+        description: Ensures exactly one newline at EOF
+      - id: fix-byte-order-marker
+        name: Fix Byte Order Marker
+        description: Removes BOM from files
+      - id: mixed-line-ending
+        name: Mixed Line Ending
+        description: Ensures consistent line endings in files
+      - id: name-tests-test
+        name: Name Tests Test
+        description: Ensures test files are named correctly
+      # - id: no-commit-to-branch
+      #   name: No Commit To Branch
+      #   description: Prevents commits to specified branches
+      #   args:
+      #     - --branch=main
+      #     - --branch=master
+      #     - --branch=dev
+      - id: trailing-whitespace
+        name: Trailing Whitespace
+        description: Removes accidental spaces at end of lines
+
+  # PYTHON
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.11
+    hooks:
+      - id: ruff-check
+        args:
+          - --fix
+        name: Python - Ruff Linter
+        description: Lint Python code using Ruff
+      - id: ruff-format
+        name: Python - Ruff Formatter
+        description: Format Python code using Ruff
+
+  # OPENTOFU
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: "v1.105.0"
+    hooks:
+      - id: terraform_fmt
+        name: OpenTofu - Formatter
+        description: "Run 'tofu fmt' to format OpenTofu code."
+        args:
+          - --hook-config=--tf-path=tofu
+      - id: terraform_validate
+        name: OpenTofu - Validator
+        description: "Run 'tofu validate' to validate OpenTofu code."
+        args:
+          - --hook-config=--tf-path=tofu
+      - id: terraform_tflint
+        name: OpenTofu - TFLint
+        description: "Run 'tflint' to lint OpenTofu code."
+        args:
+          - --hook-config=--tf-path=tofu
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
+
+  # DOCKER
+  - repo: https://github.com/hadolint/hadolint.git
+    rev: v2.14.0
+    hooks:
+      - id: hadolint-docker
+        name: Docker - Hadolint
+        entry: hadolint/hadolint:v2.14.0 hadolint
+        args:
+          [
+            "--ignore=DL3006",
+            "--ignore=DL3013"
+          ]

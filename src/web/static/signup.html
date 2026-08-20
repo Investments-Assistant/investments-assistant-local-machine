@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create account · InvestAI</title>
+  <link rel="stylesheet" href="/static/style.css?v=auth-20260804" />
+</head>
+<body class="auth-page">
+  <main class="auth-card" aria-labelledby="signup-title">
+    <div class="auth-brand">📈 InvestAI</div>
+    <h1 id="signup-title">Create your account</h1>
+    <p class="auth-subtitle">Your chats, projects, profile, and broker settings stay private to your account.</p>
+    <form id="signup-form" autocomplete="off">
+      <label for="username">Username</label>
+      <input id="username" name="username" autocomplete="username" required minlength="3" maxlength="128" pattern="[A-Za-z0-9_.@-]+" />
+      <label for="display-name">Display name <span class="auth-optional">(optional)</span></label>
+      <input id="display-name" name="display_name" maxlength="128" autocomplete="name" />
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="256" />
+      <label for="password-confirmation">Confirm password</label>
+      <input id="password-confirmation" name="password_confirmation" type="password" autocomplete="new-password" required minlength="12" maxlength="256" />
+      <button type="submit">Create account</button>
+      <p id="signup-error" class="auth-error" role="alert" hidden></p>
+    </form>
+    <p class="auth-switch">Already have an account? <a href="/login">Sign in</a></p>
+    <p class="auth-note">Access is restricted to your WireGuard VPN.</p>
+  </main>
+  <script>
+    const form = document.getElementById('signup-form');
+    const error = document.getElementById('signup-error');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      error.hidden = true;
+      const body = {
+        username: document.getElementById('username').value,
+        display_name: document.getElementById('display-name').value,
+        password: document.getElementById('password').value,
+        password_confirmation: document.getElementById('password-confirmation').value,
+      };
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          credentials: 'same-origin',
+          body: JSON.stringify(body),
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.detail || 'Account could not be created.');
+        window.location.assign('/');
+      } catch (err) {
+        error.textContent = err.message;
+        error.hidden = false;
+      }
+    });
+  </script>
+</body>
+</html>
