@@ -50,7 +50,7 @@ control-plane complexity has no benefit at this scale.
 ## Service map
 
 ```
-┌── nginx (container, :443) ──────────────────────────────────┐
+┌── nginx (container, host :8443 / container :443) ──────────┐
 │  TLS termination, IP whitelist, rate limiting                │
 │  proxy_pass → app:8000                                       │
 └───────────────────────────────────────────────────────────────┘
@@ -116,7 +116,7 @@ control-plane complexity has no benefit at this scale.
 ## Request flow — WebSocket chat
 
 ```
-1. User opens https://10.8.0.1 in browser
+1. User opens https://investmentsassistant.home.arpa:8443 in a trusted LAN browser
 2. app.js opens WebSocket to /ws/chat/{uuid}
 3. User types a message and presses Enter
 4. Browser sends JSON: {"message": "What's AAPL doing?"}

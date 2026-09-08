@@ -4,12 +4,15 @@ This repository is the local-machine deployment of the same private, local-reaso
 investment assistant architecture as the Raspberry Pi edition. It runs the FastAPI app,
 PostgreSQL, local GGUF inference, encrypted per-user brokerage accounts, and Nginx in Docker.
 
-The only published ports are `127.0.0.1:8080` and `127.0.0.1:8443`; there is no WireGuard,
-Pi-hole, cloud LLM, AI API, or public listener. Access the UI at:
+Only Nginx is published on TCP `8080` and `8443`; PostgreSQL and the app remain private
+inside Docker. The host firewall and Nginx allow-list restrict those ports to the configured
+home LAN (`192.168.1.0/24` by default). Access the UI at:
 
 ```text
 https://127.0.0.1:8443
 ```
+
+LAN devices use `https://investmentsassistant.home.arpa:8443` after configuring local DNS.
 
 The self-signed certificate warning is expected on first use. A local ID/password login is
 still required. PostgreSQL stores each user's chat history, profile, preferences, trading mode,
@@ -81,11 +84,11 @@ simulations, market snapshot, and news before writing and saving the report.
 
 ## Local security boundary
 
-Compose binds Nginx to loopback only. PostgreSQL and the app are not published to the host.
-Nginx and FastAPI both allow only loopback/Docker bridge traffic, while the application still
-requires signed ID/password sessions and CSRF protection. If remote access is needed, use a
-separate private network/VPN design and change the allow-list deliberately; do not expose these
-ports directly to the internet.
+Compose publishes only Nginx. PostgreSQL and the app are not published to the host. Nginx and
+FastAPI allow the configured LAN plus local Docker/WSL paths, while Windows Defender Firewall
+keeps inbound traffic default-deny and permits these ports only from the LAN. The application
+still requires signed ID/password sessions and CSRF protection. Do not create router port
+forwards or enable UPnP for these ports.
 
 ## Persistence and multi-user behavior
 

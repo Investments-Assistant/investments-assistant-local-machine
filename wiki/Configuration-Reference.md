@@ -30,7 +30,7 @@ In `development` mode:
 
 | Variable | Type | Default | Description |
 | --- | --- | --- | --- |
-| `ALLOWED_IPS` | comma-separated CIDRs | `10.8.0.0/24` | IP ranges allowed to access the app |
+| `ALLOWED_IPS` | comma-separated CIDRs | `127.0.0.1/32,192.168.1.0/24,172.16.0.0/12` | IP ranges allowed to access the app |
 | `TRUST_PROXY_HEADERS` | bool | `true` | Trust the configured reverse proxy client-IP headers |
 | `AUTH_USERNAME` | string | `admin` | Bootstrap local login ID; additional users may use `/signup` or `scripts/create_user.py` |
 | `AUTH_PASSWORD_HASH` | string | `""` | scrypt hash from `scripts/create_auth_hash.py` |
@@ -43,11 +43,11 @@ In `development` mode:
 Examples:
 
 ```env
-# VPN only (maximum security):
-ALLOWED_IPS=10.8.0.0/24
+# LAN-only local-machine profile:
+ALLOWED_IPS=127.0.0.1/32,192.168.1.0/24,172.16.0.0/12
 
-# If you intentionally change this, also change the host firewall and Nginx rules.
-# The supported Pi profile is VPN-only.
+# If you change the LAN CIDR, also change LAN_CIDR, the Windows firewall rule,
+# the router DNS record, and the generated Nginx allow-list.
 ```
 
 `settings.allowed_networks` parses this string into a list of `ipaddress.IPv4Network`

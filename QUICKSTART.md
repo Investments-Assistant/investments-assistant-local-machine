@@ -36,8 +36,10 @@ when diagnosing a specific stage. Authentication hashes contain `$` characters; 
 single-quoted `AUTH_PASSWORD_HASH` line printed by `scripts/create_auth_hash.py`
 so Docker Compose does not truncate it.
 
-Open `https://127.0.0.1:8443`. Accept the self-signed certificate warning, then sign in.
-Port `8080` redirects to HTTPS. Both ports are bound to loopback only.
+Open `https://127.0.0.1:8443` locally, or
+`https://investmentsassistant.home.arpa:8443` from a device on the configured LAN.
+Port `8080` redirects to HTTPS. Only Nginx is published; the application and database
+remain private to Docker.
 
 ## 4. Add users and brokerage accounts
 
@@ -64,6 +66,8 @@ make local-status
 make local-logs SERVICE=app
 make local-ready
 ```
+
+For LAN access, follow [LAN access](wiki/LAN-access.md) before opening the hostname.
 
 The readiness endpoint is internal to the app container and is used by Compose. Full integration
 tests require a running PostgreSQL service; focused unit tests can run with:

@@ -141,6 +141,7 @@ models/
 .models/
 reports/
 config/nginx/certs/
+config/nginx/lan-allow.conf
 .venv
 env/
 venv/
