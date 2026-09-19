@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, patch
 
-from cryptography.fernet import Fernet
 import pytest
+from cryptography.fernet import Fernet
 
 from src.tools import dispatcher
 from src.tools.broker_accounts import (
@@ -53,12 +53,14 @@ def test_broker_boolean_fields_are_strict():
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_authenticated_user_without_account_gets_capability_result():
-    with patch.object(dispatcher, "load_user_broker_accounts", new=AsyncMock(return_value=[])):
-        with dispatcher.tool_context("session-1", "user-1", "recommend"):
-            result = await dispatcher._dispatch(
-                "get_account_info",
-                {"broker": "alpaca"},
-            )
+    with (
+        patch.object(dispatcher, 'load_user_broker_accounts', new=AsyncMock(return_value=[])),
+        dispatcher.tool_context('session-1', 'user-1', 'recommend'),
+    ):
+        result = await dispatcher._dispatch(
+            "get_account_info",
+            {"broker": "alpaca"},
+        )
     assert result["available"] is False
     assert "required credentials" in result["error"]
 
@@ -74,11 +76,10 @@ async def test_multiple_accounts_require_explicit_selection():
         dispatcher,
         "load_user_broker_accounts",
         new=AsyncMock(return_value=accounts),
-    ):
-        with dispatcher.tool_context("session-1", "user-1", "recommend"):
-            result = await dispatcher._dispatch(
-                "get_account_info",
-                {"broker": "alpaca"},
-            )
+    ), dispatcher.tool_context("session-1", "user-1", "recommend"):
+        result = await dispatcher._dispatch(
+            "get_account_info",
+            {"broker": "alpaca"},
+        )
     assert result["account_id_required"] is True
     assert {item["id"] for item in result["accounts"]} == {"one", "two"}

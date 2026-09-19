@@ -1,0 +1,208 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "environment": {
+      "const": "simulator",
+      "title": "Environment",
+      "type": "string"
+    },
+    "strategy": {
+      "const": "periodic_fixture_buy",
+      "title": "Strategy",
+      "type": "string"
+    },
+    "strategy_version": {
+      "const": "1",
+      "title": "Strategy Version",
+      "type": "string"
+    },
+    "instrument_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Instrument Ids",
+      "type": "array"
+    },
+    "capital_limit": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,18}|(?=[\\d.]{1,29}0*$)\\d{0,18}\\.\\d{0,10}0*$)",
+          "type": "string"
+        }
+      ],
+      "title": "Capital Limit"
+    },
+    "max_position": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,18}|(?=[\\d.]{1,29}0*$)\\d{0,18}\\.\\d{0,10}0*$)",
+          "type": "string"
+        }
+      ],
+      "title": "Max Position"
+    },
+    "max_order": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,18}|(?=[\\d.]{1,29}0*$)\\d{0,18}\\.\\d{0,10}0*$)",
+          "type": "string"
+        }
+      ],
+      "title": "Max Order"
+    },
+    "daily_loss_limit": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,18}|(?=[\\d.]{1,29}0*$)\\d{0,18}\\.\\d{0,10}0*$)",
+          "type": "string"
+        }
+      ],
+      "title": "Daily Loss Limit"
+    },
+    "drawdown_limit": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,18}|(?=[\\d.]{1,29}0*$)\\d{0,18}\\.\\d{0,10}0*$)",
+          "type": "string"
+        }
+      ],
+      "title": "Drawdown Limit"
+    },
+    "max_orders_per_day": {
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Max Orders Per Day",
+      "type": "integer"
+    },
+    "min_interval_seconds": {
+      "maximum": 86400,
+      "minimum": 60,
+      "title": "Min Interval Seconds",
+      "type": "integer"
+    },
+    "max_quote_age_seconds": {
+      "maximum": 60,
+      "minimum": 1,
+      "title": "Max Quote Age Seconds",
+      "type": "integer"
+    },
+    "max_fee_bps": {
+      "anyOf": [
+        {
+          "maximum": 100.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "title": "Max Fee Bps"
+    },
+    "max_spread_bps": {
+      "anyOf": [
+        {
+          "maximum": 100.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "title": "Max Spread Bps"
+    },
+    "trading_timezone": {
+      "const": "UTC",
+      "title": "Trading Timezone",
+      "type": "string"
+    },
+    "start_hour": {
+      "maximum": 23,
+      "minimum": 0,
+      "title": "Start Hour",
+      "type": "integer"
+    },
+    "end_hour": {
+      "maximum": 24,
+      "minimum": 1,
+      "title": "End Hour",
+      "type": "integer"
+    },
+    "weekdays": {
+      "items": {
+        "type": "integer"
+      },
+      "maxItems": 7,
+      "minItems": 1,
+      "title": "Weekdays",
+      "type": "array"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "quantity_per_order": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,18}|(?=[\\d.]{1,29}0*$)\\d{0,18}\\.\\d{0,10}0*$)",
+          "type": "string"
+        }
+      ],
+      "title": "Quantity Per Order"
+    }
+  },
+  "required": [
+    "environment",
+    "strategy",
+    "strategy_version",
+    "instrument_ids",
+    "capital_limit",
+    "max_position",
+    "max_order",
+    "daily_loss_limit",
+    "drawdown_limit",
+    "max_orders_per_day",
+    "min_interval_seconds",
+    "max_quote_age_seconds",
+    "max_fee_bps",
+    "max_spread_bps",
+    "trading_timezone",
+    "start_hour",
+    "end_hour",
+    "weekdays",
+    "expires_at",
+    "quantity_per_order"
+  ],
+  "title": "MandateSpec",
+  "type": "object"
+}

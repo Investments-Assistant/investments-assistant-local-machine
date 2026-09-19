@@ -25,7 +25,7 @@ jobs:
   sonar-quality-gate:
     name: SonarCloud Quality Gate (combined coverage)
     runs-on: ubuntu-latest
-    needs: [unit-tests, integration-tests]
+    needs: [unit-tests, integration-tests, browser-tests]
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -77,9 +77,18 @@ jobs:
             sleep 2
           done
 
+      - name: Mark the disposable combined-coverage database
+        env:
+          PGPASSWORD: postgres
+        run: >-
+          psql -h localhost -U postgres -d test_investments -v ON_ERROR_STOP=1
+          -c "CREATE TABLE ia_disposable_marker(token text NOT NULL);
+          INSERT INTO ia_disposable_marker VALUES ('ci-isolated-service');"
+
       - name: Run all tests together with combined coverage
         env:
           ENVIRONMENT: development
+          TEST_DATABASE_DISPOSABLE_TOKEN: ci-isolated-service
           DATABASE_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/investments"
           TEST_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/test_investments"
         run: |
@@ -121,3 +130,55 @@ jobs:
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+
+  browser-tests:
+    name: Chromium + PostgreSQL (synthetic model)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: integration-tests
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres # Disposable CI-only value
+          POSTGRES_DB: test_browser
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    env:
+      TEST_DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/test_browser
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/test_browser
+      TEST_DATABASE_DISPOSABLE_TOKEN: ci-browser-isolated
+      PLAYWRIGHT_BROWSERS_PATH: /tmp/ia-playwright
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: snok/install-poetry@v1
+        with:
+          version: "2.3.4"
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      - run: poetry install --no-interaction --no-root
+      - name: Install isolated Chromium dependencies
+        run: poetry run playwright install --with-deps chromium --only-shell
+      - name: Mark and migrate disposable database
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d test_browser -v ON_ERROR_STOP=1 -c "CREATE TABLE ia_disposable_marker(token text NOT NULL); INSERT INTO ia_disposable_marker VALUES ('ci-browser-isolated');"
+          poetry run alembic upgrade head
+      - name: Exercise real browser routes and isolation
+        run: poetry run python scripts/verify_browser.py > docs/acceptance/evidence/browser-ci.txt 2>&1
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-synthetic-evidence
+          path: |
+            docs/acceptance/evidence/browser-ci.txt
+            /tmp/ia-browser-evidence

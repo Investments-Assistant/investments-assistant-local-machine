@@ -1,0 +1,60 @@
+{
+  "tier": "real-application-model-synthetic-tools",
+  "timestamp": "2026-09-08T14:19:10.061655+00:00",
+  "load_seconds": 1.6195935200012173,
+  "model": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+  "peak_process_rss_mib": 1984.46484375,
+  "observations": [
+    {
+      "required_tools": [
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [
+        "get_portfolio_summary"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 13.328569528002845,
+      "final_answer": "Portfolio evidence: {\"fixture\": true, \"account_id\": \"synthetic-account\", \"holdings\": [{\"symbol\": \"FIXTURE\", \"quantity_exact\": \"0.004\", \"price\": \"100\", \"currency\": \"EUR\", \"value_usd\": null}], \"valuation_status\": \"partial\", \"broker_connected\": false, \"execution_count\": 0}",
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "required_tools": [
+        "get_latest_news",
+        "get_market_overview",
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [
+        "get_portfolio_summary",
+        "get_latest_news",
+        "get_market_overview"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 7.522985973999312,
+      "final_answer": "The latest news indicates a synthetic market observation titled \"Synthetic market observation\" from fixture. This news does not provide specific details about the portfolio exposure or market overview. The portfolio exposure shows 0.004 FIXTURE shares with a price of 100 EUR and a value in USD that is not available. The market overview is unavailable as of the provided date.",
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "tool_call",
+        "tool_result",
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    }
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "status": "PASS",
+  "limitations": [
+    "Tools return synthetic evidence; no external freshness, broker, DB or browser claim.",
+    "Final text needs factual review; complete events alone do not prove correctness."
+  ]
+}

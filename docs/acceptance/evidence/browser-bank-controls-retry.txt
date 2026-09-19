@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 383, in <module>
+    main()
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 309, in main
+    assert not errors, errors
+           ^^^^^^^^^^
+AssertionError: ['Failed to load resource: the server responded with a status of 409 (Conflict)']

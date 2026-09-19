@@ -7,16 +7,16 @@ or injected into the LLM context.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import json
 from typing import Any
+from dataclasses import dataclass
 
-from cryptography.fernet import Fernet, InvalidToken
 from sqlalchemy import select
+from cryptography.fernet import Fernet, InvalidToken
 
 from src.config import settings
-from src.db.database import async_session
 from src.db.models import BrokerAccount
+from src.db.database import async_session
 
 SUPPORTED_BROKERS = ("alpaca", "ibkr", "coinbase", "binance")
 
@@ -24,13 +24,14 @@ BROKER_FIELDS: dict[str, set[str]] = {
     "alpaca": {"api_key", "secret_key", "paper"},
     "coinbase": {"api_key", "api_secret"},
     "binance": {"api_key", "secret_key", "testnet"},
-    "ibkr": {"host", "port", "client_id", "enabled"},
+    "ibkr": {"host", "port", "client_id", "enabled", "read_authorized",
+             "broker_account_id", "environment"},
 }
 SECRET_FIELDS: dict[str, set[str]] = {
     "alpaca": {"api_key", "secret_key"},
     "coinbase": {"api_key", "api_secret"},
     "binance": {"api_key", "secret_key"},
-    "ibkr": set(),
+    "ibkr": {"broker_account_id"},
 }
 
 
@@ -135,6 +136,10 @@ def validate_broker_config(broker: str, config: dict[str, Any]) -> dict[str, Any
         normalized["port"] = int(normalized.get("port", 4002))
         normalized["client_id"] = int(normalized.get("client_id", 1))
         normalized["enabled"] = boolean("enabled", True)
+        normalized["read_authorized"] = boolean("read_authorized", False)
+        normalized["environment"] = str(normalized.get("environment", "unverified"))
+        if normalized["environment"] not in {"unverified", "paper", "live"}:
+            raise ValueError("IBKR environment must be explicitly selected")
         if not 1 <= normalized["port"] <= 65535:
             raise ValueError("IBKR port must be between 1 and 65535")
         if normalized["client_id"] < 0:

@@ -1,0 +1,108 @@
+{
+  "status": "PASS",
+  "tier": "real-postgresql-disposable-backup-restore",
+  "timestamp": "2026-09-08T14:13:36.104185+00:00",
+  "source": "test_acceptance_browser",
+  "target": "test_restore_20260908_a",
+  "revision": "0005_sessions",
+  "tables": {
+    "alembic_version": {
+      "count": 1,
+      "sha256": "084ef0aec80d2f9436c865c208caaf79403048ba3fbc16f7bd8ac0ad3f4ceca3"
+    },
+    "analyses": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bank_sync_states": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "broker_accounts": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "chat_messages": {
+      "count": 4,
+      "sha256": "2d35027127d350112f2de0c406ce447994e9406667219a98c228cc670c93873b"
+    },
+    "conversations": {
+      "count": 4,
+      "sha256": "71c4053f9db816825624f8d9b4e5bf1bcd7faa9db051feb0e496e7b40740f71c"
+    },
+    "daily_pnl": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "execution_events": {
+      "count": 15,
+      "sha256": "5cc61b6d741d82aab8fa2898d529b901f24c66336edbfc6f75e5eae6fe959622"
+    },
+    "expense_transactions": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ia_disposable_marker": {
+      "count": 1,
+      "sha256": "dff19b8ec78298ee8347f7722072185872b105becd5e894b4e7e3ca76816fd11"
+    },
+    "job_leases": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "news_articles": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "operational_alerts": {
+      "count": 2,
+      "sha256": "186ea6a03cc1e528b45908cf20e12865f7ee19ceb3834338c2f031c3abcaf811"
+    },
+    "projects": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reports": {
+      "count": 2,
+      "sha256": "6eb64f66ec76e63271407b3a2f7ffb0598aaf3ddc0b7e2b476edb817aa303101"
+    },
+    "session_revocations": {
+      "count": 1,
+      "sha256": "9a1ea65e8ea4df1366254074619322faad3d531a829f0fab3d5c16fed9966af1"
+    },
+    "simulation_results": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "simulator_accounts": {
+      "count": 5,
+      "sha256": "74a8c2c0a1e4658de5e29dc326daba284432e958c8cd00fb5d44292656657f13"
+    },
+    "simulator_instruments": {
+      "count": 5,
+      "sha256": "28e44c3e7af8d21f61f17b47f449d063948287b00f1dd73f8b596c43d41b6913"
+    },
+    "simulator_orders": {
+      "count": 5,
+      "sha256": "d5e2802399da82587623062c746b7095ff9904d60c5434aac32f0a5fc1e11aa6"
+    },
+    "simulator_positions": {
+      "count": 5,
+      "sha256": "cf0dce2542272a183f9b0450ff86e394d17b87e4e1409f8314685c58ef8a3645"
+    },
+    "trades": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "users": {
+      "count": 4,
+      "sha256": "91c3ca50d94b18cba9b4ba1de06cded912e5e82301457bc9d2b7eb6abfa91c95"
+    }
+  },
+  "archive": "/tmp/test_restore_20260908_a.dump",
+  "archive_sha256": "68a00526f1d9084d6f7e04616e752d48bcee6d131bc37580b2a5ba6be0162742",
+  "production_data": false,
+  "limitations": [
+    "Database only; reports/model/vault-key filesystem recovery is separate."
+  ]
+}

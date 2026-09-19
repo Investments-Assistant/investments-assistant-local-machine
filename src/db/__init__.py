@@ -1,5 +1,6 @@
-from src.db.database import Base, async_session, engine, get_db
-from src.db.models import Analysis, ChatMessage, Conversation, DailyPnL, Project, Report, Trade
+"""Database exports; defer model loading to avoid execution/model import cycles."""
+
+from src.db.database import Base, engine, get_db, async_session
 
 __all__ = [
     "Base",
@@ -14,3 +15,11 @@ __all__ = [
     "DailyPnL",
     "Project",
 ]
+
+
+def __getattr__(name):
+    if name in __all__:
+        from src.db import models
+
+        return getattr(models, name)
+    raise AttributeError(name)

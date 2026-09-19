@@ -1,0 +1,2 @@
+{"Model":"20Y6S14U00","TotalPhysicalMemory":68408107008}
+[{"Name":"Intel(R) UHD Graphics","AdapterRAM":2147479552,"DriverVersion":"32.0.101.7085"},{"Name":"NVIDIA GeForce RTX 3050 Ti Laptop GPU","AdapterRAM":4293918720,"DriverVersion":"32.0.16.1664"}]

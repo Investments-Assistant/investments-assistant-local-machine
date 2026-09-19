@@ -1,0 +1,6 @@
+
+Leap Indicator: 0(no warning)
+Stratum: 5 (secondary reference - syncd by (S)NTP)
+Last Successful Sync Time: 08-Sep-26 14:46:36
+
+

@@ -11,17 +11,29 @@ are fetched (no scraping — would violate their ToS).
 
 from __future__ import annotations
 
-import asyncio
-from datetime import UTC, datetime, timedelta
 import re
 from typing import Any
+import asyncio
+from datetime import UTC, datetime, timedelta
 
 from bs4 import BeautifulSoup
 import feedparser
-import httpx
 
-from src.agent.utils.logger import get_logger
 from src.config import settings
+from src.news.http import PublicFetchError, fetch_public
+from src.agent.utils.logger import get_logger
+from src.operations.workloads import WorkPool
+
+source_work = WorkPool(2, "NEWS_FETCH")
+
+
+class ArticleBatch(list):
+    """List-compatible article batch with explicit source failures."""
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.failures = []
+
 
 logger = get_logger(__name__)
 
@@ -207,22 +219,46 @@ def _article(
 # ---------------------------------------------------------------------------
 
 
+def fetch_rss_source(source, url, *, max_per_feed=20, headers=None):
+    """One bounded feed request; validators are supplied only by durable ingestion."""
+    response = fetch_public(url, headers=headers) if headers else fetch_public(url)
+    if response.status == 304:
+        return [], response
+    feed = feedparser.parse(response.body)
+    if getattr(feed, "bozo", False) and not feed.entries:
+        raise ValueError("INVALID_RSS_DOCUMENT")
+    articles = []
+    for entry in feed.entries[:max_per_feed]:
+        link = getattr(entry, "link", "") or ""
+        if link:
+            articles.append(
+                _article(
+                    getattr(entry, "title", "") or "",
+                    getattr(entry, "summary", "") or "",
+                    source,
+                    link,
+                    getattr(entry, "published", "") or "",
+                )
+            )
+    return articles, response
+
+
 def fetch_rss(max_per_feed: int = 20) -> list[dict[str, Any]]:
-    """Fetch articles from all RSS feeds. Returns raw article dicts."""
-    articles: list[dict[str, Any]] = []
+    """Direct read adapter; scheduled ingestion uses per-source durable leases."""
+    articles = ArticleBatch()
     for source, url in RSS_FEEDS.items():
         try:
-            feed = feedparser.parse(url)
-            for entry in feed.entries[:max_per_feed]:
-                link = getattr(entry, "link", "") or ""
-                if not link:
-                    continue
-                title = getattr(entry, "title", "") or ""
-                summary = getattr(entry, "summary", "") or ""
-                published = getattr(entry, "published", "") or ""
-                articles.append(_article(title, summary, source, link, published))
+            batch, _ = fetch_rss_source(source, url, max_per_feed=max_per_feed)
+            articles.extend(batch)
         except Exception as exc:
-            logger.debug("RSS %s failed: %s", source, exc)
+            articles.failures.append(
+                {
+                    "source": source,
+                    "code": str(exc) if isinstance(exc, PublicFetchError) else type(exc).__name__,
+                    "retry_after": getattr(exc, "retry_after", None),
+                }
+            )
+            logger.debug("RSS %s failed (%s)", source, type(exc).__name__)
     return articles
 
 
@@ -240,7 +276,7 @@ _GUARDIAN_SECTIONS = [
 ]
 
 
-async def fetch_guardian(days_back: int = 1) -> list[dict[str, Any]]:
+async def fetch_guardian(days_back: int = 1, *, sections=None) -> list[dict[str, Any]]:
     """Fetch articles from The Guardian Content API (free tier: 500 req/day).
 
     Set GUARDIAN_API_KEY in .env — obtain at https://open-platform.theguardian.com/
@@ -251,38 +287,46 @@ async def fetch_guardian(days_back: int = 1) -> list[dict[str, Any]]:
         return []
 
     since = (datetime.now(UTC) - timedelta(days=days_back)).strftime("%Y-%m-%d")
-    articles: list[dict[str, Any]] = []
+    articles = ArticleBatch()
 
-    async with httpx.AsyncClient(timeout=15) as client:
-        for section in _GUARDIAN_SECTIONS:
-            params = {
-                "api-key": settings.guardian_api_key,
-                "section": section,
-                "from-date": since,
-                "page-size": 50,
-                "show-fields": "bodyText,trailText",
-                "order-by": "newest",
-            }
-            try:
-                resp = await client.get(_GUARDIAN_BASE, params=params)
-                resp.raise_for_status()
-                for item in resp.json().get("response", {}).get("results", []):
-                    fields = item.get("fields", {})
-                    body = fields.get("bodyText", "")
-                    trail = fields.get("trailText", "")
-                    articles.append(
-                        _article(
-                            title=item.get("webTitle", ""),
-                            summary=trail or body[:500],
-                            source="The Guardian",
-                            url=item.get("webUrl", ""),
-                            published_raw=item.get("webPublicationDate", ""),
-                            content=body[:5000] if body else None,
-                        )
+    for section in _GUARDIAN_SECTIONS if sections is None else sections:
+        params = {
+            "api-key": settings.guardian_api_key,
+            "section": section,
+            "from-date": since,
+            "page-size": 50,
+            "show-fields": "bodyText,trailText",
+            "order-by": "newest",
+        }
+        try:
+            from urllib.parse import urlencode
+
+            resp = await source_work.arun(
+                fetch_public, _GUARDIAN_BASE + "?" + urlencode(params), timeout=25
+            )
+            for item in resp.json().get("response", {}).get("results", []):
+                fields = item.get("fields", {})
+                body = fields.get("bodyText", "")
+                trail = fields.get("trailText", "")
+                articles.append(
+                    _article(
+                        title=item.get("webTitle", ""),
+                        summary=trail or body[:500],
+                        source="The Guardian",
+                        url=item.get("webUrl", ""),
+                        published_raw=item.get("webPublicationDate", ""),
+                        content=body[:5000] if body else None,
                     )
-            except Exception as exc:
-                logger.warning("Guardian API section=%s failed: %s", section, exc)
-
+                )
+        except Exception as exc:
+            articles.failures.append(
+                {
+                    "source": "The Guardian:" + section,
+                    "code": str(exc) if isinstance(exc, PublicFetchError) else type(exc).__name__,
+                    "retry_after": getattr(exc, "retry_after", None),
+                }
+            )
+            logger.warning("Guardian API section=%s failed (%s)", section, type(exc).__name__)
     return articles
 
 
@@ -309,37 +353,43 @@ _SCRAPE_TARGETS: list[tuple[str, str, str, str, str]] = [
 ]
 
 
-async def fetch_scraped(max_per_site: int = 10) -> list[dict[str, Any]]:
+async def fetch_scraped(max_per_site: int = 10, *, targets=None) -> list[dict[str, Any]]:
     """Scrape open-access financial sites that have no suitable RSS/API."""
-    articles: list[dict[str, Any]] = []
+    articles = ArticleBatch()
     headers = {"User-Agent": "InvestmentAssistantBot/1.0 (research; non-commercial)"}
 
-    async with httpx.AsyncClient(timeout=20, headers=headers, follow_redirects=True) as client:
-        for source, url, item_sel, title_sel, summary_sel in _SCRAPE_TARGETS:
-            try:
-                resp = await client.get(url)
-                resp.raise_for_status()
-                soup = BeautifulSoup(resp.text, "lxml")
-                for i, item in enumerate(soup.select(item_sel)):
-                    if i >= max_per_site:
-                        break
-                    title_el = item.select_one(title_sel)
-                    summary_el = item.select_one(summary_sel)
-                    if not title_el:
-                        continue
-                    title = title_el.get_text(strip=True)
-                    link_el = title_el if title_el.name == "a" else title_el.find("a")
-                    href = link_el["href"] if link_el and link_el.get("href") else url
-                    if href.startswith("/"):
-                        from urllib.parse import urlparse
+    for source, url, item_sel, title_sel, summary_sel in (
+        _SCRAPE_TARGETS if targets is None else targets
+    ):
+        try:
+            resp = await source_work.arun(fetch_public, url, headers=headers, timeout=25)
+            soup = BeautifulSoup(resp.text, "lxml")
+            for i, item in enumerate(soup.select(item_sel)):
+                if i >= max_per_site:
+                    break
+                title_el = item.select_one(title_sel)
+                summary_el = item.select_one(summary_sel)
+                if not title_el:
+                    continue
+                title = title_el.get_text(strip=True)
+                link_el = title_el if title_el.name == "a" else title_el.find("a")
+                href = link_el["href"] if link_el and link_el.get("href") else url
+                if href.startswith("/"):
+                    from urllib.parse import urlparse
 
-                        base = urlparse(url)
-                        href = f"{base.scheme}://{base.netloc}{href}"
-                    summary = summary_el.get_text(strip=True)[:500] if summary_el else ""
-                    articles.append(_article(title, summary, source, href))
-            except Exception as exc:
-                logger.debug("Scrape %s failed: %s", source, exc)
-
+                    base = urlparse(url)
+                    href = f"{base.scheme}://{base.netloc}{href}"
+                summary = summary_el.get_text(strip=True)[:500] if summary_el else ""
+                articles.append(_article(title, summary, source, href))
+        except Exception as exc:
+            articles.failures.append(
+                {
+                    "source": source,
+                    "code": str(exc) if isinstance(exc, PublicFetchError) else type(exc).__name__,
+                    "retry_after": getattr(exc, "retry_after", None),
+                }
+            )
+            logger.debug("Scrape %s failed (%s)", source, type(exc).__name__)
     return articles
 
 
@@ -367,4 +417,10 @@ async def fetch_all(days_back: int = 1) -> list[dict[str, Any]]:
         if u and u not in seen:
             seen.add(u)
             deduped.append(a)
-    return deduped
+    batch = ArticleBatch(deduped)
+    batch.failures = [
+        failure
+        for source_batch in (rss, guardian, scraped)
+        for failure in getattr(source_batch, "failures", [])
+    ]
+    return batch

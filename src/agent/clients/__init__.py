@@ -1,6 +1,6 @@
 """LLM client factory.
 
-The Raspberry Pi deployment supports one local backend: llama.cpp with GGUF
+The local-machine deployment supports one local backend: llama.cpp with GGUF
 models loaded directly into process memory. No external AI API or sidecar model
 server is used.
 """

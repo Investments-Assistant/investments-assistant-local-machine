@@ -1,0 +1,266 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 22 items
+
+tests/integration/broker_observations_test.py .....FF.F..........        [ 86%]
+tests/integration/operations_test.py ...                                 [100%]
+
+=================================== FAILURES ===================================
+_ test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[rebind-BROKER_ACCOUNT_CHANGED_DURING_READ] _
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x7f7253d26990>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7253d817f0>
+change = 'rebind', reason = 'BROKER_ACCOUNT_CHANGED_DURING_READ'
+
+    @pytest.mark.parametrize(
+        "change,reason",
+        [
+            ("success", None),
+            ("partial", None),
+            ("rebind", "BROKER_ACCOUNT_CHANGED_DURING_READ"),
+            ("revoke", "IBKR_READ_CONSENT_REQUIRED"),
+            ("deactivate", "PRINCIPAL_INACTIVE"),
+            ("disable_account", "BROKER_ACCOUNT_INACTIVE"),
+            ("expired_lease", "STALE_JOB_LEASE"),
+            ("reclaimed_lease", "STALE_JOB_LEASE"),
+        ],
+    )
+    async def test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence(
+        integration_engine, monkeypatch, change, reason
+    ):
+        from types import SimpleNamespace
+        from unittest.mock import AsyncMock
+    
+        from src.execution import broker_monitor
+        from src.execution.broker_observations import OBSERVATION
+    
+        factory = async_sessionmaker(integration_engine, expire_on_commit=False)
+        async with factory.begin() as session:
+            user, account = await seed(session)
+        event = OBSERVATION.validate_python(execution())
+    
+        async def read(_function, selected, *, timeout):
+            assert selected.user_id == user.id and selected.id == account.id and timeout == 40
+            async with factory.begin() as session:
+                row = await session.get(BrokerAccount, account.id)
+                config = vault.decrypt_config(row.config_encrypted)
+                if change == "rebind":
+                    row.config_encrypted = vault.encrypt_config(config | {"broker_account_id": "CHANGED"})
+                elif change == "revoke":
+                    row.config_encrypted = vault.encrypt_config(config | {"read_authorized": False})
+                elif change == "deactivate":
+                    (await session.get(User, user.id)).is_active = False
+                elif change == "disable_account":
+                    row.is_active = False
+                elif change in {"expired_lease", "reclaimed_lease"}:
+                    lease = await session.scalar(select(JobLease).where(JobLease.user_id == user.id))
+                    if change == "expired_lease":
+                        lease.lease_until = datetime.now(UTC) - timedelta(seconds=1)
+                    else:
+                        lease.token = str(uuid.uuid4())
+            return dict(
+                observations=[event],
+                status="partial" if change == "partial" else "observed",
+                request_finished=change != "partial",
+                failures=["BROKER_SNAPSHOT_REQUEST_FAILED"] if change == "partial" else [],
+                execution_authority="none",
+                late_commissions_complete=False,
+            )
+    
+        monkeypatch.setattr(broker_monitor, "async_session", factory)
+        monkeypatch.setattr(broker_monitor, "broker_read_work", SimpleNamespace(arun=AsyncMock(side_effect=read)))
+        try:
+            if reason:
+                with pytest.raises(PolicyDenied, match=reason):
+                    await broker_monitor.refresh_observations(user_id=user.id, account_id=account.id)
+            else:
+                result = await broker_monitor.refresh_observations(user_id=user.id, account_id=account.id)
+                assert result["inserted"] == 1 and "observations" not in result
+                assert "SYNTHETIC-ACCOUNT-ONLY" not in str(result)
+                assert result["status"] == ("partial" if change == "partial" else "observed")
+            async with factory.begin() as session:
+                rows = (
+                    await session.scalars(select(BrokerObservation).where(BrokerObservation.account_id == account.id))
+                ).all()
+                assert len(rows) == (0 if reason else 1)
+                alerts = (await session.scalars(select(OperationalAlert).where(OperationalAlert.user_id == user.id))).all()
+>               assert len(alerts) == (0 if reason else 1)
+E               assert 1 == 0
+E                +  where 1 = len([<src.operations.models.OperationalAlert object at 0x7f7253c1ad50>])
+
+tests/integration/broker_observations_test.py:252: AssertionError
+_ test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[revoke-IBKR_READ_CONSENT_REQUIRED] _
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x7f7253d427d0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7253ddd4f0>
+change = 'revoke', reason = 'IBKR_READ_CONSENT_REQUIRED'
+
+    @pytest.mark.parametrize(
+        "change,reason",
+        [
+            ("success", None),
+            ("partial", None),
+            ("rebind", "BROKER_ACCOUNT_CHANGED_DURING_READ"),
+            ("revoke", "IBKR_READ_CONSENT_REQUIRED"),
+            ("deactivate", "PRINCIPAL_INACTIVE"),
+            ("disable_account", "BROKER_ACCOUNT_INACTIVE"),
+            ("expired_lease", "STALE_JOB_LEASE"),
+            ("reclaimed_lease", "STALE_JOB_LEASE"),
+        ],
+    )
+    async def test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence(
+        integration_engine, monkeypatch, change, reason
+    ):
+        from types import SimpleNamespace
+        from unittest.mock import AsyncMock
+    
+        from src.execution import broker_monitor
+        from src.execution.broker_observations import OBSERVATION
+    
+        factory = async_sessionmaker(integration_engine, expire_on_commit=False)
+        async with factory.begin() as session:
+            user, account = await seed(session)
+        event = OBSERVATION.validate_python(execution())
+    
+        async def read(_function, selected, *, timeout):
+            assert selected.user_id == user.id and selected.id == account.id and timeout == 40
+            async with factory.begin() as session:
+                row = await session.get(BrokerAccount, account.id)
+                config = vault.decrypt_config(row.config_encrypted)
+                if change == "rebind":
+                    row.config_encrypted = vault.encrypt_config(config | {"broker_account_id": "CHANGED"})
+                elif change == "revoke":
+                    row.config_encrypted = vault.encrypt_config(config | {"read_authorized": False})
+                elif change == "deactivate":
+                    (await session.get(User, user.id)).is_active = False
+                elif change == "disable_account":
+                    row.is_active = False
+                elif change in {"expired_lease", "reclaimed_lease"}:
+                    lease = await session.scalar(select(JobLease).where(JobLease.user_id == user.id))
+                    if change == "expired_lease":
+                        lease.lease_until = datetime.now(UTC) - timedelta(seconds=1)
+                    else:
+                        lease.token = str(uuid.uuid4())
+            return dict(
+                observations=[event],
+                status="partial" if change == "partial" else "observed",
+                request_finished=change != "partial",
+                failures=["BROKER_SNAPSHOT_REQUEST_FAILED"] if change == "partial" else [],
+                execution_authority="none",
+                late_commissions_complete=False,
+            )
+    
+        monkeypatch.setattr(broker_monitor, "async_session", factory)
+        monkeypatch.setattr(broker_monitor, "broker_read_work", SimpleNamespace(arun=AsyncMock(side_effect=read)))
+        try:
+            if reason:
+                with pytest.raises(PolicyDenied, match=reason):
+                    await broker_monitor.refresh_observations(user_id=user.id, account_id=account.id)
+            else:
+                result = await broker_monitor.refresh_observations(user_id=user.id, account_id=account.id)
+                assert result["inserted"] == 1 and "observations" not in result
+                assert "SYNTHETIC-ACCOUNT-ONLY" not in str(result)
+                assert result["status"] == ("partial" if change == "partial" else "observed")
+            async with factory.begin() as session:
+                rows = (
+                    await session.scalars(select(BrokerObservation).where(BrokerObservation.account_id == account.id))
+                ).all()
+                assert len(rows) == (0 if reason else 1)
+                alerts = (await session.scalars(select(OperationalAlert).where(OperationalAlert.user_id == user.id))).all()
+>               assert len(alerts) == (0 if reason else 1)
+E               assert 1 == 0
+E                +  where 1 = len([<src.operations.models.OperationalAlert object at 0x7f7253cdf4d0>])
+
+tests/integration/broker_observations_test.py:252: AssertionError
+_ test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[disable_account-BROKER_ACCOUNT_INACTIVE] _
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x7f7253cbd3d0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7253cc56d0>
+change = 'disable_account', reason = 'BROKER_ACCOUNT_INACTIVE'
+
+    @pytest.mark.parametrize(
+        "change,reason",
+        [
+            ("success", None),
+            ("partial", None),
+            ("rebind", "BROKER_ACCOUNT_CHANGED_DURING_READ"),
+            ("revoke", "IBKR_READ_CONSENT_REQUIRED"),
+            ("deactivate", "PRINCIPAL_INACTIVE"),
+            ("disable_account", "BROKER_ACCOUNT_INACTIVE"),
+            ("expired_lease", "STALE_JOB_LEASE"),
+            ("reclaimed_lease", "STALE_JOB_LEASE"),
+        ],
+    )
+    async def test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence(
+        integration_engine, monkeypatch, change, reason
+    ):
+        from types import SimpleNamespace
+        from unittest.mock import AsyncMock
+    
+        from src.execution import broker_monitor
+        from src.execution.broker_observations import OBSERVATION
+    
+        factory = async_sessionmaker(integration_engine, expire_on_commit=False)
+        async with factory.begin() as session:
+            user, account = await seed(session)
+        event = OBSERVATION.validate_python(execution())
+    
+        async def read(_function, selected, *, timeout):
+            assert selected.user_id == user.id and selected.id == account.id and timeout == 40
+            async with factory.begin() as session:
+                row = await session.get(BrokerAccount, account.id)
+                config = vault.decrypt_config(row.config_encrypted)
+                if change == "rebind":
+                    row.config_encrypted = vault.encrypt_config(config | {"broker_account_id": "CHANGED"})
+                elif change == "revoke":
+                    row.config_encrypted = vault.encrypt_config(config | {"read_authorized": False})
+                elif change == "deactivate":
+                    (await session.get(User, user.id)).is_active = False
+                elif change == "disable_account":
+                    row.is_active = False
+                elif change in {"expired_lease", "reclaimed_lease"}:
+                    lease = await session.scalar(select(JobLease).where(JobLease.user_id == user.id))
+                    if change == "expired_lease":
+                        lease.lease_until = datetime.now(UTC) - timedelta(seconds=1)
+                    else:
+                        lease.token = str(uuid.uuid4())
+            return dict(
+                observations=[event],
+                status="partial" if change == "partial" else "observed",
+                request_finished=change != "partial",
+                failures=["BROKER_SNAPSHOT_REQUEST_FAILED"] if change == "partial" else [],
+                execution_authority="none",
+                late_commissions_complete=False,
+            )
+    
+        monkeypatch.setattr(broker_monitor, "async_session", factory)
+        monkeypatch.setattr(broker_monitor, "broker_read_work", SimpleNamespace(arun=AsyncMock(side_effect=read)))
+        try:
+            if reason:
+                with pytest.raises(PolicyDenied, match=reason):
+                    await broker_monitor.refresh_observations(user_id=user.id, account_id=account.id)
+            else:
+                result = await broker_monitor.refresh_observations(user_id=user.id, account_id=account.id)
+                assert result["inserted"] == 1 and "observations" not in result
+                assert "SYNTHETIC-ACCOUNT-ONLY" not in str(result)
+                assert result["status"] == ("partial" if change == "partial" else "observed")
+            async with factory.begin() as session:
+                rows = (
+                    await session.scalars(select(BrokerObservation).where(BrokerObservation.account_id == account.id))
+                ).all()
+                assert len(rows) == (0 if reason else 1)
+                alerts = (await session.scalars(select(OperationalAlert).where(OperationalAlert.user_id == user.id))).all()
+>               assert len(alerts) == (0 if reason else 1)
+E               assert 1 == 0
+E                +  where 1 = len([<src.operations.models.OperationalAlert object at 0x7f7253b5a120>])
+
+tests/integration/broker_observations_test.py:252: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/broker_observations_test.py::test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[rebind-BROKER_ACCOUNT_CHANGED_DURING_READ]
+FAILED tests/integration/broker_observations_test.py::test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[revoke-IBKR_READ_CONSENT_REQUIRED]
+FAILED tests/integration/broker_observations_test.py::test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[disable_account-BROKER_ACCOUNT_INACTIVE]
+========================= 3 failed, 19 passed in 2.40s =========================

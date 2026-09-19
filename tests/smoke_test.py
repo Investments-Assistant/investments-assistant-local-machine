@@ -30,11 +30,11 @@ def test_settings_importable() -> None:
 def test_db_models_importable() -> None:
     """All ORM model classes must be importable."""
     from src.db.models import (  # noqa: F401
-        Analysis,
-        ChatMessage,
-        DailyPnL,
-        NewsArticle,
-        Report,
-        SimulationResult,
         Trade,
+        Report,
+        Analysis,
+        DailyPnL,
+        ChatMessage,
+        NewsArticle,
+        SimulationResult,
     )

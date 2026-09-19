@@ -14,12 +14,12 @@ Configure in Claude Desktop's config (see config/mcp/setup.md).
 
 from __future__ import annotations
 
-import argparse
-import asyncio
-import json
 import os
-from pathlib import Path
 import sys
+import json
+import asyncio
+from pathlib import Path
+import argparse
 
 import httpx
 

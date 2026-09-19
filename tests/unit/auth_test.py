@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.web.auth import create_session, hash_password, verify_password, verify_session
+from src.web.auth import hash_password, create_session, verify_session, verify_password
 
 
 @pytest.mark.unit

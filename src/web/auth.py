@@ -1,25 +1,27 @@
-"""Small, dependency-free authentication layer for the private Pi UI.
+"""Small, dependency-free authentication layer for the private local UI.
 
 User accounts live in PostgreSQL. The environment credentials bootstrap the
 first account; additional accounts are provisioned with the local CLI. A
 salted scrypt password hash and an HMAC-signed, short-lived cookie avoid adding
-an identity service to the Pi. The cookie contains no portfolio data and is
+an identity service to the application. The cookie contains no portfolio data and is
 invalidated by changing ``AUTH_SESSION_SECRET``.
 """
 
 from __future__ import annotations
 
-import base64
-from collections import defaultdict, deque
-from dataclasses import dataclass
-import hashlib
 import hmac
-import secrets
 import time
+import base64
+import hashlib
+import secrets
+from datetime import UTC, datetime
+from collections import deque, defaultdict
+from dataclasses import dataclass
 
-from fastapi import HTTPException, Request, WebSocket
+from fastapi import Request, WebSocket, HTTPException
 
 from src import config
+from src.web.network import trusted_proxy
 
 SESSION_COOKIE = "ia_session"
 CSRF_COOKIE = "ia_csrf"
@@ -40,6 +42,8 @@ class Principal:
     username: str
     mechanism: str = "cookie"
     user_id: str | None = None
+    issued_at: datetime | None = None
+    expires_at: datetime | None = None
 
 
 def _b64(value: bytes) -> str:
@@ -97,7 +101,7 @@ def create_session(username: str | None = None, user_id: str | None = None) -> s
     expires = int(time.time()) + max(5, config.settings.auth_session_ttl_minutes) * 60
     nonce = secrets.token_urlsafe(24)
     payload = (
-        f"{user_id}|{subject}|{expires}|{nonce}"
+        f"{user_id}|{subject}|{expires}|{nonce}|{time.time_ns() // 1000}"
         if user_id
         else f"{subject}|{expires}|{nonce}"
     )
@@ -117,17 +121,18 @@ def verify_session(token: str | None) -> Principal | None:
         if not hmac.compare_digest(expected, _unb64(encoded_signature)):
             return None
         parts = payload_bytes.decode("utf-8").split("|")
-        if len(parts) != 4:
+        if len(parts) != 5:
             return None
-        user_id, username, expires_raw, nonce = parts
-        if (
-            not nonce
-            or int(expires_raw) <= int(time.time())
-            or not user_id
-        ):
+        user_id, username, expires_raw, nonce, issued_raw = parts
+        if not nonce or int(expires_raw) <= int(time.time()) or not user_id:
             return None
-        return Principal(username=username, user_id=user_id)
-    except (TypeError, ValueError, UnicodeError):
+        return Principal(
+            username=username,
+            user_id=user_id,
+            issued_at=datetime.fromtimestamp(int(issued_raw) / 1_000_000, UTC),
+            expires_at=datetime.fromtimestamp(int(expires_raw), UTC),
+        )
+    except (TypeError, ValueError, UnicodeError, OverflowError, OSError):
         return None
 
 
@@ -161,7 +166,7 @@ def record_registration_attempt(ip: str) -> None:
     _registration_attempts[ip].append(time.monotonic())
 
 
-def require_authenticated(request: Request) -> Principal:
+async def require_authenticated(request: Request) -> Principal:
     """FastAPI dependency for private browser routes."""
     if config.settings.is_development or not config.settings.auth_require_login:
         return Principal(
@@ -178,7 +183,23 @@ def require_authenticated(request: Request) -> Principal:
             detail="Authentication required",
             headers={"WWW-Authenticate": "Cookie"},
         )
+    await validate_principal(principal, request.cookies.get(SESSION_COOKIE))
     return principal
+
+
+async def validate_principal(principal, token):
+    from src.db.database import async_session
+    from src.security.sessions import SessionInactive, assert_active
+
+    try:
+        async with async_session() as session:
+            await assert_active(
+                session, principal.user_id, token=token, issued_at=principal.issued_at
+            )
+    except SessionInactive as exc:
+        raise HTTPException(401, "Session is no longer active") from exc
+    except Exception as exc:
+        raise HTTPException(503, "Authentication service unavailable") from exc
 
 
 def require_csrf(request: Request) -> None:
@@ -191,17 +212,22 @@ def require_csrf(request: Request) -> None:
         raise HTTPException(status_code=403, detail="CSRF validation failed")
 
 
-def require_mcp_or_browser(request: Request) -> Principal:
+async def require_mcp_or_browser(request: Request) -> Principal:
     """Allow the browser session or a separately configured local MCP token."""
     if config.settings.mcp_enabled and config.settings.mcp_auth_token:
         authorization = request.headers.get("Authorization", "")
         scheme, _, token = authorization.partition(" ")
-        if (
-            scheme.lower() == "bearer"
-            and hmac.compare_digest(token, config.settings.mcp_auth_token)
+        if scheme.lower() == "bearer" and hmac.compare_digest(
+            token, config.settings.mcp_auth_token
         ):
-            return Principal(username="mcp", mechanism="bearer", user_id=None)
-    return require_authenticated(request)
+            if not config.settings.mcp_user_id:
+                raise HTTPException(403, "MCP requires an explicitly bound local account")
+            principal = Principal(
+                username="mcp", mechanism="bearer", user_id=config.settings.mcp_user_id
+            )
+            await validate_principal(principal, None)
+            return principal
+    return await require_authenticated(request)
 
 
 def websocket_principal(websocket: WebSocket) -> Principal | None:
@@ -224,6 +250,13 @@ def websocket_origin_allowed(websocket: WebSocket) -> bool:
     origin = websocket.headers.get("Origin")
     if not origin:
         return False
-    forwarded_proto = websocket.headers.get("X-Forwarded-Proto", "https")
+    scheme = "https" if websocket.url.scheme == "wss" else "http"
+    forwarded_proto = (
+        websocket.headers.get("X-Forwarded-Proto", scheme)
+        if trusted_proxy(websocket, config.settings)
+        else scheme
+    )
+    if forwarded_proto not in {"http", "https"}:
+        return False
     host = websocket.headers.get("Host", "")
     return origin.rstrip("/") == f"{forwarded_proto}://{host}".rstrip("/")

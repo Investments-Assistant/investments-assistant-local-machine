@@ -1,0 +1,3 @@
+test_acceptance_expenses verified migration complete
+test_browser_expenses verified migration complete
+test_soak_acceptance verified migration complete

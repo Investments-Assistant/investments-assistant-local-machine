@@ -106,7 +106,7 @@ class TestSettingsProperties:
         assert cfg.is_development is False
 
     def test_database_url_format(self):
-        cfg = Settings(
+        cfg = Settings(DATABASE_URL="",
             _env_file=None,  # type: ignore[call-arg]
             postgres_user="u",
             postgres_password="p",

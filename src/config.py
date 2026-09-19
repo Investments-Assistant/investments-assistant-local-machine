@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from typing import Literal
 from functools import lru_cache
 import ipaddress
-from typing import Literal
+from contextlib import suppress
 
 from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -32,6 +33,7 @@ class Settings(BaseSettings):
     # proxy headers enabled there, but make the trust decision explicit so a
     # future direct deployment does not accidentally trust user-supplied XFF.
     trust_proxy_headers: bool = True
+    trusted_proxy_ips: str = "127.0.0.1/32,::1/128"
 
     # Browser authentication.  Passwords are stored as scrypt hashes generated
     # by scripts/create_auth_hash.py; the clear-text password is never needed by
@@ -50,8 +52,17 @@ class Settings(BaseSettings):
 
     # Optional, separately scoped access for the local MCP bridge.  It is off
     # by default because the browser UI is the primary control surface.
+    # External bank API access requires a separate operator decision and bank consent.
+    bank_sync_enabled: bool = False
+    bank_credentials_key: str = Field("", repr=False)
+    gocardless_secret_id: str = Field("", repr=False)
+    gocardless_secret_key: str = Field("", repr=False)
+    bank_consent_redirect: str = ""
+    bank_sync_interval_seconds: int = Field(21600, ge=900, le=86400)
+
     mcp_enabled: bool = False
     mcp_auth_token: str = ""
+    mcp_user_id: str = ""  # Explicit local account binding; no bootstrap fallback.
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -61,10 +72,8 @@ class Settings(BaseSettings):
             entry = entry.strip()
             if not entry:
                 continue
-            try:
+            with suppress(ValueError):
                 networks.append(ipaddress.ip_network(entry, strict=False))
-            except ValueError:
-                pass
         return networks
 
     def is_ip_allowed(self, ip: str) -> bool:
@@ -83,6 +92,9 @@ class Settings(BaseSettings):
     # tokens before conversation history is added. Reduce this only when using
     # a smaller tool catalog or model configuration.
     llm_context_size: int = 4096
+    llm_queue_capacity: int = Field(4, ge=1, le=16)
+    llm_queue_wait_seconds: float = Field(15, gt=0, le=120)
+    llm_inference_timeout_seconds: float = Field(120, gt=0, le=600)
     # GPU layers to offload: 0 = CPU only (Pi 5 has no GPU), -1 = all to GPU.
     llm_n_gpu_layers: int = 0
     # CPU worker threads for llama.cpp. Pi 5 has 4 Cortex-A76 cores.
@@ -122,6 +134,7 @@ class Settings(BaseSettings):
         return {s.strip().upper() for s in self.auto_allowed_symbols.split(",")}
 
     # ── Database ───────────────────────────────────────────────────────────────
+    database_url_override: str = Field("", validation_alias="DATABASE_URL", repr=False)
     postgres_host: str = "postgres"
     postgres_port: int = 5432
     postgres_db: str = "investment_assistant"
@@ -131,6 +144,8 @@ class Settings(BaseSettings):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def database_url(self) -> str:
+        if self.database_url_override:
+            return self.database_url_override
         return (
             f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
@@ -165,8 +180,9 @@ class Settings(BaseSettings):
     # Outlook, and any standard IMAP server.
     newsletter_imap_server: str = "imap.gmail.com"
     newsletter_imap_port: int = 993
-    newsletter_email_user: str = ""  # your email address
-    newsletter_email_password: str = ""  # app password, not your main password
+    newsletter_owner_user_id: str = ""  # explicit active application owner, never inferred
+    newsletter_email_user: str = Field(default="", repr=False)  # your email address
+    newsletter_email_password: str = Field(default="", repr=False)  # app password, not your main password
     newsletter_sender_filter: str = ""  # only ingest emails FROM this address
 
     # NewsAPI/Guardian are retained as optional adapters for compatibility, but
@@ -176,13 +192,16 @@ class Settings(BaseSettings):
 
     # ── Scheduler ─────────────────────────────────────────────────────────────
     market_data_refresh_minutes: int = Field(5, ge=1)
-    news_ingestion_minutes: int = Field(60, ge=1)
+    news_ingestion_minutes: int = Field(60, ge=1, le=1440)
+    news_service_user_id: str = ""  # explicitly provisioned active ingestion principal
     weekly_report_day: int = 6  # weekday index: Monday is 0, Sunday is 6
     weekly_report_hour: int = 18
     weekly_report_minute: int = 0
 
     # ── Reports ────────────────────────────────────────────────────────────────
     reports_dir: str = "/app/reports"
+    storage_minimum_free_bytes: int = Field(1073741824, ge=1048576)
+    report_maximum_bytes: int = Field(16777216, ge=1024, le=67108864)
 
     @property
     def is_development(self) -> bool:

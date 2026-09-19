@@ -7,9 +7,9 @@ Run with:
 from __future__ import annotations
 
 import pytest
-from sqlalchemy import select, text
+from sqlalchemy import text, select
 
-from src.db.models import ChatMessage, DailyPnL, NewsArticle, Trade
+from src.db.models import Trade, DailyPnL, ChatMessage, NewsArticle
 
 
 @pytest.mark.integration

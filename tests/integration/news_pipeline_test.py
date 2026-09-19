@@ -18,8 +18,8 @@ import pytest
 from sqlalchemy import func, select
 
 from src.db.models import NewsArticle
-from src.news.ingestion import get_article_count, ingest_articles
-from src.news.search import get_recent_headlines, search_news
+from src.news.search import search_news, get_recent_headlines
+from src.news.ingestion import ingest_articles, get_article_count
 
 
 def _article(url: str = "https://example.com/1", title: str = "Test headline") -> dict:
@@ -65,9 +65,7 @@ class TestIngestArticlesIntegration:
             await ingest_articles(articles)
 
         # Only one row should be in the DB
-        result = await db_session.execute(
-            select(func.count()).select_from(NewsArticle).where(NewsArticle.url == url)
-        )
+        result = await db_session.execute(select(func.count()).select_from(NewsArticle).where(NewsArticle.url == url))
         count = result.scalar()
         assert count == 1
 
@@ -137,7 +135,7 @@ class TestSearchNewsIntegration:
 
         with patch("src.news.search.async_session") as mock_factory:
             mock_factory.return_value = db_session
-            results = await search_news("Federal Reserve rates")
+            results = await search_news("Federal Reserve rates", days_back=0)
 
         assert any("Federal Reserve" in r["title"] for r in results)
 
@@ -158,10 +156,11 @@ class TestSearchNewsIntegration:
 
         with patch("src.news.search.async_session") as mock_factory:
             mock_factory.return_value = db_session
-            results = await search_news("markets", sentiment="bullish")
+            results = await search_news("markets", sentiment="bullish", days_back=0)
 
+        assert results, "The fixture must match; the filter test must not pass vacuously"
         for r in results:
-            assert r["sentiment"]["label"] == "bullish"
+            assert r["sentiment"] == "bullish"
 
     async def test_empty_query_returns_list(self, db_session):
         with patch("src.news.search.async_session") as mock_factory:
@@ -217,3 +216,41 @@ class TestGetRecentHeadlinesIntegration:
             results = await get_recent_headlines(limit=2)
 
         assert len(results) <= 2
+
+
+@pytest.mark.integration
+async def test_metadata_correction_retains_prior_evidence_and_first_seen(db_session):
+    from src.db.models import NewsRevision
+
+    original = _article("https://example.com/metadata-correction")
+    assert await ingest_articles([original], db_session=db_session) == 1
+    article = await db_session.scalar(select(NewsArticle).where(NewsArticle.url == original["url"]))
+    first_seen, first_available, text_hash = article.fetched_at, article.available_at, article.content_hash
+    await db_session.flush()
+    before = await db_session.scalar(select(NewsRevision).where(NewsRevision.article_id == article.id))
+    original_evidence = dict(before.evidence)
+    corrected = original | {
+        "source": "Fixture corrected source",
+        "license": "synthetic-test-only",
+        "retention": "fixture-explicit-policy",
+        "tags": ["FIXTURE"],
+        "sentiment_label": "bearish",
+        "sentiment_score": -0.1,
+    }
+    assert await ingest_articles([corrected], db_session=db_session) == 1
+    await db_session.flush()
+    await db_session.refresh(article)
+    assert article.content_hash == text_hash
+    assert article.fetched_at == first_seen and article.available_at > first_available
+    assert article.source == corrected["source"]
+    assert article.provenance["license"] == "synthetic-test-only"
+    assert article.provenance["entities"] == ["FIXTURE"]
+    revisions = (
+        await db_session.scalars(
+            select(NewsRevision).where(NewsRevision.article_id == article.id).order_by(NewsRevision.available_at)
+        )
+    ).all()
+    assert len(revisions) == 2 and revisions[0].evidence == original_evidence
+    assert revisions[1].evidence["source"] == corrected["source"]
+    assert revisions[1].evidence["sentiment_score"] == -0.1
+    assert await ingest_articles([corrected], db_session=db_session) == 0

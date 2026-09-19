@@ -1,0 +1,42 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/integration/bank_sync_test.py ..F.                                 [100%]
+
+=================================== FAILURES ===================================
+_________ test_invalid_batch_is_atomic_and_revoked_consent_disconnects _________
+
+db_session = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7ee0b9f60cb0>
+
+    async def test_invalid_batch_is_atomic_and_revoked_consent_disconnects(db_session):
+        owner, state_id, provider, vault, fixture = await connected(db_session)
+        args = dict(user_id=owner, state_id=state_id, provider=provider, vault=vault)
+        fixture.records["booked"].append({"transactionId": "bad", "amount": -1, "date": "2026-09-01"})
+        assert (await sync_account(db_session, **args))["error_code"] == "INVALID_PROVIDER_DATA"
+        assert (
+            not (
+                await db_session.execute(
+                    select(ExpenseTransaction).where(ExpenseTransaction.user_id == owner)
+                )
+            )
+            .scalars()
+            .all()
+        )
+        state = await db_session.get(BankSyncState, state_id)
+        assert state.last_success_at is None
+        state.checkpoint = {}
+        fixture.status = "EX"
+        assert (await sync_account(db_session, **args))["status"] == "reconnect_required"
+>       assert not any(path.endswith("transactions/") for path in fixture.calls[4:])
+E       assert not True
+E        +  where True = any(<generator object test_invalid_batch_is_atomic_and_revoked_consent_disconnects.<locals>.<genexpr> at 0x7ee0ba60f510>)
+
+tests/integration/bank_sync_test.py:184: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/bank_sync_test.py::test_invalid_batch_is_atomic_and_revoked_consent_disconnects
+========================= 1 failed, 3 passed in 0.84s ==========================

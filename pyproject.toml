@@ -5,9 +5,22 @@ description = "AI-powered investment assistant with real-time market data, broke
 license = "MIT"
 readme = "README.md"
 requires-python = ">=3.12,<3.15,!=3.14.1"
-authors = [{"name" = "Luís Pires", "email" = "27.investments.assistant@gmail.com"}]
-maintainers = [{"name" = "Luís Pires", "email" = "27.investments.assistant@gmail.com"}]
-keywords = ["ai", "investment", "gguf", "local-llm", "fastapi", "trading", "crypto", "stocks"]
+authors = [
+    { "name" = "Luís Pires", "email" = "27.investments.assistant@gmail.com" },
+]
+maintainers = [
+    { "name" = "Luís Pires", "email" = "27.investments.assistant@gmail.com" },
+]
+keywords = [
+    "ai",
+    "investment",
+    "gguf",
+    "local-llm",
+    "fastapi",
+    "trading",
+    "crypto",
+    "stocks",
+]
 
 [tool.poetry]
 package-mode = false
@@ -26,11 +39,11 @@ llama-cpp-python = ">=0.3.0"
 
 # MCP server — expose tools to Claude Desktop / Claude Code
 #   pip install mcp   (on your laptop, not the Pi)
-mcp = {version = ">=1.0.0", optional = true}
+mcp = { version = ">=1.0.0", optional = true }
 
 # ── Web framework ─────────────────────────────────────────────────────────────
 fastapi = ">=0.115.0"
-uvicorn = {version = ">=0.32.0", extras = ["standard"]}
+uvicorn = { version = ">=0.32.0", extras = ["standard"] }
 websockets = ">=14.0"
 python-multipart = ">=0.0.12"
 jinja2 = ">=3.1.0"
@@ -38,7 +51,7 @@ httpx = ">=0.28.0"
 aiofiles = ">=24.1.0"
 
 # ── Database ──────────────────────────────────────────────────────────────────
-sqlalchemy = {version = ">=2.0.0", extras = ["asyncio"]}
+sqlalchemy = { version = ">=2.0.0", extras = ["asyncio"] }
 asyncpg = ">=0.30.0"
 alembic = ">=1.14.0"
 
@@ -63,9 +76,10 @@ python-binance = ">=1.0.19"
 
 # ── Report generation ─────────────────────────────────────────────────────────
 weasyprint = ">=65.0"
+exchange-calendars = "4.13.2"
 
 [tool.poetry.extras]
-mcp              = ["mcp"]
+mcp = ["mcp"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.0.0"
@@ -74,6 +88,7 @@ pytest-cov = ">=6.0.0"
 ipykernel = ">=6.0.0"
 ruff = ">=0.8.0"
 mypy = ">=1.13.0"
+playwright = ">=1.50,<2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -85,7 +100,7 @@ python_files = ["test_*.py", "*_test.py"]
 addopts = "-v"
 pythonpath = ["."]
 asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "session"
+asyncio_default_fixture_loop_scope = "function"
 markers = [
     "unit: Pure unit tests with no external dependencies",
     "integration: Integration tests requiring a live PostgreSQL database",
@@ -104,19 +119,26 @@ output = "coverage.xml"
 
 [tool.ruff]
 fix = true
-line-length = 100
+line-length = 120
 
 [tool.ruff.format]
 docstring-code-format = true
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
+select = ["E", "ERA", "W", "F", "UP", "B", "SIM", "I", "TID252"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
 force-sort-within-sections = true
+length-sort = true
+force-wrap-aliases = true
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
 
 [tool.mypy]
 python_version = "3.12"
 strict = false
 ignore_missing_imports = true
+
+[tool.codespell]

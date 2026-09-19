@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "fixture_rows": 6000,
+  "selected_rows": 500,
+  "indexes": [
+    "ix_expense_raw_retention"
+  ],
+  "execution_ms": 0.703,
+  "production_data": false,
+  "transaction": "rolled_back"
+}

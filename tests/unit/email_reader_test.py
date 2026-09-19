@@ -3,17 +3,17 @@
 from __future__ import annotations
 
 import email as email_lib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from unittest.mock import AsyncMock, MagicMock, patch
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 import pytest
 
 from src.news.email_reader import (
-    _build_search_criteria,
-    _decode_header_value,
-    _extract_body,
     _strip_html,
+    _extract_body,
+    _decode_header_value,
+    _build_search_criteria,
     read_and_ingest_newsletters,
 )
 
@@ -164,6 +164,16 @@ class TestBuildSearchCriteria:
 
 @pytest.mark.unit
 class TestReadAndIngestNewsletters:
+    @pytest.fixture(autouse=True)
+    def owner(self, force_development_env):
+        force_development_env.newsletter_owner_user_id = "synthetic-owner"
+        with (
+            patch("src.news.email_reader.async_session") as factory,
+            patch("src.news.email_reader.assert_active", new=AsyncMock()),
+        ):
+            factory.return_value = AsyncMock()
+            yield
+
     async def test_returns_zero_when_no_credentials(self, force_development_env):
         # Arrange — no credentials configured
         force_development_env.newsletter_email_user = ""
@@ -171,7 +181,7 @@ class TestReadAndIngestNewsletters:
         # Act
         result = await read_and_ingest_newsletters()
         # Assert
-        assert result == {"fetched": 0, "inserted": 0}
+        assert result == {"fetched": 0, "inserted": 0, "status": "unavailable"}
 
     async def test_imap_login_failure_returns_zero(self, force_development_env):
         force_development_env.newsletter_email_user = "user@gmail.com"
@@ -181,7 +191,7 @@ class TestReadAndIngestNewsletters:
             mock_imap.side_effect = Exception("auth failed")
             result = await read_and_ingest_newsletters()
 
-        assert result == {"fetched": 0, "inserted": 0}
+        assert result == {"fetched": 0, "inserted": 0, "status": "unavailable"}
 
     async def test_parses_and_ingests_matching_email(self, force_development_env):
         force_development_env.newsletter_email_user = "user@gmail.com"
@@ -202,9 +212,36 @@ class TestReadAndIngestNewsletters:
         mock_conn.fetch = MagicMock(return_value=(None, [(None, raw_bytes)]))
         mock_conn.logout = MagicMock()
 
-        with patch("src.news.email_reader.imaplib.IMAP4_SSL", return_value=mock_conn):
-            with patch("src.news.email_reader.ingest_articles", new=AsyncMock(return_value=1)):
-                result = await read_and_ingest_newsletters()
+        with (
+            patch('src.news.email_reader.imaplib.IMAP4_SSL', return_value=mock_conn),
+            patch('src.news.email_reader.ingest_articles', new=AsyncMock(return_value=1)),
+        ):
+            result = await read_and_ingest_newsletters()
 
         assert result["fetched"] == 1
         assert result["inserted"] == 1
+
+
+@pytest.mark.unit
+async def test_missing_owner_never_connects(force_development_env):
+    force_development_env.newsletter_owner_user_id = ""
+    with patch("src.news.email_reader._imap_connect") as connect:
+        result = await read_and_ingest_newsletters()
+    connect.assert_not_called()
+    assert result["reason"] == "NEWSLETTER_OWNER_REQUIRED"
+
+
+@pytest.mark.unit
+async def test_inactive_owner_never_connects(force_development_env):
+    from src.security.sessions import SessionInactive
+
+    force_development_env.newsletter_owner_user_id = "inactive-fixture"
+    with (
+        patch("src.news.email_reader.async_session") as factory,
+        patch("src.news.email_reader.assert_active", new=AsyncMock(side_effect=SessionInactive())),
+        patch("src.news.email_reader._imap_connect") as connect,
+    ):
+        factory.return_value = AsyncMock()
+        result = await read_and_ingest_newsletters()
+    connect.assert_not_called()
+    assert result["reason"] == "PRINCIPAL_INACTIVE"

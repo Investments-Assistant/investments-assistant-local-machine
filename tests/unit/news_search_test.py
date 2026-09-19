@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from src.news.search import get_recent_headlines, search_news
+from src.news.search import search_news, get_recent_headlines
 
 
 def _make_db_article(**kwargs) -> MagicMock:

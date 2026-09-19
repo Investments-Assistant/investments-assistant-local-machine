@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 310, in <module>
+    main()
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 49, in main
+    raise RuntimeError(
+RuntimeError: Fixture server exited; inspect /tmp/ia-browser-evidence/server.log

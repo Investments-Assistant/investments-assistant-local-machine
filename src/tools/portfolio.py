@@ -2,16 +2,19 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 import yfinance as yf
 
-from src.agent.utils.logger import get_logger
-from src.tools.broker_accounts import BrokerAccountConfig
 from src.tools.brokers import (
+    ibkr as ibkr_tool,
     alpaca as alpaca_tool,
     binance as binance_tool,
     coinbase,
-    ibkr as ibkr_tool,
 )
+from src.agent.utils.logger import get_logger
+from src.finance.normalization import usd_value
+from src.tools.broker_accounts import BrokerAccountConfig
 
 logger = get_logger(__name__)
 
@@ -74,10 +77,16 @@ def _collect_broker(
                     p["account_id"] = account.id
                     p["account_name"] = account.display_name
                 result["positions"].append(p)
-                result["total_market_value_usd"] += float(p.get("market_value") or 0)
-                result["total_unrealized_pnl_usd"] += float(
-                    p.get("unrealized_pnl") or p.get("unrealized_pl") or 0
-                )
+                for target, source_value in (
+                    ("total_market_value_usd", p.get("market_value")),
+                    ("total_unrealized_pnl_usd", p.get("unrealized_pnl", p.get("unrealized_pl"))),
+                ):
+                    value = usd_value(source_value, p)
+                    if value is None:
+                        result[target] = None
+                        result["valuation_status"] = "partial"
+                    elif result.get(target) is not None:
+                        result[target] = float(Decimal(str(result[target])) + Decimal(str(value)))
             else:
                 error = str(p["error"])
                 if not any(
@@ -105,9 +114,7 @@ def get_portfolio_summary(
         "total_unrealized_pnl_usd": 0.0,
     }
     if accounts is None:
-        for name, pos_fn, acc_fn in _BROKER_FUNNELS:
-            if broker is None or broker == name:
-                _collect_broker(name, pos_fn, acc_fn, result)
+        result["errors"].append({"error": "AUTHENTICATED_ACCOUNT_REQUIRED"})
     else:
         functions = {name: (pos_fn, acc_fn) for name, pos_fn, acc_fn in _BROKER_FUNNELS}
         for account in accounts:
@@ -115,12 +122,18 @@ def get_portfolio_summary(
                 continue
             pos_fn, acc_fn = functions[account.broker]
             _collect_broker(account.broker, pos_fn, acc_fn, result, account)
-    result["total_market_value_usd"] = round(result["total_market_value_usd"], 2)
-    result["total_unrealized_pnl_usd"] = round(result["total_unrealized_pnl_usd"], 2)
+    if result["errors"]:
+        result["valuation_status"] = "partial"
+        result["total_market_value_usd"] = None
+        result["total_unrealized_pnl_usd"] = None
+    else:
+        result.setdefault("valuation_status", "complete")
     return result
 
 
 def get_account_info(broker: str, account: BrokerAccountConfig | None = None) -> dict:
+    if account is None or account.broker != broker or not account.user_id or not account.id:
+        return {"error": "AUTHENTICATED_ACCOUNT_REQUIRED"}
     dispatch = {
         "alpaca": alpaca_tool.get_alpaca_account,
         "ibkr": ibkr_tool.get_ibkr_account,
@@ -136,6 +149,8 @@ def get_account_info(broker: str, account: BrokerAccountConfig | None = None) ->
 def get_trade_history(
     broker: str, days: int = 30, account: BrokerAccountConfig | None = None
 ) -> list[dict]:
+    if account is None or account.broker != broker or not account.user_id or not account.id:
+        return [{"error": "AUTHENTICATED_ACCOUNT_REQUIRED"}]
     if broker == "alpaca":
         return (
             alpaca_tool.get_alpaca_orders(days, account=account)

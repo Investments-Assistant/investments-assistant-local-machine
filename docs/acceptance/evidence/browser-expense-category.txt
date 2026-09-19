@@ -1,0 +1,55 @@
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 346, in <module>
+    main()
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 206, in main
+    refund_category.select_option("education")
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 20069, in select_option
+    self._sync(
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/_impl/_locator.py", line 633, in select_option
+    return await self._frame.select_option(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/_impl/_frame.py", line 814, in select_option
+    return await self._channel.send("selectOption", self._timeout, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.select_option: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("#expenses-transactions-body tr").filter(has_text="Fixture refund").locator("select")
+    - locator resolved to <select onchange="changeExpenseCategory(this)" id="category-87b649c8-6906-4e37-842b-c193612eb290" data-transaction="87b649c8-6906-4e37-842b-c193612eb290">…</select>
+  - attempting select option action
+    2 × waiting for element to be visible and enabled
+      - did not find some options
+    - retrying select option action
+    - waiting 20ms
+    2 × waiting for element to be visible and enabled
+      - did not find some options
+    - retrying select option action
+      - waiting 100ms
+    55 × waiting for element to be visible and enabled
+       - did not find some options
+     - retrying select option action
+       - waiting 500ms
+    - waiting for element to be visible and enabled
+  - element was detached from the DOM, retrying
+    - locator resolved to <select onchange="changeExpenseCategory(this)" id="category-87b649c8-6906-4e37-842b-c193612eb290" data-transaction="87b649c8-6906-4e37-842b-c193612eb290">…</select>
+  - attempting select option action
+    2 × waiting for element to be visible and enabled
+      - did not find some options
+    - retrying select option action
+    - waiting 20ms
+    2 × waiting for element to be visible and enabled
+      - did not find some options
+    - retrying select option action
+      - waiting 100ms
+    4 × waiting for element to be visible and enabled
+      - did not find some options
+    - retrying select option action
+      - waiting 500ms
+

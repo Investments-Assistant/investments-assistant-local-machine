@@ -5,12 +5,12 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
 
-from src.db.models import ExpenseTransaction
 from src.web.auth import hash_password
+from src.db.models import ExpenseTransaction
 
 
 def _client() -> TestClient:
@@ -85,7 +85,13 @@ class TestExpenseNormalisation:
         from src.expenses.sync import normalise_transaction
 
         result = normalise_transaction(
-            {"id": "salary-1", "amount": 2500, "date": "2026-08-01", "direction": "credit"},
+            {
+                "id": "salary-1",
+                "amount": 2500,
+                "currency": "EUR",
+                "date": "2026-08-01",
+                "direction": "credit",
+            },
             "bank_feed",
         )
 
@@ -95,6 +101,13 @@ class TestExpenseNormalisation:
 
 @pytest.mark.unit
 class TestExpenseEndpoints:
+    @pytest.fixture(autouse=True)
+    def current_session_store(self):
+        # Route/expense persistence is mocked here; account revocation has a real
+        # PostgreSQL tier in sessions_test and a browser logout replay test.
+        with patch("src.web.auth.validate_principal", new_callable=AsyncMock):
+            yield
+
     def test_summary_is_scoped_to_authenticated_user(self):
         cfg = _settings()
         user = _user(cfg)
@@ -124,6 +137,15 @@ class TestExpenseEndpoints:
             patch("src.web.routes.settings", cfg),
             patch("src.web.auth.config.settings", cfg),
             patch("src.web.routes.async_session", return_value=session),
+            patch(
+                "src.expenses.status.sync_clocks",
+                new=AsyncMock(
+                    return_value={
+                        "last_received_at": "2026-08-10T00:00:00+00:00",
+                        "provider_last_success_at": None,
+                    }
+                ),
+            ),
         ):
             client = _client()
             assert (
@@ -155,6 +177,9 @@ class TestExpenseEndpoints:
             patch("src.web.routes.settings", cfg),
             patch("src.web.auth.config.settings", cfg),
             patch("src.web.routes.async_session", return_value=session),
+            patch(
+                "src.expenses.persistence.upsert_transaction", new=AsyncMock(return_value=True)
+            ) as upsert,
         ):
             client = _client()
             assert (
@@ -174,6 +199,7 @@ class TestExpenseEndpoints:
                         {
                             "transactionId": "tx-1",
                             "amount": "-12.30",
+                            "currency": "EUR",
                             "date": "2026-08-20",
                             "merchant": "Cafe Lisboa",
                         }
@@ -183,7 +209,7 @@ class TestExpenseEndpoints:
 
         assert response.status_code == 200
         assert response.json()["imported"] == 1
-        created = session.add.call_args.args[0]
-        assert created.user_id == "user-a"
-        assert created.external_id == "tx-1"
-        assert created.category == "food"
+        values = upsert.call_args.kwargs
+        assert values["user_id"] == "user-a"
+        assert values["item"]["external_id"] == "tx-1"
+        assert values["item"]["category"] == "food"

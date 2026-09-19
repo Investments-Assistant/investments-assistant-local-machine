@@ -9,9 +9,16 @@ import pytest
 from src.tools.portfolio import (
     _collect_broker,
     get_account_info,
-    get_portfolio_summary,
     get_trade_history,
+    get_portfolio_summary,
 )
+from src.tools.broker_accounts import BrokerAccountConfig
+
+FIXTURE_ACCOUNTS = [
+    BrokerAccountConfig(name, "fixture-user", name, "Fixture", {})
+    for name in ("alpaca", "ibkr", "coinbase", "binance")
+]
+
 
 # ---------------------------------------------------------------------------
 # _collect_broker
@@ -32,7 +39,9 @@ class TestCollectBroker:
         # Arrange
         account_fn = MagicMock(return_value={"broker": "alpaca", "equity": 5000.0})
         positions_fn = MagicMock(
-            return_value=[{"symbol": "AAPL", "market_value": 1000.0, "unrealized_pl": 50.0}]
+            return_value=[
+                {"symbol": "AAPL", "currency": "USD", "market_value": 1000.0, "unrealized_pl": 50.0}
+            ]
         )
         result = self._make_result()
 
@@ -75,20 +84,22 @@ class TestCollectBroker:
 
         assert result["positions"] == []
 
-    def test_missing_market_value_treated_as_zero(self):
+    def test_missing_market_value_is_unavailable(self):
         account_fn = MagicMock(return_value={"broker": "ibkr"})
         positions_fn = MagicMock(return_value=[{"symbol": "SPY"}])  # no market_value
         result = self._make_result()
 
         _collect_broker("ibkr", positions_fn, account_fn, result)
 
-        assert result["total_market_value_usd"] == pytest.approx(0.0)
+        assert result["total_market_value_usd"] is None
 
     def test_unrealized_pnl_from_unrealized_pl_key(self):
         """Some brokers use 'unrealized_pl', others 'unrealized_pnl'."""
         account_fn = MagicMock(return_value={"broker": "ibkr"})
         positions_fn = MagicMock(
-            return_value=[{"symbol": "SPY", "market_value": 500.0, "unrealized_pl": 25.0}]
+            return_value=[
+                {"symbol": "SPY", "currency": "USD", "market_value": 500.0, "unrealized_pl": 25.0}
+            ]
         )
         result = self._make_result()
 
@@ -107,11 +118,11 @@ class TestGetPortfolioSummary:
     def test_all_brokers_queried_when_no_filter(self):
         called = []
 
-        def fake_collect(name, pos_fn, acc_fn, result):
+        def fake_collect(name, pos_fn, acc_fn, result, account):
             called.append(name)
 
         with patch("src.tools.portfolio._collect_broker", side_effect=fake_collect):
-            get_portfolio_summary()
+            get_portfolio_summary(accounts=FIXTURE_ACCOUNTS)
 
         assert "alpaca" in called
         assert "ibkr" in called
@@ -121,28 +132,28 @@ class TestGetPortfolioSummary:
     def test_single_broker_filter(self):
         called = []
 
-        def fake_collect(name, pos_fn, acc_fn, result):
+        def fake_collect(name, pos_fn, acc_fn, result, account):
             called.append(name)
 
         with patch("src.tools.portfolio._collect_broker", side_effect=fake_collect):
-            get_portfolio_summary(broker="alpaca")
+            get_portfolio_summary(broker="alpaca", accounts=FIXTURE_ACCOUNTS)
 
         assert called == ["alpaca"]
 
-    def test_totals_rounded_to_two_decimals(self):
-        def fake_collect(name, pos_fn, acc_fn, result):
+    def test_totals_preserve_source_precision(self):
+        def fake_collect(name, pos_fn, acc_fn, result, account):
             result["total_market_value_usd"] += 1000.123456
             result["total_unrealized_pnl_usd"] += 12.987654
 
         with patch("src.tools.portfolio._collect_broker", side_effect=fake_collect):
-            result = get_portfolio_summary()
+            result = get_portfolio_summary(accounts=FIXTURE_ACCOUNTS)
 
-        # After 4 brokers: 4 * 1000.123456 = 4000.493824 → rounded to 4000.49
-        assert result["total_market_value_usd"] == round(result["total_market_value_usd"], 2)
+        # Rounding belongs only in the display layer.
+        assert result["total_market_value_usd"] == pytest.approx(4000.493824)
 
     def test_returns_expected_structure(self):
         with patch("src.tools.portfolio._collect_broker"):
-            result = get_portfolio_summary()
+            result = get_portfolio_summary(accounts=FIXTURE_ACCOUNTS)
 
         assert "positions" in result
         assert "accounts" in result
@@ -161,7 +172,7 @@ class TestGetAccountInfo:
         mock_fn = MagicMock(return_value={"equity": 5000})
         with patch("src.tools.portfolio.alpaca_tool") as mock_alpaca:
             mock_alpaca.get_alpaca_account = mock_fn
-            result = get_account_info("alpaca")
+            result = get_account_info("alpaca", account=FIXTURE_ACCOUNTS[0])
         assert result == {"equity": 5000}
 
     def test_unknown_broker_returns_error(self):
@@ -185,5 +196,5 @@ class TestGetTradeHistory:
         mock_orders = [{"id": "1", "symbol": "AAPL"}]
         with patch("src.tools.portfolio.alpaca_tool") as mock_alpaca:
             mock_alpaca.get_alpaca_orders = MagicMock(return_value=mock_orders)
-            result = get_trade_history("alpaca", days=10)
+            result = get_trade_history("alpaca", days=10, account=FIXTURE_ACCOUNTS[0])
         assert result == mock_orders

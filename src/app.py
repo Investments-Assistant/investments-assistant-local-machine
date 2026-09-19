@@ -8,12 +8,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from src.agent.clients import create_llm_client
-from src.agent.utils.logger import get_logger, setup_logging
 from src.config import settings
-from src.db.database import create_all_tables
-from src.scheduler.jobs import setup_scheduler, shutdown_scheduler
 from src.web.routes import STATIC_DIR, router
+from src.db.database import create_all_tables
+from src.agent.clients import create_llm_client
+from src.scheduler.jobs import setup_scheduler, shutdown_scheduler
+from src.agent.utils.logger import get_logger, setup_logging
 
 setup_logging()
 logger = get_logger(__name__)

@@ -1,0 +1,258 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 5 items
+
+tests/unit/portfolio_replay_test.py FFFFF                                [100%]
+
+=================================== FAILURES ===================================
+___ test_momentum_uses_later_open_and_marks_final_holdings_without_fake_sale ___
+
+    def test_momentum_uses_later_open_and_marks_final_holdings_without_fake_sale():
+>       result = replay({"SPYL": bars()})
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/portfolio_replay_test.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/portfolio_replay_test.py:33: in replay
+    return replay_portfolio(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+series = {'SPYL': [Bar(symbol='SPYL', open_at=datetime.datetime(2024, 1, 29, 8, 0, tzinfo=datetime.timezone.utc), close_at=date...x_as_of=datetime.datetime(2024, 2, 2, 8, 0, tzinfo=datetime.timezone.utc), split=Decimal('1'), dividend=Decimal('0'))]}
+
+    def replay_portfolio(
+        series: dict[str, list[Bar]],
+        *,
+        capital: Decimal,
+        base_currency: str,
+        strategy: str,
+        params: dict,
+        costs: Costs,
+        source: dict,
+    ):
+        if not series or len(series) > 20 or sum(map(len, series.values())) > 100000:
+            raise ValueError("Provide 1..20 instruments and at most100000 session bars")
+        if strategy not in {"cash", "buy_and_hold", "momentum", "sma_crossover", "rsi_mean_reversion"}:
+            raise ValueError("Unsupported strategy")
+        for bars in series.values():
+            validate(bars, costs, capital, base_currency)
+        if any(any(bar.symbol != symbol for bar in bars) for symbol, bars in series.items()):
+            raise ValueError("Instrument series identity mismatch")
+        days = defaultdict(list)
+        for bars in series.values():
+            for bar in bars:
+                days[bar.close_at.date()].append(bar)
+>       cash, fees, realized, dividends, turnover = capital, ZERO, ZERO, ZERO, ZERO, ZERO
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: too many values to unpack (expected 5)
+
+src/research/portfolio.py:95: ValueError
+___________ test_multi_currency_shared_cash_never_labels_usd_as_eur ____________
+
+    def test_multi_currency_shared_cash_never_labels_usd_as_eur():
+>       result = replay(
+            {"EUR": bars("EUR", (10, 10, 10)), "USD": bars("USD", (20, 20, 20), "USD", ".5")},
+            strategy="buy_and_hold",
+        )
+
+tests/unit/portfolio_replay_test.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/portfolio_replay_test.py:33: in replay
+    return replay_portfolio(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+series = {'EUR': [Bar(symbol='EUR', open_at=datetime.datetime(2024, 1, 29, 8, 0, tzinfo=datetime.timezone.utc), close_at=dateti..._as_of=datetime.datetime(2024, 1, 31, 8, 0, tzinfo=datetime.timezone.utc), split=Decimal('1'), dividend=Decimal('0'))]}
+
+    def replay_portfolio(
+        series: dict[str, list[Bar]],
+        *,
+        capital: Decimal,
+        base_currency: str,
+        strategy: str,
+        params: dict,
+        costs: Costs,
+        source: dict,
+    ):
+        if not series or len(series) > 20 or sum(map(len, series.values())) > 100000:
+            raise ValueError("Provide 1..20 instruments and at most100000 session bars")
+        if strategy not in {"cash", "buy_and_hold", "momentum", "sma_crossover", "rsi_mean_reversion"}:
+            raise ValueError("Unsupported strategy")
+        for bars in series.values():
+            validate(bars, costs, capital, base_currency)
+        if any(any(bar.symbol != symbol for bar in bars) for symbol, bars in series.items()):
+            raise ValueError("Instrument series identity mismatch")
+        days = defaultdict(list)
+        for bars in series.values():
+            for bar in bars:
+                days[bar.close_at.date()].append(bar)
+>       cash, fees, realized, dividends, turnover = capital, ZERO, ZERO, ZERO, ZERO, ZERO
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: too many values to unpack (expected 5)
+
+src/research/portfolio.py:95: ValueError
+_ test_retained_strategy_flows_have_costs_and_later_fills[buy_and_hold-params0] _
+
+strategy = 'buy_and_hold', params = {}
+
+    @pytest.mark.parametrize(
+        "strategy,params",
+        [
+            ("buy_and_hold", {}),
+            ("sma_crossover", {"fast": 2, "slow": 3}),
+            ("rsi_mean_reversion", {"rsi_buy": 30, "rsi_sell": 70}),
+        ],
+    )
+    def test_retained_strategy_flows_have_costs_and_later_fills(strategy, params):
+        prices = tuple(range(120, 99, -1)) + tuple(range(100, 130))
+>       result = replay({"SPYL": bars(prices=prices)}, strategy=strategy, costs=Costs(), **params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/portfolio_replay_test.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/portfolio_replay_test.py:33: in replay
+    return replay_portfolio(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+series = {'SPYL': [Bar(symbol='SPYL', open_at=datetime.datetime(2024, 1, 29, 8, 0, tzinfo=datetime.timezone.utc), close_at=date...of=datetime.datetime(2024, 2, 3, 8, 0, tzinfo=datetime.timezone.utc), split=Decimal('1'), dividend=Decimal('0')), ...]}
+
+    def replay_portfolio(
+        series: dict[str, list[Bar]],
+        *,
+        capital: Decimal,
+        base_currency: str,
+        strategy: str,
+        params: dict,
+        costs: Costs,
+        source: dict,
+    ):
+        if not series or len(series) > 20 or sum(map(len, series.values())) > 100000:
+            raise ValueError("Provide 1..20 instruments and at most100000 session bars")
+        if strategy not in {"cash", "buy_and_hold", "momentum", "sma_crossover", "rsi_mean_reversion"}:
+            raise ValueError("Unsupported strategy")
+        for bars in series.values():
+            validate(bars, costs, capital, base_currency)
+        if any(any(bar.symbol != symbol for bar in bars) for symbol, bars in series.items()):
+            raise ValueError("Instrument series identity mismatch")
+        days = defaultdict(list)
+        for bars in series.values():
+            for bar in bars:
+                days[bar.close_at.date()].append(bar)
+>       cash, fees, realized, dividends, turnover = capital, ZERO, ZERO, ZERO, ZERO, ZERO
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: too many values to unpack (expected 5)
+
+src/research/portfolio.py:95: ValueError
+_ test_retained_strategy_flows_have_costs_and_later_fills[sma_crossover-params1] _
+
+strategy = 'sma_crossover', params = {'fast': 2, 'slow': 3}
+
+    @pytest.mark.parametrize(
+        "strategy,params",
+        [
+            ("buy_and_hold", {}),
+            ("sma_crossover", {"fast": 2, "slow": 3}),
+            ("rsi_mean_reversion", {"rsi_buy": 30, "rsi_sell": 70}),
+        ],
+    )
+    def test_retained_strategy_flows_have_costs_and_later_fills(strategy, params):
+        prices = tuple(range(120, 99, -1)) + tuple(range(100, 130))
+>       result = replay({"SPYL": bars(prices=prices)}, strategy=strategy, costs=Costs(), **params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/portfolio_replay_test.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/portfolio_replay_test.py:33: in replay
+    return replay_portfolio(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+series = {'SPYL': [Bar(symbol='SPYL', open_at=datetime.datetime(2024, 1, 29, 8, 0, tzinfo=datetime.timezone.utc), close_at=date...of=datetime.datetime(2024, 2, 3, 8, 0, tzinfo=datetime.timezone.utc), split=Decimal('1'), dividend=Decimal('0')), ...]}
+
+    def replay_portfolio(
+        series: dict[str, list[Bar]],
+        *,
+        capital: Decimal,
+        base_currency: str,
+        strategy: str,
+        params: dict,
+        costs: Costs,
+        source: dict,
+    ):
+        if not series or len(series) > 20 or sum(map(len, series.values())) > 100000:
+            raise ValueError("Provide 1..20 instruments and at most100000 session bars")
+        if strategy not in {"cash", "buy_and_hold", "momentum", "sma_crossover", "rsi_mean_reversion"}:
+            raise ValueError("Unsupported strategy")
+        for bars in series.values():
+            validate(bars, costs, capital, base_currency)
+        if any(any(bar.symbol != symbol for bar in bars) for symbol, bars in series.items()):
+            raise ValueError("Instrument series identity mismatch")
+        days = defaultdict(list)
+        for bars in series.values():
+            for bar in bars:
+                days[bar.close_at.date()].append(bar)
+>       cash, fees, realized, dividends, turnover = capital, ZERO, ZERO, ZERO, ZERO, ZERO
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: too many values to unpack (expected 5)
+
+src/research/portfolio.py:95: ValueError
+_ test_retained_strategy_flows_have_costs_and_later_fills[rsi_mean_reversion-params2] _
+
+strategy = 'rsi_mean_reversion', params = {'rsi_buy': 30, 'rsi_sell': 70}
+
+    @pytest.mark.parametrize(
+        "strategy,params",
+        [
+            ("buy_and_hold", {}),
+            ("sma_crossover", {"fast": 2, "slow": 3}),
+            ("rsi_mean_reversion", {"rsi_buy": 30, "rsi_sell": 70}),
+        ],
+    )
+    def test_retained_strategy_flows_have_costs_and_later_fills(strategy, params):
+        prices = tuple(range(120, 99, -1)) + tuple(range(100, 130))
+>       result = replay({"SPYL": bars(prices=prices)}, strategy=strategy, costs=Costs(), **params)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/portfolio_replay_test.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/portfolio_replay_test.py:33: in replay
+    return replay_portfolio(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+series = {'SPYL': [Bar(symbol='SPYL', open_at=datetime.datetime(2024, 1, 29, 8, 0, tzinfo=datetime.timezone.utc), close_at=date...of=datetime.datetime(2024, 2, 3, 8, 0, tzinfo=datetime.timezone.utc), split=Decimal('1'), dividend=Decimal('0')), ...]}
+
+    def replay_portfolio(
+        series: dict[str, list[Bar]],
+        *,
+        capital: Decimal,
+        base_currency: str,
+        strategy: str,
+        params: dict,
+        costs: Costs,
+        source: dict,
+    ):
+        if not series or len(series) > 20 or sum(map(len, series.values())) > 100000:
+            raise ValueError("Provide 1..20 instruments and at most100000 session bars")
+        if strategy not in {"cash", "buy_and_hold", "momentum", "sma_crossover", "rsi_mean_reversion"}:
+            raise ValueError("Unsupported strategy")
+        for bars in series.values():
+            validate(bars, costs, capital, base_currency)
+        if any(any(bar.symbol != symbol for bar in bars) for symbol, bars in series.items()):
+            raise ValueError("Instrument series identity mismatch")
+        days = defaultdict(list)
+        for bars in series.values():
+            for bar in bars:
+                days[bar.close_at.date()].append(bar)
+>       cash, fees, realized, dividends, turnover = capital, ZERO, ZERO, ZERO, ZERO, ZERO
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: too many values to unpack (expected 5)
+
+src/research/portfolio.py:95: ValueError
+=========================== short test summary info ============================
+FAILED tests/unit/portfolio_replay_test.py::test_momentum_uses_later_open_and_marks_final_holdings_without_fake_sale
+FAILED tests/unit/portfolio_replay_test.py::test_multi_currency_shared_cash_never_labels_usd_as_eur
+FAILED tests/unit/portfolio_replay_test.py::test_retained_strategy_flows_have_costs_and_later_fills[buy_and_hold-params0]
+FAILED tests/unit/portfolio_replay_test.py::test_retained_strategy_flows_have_costs_and_later_fills[sma_crossover-params1]
+FAILED tests/unit/portfolio_replay_test.py::test_retained_strategy_flows_have_costs_and_later_fills[rsi_mean_reversion-params2]
+============================== 5 failed in 1.36s ===============================

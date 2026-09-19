@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "tier": "compose-config-only",
+  "daemon_started": false,
+  "profiles": [
+    {
+      "profile": "default_loopback",
+      "nginx_ports": [
+        {
+          "mode": "ingress",
+          "host_ip": "127.0.0.1",
+          "target": 80,
+          "published": "8080",
+          "protocol": "tcp"
+        },
+        {
+          "mode": "ingress",
+          "host_ip": "127.0.0.1",
+          "target": 443,
+          "published": "8443",
+          "protocol": "tcp"
+        }
+      ],
+      "private_services_unpublished": true,
+      "trusted_proxy": "172.30.80.3",
+      "log_rotation": "10m x 3 per service"
+    },
+    {
+      "profile": "explicit_fixture_lan",
+      "nginx_ports": [
+        {
+          "mode": "ingress",
+          "host_ip": "192.168.50.10",
+          "target": 80,
+          "published": "8080",
+          "protocol": "tcp"
+        },
+        {
+          "mode": "ingress",
+          "host_ip": "192.168.50.10",
+          "target": 443,
+          "published": "8443",
+          "protocol": "tcp"
+        }
+      ],
+      "private_services_unpublished": true,
+      "trusted_proxy": "172.30.80.3",
+      "log_rotation": "10m x 3 per service"
+    }
+  ]
+}

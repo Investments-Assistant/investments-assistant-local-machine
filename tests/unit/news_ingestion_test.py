@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from src.news.ingestion import get_article_count, ingest_articles, run_ingestion
+from src.news.ingestion import run_ingestion, ingest_articles, get_article_count
 
 
 def _make_article(url: str = "https://example.com/1") -> dict:
@@ -42,7 +42,7 @@ class TestIngestArticles:
     async def test_valid_articles_inserted(self, mock_async_session_factory):
         # Arrange
         mock_execute_result = MagicMock()
-        mock_execute_result.rowcount = 2
+        mock_execute_result.scalars.return_value.all.return_value = [MagicMock(), MagicMock()]
         mock_async_session_factory.return_value.execute = AsyncMock(
             return_value=mock_execute_result
         )
@@ -57,7 +57,7 @@ class TestIngestArticles:
 
     async def test_session_commit_called(self, mock_async_session_factory):
         mock_execute_result = MagicMock()
-        mock_execute_result.rowcount = 1
+        mock_execute_result.scalars.return_value.all.return_value = [MagicMock()]
         session = mock_async_session_factory.return_value
         session.execute = AsyncMock(return_value=mock_execute_result)
         session.commit = AsyncMock()
@@ -74,29 +74,16 @@ class TestIngestArticles:
 
 @pytest.mark.unit
 class TestRunIngestion:
-    async def test_calls_fetch_all_and_ingest(self):
-        articles = [_make_article()]
-        with patch("src.news.ingestion.fetch_all", new=AsyncMock(return_value=articles)):
-            with patch("src.news.ingestion.ingest_articles", new=AsyncMock(return_value=1)):
-                stats = await run_ingestion()
+    async def test_missing_identity_never_fetches(self):
+        result = await run_ingestion()
+        assert result["status"] == "blocked"
+        assert result["error_code"] == "NEWS_PRINCIPAL_REQUIRED"
 
-        assert stats["fetched"] == 1
-        assert stats["inserted"] == 1
-
-    async def test_exception_returns_error_dict(self):
-        with patch("src.news.ingestion.fetch_all", new=AsyncMock(side_effect=RuntimeError("net"))):
-            stats = await run_ingestion()
-
-        assert stats["fetched"] == 0
-        assert "error" in stats
-
-    async def test_days_back_passed_to_fetch_all(self):
-        mock_fetch = AsyncMock(return_value=[])
-        with patch("src.news.ingestion.fetch_all", new=mock_fetch):
-            with patch("src.news.ingestion.ingest_articles", new=AsyncMock(return_value=0)):
-                await run_ingestion(days_back=7)
-
-        mock_fetch.assert_called_once_with(days_back=7)
+    async def test_selected_identity_and_interval_are_preserved(self):
+        expected = {"status": "complete", "fetched": 3, "inserted": 2}
+        with patch("src.news.runtime.run_sources", AsyncMock(return_value=expected)) as run:
+            assert await run_ingestion(days_back=7, user_id="fixture") == expected
+        run.assert_awaited_once_with(user_id="fixture", days_back=7)
 
 
 # ---------------------------------------------------------------------------
@@ -107,9 +94,15 @@ class TestRunIngestion:
 @pytest.mark.unit
 class TestGetArticleCount:
     async def test_returns_row_count(self, mock_async_session_factory):
-        mock_result = MagicMock()
-        mock_result.all.return_value = [MagicMock()] * 42
-        mock_async_session_factory.return_value.execute = AsyncMock(return_value=mock_result)
+        mock_async_session_factory.return_value.scalar = AsyncMock(return_value=42)
 
         count = await get_article_count()
         assert count == 42
+
+
+@pytest.mark.unit
+async def test_unavailable_sources_are_not_reported_as_successful_empty_feed():
+    failed = {"status": "partial_failure", "source_failures": [{"error_code": "PUBLIC_HTTP_503"}]}
+    with patch("src.news.runtime.run_sources", AsyncMock(return_value=failed)):
+        result = await run_ingestion(user_id="fixture")
+    assert result["status"] == "partial_failure" and result["source_failures"]

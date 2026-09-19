@@ -67,5 +67,5 @@ async def test_trade_confirmation_cannot_cross_user_boundary():
         result = await dispatcher._confirm_trade({"confirmation_id": confirmation_id})
 
     assert result["blocked"] is True
-    assert "another chat session" in result["reason"]
+    assert result["reason_code"] == "HUMAN_APPROVAL_REQUIRED"
     dispatcher._pending_trade_proposals.pop(confirmation_id, None)

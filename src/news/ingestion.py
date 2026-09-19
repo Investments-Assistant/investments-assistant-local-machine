@@ -1,79 +1,159 @@
 """Ingestion pipeline: fetch from all sources and persist to PostgreSQL.
 
-Deduplication is done at the DB level via the unique constraint on `url`.
-Insert-or-ignore semantics: articles already in the DB are silently skipped.
+URL upserts append immutable revisions only when observed content changes.
+Publication timestamps never substitute for locally observed availability.
 """
 
 from __future__ import annotations
 
+import json
 from typing import Any
+import hashlib
+from contextlib import asynccontextmanager
 
-from sqlalchemy import select
-from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy import or_, cast, func, select
+from sqlalchemy.dialects.postgresql import (
+    JSONB,
+    insert as pg_insert,
+)
 
-from src.agent.utils.logger import get_logger
+from src.db.models import NewsArticle, NewsRevision
 from src.db.database import async_session
-from src.db.models import NewsArticle
-from src.news.sources import fetch_all
+from src.news.visibility import visible_to
+from src.security.sessions import assert_active
+from src.agent.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
-async def ingest_articles(articles: list[dict[str, Any]]) -> int:
+@asynccontextmanager
+async def _article_session(existing):
+    if existing is not None:
+        yield existing
+    else:
+        async with async_session() as session:
+            yield session
+
+
+async def ingest_articles(articles: list[dict[str, Any]], *, owner_user_id: str | None = None, db_session=None) -> int:
     """Persist *articles* to the DB. Returns the count of newly inserted rows.
 
-    Uses PostgreSQL's ON CONFLICT DO NOTHING so duplicate URLs are silently
-    skipped without raising an error.
+    Returns newly inserted or corrected articles; exact repeated content is skipped.
     """
     if not articles:
         return 0
 
     rows = [
         {
+            "content_hash": hashlib.sha256(
+                json.dumps(
+                    {k: a.get(k) for k in ("title", "summary", "content", "published_at")},
+                    sort_keys=True,
+                    default=str,
+                    ensure_ascii=False,
+                ).encode()
+            ).hexdigest(),
+            "available_at": func.clock_timestamp(),
+            "provenance": {
+                "language": a.get("language", "unknown"),
+                "license": a.get("license", "unverified"),
+                "retention": a.get("retention", "operator_review_required"),
+                "entities": a.get("tags", []),
+            },
             "title": a["title"],
             "summary": a.get("summary", ""),
             "content": a.get("content"),
             "source": a["source"],
-            "url": a["url"],
+            "url": ("newsletter://" + hashlib.sha256((owner_user_id + "\0" + a["url"]).encode()).hexdigest())
+            if owner_user_id
+            else a["url"],
+            "user_id": owner_user_id,
+            "visibility": "private" if owner_user_id else "public",
             "published_at": a.get("published_at"),
             "sentiment_label": a.get("sentiment_label", "neutral"),
             "sentiment_score": a.get("sentiment_score", 0.0),
             "tags": a.get("tags", []),
         }
         for a in articles
-        if a.get("url")
+        if a.get("url") and (owner_user_id or a["url"].startswith("https://"))
     ]
 
     if not rows:
         return 0
 
-    async with async_session() as session:
-        stmt = pg_insert(NewsArticle).values(rows).on_conflict_do_nothing(index_elements=["url"])
-        result = await session.execute(stmt)
-        await session.commit()
-        return result.rowcount or 0
-
-
-async def run_ingestion(days_back: int = 1) -> dict[str, Any]:
-    """Fetch all sources and persist. Returns stats dict."""
-    logger.info("News ingestion started (days_back=%d)", days_back)
-    try:
-        articles = await fetch_all(days_back=days_back)
-        fetched = len(articles)
-        inserted = await ingest_articles(articles)
-        logger.info("News ingestion done: fetched=%d new=%d", fetched, inserted)
-        return {"fetched": fetched, "inserted": inserted}
-    except Exception as exc:
-        logger.error("News ingestion failed: %s", exc)
-        return {"fetched": 0, "inserted": 0, "error": str(exc)}
-
-
-async def get_article_count() -> int:
-    """Return total number of articles stored."""
-    async with async_session() as session:
-        result = await session.execute(
-            select(NewsArticle).with_only_columns(  # type: ignore[call-overload]
-                NewsArticle.id
-            )
+    async with _article_session(db_session) as session:
+        if owner_user_id:
+            await assert_active(session, owner_user_id)
+        # Collapse exact repeated URLs within a batch before PostgreSQL upsert.
+        rows = list({row["url"]: row for row in rows}.values())
+        insert = pg_insert(NewsArticle).values(rows)
+        mutable = (
+            "title",
+            "summary",
+            "content",
+            "published_at",
+            "sentiment_label",
+            "sentiment_score",
+            "tags",
+            "content_hash",
+            "available_at",
+            "provenance",
+            "source",
         )
-        return len(result.all())
+        statement = (
+            insert.on_conflict_do_update(
+                index_elements=["url"],
+                set_={key: getattr(insert.excluded, key) for key in mutable},
+                where=or_(
+                    NewsArticle.content_hash.is_distinct_from(insert.excluded.content_hash),
+                    cast(NewsArticle.provenance, JSONB).is_distinct_from(cast(insert.excluded.provenance, JSONB)),
+                    NewsArticle.source.is_distinct_from(insert.excluded.source),
+                    NewsArticle.sentiment_label.is_distinct_from(insert.excluded.sentiment_label),
+                    NewsArticle.sentiment_score.is_distinct_from(insert.excluded.sentiment_score),
+                )
+                & (NewsArticle.visibility == insert.excluded.visibility)
+                & (NewsArticle.user_id.is_not_distinct_from(insert.excluded.user_id)),
+            )
+            .returning(NewsArticle)
+            .execution_options(populate_existing=True)
+        )
+        changed = (await session.execute(statement)).scalars().all()
+        for article in changed:
+            session.add(
+                NewsRevision(
+                    article_id=article.id,
+                    content_hash=article.content_hash,
+                    available_at=article.available_at,
+                    evidence={
+                        key: (value.isoformat() if hasattr(value, "isoformat") else value)
+                        for key in (
+                            "title",
+                            "summary",
+                            "content",
+                            "source",
+                            "url",
+                            "published_at",
+                            "provenance",
+                            "sentiment_label",
+                            "sentiment_score",
+                        )
+                        for value in [getattr(article, key)]
+                    },
+                )
+            )
+        if db_session is None:
+            await session.commit()
+        return len(changed)
+
+
+async def run_ingestion(days_back: int = 1, *, user_id: str | None = None) -> dict[str, Any]:
+    """Run durable ingestion only for an explicitly selected active principal."""
+    from src.news.runtime import run_sources
+
+    return await run_sources(user_id=user_id, days_back=days_back)
+
+
+async def get_article_count(*, user_id: str | None = None) -> int:
+    """Count only articles visible to the current principal, entirely in SQL."""
+    async with async_session() as session:
+        return await session.scalar(select(func.count()).select_from(NewsArticle).where(visible_to(user_id))) or 0

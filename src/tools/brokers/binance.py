@@ -2,19 +2,19 @@
 
 from __future__ import annotations
 
+from contextlib import suppress
+
 from src.agent.utils.logger import get_logger
-from src.config import settings
+from src.execution.external import disabled_external_write
 from src.tools.broker_accounts import BrokerAccountConfig
 
 logger = get_logger(__name__)
 
 
 def _config(account: BrokerAccountConfig | None) -> dict:
-    return account.config if account else {
-        "api_key": settings.binance_api_key,
-        "secret_key": settings.binance_secret_key,
-        "testnet": settings.binance_testnet,
-    }
+    if account is None or not account.id or not account.user_id or account.broker != "binance":
+        return {}
+    return account.config
 
 
 def _configured(account: BrokerAccountConfig | None = None) -> bool:
@@ -87,10 +87,8 @@ def get_binance_orders(
             # Binance requires a symbol; fetch BTCUSDT, ETHUSDT as defaults
             orders = []
             for sym in ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"]:
-                try:
+                with suppress(Exception):
                     orders.extend(client.get_all_orders(symbol=sym, limit=20))
-                except Exception:
-                    pass
         return [
             {
                 "order_id": str(o["orderId"]),
@@ -110,6 +108,7 @@ def get_binance_orders(
         return [{"error": str(exc)}]
 
 
+@disabled_external_write
 def submit_binance_order(
     symbol: str,
     side: str,
@@ -125,10 +124,10 @@ def submit_binance_order(
         return _not_configured(account)
     try:
         from binance.enums import (
-            ORDER_TYPE_LIMIT,
-            ORDER_TYPE_MARKET,
             SIDE_BUY,
             SIDE_SELL,
+            ORDER_TYPE_LIMIT,
+            ORDER_TYPE_MARKET,
             TIME_IN_FORCE_GTC,
         )
 
@@ -171,6 +170,7 @@ def submit_binance_order(
         return {"success": False, "error": str(exc)}
 
 
+@disabled_external_write
 def cancel_binance_order(
     order_id: str,
     symbol: str = "BTCUSDT",

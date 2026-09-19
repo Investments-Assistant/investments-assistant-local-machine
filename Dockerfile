@@ -49,6 +49,8 @@ RUN poetry config virtualenvs.create false \
 
 # Copy source
 COPY src/ ./src/
+COPY alembic.ini ./alembic.ini
+COPY migrations/ ./migrations/
 COPY .env.example ./.env.example
 RUN mkdir -p /app/scripts
 COPY scripts/create_user.py ./scripts/create_user.py
@@ -61,4 +63,4 @@ USER appuser
 
 EXPOSE 8000
 
-CMD ["python", "-m", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "info"]
+CMD ["python", "-m", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "info", "--no-proxy-headers"]

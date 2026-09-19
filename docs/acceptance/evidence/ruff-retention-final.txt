@@ -1,0 +1,12 @@
+E501 Line too long (128 > 120)
+   --> scripts/verify_browser.py:394:121
+    |
+392 | …                     "independent approval",
+393 | …                     "independent simulator mandate approval",
+394 | …                     "expense import, currencies, pages, category, full-period export and raw-payload retention",
+    |                                                                                                           ^^^^^^^^
+395 | …                     "bank disabled status; intercepted UI consent/selection/retry/disconnect",
+396 | …                     "cost-aware replay, evidence download/reproduction/isolation",
+    |
+
+Found 1 error.

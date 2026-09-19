@@ -21,11 +21,11 @@ Usage
 
 from __future__ import annotations
 
-import argparse
-from dataclasses import dataclass
+import sys
 import json
 from pathlib import Path
-import sys
+import argparse
+from dataclasses import dataclass
 import urllib.error
 import urllib.request
 

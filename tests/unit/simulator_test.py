@@ -8,9 +8,9 @@ import pandas as pd
 import pytest
 
 from src.tools.simulator import (
-    _crossover_signal,
     _metrics,
     run_simulation,
+    _crossover_signal,
 )
 
 # ---------------------------------------------------------------------------
@@ -119,10 +119,28 @@ class TestMetrics:
 
 @pytest.mark.unit
 class TestRunSimulation:
-    def _make_prices(self) -> pd.DataFrame:
-        dates = pd.date_range("2023-01-01", periods=100, freq="D")
-        p = 100 + pd.Series(range(100), dtype=float) * 0.5
-        return pd.DataFrame({"AAPL": p.values}, index=dates)
+    def _make_prices(self):
+        from decimal import Decimal
+        from datetime import UTC, datetime, timedelta
+
+        from src.research.replay import Bar
+
+        start = datetime(2023, 1, 1, 9, tzinfo=UTC)
+        bars = [
+            Bar(
+                "AAPL",
+                start + timedelta(days=i),
+                start + timedelta(days=i, hours=8),
+                Decimal(100 + i),
+                Decimal(100 + i),
+                Decimal(100000),
+                "USD",
+                Decimal(1),
+                start + timedelta(days=i),
+            )
+            for i in range(100)
+        ]
+        return {"AAPL": bars}, {"fixture": True}
 
     def test_buy_and_hold_returns_result(self):
         prices = self._make_prices()

@@ -1,0 +1,60 @@
+{
+  "tier": "real-application-model-synthetic-tools",
+  "timestamp": "2026-09-08T14:17:19.718129+00:00",
+  "load_seconds": 1.5249812769980053,
+  "model": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+  "peak_process_rss_mib": 1988.69921875,
+  "observations": [
+    {
+      "required_tools": [
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [
+        "get_portfolio_summary"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 85.4220073969991,
+      "final_answer": "The current portfolio summary is untrusted and incomplete. The holdings are listed as FIXTURE with a quantity of 0.004, but the value in USD is not provided. The valuation status is partial, indicating that not all holdings have been valued. The account is synthetic and not connected to a real broker, which raises concerns about the accuracy of the data. The execution count is zero, suggesting no trades have been executed on this account. Without more detailed information, it is not possible to provide a complete and accurate analysis of your portfolio.",
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "required_tools": [
+        "get_latest_news",
+        "get_market_overview",
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [
+        "get_portfolio_summary",
+        "get_latest_news",
+        "get_market_overview"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 27.11618004200136,
+      "final_answer": "The latest news indicates a synthetic market observation titled \"Synthetic market observation\" from the source \"fixture\" on September 8, 2026. The news does not provide specific market data or analysis. The portfolio exposure is not available due to the unverified tool evidence.",
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "tool_call",
+        "tool_result",
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    }
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "status": "PASS",
+  "limitations": [
+    "Tools return synthetic evidence; no external freshness, broker, DB or browser claim.",
+    "Final text needs factual review; complete events alone do not prove correctness."
+  ]
+}

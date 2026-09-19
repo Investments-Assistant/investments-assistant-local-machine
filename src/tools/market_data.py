@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import contextlib
-from datetime import UTC, datetime
 from typing import Any
+from datetime import UTC, datetime
+import contextlib
 
-import pandas as pd
 import ta
+import pandas as pd
 import yfinance as yf
 
 from src.agent.utils.logger import get_logger
@@ -156,7 +156,7 @@ def get_technical_indicators(symbol: str, period: str = "6mo") -> dict:
         low = df["Low"]
         volume = df["Volume"]
 
-        # RSI (14)
+        # Relative strength index over 14 periods.
         rsi_indicator = ta.momentum.RSIIndicator(close=close, window=14)
         rsi = rsi_indicator.rsi().iloc[-1]
 
@@ -181,7 +181,7 @@ def get_technical_indicators(symbol: str, period: str = "6mo") -> dict:
             else None
         )
 
-        # ATR (14)
+        # Average true range over 14 periods.
         atr = (
             ta.volatility.AverageTrueRange(high=high, low=low, close=close, window=14)
             .average_true_range()
@@ -272,10 +272,8 @@ def get_options_chain(symbol: str, expiry: str | None = None) -> dict:
         if not exps:
             return {"error": f"No options available for {symbol}"}
 
-        if expiry and expiry in exps:
-            target_exps = [expiry]
-        else:
-            target_exps = list(exps[:3])  # next 3 expiries
+        # Use the selected expiry or the next three available expiries.
+        target_exps = [expiry] if expiry and expiry in exps else list(exps[:3])
 
         result: dict[str, Any] = {"symbol": symbol, "expiries": {}}
         for exp in target_exps:

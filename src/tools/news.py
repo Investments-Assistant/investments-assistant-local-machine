@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
 import re
+from datetime import UTC, datetime, timedelta
 
 import feedparser
 
-from src.agent.utils.logger import get_logger
 from src.config import settings
+from src.agent.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -96,7 +96,9 @@ def _simple_sentiment(text: str) -> dict:
 def _rss_entries(source: str, url: str):
     """Yield (source, entry) pairs from a single RSS feed, suppressing fetch errors."""
     try:
-        feed = feedparser.parse(url)
+        from src.news.http import fetch_public
+
+        feed = feedparser.parse(fetch_public(url).body)
         for entry in feed.entries:
             yield source, entry
     except Exception as exc:
@@ -137,9 +139,7 @@ def _fetch_rss(query: str, max_articles: int) -> list[dict]:
 
 def _fetch_newsapi(query: str, max_articles: int) -> list[dict]:
     """Fetch articles from NewsAPI (requires API key)."""
-    if not settings.newsapi_key or not bool(
-        getattr(settings, "news_api_adapters_enabled", False)
-    ):
+    if not settings.newsapi_key or not bool(getattr(settings, "news_api_adapters_enabled", False)):
         return []
     try:
         from newsapi import NewsApiClient

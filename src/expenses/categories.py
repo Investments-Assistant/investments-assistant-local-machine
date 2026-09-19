@@ -7,8 +7,8 @@ normaliser maps them into this set so summaries remain comparable over time.
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from typing import TypedDict
+from collections.abc import Iterable
 
 
 class CategoryDefinition(TypedDict):
@@ -255,6 +255,8 @@ def normalise_category(
             CATEGORY_TAXONOMY[category_key]["subcategories"][0]
         )
 
+    if transaction_type == "refund":
+        return "income", "refund"
     if transaction_type == "income":
         return "income", subcategory_value or "other income"
     if transaction_type == "transfer":

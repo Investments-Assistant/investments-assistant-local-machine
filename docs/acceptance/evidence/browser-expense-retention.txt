@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 427, in <module>
+    main()
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 276, in main
+    verify_retention(page, context, base, user_a)
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/tests/e2e/expense_retention.py", line 44, in verify_retention
+    asyncio.run(age_fixture(username))
+  File "/usr/lib/python3.12/asyncio/runners.py", line 190, in run
+    raise RuntimeError(
+RuntimeError: asyncio.run() cannot be called from a running event loop
+sys:1: RuntimeWarning: coroutine 'age_fixture' was never awaited

@@ -5,17 +5,16 @@ from __future__ import annotations
 from typing import Any
 
 from src.agent.utils.logger import get_logger
-from src.config import settings
+from src.execution.external import disabled_external_write
 from src.tools.broker_accounts import BrokerAccountConfig
 
 logger = get_logger(__name__)
 
 
 def _config(account: BrokerAccountConfig | None) -> dict:
-    return account.config if account else {
-        "api_key": settings.coinbase_api_key,
-        "api_secret": settings.coinbase_api_secret,
-    }
+    if account is None or not account.id or not account.user_id or account.broker != "coinbase":
+        return {}
+    return account.config
 
 
 def _configured(account: BrokerAccountConfig | None = None) -> bool:
@@ -92,6 +91,7 @@ def get_coinbase_orders(account: BrokerAccountConfig | None = None) -> list[dict
         return [{"error": str(exc)}]
 
 
+@disabled_external_write
 def submit_coinbase_order(
     symbol: str,
     side: str,
@@ -151,6 +151,7 @@ def submit_coinbase_order(
         return {"success": False, "error": str(exc)}
 
 
+@disabled_external_write
 def cancel_coinbase_order(
     order_id: str, account: BrokerAccountConfig | None = None
 ) -> dict:

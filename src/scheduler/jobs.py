@@ -5,16 +5,16 @@ from __future__ import annotations
 import asyncio
 from datetime import UTC, datetime
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from src.agent.utils.logger import get_logger
 from src.config import settings
-from src.news.email_reader import read_and_ingest_newsletters
-from src.news.ingestion import run_ingestion
-from src.tools.market_data import get_market_overview
 from src.tools.news import search_market_news
+from src.news.ingestion import run_ingestion
+from src.news.email_reader import read_and_ingest_newsletters
+from src.tools.market_data import get_market_overview
+from src.agent.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -52,27 +52,29 @@ async def _refresh_market_data() -> None:
 
 
 async def _run_weekly_report() -> None:
-    """Generate and save the weekly report."""
-    logger.info("Scheduled: generating weekly report")
-    today = datetime.now(UTC).strftime("%Y-%m-%d")
-    # Compute last 7 days
+    """Generate reports only for explicitly opted-in, active users."""
     from datetime import timedelta
 
-    start = (datetime.now(UTC) - timedelta(days=7)).strftime("%Y-%m-%d")
-    try:
-        from src.scheduler.reporter import generate_report
+    from src.tools.dispatcher import tool_context
+    from src.operations.runner import run_scoped, monitoring_users
+    from src.scheduler.reporter import generate_report
 
-        result = await generate_report(period_start=start, period_end=today)
-        logger.info("Weekly report generated: %s", result.get("report_id"))
-    except Exception as exc:
-        logger.error("Weekly report generation failed: %s", exc)
+    async def report(user_id):
+        today = datetime.now(UTC).date()
+        with tool_context("scheduled-report", user_id, "recommend"):
+            result = await generate_report(str(today - timedelta(days=7)), str(today))
+            if result.get("status") != "complete":
+                raise RuntimeError("REPORT_PARTIAL_FAILURE")
+
+    for user_id in await monitoring_users():
+        await run_scoped(user_id, "weekly_report", report, interval_seconds=86400)
 
 
 async def _ingest_news() -> None:
     """Fetch and persist articles from all configured sources."""
     logger.info("Scheduled: news ingestion")
-    stats = await run_ingestion(days_back=1)
-    logger.info("News ingestion complete: %s", stats)
+    stats = await run_ingestion(days_back=1, user_id=settings.news_service_user_id or None)
+    logger.info("News ingestion outcome: %s", stats)
 
 
 async def _ingest_newsletter() -> None:
@@ -83,53 +85,36 @@ async def _ingest_newsletter() -> None:
 
 
 async def _autonomous_scan() -> None:
-    """Run a local evidence review; execution remains server-guarded."""
+    """Read-only reviews, with explicit user opt-in and durable completion leases."""
     if not settings.autonomous_scans_enabled:
         return
-    logger.info("Scheduled: autonomous market scan")
-    try:
-        from src.agent.orchestrator import get_or_create_session
+    import uuid
 
-        session = get_or_create_session("autonomous_scanner")
+    from src.operations.runner import run_scoped, monitoring_users
+    from src.agent.orchestrator import get_or_create_session
+
+    async def scan(user_id):
+        session_id = str(uuid.uuid5(uuid.NAMESPACE_URL, "local-monitoring:" + user_id))
+        session = get_or_create_session(session_id, user_id)
         prompt = (
-            "Perform the hourly autonomous investment review. Check the latest stored global "
-            "news, market overview, portfolio exposure, and technical data for configured "
-            "assets. Identify material risks, thesis invalidations, and opportunities across "
-            "stocks, ETFs, options, crypto, and FX. Use evidence and state uncertainty. "
-            f"Current mode is {settings.trading_mode}. In recommend mode, record proposals "
-            "but do not attempt to confirm them. In auto mode, only use execute_trade when "
-            "the server-side limits can be satisfied; never bypass a blocked result."
+            "Review latest stored news, market overview and my portfolio exposure. "
+            "Fetch scoped read evidence, identify missing or stale data, and state uncertainty. "
+            "This is monitoring only. Do not submit, confirm, cancel, or change trading policy."
         )
-        text_parts: list[str] = []
+        model_failed = False
         async for event in session.chat(prompt):
-            if event["type"] == "final_answer":
-                text_parts.append(event["text"])
+            model_failed |= event.get("type") == "error"
+        # Finish persisting scoped partial evidence before raising the job alert.
+        if model_failed:
+            raise RuntimeError("MONITORING_MODEL_UNAVAILABLE")
 
-        summary = "".join(text_parts)
-        if summary:
-            await _persist_analysis(summary, prompt)
-    except Exception as exc:
-        logger.error("Autonomous scan failed: %s", exc)
-
-
-async def _persist_analysis(summary: str, prompt: str) -> None:
-    """Save the autonomous scan result as an Analysis record."""
-    try:
-        from src.db.database import async_session
-        from src.db.models import Analysis
-
-        async with async_session() as session:
-            analysis = Analysis(
-                trigger="scheduled",
-                symbols=[],
-                summary=summary,
-                raw_data={"prompt": prompt},
-            )
-            session.add(analysis)
-            await session.commit()
-        logger.info("Autonomous scan analysis persisted")
-    except Exception as exc:
-        logger.warning("Failed to persist autonomous scan analysis: %s", exc)
+    for user_id in await monitoring_users():
+        await run_scoped(
+            user_id,
+            "market_scan",
+            scan,
+            interval_seconds=settings.autonomous_scan_interval_minutes * 60,
+        )
 
 
 def setup_scheduler() -> None:
@@ -192,6 +177,40 @@ def setup_scheduler() -> None:
         replace_existing=True,
     )
 
+    from src.expenses.runtime import poll_connections
+
+    scheduler.add_job(
+        poll_connections,
+        trigger=IntervalTrigger(minutes=15),
+        id="bank_sync",
+        replace_existing=True,
+        max_instances=1,
+        coalesce=True,
+        misfire_grace_time=60,
+    )
+
+    from src.execution.monitor import monitor_simulator_risk
+    from src.execution.runtime import run_simulator_strategies
+
+    scheduler.add_job(
+        monitor_simulator_risk,
+        trigger=IntervalTrigger(seconds=60),
+        id="simulator_risk_monitor",
+        replace_existing=True,
+        max_instances=1,
+        coalesce=True,
+        misfire_grace_time=30,
+    )
+
+    scheduler.add_job(
+        run_simulator_strategies,
+        trigger=IntervalTrigger(seconds=60),
+        id="approved_simulator_strategies",
+        replace_existing=True,
+        max_instances=1,
+        coalesce=True,
+        misfire_grace_time=30,
+    )
     scheduler.start()
     logger.info("Scheduler started (%d jobs)", len(scheduler.get_jobs()))
 

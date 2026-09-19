@@ -2,16 +2,20 @@
 
 from __future__ import annotations
 
-import asyncio
-from datetime import UTC, datetime, timedelta
+import re
 import json
 import math
-from pathlib import Path
-import re
-import secrets
 import uuid
+import asyncio
+from decimal import Decimal
+from pathlib import Path
+import secrets
+from datetime import UTC, datetime, timedelta
+from contextlib import suppress
 
-from fastapi import APIRouter, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi import Depends, Request, APIRouter, WebSocket, HTTPException, WebSocketDisconnect
+from sqlalchemy import or_, text, delete, select
+from sqlalchemy.exc import IntegrityError
 from fastapi.responses import (
     FileResponse,
     HTMLResponse,
@@ -20,27 +24,53 @@ from fastapi.responses import (
     StreamingResponse,
 )
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import delete, or_, select, text
-from sqlalchemy.exc import IntegrityError
 
-from src.agent.utils.logger import get_logger
 from src.config import settings
-from src.db.database import async_session
+from src.web.auth import (
+    CSRF_COOKIE,
+    SESSION_COOKIE,
+    require_csrf,
+    hash_password,
+    login_allowed,
+    create_session,
+    verify_password,
+    websocket_principal,
+    clear_login_failures,
+    record_login_failure,
+    registration_allowed,
+    require_authenticated,
+    require_mcp_or_browser,
+    websocket_origin_allowed,
+    record_registration_attempt,
+)
 from src.db.models import (
-    BrokerAccount,
+    User,
+    Trade,
+    Report,
+    Project,
+    DailyPnL,
     ChatMessage,
     Conversation,
-    DailyPnL,
-    ExpenseTransaction,
-    Project,
-    Report,
+    BrokerAccount,
     SimulationResult,
-    Trade,
-    User,
+    ExpenseTransaction,
 )
-from src.expenses.categories import CATEGORY_TAXONOMY, category_label
+from src.db.database import async_session
+from src.web.network import trusted_proxy
+from src.chat.evidence import message_turn_fields
 from src.expenses.sync import normalise_transaction
 from src.scheduler.jobs import get_latest_snapshot
+from src.tools.portfolio import get_portfolio_summary
+from src.tools.simulator import run_simulation_async
+from src.expenses.summary import summarize_currencies
+from src.agent.utils.logger import get_logger
+from src.expenses.categories import CATEGORY_TAXONOMY, category_label
+from src.finance.normalization import (
+    usd_value,
+    portfolio_number as _portfolio_number,
+    portfolio_position as _portfolio_position,
+    first_portfolio_number as _first_portfolio_number,
+)
 from src.tools.broker_accounts import (
     BROKER_FIELDS,
     SECRET_FIELDS,
@@ -50,27 +80,8 @@ from src.tools.broker_accounts import (
     decrypt_config,
     encrypt_config,
     ensure_broker_vault,
-    load_user_broker_accounts,
     validate_broker_config,
-)
-from src.tools.portfolio import get_portfolio_summary
-from src.tools.simulator import run_simulation
-from src.web.auth import (
-    CSRF_COOKIE,
-    SESSION_COOKIE,
-    clear_login_failures,
-    create_session,
-    hash_password,
-    login_allowed,
-    record_login_failure,
-    record_registration_attempt,
-    registration_allowed,
-    require_authenticated,
-    require_csrf,
-    require_mcp_or_browser,
-    verify_password,
-    websocket_origin_allowed,
-    websocket_principal,
+    load_user_broker_accounts,
 )
 
 logger = get_logger(__name__)
@@ -93,7 +104,7 @@ templates = Jinja2Templates(directory=str(STATIC_DIR))
 def _get_client_ip(request: Request | WebSocket) -> str:
     # Nginx overwrites X-Real-IP in this deployment.  X-Forwarded-For is kept
     # as a compatibility fallback for tests and other trusted reverse proxies.
-    if settings.trust_proxy_headers:
+    if trusted_proxy(request, settings):
         real_ip = request.headers.get("X-Real-IP")
         if real_ip:
             return real_ip.strip()
@@ -133,37 +144,52 @@ async def websocket_chat(websocket: WebSocket, session_id: str) -> None:
     if not re.fullmatch(r"[A-Za-z0-9_-]{1,36}", session_id):
         await websocket.close(code=4400, reason="Invalid session")
         return
+    from src.web.auth import validate_principal
+    from src.security.sessions import cookie_authority
+
     if principal.user_id:
-        # Signed cookies are deliberately stateless, so check the account's
-        # active flag when a WebSocket is opened. This makes local account
-        # deactivation effective without waiting for cookie expiry.
         try:
-            async with async_session() as db_session:
-                result = await db_session.execute(
-                    select(User).where(
-                        User.id == principal.user_id,
-                        User.is_active.is_(True),
-                    )
-                )
-                if result.scalar_one_or_none() is None:
-                    await websocket.close(code=4001, reason="Authentication required")
-                    return
-        except Exception as exc:
-            logger.error("WebSocket account lookup failed: %s", exc)
-            await websocket.close(code=1013, reason="Authentication service unavailable")
+            await validate_principal(principal, websocket.cookies.get(SESSION_COOKIE))
+        except HTTPException:
+            await websocket.close(code=4001, reason="Authentication required")
             return
 
     await websocket.accept()
-    logger.info("WebSocket connected: session=%s ip=%s", session_id, ip)
+    logger.info("Authenticated WebSocket connected")
 
     from src.agent.orchestrator import get_or_create_session
 
     session = get_or_create_session(session_id, principal.user_id)
     await session.load_history_from_db()
 
+    parent = asyncio.current_task()
+    authority_lost = False
+
+    async def watch_authority():
+        nonlocal authority_lost
+        while True:
+            await asyncio.sleep(1)
+            current = websocket_principal(websocket)
+            try:
+                if current is None:
+                    raise HTTPException(401, "Session expired")
+                if current.user_id:
+                    await validate_principal(current, websocket.cookies.get(SESSION_COOKIE))
+            except HTTPException:
+                authority_lost = True
+                parent.cancel()
+                return
+
+    watcher = asyncio.create_task(watch_authority())
     try:
         while True:
             raw = await websocket.receive_text()
+            current = websocket_principal(websocket)
+            if current is None:
+                await websocket.close(code=4001, reason="Session expired")
+                return
+            if current.user_id:
+                await validate_principal(current, websocket.cookies.get(SESSION_COOKIE))
             try:
                 data = json.loads(raw)
                 user_message = data.get("message", "").strip()
@@ -184,17 +210,23 @@ async def websocket_chat(websocket: WebSocket, session_id: str) -> None:
                 continue
 
             # Stream agent response events back over WebSocket
-            async for event in session.chat(user_message):
-                await websocket.send_json(event)
+            with cookie_authority(websocket.cookies.get(SESSION_COOKIE)):
+                async for event in session.chat(user_message):
+                    await websocket.send_json(event)
 
+    except asyncio.CancelledError:
+        if not authority_lost:
+            raise
+        await websocket.close(code=4001, reason="Session no longer active")
     except WebSocketDisconnect:
-        logger.info("WebSocket disconnected: session=%s", session_id)
+        logger.info("WebSocket disconnected")
     except Exception as exc:
-        logger.exception("WebSocket error: %s", exc)
-        try:
-            await websocket.send_json({"type": "error", "message": str(exc)})
-        except Exception:
-            pass
+        logger.warning("WebSocket error (%s)", type(exc).__name__)
+        with suppress(Exception):
+            await websocket.send_json({"type": "error", "message": "Chat transport unavailable"})
+    finally:
+        watcher.cancel()
+        await asyncio.gather(watcher, return_exceptions=True)
 
 
 # ── REST API ──────────────────────────────────────────────────────────────────
@@ -217,11 +249,13 @@ async def ready() -> dict:
     checks = {"database": False, "model": False}
     try:
         async with async_session() as session:
-            await session.execute(text("SELECT 1"))
-        checks["database"] = True
+            revision = await session.scalar(text("SELECT version_num FROM alembic_version"))
+        checks["database"] = revision == "0012_broker_observations"
     except Exception as exc:
         logger.warning("Readiness database check failed: %s", exc)
-    checks["model"] = Path(settings.llm_model_path).is_file()
+    from src.agent.clients.llama_cpp_client import model_status
+
+    checks["model"] = model_status()["loaded"]
     if not all(checks.values()):
         raise HTTPException(status_code=503, detail={"status": "not_ready", "checks": checks})
     return {"status": "ready", "checks": checks, "timestamp": datetime.now(UTC).isoformat()}
@@ -241,7 +275,11 @@ async def login_page(request: Request) -> HTMLResponse | RedirectResponse:
         from src.web.auth import verify_session
 
         if verify_session(request.cookies.get(SESSION_COOKIE)) is not None:
-            return RedirectResponse("/", status_code=303)
+            try:
+                await require_authenticated(request)
+                return RedirectResponse("/", status_code=303)
+            except HTTPException:
+                pass
     return HTMLResponse(content=(STATIC_DIR / "login.html").read_text(), status_code=200)
 
 
@@ -259,7 +297,11 @@ async def signup_page(request: Request) -> HTMLResponse | RedirectResponse:
         from src.web.auth import verify_session
 
         if verify_session(request.cookies.get(SESSION_COOKIE)) is not None:
-            return RedirectResponse("/", status_code=303)
+            try:
+                await require_authenticated(request)
+                return RedirectResponse("/", status_code=303)
+            except HTTPException:
+                pass
     return HTMLResponse(content=(STATIC_DIR / "signup.html").read_text(), status_code=200)
 
 
@@ -401,7 +443,7 @@ async def register(request: Request) -> JSONResponse:
     dependencies=[Depends(require_allowed_ip), Depends(require_authenticated)],
 )
 async def auth_me(request: Request) -> dict:
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     return {
         "authenticated": True,
         "username": principal.username,
@@ -431,7 +473,7 @@ def _profile_payload(user: User) -> dict:
 )
 async def get_profile(request: Request) -> dict:
     """Return the authenticated user's durable assistant preferences."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         return {
             "user_id": None,
@@ -465,7 +507,7 @@ async def get_profile(request: Request) -> dict:
 )
 async def update_profile(request: Request) -> dict:
     """Persist bounded user description and preference data."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Profile persistence is unavailable")
     try:
@@ -520,7 +562,7 @@ async def update_profile(request: Request) -> dict:
 )
 async def update_trading_mode(request: Request) -> dict:
     """Persist a user's trading mode without mutating the process-global default."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Trading mode persistence is unavailable")
     try:
@@ -593,11 +635,7 @@ def _validated_account_config(
         normalized = validate_broker_config(broker, merged)
     except (TypeError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    missing = [
-        field
-        for field in secret_fields
-        if not str(normalized.get(field, "")).strip()
-    ]
+    missing = [field for field in secret_fields if not str(normalized.get(field, "")).strip()]
     if missing:
         raise HTTPException(
             status_code=400,
@@ -629,7 +667,7 @@ async def broker_account_providers() -> dict:
 )
 async def list_broker_accounts(request: Request) -> dict:
     """List the authenticated user's accounts with secrets masked."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Broker account persistence is unavailable")
     try:
@@ -653,7 +691,7 @@ async def list_broker_accounts(request: Request) -> dict:
 )
 async def create_broker_account(request: Request) -> dict:
     """Create one encrypted broker configuration owned by the current user."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Broker account persistence is unavailable")
     try:
@@ -702,7 +740,7 @@ async def create_broker_account(request: Request) -> dict:
 )
 async def update_broker_account(account_id: str, request: Request) -> dict:
     """Update one owned account; blank secret fields preserve the old secret."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Broker account persistence is unavailable")
     try:
@@ -761,7 +799,7 @@ async def update_broker_account(account_id: str, request: Request) -> dict:
 )
 async def deactivate_broker_account(account_id: str, request: Request) -> dict:
     """Disable an account without destroying its encrypted audit/config record."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Broker account persistence is unavailable")
     try:
@@ -783,45 +821,6 @@ async def deactivate_broker_account(account_id: str, request: Request) -> dict:
     except Exception as exc:
         logger.error("Could not deactivate broker account %s: %s", account_id, exc)
         raise HTTPException(status_code=503, detail="Broker account could not be disabled") from exc
-
-
-def _portfolio_number(value: object) -> float | None:
-    """Convert provider values to finite JSON-safe numbers."""
-    try:
-        number = float(value)  # type: ignore[arg-type]
-    except (TypeError, ValueError):
-        return None
-    return round(number, 2) if math.isfinite(number) else None
-
-
-def _first_portfolio_number(data: dict, *keys: str) -> float | None:
-    for key in keys:
-        value = _portfolio_number(data.get(key))
-        if value is not None:
-            return value
-    return None
-
-
-def _portfolio_position(position: dict) -> dict:
-    """Expose a consistent, non-secret position shape to the dashboard."""
-    symbol = (
-        position.get("symbol")
-        or position.get("asset")
-        or position.get("currency")
-        or "Unknown"
-    )
-    value = _first_portfolio_number(position, "market_value", "value", "usd_value")
-    quantity = _first_portfolio_number(position, "qty", "quantity", "available", "free")
-    price = _first_portfolio_number(position, "current_price", "market_price", "price")
-    pnl = _first_portfolio_number(position, "unrealized_pnl", "unrealized_pl")
-    return {
-        **position,
-        "symbol": str(symbol),
-        "quantity": quantity,
-        "price_usd": price,
-        "value_usd": value,
-        "pnl_usd": pnl,
-    }
 
 
 def _portfolio_account(account: dict) -> dict:
@@ -853,12 +852,13 @@ def _portfolio_account(account: dict) -> dict:
         "broker": account.get("broker", "unknown"),
         "account_id": account.get("account_id"),
         "account_name": account.get("account_name") or account.get("broker", "Account"),
-        "equity_usd": _first_portfolio_number(
-            account, "equity", "portfolio_value", "net_liquidation"
+        "equity_usd": usd_value(
+            _first_portfolio_number(account, "equity", "portfolio_value", "net_liquidation"),
+            account,
         ),
-        "cash_usd": cash,
-        "unrealized_pnl_usd": _first_portfolio_number(
-            account, "unrealized_pnl", "unrealized_pl"
+        "cash_usd": usd_value(cash, account),
+        "unrealized_pnl_usd": usd_value(
+            _first_portfolio_number(account, "unrealized_pnl", "unrealized_pl"), account
         ),
         "status": "connected",
     }
@@ -870,7 +870,7 @@ def _portfolio_account(account: dict) -> dict:
 )
 async def portfolio_snapshot(request: Request) -> dict:
     """Return the authenticated user's live, broker-backed portfolio snapshot."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Portfolio persistence is unavailable")
     try:
@@ -894,21 +894,13 @@ async def portfolio_snapshot(request: Request) -> dict:
         }
         for error in summary.get("errors", [])
     ]
-    errors_by_account = {
-        error.get("account_id")
-        for error in errors
-        if error.get("account_id")
-    }
+    errors_by_account = {error.get("account_id") for error in errors if error.get("account_id")}
     connected_accounts = [
         account.public
         | {
             "status": "error" if account.id in errors_by_account else "connected",
             "error": next(
-                (
-                    error["error"]
-                    for error in errors
-                    if error.get("account_id") == account.id
-                ),
+                (error["error"] for error in errors if error.get("account_id") == account.id),
                 None,
             ),
         }
@@ -920,10 +912,8 @@ async def portfolio_snapshot(request: Request) -> dict:
         value = position.get("value_usd")
         if value is not None and value > 0:
             symbol = position["symbol"]
-            allocation_by_symbol[symbol] = round(
-                allocation_by_symbol.get(symbol, 0.0) + value, 2
-            )
-    market_value = _portfolio_number(summary.get("total_market_value_usd")) or 0.0
+            allocation_by_symbol[symbol] = round(allocation_by_symbol.get(symbol, 0.0) + value, 2)
+    market_value = _portfolio_number(summary.get("total_market_value_usd"))
     allocation_total = round(sum(allocation_by_symbol.values()), 2)
     allocation = [
         {
@@ -936,19 +926,19 @@ async def portfolio_snapshot(request: Request) -> dict:
         )
     ]
     cash_values = [
-        account["cash_usd"]
-        for account in account_metrics
-        if account.get("cash_usd") is not None
+        account["cash_usd"] for account in account_metrics if account.get("cash_usd") is not None
     ]
     equity_values = [
         account["equity_usd"]
         for account in account_metrics
         if account.get("equity_usd") is not None
     ]
-    cash = round(sum(cash_values), 2) if cash_values else None
-    equity = round(sum(equity_values), 2) if equity_values else None
-    if equity is None and (market_value or cash is not None):
-        equity = round(market_value + (cash or 0.0), 2)
+    cash = sum(cash_values) if cash_values and len(cash_values) == len(account_metrics) else None
+    equity = (
+        sum(equity_values) if equity_values and len(equity_values) == len(account_metrics) else None
+    )
+    if equity is None and market_value is not None and cash is not None:
+        equity = market_value + cash
 
     empty_state: str | None
     if not accounts:
@@ -979,10 +969,8 @@ async def portfolio_snapshot(request: Request) -> dict:
         "total_market_value_usd": market_value,
         "total_equity_usd": equity,
         "cash_usd": cash,
-        "total_unrealized_pnl_usd": _portfolio_number(
-            summary.get("total_unrealized_pnl_usd")
-        )
-        or 0.0,
+        "total_unrealized_pnl_usd": _portfolio_number(summary.get("total_unrealized_pnl_usd")),
+        "valuation_status": summary.get("valuation_status", "unverified"),
         "day_change_usd": None,
         "day_change_pct": None,
         "allocation": allocation,
@@ -1005,9 +993,7 @@ def _conversation_payload(
         "created_at": conversation.created_at.isoformat(),
         "updated_at": conversation.updated_at.isoformat(),
         "last_message_at": (
-            conversation.last_message_at.isoformat()
-            if conversation.last_message_at
-            else None
+            conversation.last_message_at.isoformat() if conversation.last_message_at else None
         ),
     }
 
@@ -1105,7 +1091,7 @@ async def _owned_project(session, user_id: str, project_id: str | None) -> Proje
 )
 async def list_projects(request: Request, search: str = "") -> dict:
     """Return the authenticated user's projects and grouped chat history."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Conversation persistence is unavailable")
     try:
@@ -1163,7 +1149,7 @@ async def list_conversations(
     limit: int = 200,
 ) -> list[dict]:
     """Return resumable conversations sorted by most recent activity."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Conversation persistence is unavailable")
     try:
@@ -1193,7 +1179,7 @@ async def list_conversations(
 )
 async def create_project(request: Request) -> dict:
     """Create a project owned by the authenticated user."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Project persistence is unavailable")
     try:
@@ -1237,7 +1223,7 @@ async def create_project(request: Request) -> dict:
 )
 async def update_project(project_id: str, request: Request) -> dict:
     """Rename one project without affecting its conversations."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id or not _valid_session_id(project_id):
         raise HTTPException(status_code=400, detail="Invalid project ID")
     try:
@@ -1290,7 +1276,7 @@ async def update_project(project_id: str, request: Request) -> dict:
 )
 async def create_conversation(request: Request) -> dict:
     """Create an empty conversation ready for a new chat turn."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Conversation persistence is unavailable")
     try:
@@ -1309,9 +1295,7 @@ async def create_conversation(request: Request) -> dict:
             requested_project_id = body.get("project_id")
             if requested_project_id is not None and not isinstance(requested_project_id, str):
                 raise HTTPException(status_code=400, detail="Invalid project ID")
-            project = await _owned_project(
-                session, principal.user_id, requested_project_id
-            )
+            project = await _owned_project(session, principal.user_id, requested_project_id)
             conversation = Conversation(
                 id=str(uuid.uuid4()),
                 user_id=principal.user_id,
@@ -1334,7 +1318,7 @@ async def create_conversation(request: Request) -> dict:
 )
 async def get_conversation(conversation_id: str, request: Request) -> dict:
     """Return one owned conversation and its complete visible transcript."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id or not _valid_session_id(conversation_id):
         raise HTTPException(status_code=400, detail="Invalid conversation ID")
     try:
@@ -1376,6 +1360,7 @@ async def get_conversation(conversation_id: str, request: Request) -> dict:
                     "role": message.role,
                     "content": message.content,
                     "created_at": message.created_at.isoformat(),
+                    **message_turn_fields(message),
                 }
                 for message in message_list
             ]
@@ -1397,7 +1382,7 @@ async def get_conversation(conversation_id: str, request: Request) -> dict:
 )
 async def update_conversation(conversation_id: str, request: Request) -> dict:
     """Rename or move one owned conversation between projects."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id or not _valid_session_id(conversation_id):
         raise HTTPException(status_code=400, detail="Invalid conversation ID")
     try:
@@ -1425,13 +1410,9 @@ async def update_conversation(conversation_id: str, request: Request) -> dict:
                 conversation.title = title
             if "project_id" in body:
                 requested_project_id = body.get("project_id")
-                if requested_project_id is not None and not isinstance(
-                    requested_project_id, str
-                ):
+                if requested_project_id is not None and not isinstance(requested_project_id, str):
                     raise HTTPException(status_code=400, detail="Invalid project ID")
-                project = await _owned_project(
-                    session, principal.user_id, requested_project_id
-                )
+                project = await _owned_project(session, principal.user_id, requested_project_id)
                 conversation.project_id = project.id if project else None
                 if project:
                     project.updated_at = datetime.now(UTC)
@@ -1461,7 +1442,7 @@ async def update_conversation(conversation_id: str, request: Request) -> dict:
 )
 async def delete_conversation(conversation_id: str, request: Request) -> dict:
     """Permanently delete one owned conversation and its transcript."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id or not _valid_session_id(conversation_id):
         raise HTTPException(status_code=400, detail="Invalid conversation ID")
     try:
@@ -1471,6 +1452,7 @@ async def delete_conversation(conversation_id: str, request: Request) -> dict:
                     Conversation.id == conversation_id,
                     Conversation.user_id == principal.user_id,
                 )
+                .with_for_update()
             )
             if conversation is None:
                 raise HTTPException(status_code=404, detail="Conversation not found")
@@ -1496,7 +1478,7 @@ async def delete_conversation(conversation_id: str, request: Request) -> dict:
 )
 async def chat_history(request: Request, session_id: str, limit: int = 200) -> list[dict]:
     """Return only the authenticated user's messages for one conversation."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not _valid_session_id(session_id):
         raise HTTPException(status_code=400, detail="Invalid session")
     limit = min(max(1, limit), 200)
@@ -1519,6 +1501,7 @@ async def chat_history(request: Request, session_id: str, limit: int = 200) -> l
                     "role": message.role,
                     "content": message.content,
                     "created_at": message.created_at.isoformat(),
+                    **message_turn_fields(message),
                 }
                 for message in messages
                 if message.role in {"user", "assistant"}
@@ -1535,7 +1518,18 @@ async def chat_history(request: Request, session_id: str, limit: int = 200) -> l
         Depends(require_csrf),
     ],
 )
-async def logout() -> JSONResponse:
+async def logout(request: Request) -> JSONResponse:
+    from src.security.sessions import revoke
+
+    principal = await require_authenticated(request)
+    if principal.mechanism == "cookie":
+        async with async_session.begin() as session:
+            await revoke(
+                session,
+                user_id=principal.user_id,
+                token=request.cookies[SESSION_COOKIE],
+                expires_at=principal.expires_at,
+            )
     response = JSONResponse({"authenticated": False})
     response.delete_cookie(SESSION_COOKIE, path="/")
     response.delete_cookie(CSRF_COOKIE, path="/")
@@ -1586,7 +1580,10 @@ def _expense_payload(row: ExpenseTransaction) -> dict:
         "account_name": row.account_name,
         "merchant": row.merchant,
         "description": row.description,
-        "amount": round(float(row.amount), 2),
+        "amount": float(row.amount),
+        "amount_exact": str(row.amount),
+        "signed_amount": (row.raw_data or {}).get("signed_amount"),
+        "lifecycle": row.lifecycle,
         "currency": row.currency,
         "transaction_type": row.transaction_type,
         "category": row.category,
@@ -1603,13 +1600,13 @@ def _expense_provider_payload() -> dict:
             "gocardless": {
                 "name": "GoCardless Bank Account Data",
                 "configured": False,
-                "coverage": "EEA / PSD2 banks",
-                "history": "Up to 24 months where the bank supports it",
+                "coverage": "Institution and provider access must be verified",
+                "history": "Requested history depends on consent and institution",
                 "access": "Bank-controlled access, commonly up to 90 days before consent renewal",
                 "mode": "Consent link + transaction sync",
                 "message": (
-                    "The expense data contract and live-update channel are ready. "
-                    "Add a provider consent flow before storing bank credentials."
+                    "Fixture-tested consent and sync adapter. External access is disabled "
+                    "until provider access and bank consent are separately configured."
                 ),
             }
         }
@@ -1664,13 +1661,15 @@ async def list_expenses(
     to_date: str | None = None,
     category: str | None = None,
     limit: int = 200,
+    offset: int = 0,
 ) -> dict:
     """Return user-scoped expenses, category totals, and sync metadata."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Expense persistence is unavailable")
     start, end = _expense_window(period, from_date, to_date)
     limit = min(max(1, limit), 500)
+    offset = max(0, offset)
     try:
         async with async_session() as session:
             result = await session.execute(
@@ -1685,35 +1684,57 @@ async def list_expenses(
                         else []
                     ),
                 )
-                .order_by(ExpenseTransaction.occurred_at.desc())
+                .order_by(ExpenseTransaction.occurred_at.desc(), ExpenseTransaction.id)
+                .offset(offset)
+                .limit(limit + 1)
             )
             rows = result.scalars().all()
+            from src.expenses.status import sync_clocks
+
+            clocks = await sync_clocks(session, principal.user_id)
     except HTTPException:
         raise
     except Exception as exc:
         logger.error("Could not load expenses: %s", exc)
         raise HTTPException(status_code=503, detail="Expense service unavailable") from exc
 
-    expenses = [row for row in rows if row.transaction_type == "expense"]
-    income = [row for row in rows if row.transaction_type == "income"]
+    has_more = len(rows) > limit
+    rows = rows[:limit]
+    totals_by_currency = summarize_currencies(rows)
+    currencies = {row.currency for row in rows}
+    mixed_currency = len(currencies) > 1
+    expenses = [
+        row
+        for row in rows
+        if row.transaction_type == "expense" and not row.pending and row.lifecycle != "deleted"
+    ]
+    income = [
+        row
+        for row in rows
+        if row.transaction_type in {"income", "refund"}
+        and not row.pending
+        and row.lifecycle != "deleted"
+    ]
     transfers = [row for row in rows if row.transaction_type == "transfer"]
-    total_expenses = round(sum(float(row.amount) for row in expenses), 2)
-    total_income = round(sum(float(row.amount) for row in income), 2)
+    total_expenses = sum((Decimal(str(row.amount)) for row in expenses), Decimal(0))
+    total_income = sum((Decimal(str(row.amount)) for row in income), Decimal(0))
     category_buckets: dict[str, dict[str, float | int]] = {}
     day_buckets: dict[str, float] = {}
     for row in expenses:
-        bucket = category_buckets.setdefault(row.category, {"amount": 0.0, "transaction_count": 0})
-        bucket["amount"] = round(float(bucket["amount"]) + float(row.amount), 2)
+        bucket = category_buckets.setdefault(
+            row.category, {"amount": Decimal(0), "transaction_count": 0}
+        )
+        bucket["amount"] += Decimal(str(row.amount))
         bucket["transaction_count"] = int(bucket["transaction_count"]) + 1
         day_key = row.occurred_at.date().isoformat()
-        day_buckets[day_key] = round(day_buckets.get(day_key, 0.0) + float(row.amount), 2)
+        day_buckets[day_key] = day_buckets.get(day_key, Decimal(0)) + Decimal(str(row.amount))
     category_totals = [
         {
             "category": key,
             "label": category_label(key),
             "amount": values["amount"],
             "transaction_count": values["transaction_count"],
-            "percentage": round((float(values["amount"]) / total_expenses) * 100, 1)
+            "percentage": round((float(values["amount"] / total_expenses)) * 100, 1)
             if total_expenses
             else 0.0,
         }
@@ -1721,9 +1742,7 @@ async def list_expenses(
             category_buckets.items(), key=lambda item: float(item[1]["amount"]), reverse=True
         )
     ]
-    last_synced = max((row.synced_at for row in rows if row.synced_at), default=None)
-    currencies = [row.currency for row in rows if row.currency]
-    currency = max(set(currencies), key=currencies.count) if currencies else "EUR"
+    currency = next(iter(currencies)) if len(currencies) == 1 else None
     provider_payload = _expense_provider_payload()
     provider_names = [row.provider for row in rows if row.provider]
     sync_status = "imported" if rows else "not_configured"
@@ -1732,21 +1751,26 @@ async def list_expenses(
         "period_start": start.date().isoformat(),
         "period_end": (end - timedelta(days=1)).date().isoformat(),
         "currency": currency,
-        "total_expenses": total_expenses,
-        "total_income": total_income,
-        "net_cashflow": round(total_income - total_expenses, 2),
+        "total_expenses": None if mixed_currency else float(total_expenses),
+        "totals_by_currency": totals_by_currency,
+        "summary_scope": "page",
+        "offset": offset,
+        "next_offset": offset + limit if has_more else None,
+        "total_income": None if mixed_currency else float(total_income),
+        "net_cashflow": None if mixed_currency else float(total_income - total_expenses),
         "transaction_count": len(expenses),
         "income_count": len(income),
         "transfer_count": len(transfers),
-        "category_totals": category_totals,
-        "daily_totals": [
-            {"date": key, "amount": value} for key, value in sorted(day_buckets.items())
-        ],
+        "category_totals": [] if mixed_currency else category_totals,
+        "daily_totals": []
+        if mixed_currency
+        else [{"date": key, "amount": value} for key, value in sorted(day_buckets.items())],
         "transactions": [_expense_payload(row) for row in rows[:limit]],
         "sync": {
             "status": sync_status,
             "provider": provider_names[0] if provider_names else None,
-            "last_synced_at": last_synced.isoformat() if last_synced else None,
+            "last_synced_at": None,
+            **clocks,
             "stream": "sse",
             "poll_interval_seconds": 30,
             "provider_options": provider_payload["providers"],
@@ -1765,7 +1789,7 @@ async def list_expenses(
 )
 async def expense_stream(request: Request) -> StreamingResponse:
     """Stream expense-import events to the current user's open dashboard."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Expense streaming is unavailable")
     user_id = principal.user_id
@@ -1777,10 +1801,19 @@ async def expense_stream(request: Request) -> StreamingResponse:
             yield 'event: ready\ndata: {"stream":"expenses"}\n\n'
             while True:
                 try:
-                    event = await asyncio.wait_for(queue.get(), timeout=25)
+                    await require_authenticated(request)
+                except HTTPException:
+                    yield "event: session_revoked\ndata: {}\n\n"
+                    return
+                try:
+                    event = await asyncio.wait_for(queue.get(), timeout=5)
                 except TimeoutError:
                     yield ": keep-alive\n\n"
                     continue
+                try:
+                    await require_authenticated(request)
+                except HTTPException:
+                    return
                 yield f"event: expenses_updated\ndata: {json.dumps(event)}\n\n"
         finally:
             subscribers = _expense_streams.get(user_id)
@@ -1807,11 +1840,10 @@ async def expense_stream(request: Request) -> StreamingResponse:
 async def import_expenses(request: Request) -> dict:
     """Import provider-normalised transactions idempotently for one user.
 
-    This is the adapter boundary used by a future GoCardless/Enable Banking
-    sync job. It also makes local fixture imports possible without pretending
-    that a bank API is already connected.
+    Shares atomic persistence with provider synchronization; imports do not
+    imply any bank consent or connection.
     """
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="Expense persistence is unavailable")
     try:
@@ -1839,29 +1871,17 @@ async def import_expenses(request: Request) -> dict:
     updated = 0
     try:
         async with async_session() as session:
+            from src.expenses.persistence import upsert_transaction
             for item in normalised:
-                result = await session.execute(
-                    select(ExpenseTransaction).where(
-                        ExpenseTransaction.user_id == principal.user_id,
-                        ExpenseTransaction.provider == item["provider"],
-                        ExpenseTransaction.external_id == item["external_id"],
-                    )
-                )
-                row = result.scalar_one_or_none()
-                if row is None:
-                    row = ExpenseTransaction(
-                        id=str(uuid.uuid4()), user_id=principal.user_id, **item
-                    )
-                    session.add(row)
+                if await upsert_transaction(
+                    session, user_id=principal.user_id, item=item, received_at=synced_at
+                ):
                     imported += 1
                 else:
-                    for key, value in item.items():
-                        setattr(row, key, value)
                     updated += 1
-                row.synced_at = synced_at
             await session.commit()
     except Exception as exc:
-        logger.error("Could not import expenses: %s", exc)
+        logger.error("Could not import expenses: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Expense import failed") from exc
 
     event = {
@@ -1893,7 +1913,7 @@ async def market_snapshot() -> dict:
 async def safety_status(request: Request) -> dict:
     """Expose the effective execution policy to the authenticated UI."""
     daily_halted: bool | None = None
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     trading_mode = settings.trading_mode
     try:
         if principal.user_id:
@@ -1947,7 +1967,7 @@ async def safety_status(request: Request) -> dict:
 )
 async def activate_kill_switch(request: Request) -> dict:
     """Halt future auto orders for today; do not claim to cancel broker orders."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     if not principal.user_id:
         raise HTTPException(status_code=503, detail="User safety policy is unavailable")
     today = datetime.now(UTC).strftime("%Y-%m-%d")
@@ -1985,7 +2005,14 @@ def _simulation_payload(simulation: SimulationResult) -> dict:
     return {
         "id": simulation.id,
         "name": simulation.name,
-        "strategy": simulation.strategy,
+        "strategy": {key: value for key, value in simulation.strategy.items() if key != "research"},
+        "base_currency": simulation.strategy.get("base_currency"),
+        "research_summary": {
+            key: value
+            for key, value in simulation.strategy.get("research", {}).get("result", {}).items()
+            if key not in {"equity", "trades", "rejected", "quantities"}
+        },
+        "evidence_available": bool(simulation.strategy.get("research")),
         "initial_capital": simulation.initial_capital,
         "final_value": simulation.final_value,
         "total_return_pct": simulation.total_return_pct,
@@ -2030,7 +2057,9 @@ def _validate_simulation_body(body: object) -> dict:
     if not isinstance(strategy, dict):
         raise HTTPException(status_code=400, detail="strategy must be an object")
     strategy_type = str(strategy.get("type", "")).strip()
-    if strategy_type not in {"buy_and_hold", "sma_crossover", "rsi_mean_reversion", "momentum"}:
+    if strategy_type not in {
+        "buy_and_hold", "sma_crossover", "rsi_mean_reversion", "momentum", "cash"
+    }:
         raise HTTPException(status_code=400, detail="Unsupported simulation strategy")
     params = strategy.get("params", {})
     if not isinstance(params, dict):
@@ -2052,7 +2081,11 @@ def _validate_simulation_body(body: object) -> dict:
             datetime.fromisoformat(period_end)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="Dates must use YYYY-MM-DD format") from exc
+    base_currency = str(body.get("base_currency", "USD")).upper()
+    if base_currency not in {"USD", "EUR", "GBP"}:
+        raise HTTPException(status_code=400, detail="Choose USD, EUR or GBP base currency")
     return {
+        "base_currency": base_currency,
         "name": str(body.get("name", "Paper simulation")).strip()[:256] or "Paper simulation",
         "symbols": symbols,
         "strategy": {"type": strategy_type, "params": params},
@@ -2068,7 +2101,7 @@ def _validate_simulation_body(body: object) -> dict:
 )
 async def list_simulations(request: Request) -> list[dict]:
     """List saved fake-money simulations for the authenticated user."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     user_filter = (
         SimulationResult.user_id == principal.user_id
         if principal.user_id
@@ -2097,13 +2130,13 @@ async def list_simulations(request: Request) -> list[dict]:
 )
 async def create_simulation(request: Request) -> dict:
     """Run and save a historical fake-money simulation; never contacts a broker."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     try:
         body = await request.json()
     except Exception as exc:
         raise HTTPException(status_code=400, detail="Invalid JSON body") from exc
     simulation_input = _validate_simulation_body(body)
-    result = await asyncio.to_thread(run_simulation, **simulation_input)
+    result = await run_simulation_async(**simulation_input)
     if result.get("error"):
         raise HTTPException(status_code=502, detail=str(result["error"]))
 
@@ -2140,7 +2173,7 @@ async def create_simulation(request: Request) -> dict:
 )
 async def list_reports(request: Request) -> list[dict]:
     """List all generated reports."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     report_filter = (
         Report.user_id == principal.user_id if principal.user_id else Report.user_id.is_(None)
     )
@@ -2156,7 +2189,10 @@ async def list_reports(request: Request) -> list[dict]:
                     "title": r.title,
                     "period_start": r.period_start.isoformat(),
                     "period_end": r.period_end.isoformat(),
-                    "pdf_available": r.pdf_path is not None,
+                    "pdf_available": r.pdf_path is not None
+                    and r.generation_status not in {"retention_pending", "retired"},
+                    "generation_status": r.generation_status,
+                    "generation_errors": r.generation_errors,
                     "created_at": r.created_at.isoformat(),
                 }
                 for r in reports
@@ -2175,7 +2211,7 @@ async def list_reports(request: Request) -> list[dict]:
 )
 async def download_report_pdf(report_id: str, request: Request) -> FileResponse:
     """Download a report as PDF."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     report_filter = (
         Report.user_id == principal.user_id if principal.user_id else Report.user_id.is_(None)
     )
@@ -2187,6 +2223,8 @@ async def download_report_pdf(report_id: str, request: Request) -> FileResponse:
             report = result.scalar_one_or_none()
             if not report:
                 raise HTTPException(status_code=404, detail="Report not found")
+            if report.generation_status in {"retention_pending", "retired"}:
+                raise HTTPException(status_code=410, detail="Report content removed by its owner")
             if not report.pdf_path or not Path(report.pdf_path).exists():
                 raise HTTPException(status_code=404, detail="PDF not available")
             report_path = Path(report.pdf_path).resolve()
@@ -2212,7 +2250,7 @@ async def download_report_pdf(report_id: str, request: Request) -> FileResponse:
 )
 async def list_trades(request: Request, limit: int = 50) -> list[dict]:
     """List recent trades recorded in the database."""
-    principal = require_authenticated(request)
+    principal = await require_authenticated(request)
     limit = min(max(1, limit), 100)
     user_filter = (
         Trade.user_id == principal.user_id if principal.user_id else Trade.user_id.is_(None)
@@ -2253,7 +2291,7 @@ async def list_trades(request: Request, limit: int = 50) -> list[dict]:
 )
 async def invoke_tool(request: Request) -> dict:
     """Invoke any agent tool by name. Used by the MCP server to forward Claude Desktop calls."""
-    principal = require_mcp_or_browser(request)
+    principal = await require_mcp_or_browser(request)
     if principal.mechanism != "bearer":
         require_csrf(request)
     try:
@@ -2267,7 +2305,7 @@ async def invoke_tool(request: Request) -> dict:
 
     tool_input = body.get("tool_input", {})
 
-    from src.tools.dispatcher import dispatch_tool, tool_context
+    from src.tools.dispatcher import tool_context, dispatch_tool
 
     trading_mode = None
     if principal.user_id:
@@ -2288,7 +2326,12 @@ async def invoke_tool(request: Request) -> dict:
         except Exception as exc:
             raise HTTPException(status_code=503, detail="User settings unavailable") from exc
 
-    with tool_context("api", principal.user_id, trading_mode):
+    from src.security.sessions import cookie_authority
+
+    with (
+        cookie_authority(request.cookies.get(SESSION_COOKIE)),
+        tool_context("api", principal.user_id, trading_mode),
+    ):
         result_json = await dispatch_tool(tool_name, tool_input)
     return {"result": result_json}
 
@@ -2304,10 +2347,56 @@ async def invoke_tool(request: Request) -> dict:
 )
 async def chat_ui(request: Request) -> HTMLResponse | RedirectResponse:
     try:
-        require_authenticated(request)
+        await require_authenticated(request)
     except HTTPException as exc:
         if exc.status_code == 401:
             return RedirectResponse("/login", status_code=303)
         raise
     index = STATIC_DIR / "index.html"
     return HTMLResponse(content=index.read_text(), status_code=200)
+
+
+# Existing network policy also covers the independently authenticated simulator UI.
+from src.web.simulator_routes import router as simulator_router  # noqa: E402
+
+router.include_router(simulator_router, dependencies=[Depends(require_allowed_ip)])
+
+from src.web.alert_routes import router as alert_router  # noqa: E402
+
+router.include_router(alert_router, dependencies=[Depends(require_allowed_ip)])
+
+from src.web.bank_routes import router as bank_router  # noqa: E402
+
+router.include_router(bank_router, dependencies=[Depends(require_allowed_ip)])
+
+from src.web.expense_routes import router as expense_edit_router  # noqa: E402
+
+router.include_router(expense_edit_router, dependencies=[Depends(require_allowed_ip)])
+
+from src.web.research_routes import router as research_router  # noqa: E402
+
+router.include_router(research_router, dependencies=[Depends(require_allowed_ip)])
+
+from src.web.chat_routes import router as chat_evidence_router  # noqa: E402
+
+router.include_router(chat_evidence_router, dependencies=[Depends(require_allowed_ip)])
+
+from src.web.expense_export import router as expense_export_router  # noqa: E402
+
+router.include_router(expense_export_router, dependencies=[Depends(require_allowed_ip)])
+
+from src.web.expense_retention import router as expense_retention_router  # noqa: E402
+
+router.include_router(expense_retention_router, dependencies=[Depends(require_allowed_ip)])
+
+from src.web.broker_observations import router as broker_observations_router  # noqa: E402
+
+router.include_router(broker_observations_router, dependencies=[Depends(require_allowed_ip)])
+
+from src.web.report_retention import router as report_retention_router  # noqa: E402
+
+router.include_router(report_retention_router, dependencies=[Depends(require_allowed_ip)])
+
+from src.web.chat_retention import router as chat_retention_router  # noqa: E402
+
+router.include_router(chat_retention_router, dependencies=[Depends(require_allowed_ip)])

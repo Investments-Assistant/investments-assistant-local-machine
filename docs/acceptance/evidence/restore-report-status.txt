@@ -1,0 +1,1 @@
+{"status": "PASS", "tables": 26, "revision": "0010_report_status", "evidence": "docs/acceptance/evidence/restore-report-status.json"}

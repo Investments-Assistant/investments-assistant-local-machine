@@ -1,13 +1,15 @@
 """IMAP newsletter reader.
 
 Connects to your email account and ingests investment newsletters into the
-news memory database, treated like any other article from a trusted source.
+private news memory of an explicitly selected active application user.
+Email content is untrusted evidence, never authority.
 
 Setup (Gmail example):
 1. In Gmail settings → Forwarding and POP/IMAP → enable IMAP.
 2. If 2-Factor Auth is on, create an App Password:
    Google Account → Security → App Passwords → "Mail" → your device.
 3. Set in .env:
+       NEWSLETTER_OWNER_USER_ID=<explicit application user UUID>
        NEWSLETTER_IMAP_SERVER=imap.gmail.com
        NEWSLETTER_IMAP_PORT=993
        NEWSLETTER_EMAIL_USER=your@gmail.com
@@ -17,17 +19,22 @@ Setup (Gmail example):
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
-import email
-from email.header import decode_header
-from html.parser import HTMLParser
-import imaplib
 import re
+import email
 from typing import Any
+import asyncio
+import hashlib
+import imaplib
+from datetime import UTC, datetime, timedelta
+from contextlib import suppress
+from html.parser import HTMLParser
+from email.header import decode_header
 
-from src.agent.utils.logger import get_logger
 from src.config import settings
+from src.db.database import async_session
 from src.news.ingestion import ingest_articles
+from src.security.sessions import SessionInactive, assert_active
+from src.agent.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -125,11 +132,13 @@ def _imap_connect() -> imaplib.IMAP4_SSL | None:
         logger.debug("Newsletter IMAP credentials not configured — skipping")
         return None
     try:
-        conn = imaplib.IMAP4_SSL(settings.newsletter_imap_server, settings.newsletter_imap_port)
+        conn = imaplib.IMAP4_SSL(
+            settings.newsletter_imap_server, settings.newsletter_imap_port, timeout=10
+        )
         conn.login(settings.newsletter_email_user, settings.newsletter_email_password)
         return conn
     except Exception as exc:
-        logger.warning("IMAP login failed: %s", exc)
+        logger.warning("IMAP login failed: %s", type(exc).__name__)
         return None
 
 
@@ -149,39 +158,58 @@ async def read_and_ingest_newsletters(since_days: int = 8) -> dict:
 
     Returns stats dict: {"fetched": N, "inserted": M}.
     """
+    owner = settings.newsletter_owner_user_id
+    if not owner:
+        return {
+            "fetched": 0,
+            "inserted": 0,
+            "status": "blocked",
+            "reason": "NEWSLETTER_OWNER_REQUIRED",
+        }
+    try:
+        async with async_session() as session:
+            await assert_active(session, owner)
+    except SessionInactive:
+        return {"fetched": 0, "inserted": 0, "status": "blocked", "reason": "PRINCIPAL_INACTIVE"}
+    articles = await asyncio.to_thread(_fetch_newsletters, since_days)
+    if articles is None:
+        return {"fetched": 0, "inserted": 0, "status": "unavailable"}
+    # Revalidate after fetching; a deactivated owner cannot persist new private data.
+    inserted = await ingest_articles(articles, owner_user_id=owner)
+    logger.info("Newsletter ingestion: fetched=%d new=%d", len(articles), inserted)
+    return {"fetched": len(articles), "inserted": inserted, "status": "complete"}
+
+
+def _fetch_newsletters(since_days: int):
     conn = _imap_connect()
     if conn is None:
-        return {"fetched": 0, "inserted": 0}
-
+        return None
     articles: list[dict[str, Any]] = []
     try:
-        conn.select("INBOX")
+        conn.select("INBOX", readonly=True)
         criteria = _build_search_criteria(since_days)
         _, msg_nums = conn.search(None, criteria)
 
         raw_nums = msg_nums[0] if msg_nums else b""
-        for num in (raw_nums or b"").split():
+        for num in (raw_nums or b"").split()[-50:]:
             try:
-                _, data = conn.fetch(num.decode("ascii"), "(RFC822)")
+                _, data = conn.fetch(num.decode("ascii"), "(BODY.PEEK[]<0.2097153>)")
                 raw = data[0][1] if data and data[0] else None
-                if not isinstance(raw, bytes):
+                if not isinstance(raw, bytes) or len(raw) > 2 * 1024 * 1024:
                     continue
                 msg = email.message_from_bytes(raw)
                 subject = _decode_header_value(msg.get("Subject", "Newsletter"))
-                sender = msg.get("From", "")
                 body = _extract_body(msg)
 
                 if not body.strip():
                     continue
 
-                # Use a stable synthetic URL so dedup works across re-runs
-                msg_id = msg.get("Message-ID", f"email-{num.decode()}")
-                url = f"email://{settings.newsletter_email_user}/{msg_id.strip('<>')}"
-
+                # Hash mailbox and stable message identity; never emit addresses in URLs.
+                # Without Message-ID, content identity survives IMAP sequence renumbering.
+                msg_id = msg.get("Message-ID") or hashlib.sha256(raw).hexdigest()
+                identity = settings.newsletter_email_user + "\0" + msg_id
+                url = "newsletter://" + hashlib.sha256(identity.encode()).hexdigest()
                 source_name = "Newsletter"
-                if settings.newsletter_sender_filter:
-                    domain = settings.newsletter_sender_filter.split("@")[-1]
-                    source_name = f"Newsletter ({domain})"
 
                 articles.append(
                     {
@@ -196,16 +224,12 @@ async def read_and_ingest_newsletters(since_days: int = 8) -> dict:
                         "tags": [],
                     }
                 )
-                logger.info("Newsletter fetched: %s (from %s)", subject[:80], sender)
+                logger.debug("Newsletter parsed")
             except Exception as exc:
-                logger.warning("Could not parse email %s: %s", num, exc)
+                logger.warning("Newsletter parsing failed: %s", type(exc).__name__)
 
     finally:
-        try:
+        with suppress(Exception):
             conn.logout()
-        except Exception:
-            pass
 
-    inserted = await ingest_articles(articles)
-    logger.info("Newsletter ingestion: fetched=%d new=%d", len(articles), inserted)
-    return {"fetched": len(articles), "inserted": inserted}
+    return articles

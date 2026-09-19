@@ -1,0 +1,42 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 5 items / 4 deselected / 1 selected
+
+tests/integration/news_runtime_test.py::test_scheduled_sources_isolate_failures_and_reuse_due_state FAILED [100%]
+
+=================================== FAILURES ===================================
+_________ test_scheduled_sources_isolate_failures_and_reuse_due_state __________
+
+source_fixture = (async_sessionmaker(class_='AsyncSession', bind=<sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x7bf54c16f110>, ..._commit=False), '012df73f-53e3-4677-a262-c2ef48189096', 'https://fixture.invalid/012df73f-53e3-4677-a262-c2ef48189096')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7bf54c14d070>
+
+    async def test_scheduled_sources_isolate_failures_and_reuse_due_state(source_fixture, monkeypatch):
+        _, owner, url = source_fixture
+        monkeypatch.setattr(runtime, "RSS_FEEDS", {"Good fixture": url, "Bad fixture": url + "/bad"})
+        monkeypatch.setattr(runtime, "_SCRAPE_TARGETS", [])
+        monkeypatch.setattr(runtime.config.settings, "news_api_adapters_enabled", False)
+        calls = []
+    
+        def fetch(source, address, *, headers):
+            calls.append(address)
+            if address.endswith("/bad"):
+                raise PublicFetchError("PUBLIC_HTTP_503")
+            return [article(url)], PublicResponse(200, b"", {"etag": "v1"}, url)
+    
+        monkeypatch.setattr(runtime, "fetch_rss_source", fetch)
+        result = await runtime.run_sources(user_id=owner)
+>       assert result["status"] == "partial_failure" and result["inserted"] == 1, result
+E       AssertionError: {'fetched': 0, 'inserted': 0, 'source_failures': [{'error_code': 'TypeError', 'fetched': 0, 'inserted': 0, 'status': 'failed'}, {'error_code': 'PUBLIC_HTTP_503', 'fetched': 0, 'inserted': 0, 'status': 'failed'}], 'sources_not_due': 0, ...}
+E       assert ('partial_failure' == 'partial_failure'
+E         
+E           partial_failure and 0 == 1)
+
+tests/integration/news_runtime_test.py:184: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/news_runtime_test.py::test_scheduled_sources_isolate_failures_and_reuse_due_state
+======================= 1 failed, 4 deselected in 1.35s ========================

@@ -630,6 +630,11 @@ TOOL_DEFINITIONS = [
 ]
 
 
+# Catalog reduction is defense in depth; dispatcher checks remain authoritative.
+TOOL_DEFINITIONS = [tool for tool in TOOL_DEFINITIONS
+                    if tool["name"] not in {"confirm_trade", "cancel_order", "set_trading_mode"}]
+
+
 def to_openai_tools(definitions: list[dict]) -> list[dict]:
     """Convert tool definitions from Claude input_schema format to OpenAI function calling format.
 

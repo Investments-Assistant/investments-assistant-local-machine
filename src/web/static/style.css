@@ -674,3 +674,17 @@ header {
   .expenses-filter-row .filter-control { width: 100%; }
   .simulation-form-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Execution evidence must wrap without pushing narrow screens off-canvas. */
+#main { min-width: 0; }
+#fixture-details { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 12px; }
+@media (max-width: 768px) {
+  header { flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
+  .view-tabs { order: 3; flex: 1 0 100%; justify-content: space-between; margin: 0; }
+  .view-tab { padding: 6px 8px; }
+  .simulation-view, .expenses-view { padding: 20px 12px 26px; }
+}
+
+.chat-evidence-note { padding: 0.5rem 1rem; font-size: 0.8rem; opacity: 0.85; overflow-wrap: anywhere; }
+
+.broker-evidence { max-height: 20rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .75rem; }

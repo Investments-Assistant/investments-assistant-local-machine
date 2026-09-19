@@ -1,0 +1,180 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 305 items
+
+tests/unit/acceptance_authority_test.py .........                        [  2%]
+tests/unit/acceptance_broker_test.py .........                           [  5%]
+tests/unit/acceptance_financial_test.py ........                         [  8%]
+tests/unit/acceptance_network_test.py ...                                [  9%]
+tests/unit/acceptance_reports_test.py ..                                 [ 10%]
+tests/unit/acceptance_workflows_test.py .....                            [ 11%]
+tests/unit/agent_workflow_test.py .............                          [ 16%]
+tests/unit/auth_test.py .....                                            [ 17%]
+tests/unit/broker_accounts_test.py .....                                 [ 19%]
+tests/unit/config_test.py ................                               [ 24%]
+tests/unit/dispatcher_test.py ..........................                 [ 33%]
+tests/unit/download_model_test.py ......                                 [ 35%]
+tests/unit/email_reader_test.py ...................                      [ 41%]
+tests/unit/expenses_test.py ..FF                                         [ 42%]
+tests/unit/market_data_test.py ............................              [ 51%]
+tests/unit/multi_user_test.py ...                                        [ 52%]
+tests/unit/news_ingestion_test.py ........                               [ 55%]
+tests/unit/news_memory_test.py ......                                    [ 57%]
+tests/unit/news_search_test.py .......                                   [ 59%]
+tests/unit/news_sources_test.py ................................         [ 70%]
+tests/unit/nft_test.py ..                                                [ 70%]
+tests/unit/portfolio_test.py ..............                              [ 75%]
+tests/unit/simulator_test.py ..................                          [ 81%]
+tests/unit/web_routes_test.py ........................                   [ 89%]
+tests/integration/db_models_test.py ..........                           [ 92%]
+tests/integration/execution_test.py .......                              [ 94%]
+tests/integration/migrations_test.py .                                   [ 95%]
+tests/integration/news_pipeline_test.py .........                        [ 98%]
+tests/integration/operations_test.py ...                                 [ 99%]
+tests/integration/sessions_test.py ...                                   [100%]
+
+=================================== FAILURES ===================================
+______ TestExpenseEndpoints.test_summary_is_scoped_to_authenticated_user _______
+
+self = <expenses_test.TestExpenseEndpoints object at 0x7327f3ae1a90>
+
+    def test_summary_is_scoped_to_authenticated_user(self):
+        cfg = _settings()
+        user = _user(cfg)
+        login_result = MagicMock()
+        login_result.scalar_one_or_none.return_value = user
+        row = ExpenseTransaction(
+            id="expense-1",
+            user_id="user-a",
+            provider="gocardless",
+            external_id="tx-1",
+            account_name="Main account",
+            merchant="Galp",
+            description="Fuel",
+            amount=60.0,
+            currency="EUR",
+            transaction_type="expense",
+            category="transport",
+            subcategory="car fuel",
+            occurred_at=datetime(2026, 8, 10, tzinfo=UTC),
+            synced_at=datetime(2026, 8, 10, tzinfo=UTC),
+        )
+        expense_result = MagicMock()
+        expense_result.scalars.return_value.all.return_value = [row]
+        session = _db_session(login_result, expense_result)
+    
+        with (
+            patch("src.web.routes.settings", cfg),
+            patch("src.web.auth.config.settings", cfg),
+            patch("src.web.routes.async_session", return_value=session),
+        ):
+            client = _client()
+            assert (
+                client.post(
+                    "/api/auth/login",
+                    json={"username": "admin", "password": "a-long-and-private-password"},
+                ).status_code
+                == 200
+            )
+            response = client.get("/api/expenses?period=year")
+    
+>       assert response.status_code == 200
+E       assert 401 == 200
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests/unit/expenses_test.py:138: AssertionError
+_ TestExpenseEndpoints.test_import_sets_authenticated_owner_and_is_idempotent_shape _
+
+self = <expenses_test.TestExpenseEndpoints object at 0x7327f3ae0f80>
+
+    def test_import_sets_authenticated_owner_and_is_idempotent_shape(self):
+        cfg = _settings()
+        user = _user(cfg)
+        login_result = MagicMock()
+        login_result.scalar_one_or_none.return_value = user
+        existing_result = MagicMock()
+        existing_result.scalar_one_or_none.return_value = None
+        session = _db_session(login_result, existing_result)
+    
+        with (
+            patch("src.web.routes.settings", cfg),
+            patch("src.web.auth.config.settings", cfg),
+            patch("src.web.routes.async_session", return_value=session),
+        ):
+            client = _client()
+            assert (
+                client.post(
+                    "/api/auth/login",
+                    json={"username": "admin", "password": "a-long-and-private-password"},
+                ).status_code
+                == 200
+            )
+            response = client.post(
+                "/api/expenses/import",
+                headers={"X-CSRF-Token": client.cookies.get("ia_csrf")},
+                json={
+                    "provider": "gocardless",
+                    "account_name": "Main account",
+                    "transactions": [
+                        {
+                            "transactionId": "tx-1",
+                            "amount": "-12.30",
+                            "currency": "EUR",
+                            "date": "2026-08-20",
+                            "merchant": "Cafe Lisboa",
+                        }
+                    ],
+                },
+            )
+    
+>       assert response.status_code == 200
+E       assert 503 == 200
+E        +  where 503 = <Response [503 Service Unavailable]>.status_code
+
+tests/unit/expenses_test.py:185: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    sqlalchemy.pool.impl.AsyncAdaptedQueuePool:base.py:377 Exception terminating connection <AdaptedConnection <asyncpg.connection.Connection object at 0x7327f27d63f0>>
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 373, in _close_connection
+    self._dialect.do_terminate(connection)
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 1127, in do_terminate
+    dbapi_connection.terminate()
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 402, in terminate
+    self.await_(asyncio.shield(self._terminate_graceful_close()))  # type: ignore[attr-defined] # noqa: E501
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 912, in _terminate_graceful_close
+    await self._connection.close(timeout=2)
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/asyncpg/connection.py", line 1513, in close
+    await self._protocol.close(timeout)
+  File "asyncpg/protocol/protocol.pyx", line 617, in close
+  File "asyncpg/protocol/protocol.pyx", line 650, in asyncpg.protocol.protocol.BaseProtocol._request_cancel
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/asyncpg/connection.py", line 1682, in _cancel_current_command
+    self._cancellations.add(self._loop.create_task(self._cancel(waiter)))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 456, in create_task
+    self._check_closed()
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 541, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+=============================== warnings summary ===============================
+tests/unit/market_data_test.py::TestGetStockData::test_returns_data_for_symbol
+  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine 'Connection._cancel' was never awaited
+    def __init__(self, name, parent):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/unit/expenses_test.py::TestExpenseEndpoints::test_summary_is_scoped_to_authenticated_user
+FAILED tests/unit/expenses_test.py::TestExpenseEndpoints::test_import_sets_authenticated_owner_and_is_idempotent_shape
+=================== 2 failed, 303 passed, 1 warning in 7.58s ===================

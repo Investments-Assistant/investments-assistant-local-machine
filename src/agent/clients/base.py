@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import AsyncGenerator
 from typing import Any
+from collections.abc import AsyncGenerator
 
 
 class BaseLLMClient(ABC):

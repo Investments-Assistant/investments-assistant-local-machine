@@ -10,11 +10,11 @@ written to disk by this script.
 
 from __future__ import annotations
 
+import re
+import sys
 import getpass
 from pathlib import Path
-import re
 import secrets
-import sys
 
 # Make direct execution from the repository root work without requiring an
 # editable install or a manually configured PYTHONPATH.

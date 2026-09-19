@@ -13,10 +13,11 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import or_, and_, func, select
 
-from src.db.database import async_session
 from src.db.models import NewsArticle
+from src.db.database import async_session
+from src.news.visibility import visible_to
 
 
 async def search_news(
@@ -25,6 +26,8 @@ async def search_news(
     sources: list[str] | None = None,
     sentiment: str | None = None,
     limit: int = 20,
+    *,
+    user_id: str | None = None,
 ) -> list[dict]:
     """Search stored articles using PostgreSQL full-text search.
 
@@ -53,7 +56,7 @@ async def search_news(
     ts_query = func.plainto_tsquery("english", query)
     rank = func.ts_rank(ts_vector, ts_query)
 
-    filters = [ts_vector.op("@@")(ts_query)]
+    filters = [visible_to(user_id), ts_vector.op("@@")(ts_query)]
 
     if days_back > 0:
         since = datetime.now(UTC) - timedelta(days=days_back)
@@ -87,6 +90,10 @@ async def search_news(
             "url": r.url,
             "published_at": r.published_at.isoformat() if r.published_at else None,
             "sentiment": r.sentiment_label,
+            "first_seen_at": r.fetched_at.isoformat(),
+            "available_at": r.available_at.isoformat() if r.available_at else None,
+            "content_hash": r.content_hash,
+            "provenance": r.provenance,
             "sentiment_score": r.sentiment_score,
             "tags": r.tags,
         }
@@ -94,9 +101,14 @@ async def search_news(
     ]
 
 
-async def get_recent_headlines(limit: int = 20) -> list[dict]:
+async def get_recent_headlines(limit: int = 20, *, user_id: str | None = None) -> list[dict]:
     """Return the most recently fetched headlines regardless of query."""
-    stmt = select(NewsArticle).order_by(NewsArticle.fetched_at.desc()).limit(limit)
+    stmt = (
+        select(NewsArticle)
+        .where(visible_to(user_id))
+        .order_by(NewsArticle.fetched_at.desc(), NewsArticle.published_at.desc())
+        .limit(min(max(limit, 1), 100))
+    )
     async with async_session() as session:
         rows = (await session.execute(stmt)).scalars().all()
     return [
@@ -106,6 +118,63 @@ async def get_recent_headlines(limit: int = 20) -> list[dict]:
             "url": r.url,
             "published_at": r.published_at.isoformat() if r.published_at else None,
             "sentiment": r.sentiment_label,
+            "first_seen_at": r.fetched_at.isoformat(),
+            "available_at": r.available_at.isoformat() if r.available_at else None,
+            "content_hash": r.content_hash,
+            "provenance": r.provenance,
         }
         for r in rows
+    ]
+
+
+async def get_news_evidence_as_of(
+    as_of: datetime, *, user_id: str | None = None, limit: int = 100
+) -> list[dict]:
+    """Latest observed revision per visible URL at a historical decision instant.
+
+    Unknown legacy availability is excluded. Ownership is evaluated now as well,
+    so replay never restores a deactivated user's authority.
+    """
+    from src.db.models import NewsRevision
+
+    if as_of.tzinfo is None:
+        raise ValueError("A timezone-aware decision timestamp is required")
+    ranked = (
+        select(
+            NewsRevision.id.label("id"),
+            func.row_number()
+            .over(
+                partition_by=NewsRevision.article_id,
+                order_by=(
+                    NewsRevision.available_at.desc(),
+                    NewsRevision.recorded_at.desc(),
+                    NewsRevision.id.desc(),
+                ),
+            )
+            .label("rank"),
+        )
+        .join(NewsArticle, NewsArticle.id == NewsRevision.article_id)
+        .where(
+            visible_to(user_id),
+            NewsRevision.available_at <= as_of,
+        )
+        .subquery()
+    )
+    statement = (
+        select(NewsRevision)
+        .join(ranked, ranked.c.id == NewsRevision.id)
+        .where(ranked.c.rank == 1)
+        .order_by(NewsRevision.available_at.desc())
+        .limit(min(max(limit, 1), 1000))
+    )
+    async with async_session() as session:
+        rows = (await session.execute(statement)).scalars().all()
+    return [
+        dict(
+            row.evidence,
+            revision_id=row.id,
+            content_hash=row.content_hash,
+            available_at=row.available_at.isoformat(),
+        )
+        for row in rows
     ]

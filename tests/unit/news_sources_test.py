@@ -9,12 +9,12 @@ import pytest
 
 from src.news.sources import (
     _article,
-    _extract_tags,
-    _parse_date,
-    _sentiment,
     fetch_all,
-    fetch_guardian,
     fetch_rss,
+    _sentiment,
+    _parse_date,
+    _extract_tags,
+    fetch_guardian,
 )
 
 # ---------------------------------------------------------------------------
@@ -182,6 +182,16 @@ class TestArticleFactory:
 
 @pytest.mark.unit
 class TestFetchRss:
+    @pytest.fixture(autouse=True)
+    def fixture_transport(self):
+        # Parser semantics are tested here; public-address/TLS transport has its
+        # own denial, redirect, DNS-pinning and response-bound contract tests.
+        with patch(
+            "src.news.sources.fetch_public",
+            return_value=SimpleNamespace(body=b"<rss/>", status=200),
+        ):
+            yield
+
     def test_returns_list_of_articles(self):
         # Arrange — mock feedparser to return two entries
         fake_entry = SimpleNamespace(
@@ -252,7 +262,7 @@ class TestFetchGuardian:
         mock_client.__aexit__ = AsyncMock(return_value=False)
         mock_client.get = AsyncMock(return_value=fake_response)
 
-        with patch("src.news.sources.httpx.AsyncClient", return_value=mock_client):
+        with patch("src.news.sources.fetch_public", return_value=fake_response):
             articles = await fetch_guardian()
 
         assert len(articles) > 0
@@ -267,7 +277,7 @@ class TestFetchGuardian:
         mock_client.__aexit__ = AsyncMock(return_value=False)
         mock_client.get = AsyncMock(side_effect=Exception("timeout"))
 
-        with patch("src.news.sources.httpx.AsyncClient", return_value=mock_client):
+        with patch("src.news.sources.fetch_public", side_effect=RuntimeError("fixture timeout")):
             articles = await fetch_guardian()
 
         assert isinstance(articles, list)  # No exception raised
@@ -292,10 +302,12 @@ class TestFetchAll:
             "sentiment_score": 0.0,
             "tags": [],
         }
-        with patch("src.news.sources.fetch_rss", return_value=[duplicate, duplicate]):
-            with patch("src.news.sources.fetch_guardian", new=AsyncMock(return_value=[])):
-                with patch("src.news.sources.fetch_scraped", new=AsyncMock(return_value=[])):
-                    articles = await fetch_all()
+        with (
+            patch('src.news.sources.fetch_rss', return_value=[duplicate, duplicate]),
+            patch('src.news.sources.fetch_guardian', new=AsyncMock(return_value=[])),
+            patch('src.news.sources.fetch_scraped', new=AsyncMock(return_value=[])),
+        ):
+            articles = await fetch_all()
 
         urls = [a["url"] for a in articles]
         assert len(urls) == len(set(urls))
@@ -311,9 +323,40 @@ class TestFetchAll:
             "sentiment_score": 0.0,
             "tags": [],
         }
-        with patch("src.news.sources.fetch_rss", return_value=[no_url]):
-            with patch("src.news.sources.fetch_guardian", new=AsyncMock(return_value=[])):
-                with patch("src.news.sources.fetch_scraped", new=AsyncMock(return_value=[])):
-                    articles = await fetch_all()
+        with (
+            patch('src.news.sources.fetch_rss', return_value=[no_url]),
+            patch('src.news.sources.fetch_guardian', new=AsyncMock(return_value=[])),
+            patch('src.news.sources.fetch_scraped', new=AsyncMock(return_value=[])),
+        ):
+            articles = await fetch_all()
 
         assert all(a["url"] for a in articles)
+
+
+@pytest.mark.unit
+async def test_source_failure_survives_batch_merge():
+    from src.news.sources import ArticleBatch
+
+    failed = ArticleBatch()
+    failed.failures = [{"source": "fixture feed", "code": "PUBLIC_HTTP_503"}]
+    with (
+        patch("src.news.sources.fetch_rss", return_value=failed),
+        patch("src.news.sources.fetch_guardian", AsyncMock(return_value=[])),
+        patch("src.news.sources.fetch_scraped", AsyncMock(return_value=[])),
+    ):
+        articles = await fetch_all()
+    assert articles == []
+    assert articles.failures == failed.failures
+
+
+@pytest.mark.unit
+async def test_missing_ingestion_principal_cannot_fetch_or_connect(monkeypatch):
+    from unittest.mock import AsyncMock
+
+    from src.news import runtime
+
+    fetch = AsyncMock()
+    monkeypatch.setattr(runtime, "run_source", fetch)
+    result = await runtime.run_sources(user_id=None)
+    assert result["error_code"] == "NEWS_PRINCIPAL_REQUIRED"
+    fetch.assert_not_awaited()

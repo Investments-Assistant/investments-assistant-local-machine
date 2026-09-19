@@ -27,6 +27,18 @@
       <div id="conversation-history-error" class="conversation-history-error" aria-live="polite"></div>
       <div id="conversation-projects" class="conversation-list"></div>
       <div id="conversation-unassigned" class="conversation-list"></div>
+      <details id="chat-retention-controls">
+        <summary>Chat retention</summary>
+        <p>Remove content and saved tool evidence from inactive chats. Unfinished turns are excluded.
+          IDs, dates and digest tombstones remain. Reports and source records are separate.</p>
+        <label for="chat-retain-days">Keep chats active within this many days</label>
+        <input id="chat-retain-days" type="number" min="1" max="36525" step="1" oninput="resetChatRetention()">
+        <button id="chat-retention-preview" onclick="previewChatRetention()">Preview chat removal</button>
+        <p id="chat-retention-status" role="status">Choose an age and preview before approving removal.</p>
+        <label><input id="chat-retention-confirm" type="checkbox" disabled onchange="updateChatRetentionApproval()">
+          I approve permanent removal of the chat content and tool evidence in this preview.</label>
+        <button id="chat-retention-apply" disabled onclick="applyChatRetention()">Remove approved chat content</button>
+      </details>
     </div>
 
     <div class="sidebar-section">
@@ -88,6 +100,18 @@
     <div class="sidebar-section">
       <div class="section-title">Recent Reports</div>
       <div id="reports-list" class="reports-list">Loading…</div>
+      <details id="report-retention-controls">
+        <summary>Report retention</summary>
+        <p>Remove old saved report content and PDFs. Report IDs and dates remain as tombstones.
+          Source records and existing chat copies remain. Download needed PDFs first.</p>
+        <label for="report-retain-days">Keep reports created within this many days</label>
+        <input id="report-retain-days" type="number" min="1" max="36525" step="1" oninput="resetReportRetention()">
+        <button id="report-retention-preview" onclick="previewReportRetention()">Preview report removal</button>
+        <p id="report-retention-status" role="status">Choose an age and preview before approving removal.</p>
+        <label><input id="report-retention-confirm" type="checkbox" disabled onchange="updateReportRetentionApproval()">
+          I approve permanent removal of the report content and PDFs in this preview.</label>
+        <button id="report-retention-apply" disabled onclick="applyReportRetention()">Remove approved reports</button>
+      </details>
     </div>
   </aside>
   <div
@@ -294,7 +318,7 @@
         </div>
         <div class="expenses-filter-row">
           <label class="filter-control">Period
-            <select id="expenses-period" onchange="loadExpenses(true)">
+            <select id="expenses-period" onchange="loadExpenses(true, 0)">
               <option value="month">This month</option>
               <option value="7d">Last 7 days</option>
               <option value="30d">Last 30 days</option>
@@ -303,7 +327,7 @@
             </select>
           </label>
           <label class="filter-control">Category
-            <select id="expenses-category" onchange="loadExpenses(true)">
+            <select id="expenses-category" onchange="loadExpenses(true, 0)">
               <option value="">All categories</option>
             </select>
           </label>
@@ -334,6 +358,38 @@
         </article>
       </div>
 
+      <section class="dashboard-card" aria-label="Import expense JSON">
+        <h2>Import transactions</h2>
+        <p>Choose a JSON file with a transactions array and provider name. Dates,
+        currencies and bank-account identifiers are required for accurate records.
+        Imports stay in your account and do not connect to a bank.</p>
+        <label for="expense-import-file">Transaction JSON file</label>
+        <input id="expense-import-file" type="file" accept="application/json,.json">
+        <button class="dashboard-btn" id="expense-import-submit" onclick="importExpenseFile()">Import selected file</button>
+        <p id="expense-import-status" role="status"></p>
+      </section>
+      <details class="dashboard-card" id="expense-retention-controls">
+        <summary>Raw import data retention</summary>
+        <p>Remove original provider/import payload copies last received before your chosen age.
+        Normalized transactions, amounts, categories and history remain. Removing raw copies cannot be undone here.</p>
+        <label for="expense-retain-days">Keep raw copies received within this many days</label>
+        <input id="expense-retain-days" type="number" min="1" max="36525" step="1" oninput="resetExpenseRetention()">
+        <button class="dashboard-btn" id="expense-retention-preview" onclick="previewExpenseRetention()">Preview cleanup</button>
+        <p id="expense-retention-status" role="status">No cleanup policy selected.</p>
+        <label><input id="expense-retention-confirm" type="checkbox" disabled onchange="updateExpenseRetentionApproval()">
+          I approve removing the raw copies in this preview.</label>
+        <button class="dashboard-btn" id="expense-retention-apply" disabled onclick="applyExpenseRetention()">Remove previewed raw copies</button>
+      </details>
+      <section class="dashboard-card" aria-label="Bank connections">
+        <h2>Bank connections</h2>
+        <p id="bank-access-status" role="status">Loading connection status…</p>
+        <p>Authorize access at your bank through the provider. This application never asks for your bank password.</p>
+        <label for="bank-institution">Provider institution identifier</label>
+        <input id="bank-institution" maxlength="128" autocomplete="off" placeholder="Identifier from your provider setup">
+        <button id="bank-consent" class="dashboard-btn" onclick="beginBankConsent()" disabled>Start bank consent</button>
+        <p id="bank-action-status" role="status"></p>
+        <div id="bank-connections"></div>
+      </section>
       <div id="expenses-empty" class="portfolio-empty" hidden>
         <div class="empty-icon">€</div>
         <h2>No bank transactions yet</h2>
@@ -363,7 +419,7 @@
             </div>
             <div id="expenses-sync-message" class="detail-body">Connect a provider to receive transaction updates.</div>
             <div class="sync-detail-list">
-              <div><span>Updates</span><strong>Instant in this view</strong></div>
+              <div><span>Updates</span><strong>Stream + 30-second refresh</strong></div>
               <div><span>Duplicate protection</span><strong>Provider transaction ID</strong></div>
               <div><span>Classification</span><strong>Automatic + normalized</strong></div>
             </div>
@@ -377,6 +433,10 @@
               <div class="eyebrow">RECENT ACTIVITY</div>
               <h2>Transactions</h2>
             </div>
+            <button class="text-btn" id="expenses-export-period" onclick="exportExpensePeriod()">Export all categories in period</button>
+            <button class="text-btn" id="expenses-export" onclick="exportExpensePage()">Export displayed page</button>
+            <button class="text-btn" id="expenses-prev" onclick="loadExpenses(true, Math.max(0, (expenseSnapshot?.offset || 0) - 200))" disabled>Previous page</button>
+            <button class="text-btn" id="expenses-next" onclick="loadExpenses(true, expenseSnapshot?.next_offset || 0)" disabled>Next page</button>
             <span id="expenses-transaction-count" class="muted-label">0 records</span>
           </div>
           <div class="holdings-table-wrap">
@@ -400,6 +460,26 @@
         <span id="simulation-status" class="portfolio-status neutral" aria-live="polite">Ready</span>
       </div>
 
+      <section class="dashboard-card" aria-label="Synthetic execution practice">
+        <h2>Order approval practice</h2>
+        <p>Create a synthetic €1,000 account. The fixture instrument costs €100;
+        fee assumption is 0.1%, order cap €500. These are practice values.</p>
+        <button class="dashboard-btn" id="fixture-create" onclick="createExecutionFixture()">Create practice account</button>
+        <button class="dashboard-btn" id="fixture-propose" onclick="proposeFixtureOrder()" disabled>Propose 1 fixture share</button>
+        <button class="dashboard-btn" id="fixture-approve" onclick="approveFixtureOrder()" disabled>Approve displayed order</button>
+        <button class="dashboard-btn" id="fixture-tick" onclick="tickFixtureOrder()" disabled>Advance simulated fill</button>
+        <button class="dashboard-btn" id="fixture-halt" onclick="haltFixtureAccount()" disabled>Stop new simulated orders</button>
+        <p>Optional automated practice: review a 30-minute mandate for up to three
+        fixture purchases, one per minute. Prices remain synthetic and constant;
+        this tests operation, not investment returns. Stop new orders persists across restart.</p>
+        <button class="dashboard-btn" id="fixture-mandate-review" onclick="reviewFixtureMandate()" disabled>Review practice mandate</button>
+        <button class="dashboard-btn" id="fixture-mandate-approve" onclick="approveFixtureMandate()" disabled>Approve displayed practice mandate</button>
+        <pre id="fixture-details" aria-live="polite">No practice account. No broker connection.</pre>
+        <h3>Monitoring alerts</h3>
+        <button class="dashboard-btn" onclick="loadOperationalAlerts()">Refresh alerts</button>
+        <div id="operational-alerts" aria-live="polite">No alerts loaded.</div>
+      </section>
+
       <form id="simulation-form" class="dashboard-card simulation-form" onsubmit="submitSimulation(event)">
             <div class="simulation-form-grid">
               <label>Symbols
@@ -415,6 +495,9 @@
                   <option value="rsi_mean_reversion">RSI mean reversion</option>
                   <option value="momentum">Momentum rotation</option>
                 </select>
+              </label>
+              <label>Base currency
+                <select id="simulation-currency"><option>USD</option><option>EUR</option><option>GBP</option></select>
               </label>
               <label>Start date
                 <input id="simulation-start" type="date" required />
@@ -436,7 +519,7 @@
               </label>
             </div>
             <div class="simulation-form-actions">
-              <span class="card-note">Historical data may require internet access. Results are not forecasts.</span>
+              <span class="card-note">Daily signals fill at later session opens. Assumptions: 10 bps commission (minimum 1 base-currency unit), 5 bps spread, 5 bps slippage, 10 bps FX cost and 1% volume participation. Provider adjustments and availability remain unverified.</span>
               <button class="dashboard-btn primary" id="simulation-run-btn" type="submit">Run simulation</button>
             </div>
       </form>
@@ -450,6 +533,8 @@
             </div>
             <section class="dashboard-card">
               <div class="dashboard-card-header"><div><div class="eyebrow">EQUITY CURVE</div><h2 id="simulation-result-title">Latest run</h2></div><span id="sim-result-period" class="muted-label"></span></div>
+              <p id="simulation-research-note"></p>
+              <a id="simulation-evidence-link" hidden>Download replay evidence</a>
               <div id="simulation-equity-curve" class="simulation-equity-curve"></div>
             </section>
       </div>

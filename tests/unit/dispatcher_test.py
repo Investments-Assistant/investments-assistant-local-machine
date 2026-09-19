@@ -8,13 +8,13 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from src.tools.dispatcher import (
-    _cancel_order,
-    _execute_trade,
     _route_order,
+    tool_context,
+    _cancel_order,
+    dispatch_tool,
+    _execute_trade,
     _set_trading_mode,
     _validate_trade_input,
-    dispatch_tool,
-    tool_context,
 )
 
 # ---------------------------------------------------------------------------
@@ -60,7 +60,7 @@ class TestDispatchTool:
 
 @pytest.mark.unit
 class TestSetTradingMode:
-    async def test_recommend_mode_accepted(self):
+    async def test_model_cannot_change_to_recommend(self):
         user = MagicMock(id="user-1", is_active=True, trading_mode="auto")
         result_row = MagicMock()
         result_row.scalar_one_or_none.return_value = user
@@ -68,15 +68,17 @@ class TestSetTradingMode:
         session.__aenter__ = AsyncMock(return_value=session)
         session.__aexit__ = AsyncMock(return_value=False)
         session.execute = AsyncMock(return_value=result_row)
-        with patch("src.tools.dispatcher.async_session", return_value=session):
-            with tool_context("test", "user-1", "auto"):
-                result = await _set_trading_mode("recommend")
+        with (
+            patch('src.tools.dispatcher.async_session', return_value=session),
+            tool_context('test', 'user-1', 'auto'),
+        ):
+            result = await _set_trading_mode("recommend")
 
-        assert result["success"] is True
-        assert result["trading_mode"] == "recommend"
-        assert user.trading_mode == "recommend"
+        assert result["blocked"] is True
+        assert user.trading_mode == "auto"
+        session.execute.assert_not_awaited()
 
-    async def test_auto_mode_accepted(self):
+    async def test_model_cannot_change_to_auto(self):
         user = MagicMock(id="user-1", is_active=True, trading_mode="recommend")
         result_row = MagicMock()
         result_row.scalar_one_or_none.return_value = user
@@ -84,16 +86,19 @@ class TestSetTradingMode:
         session.__aenter__ = AsyncMock(return_value=session)
         session.__aexit__ = AsyncMock(return_value=False)
         session.execute = AsyncMock(return_value=result_row)
-        with patch("src.tools.dispatcher.async_session", return_value=session):
-            with tool_context("test", "user-1", "recommend"):
-                result = await _set_trading_mode("auto")
+        with (
+            patch('src.tools.dispatcher.async_session', return_value=session),
+            tool_context('test', 'user-1', 'recommend'),
+        ):
+            result = await _set_trading_mode("auto")
 
-        assert result["success"] is True
-        assert result["trading_mode"] == "auto"
+        assert result["blocked"] is True
+        assert user.trading_mode == "recommend"
+        session.execute.assert_not_awaited()
 
     async def test_invalid_mode_returns_error(self):
         result = await _set_trading_mode("yolo")
-        assert "error" in result
+        assert result["blocked"]
 
 
 # ---------------------------------------------------------------------------
@@ -103,6 +108,11 @@ class TestSetTradingMode:
 
 @pytest.mark.unit
 class TestRouteOrder:
+    @pytest.fixture(autouse=True)
+    def stub_authority_for_adapter_contract_only(self):
+        with patch("src.tools.dispatcher._live_route_allowed", return_value=True):
+            yield
+
     def test_alpaca_dispatched(self):
         mock_submit = MagicMock(return_value={"order_id": "abc"})
         with patch("src.tools.dispatcher.alpaca_tool") as mock_alpaca:
@@ -180,6 +190,11 @@ class TestRouteOrder:
 
 @pytest.mark.unit
 class TestCancelOrder:
+    @pytest.fixture(autouse=True)
+    def stub_authority_for_adapter_contract_only(self):
+        with patch("src.tools.dispatcher._live_route_allowed", return_value=True):
+            yield
+
     def test_alpaca_cancel_dispatched(self):
         mock_cancel = MagicMock(return_value={"cancelled": True})
         with patch("src.tools.dispatcher.alpaca_tool") as mock_alpaca:
@@ -209,6 +224,17 @@ class TestCancelOrder:
 
 @pytest.mark.unit
 class TestExecuteTrade:
+    @pytest.fixture(autouse=True)
+    def fixture_user_account(self):
+        from src.tools.broker_accounts import BrokerAccountConfig
+        account = BrokerAccountConfig(id="fixture-account", user_id="fixture-user",
+            broker="alpaca", display_name="Synthetic", config={"paper": True})
+        with tool_context("fixture-session", "fixture-user"), patch(
+            "src.tools.dispatcher._resolve_single_account",
+            new=AsyncMock(return_value=(account, None)),
+        ):
+            yield
+
     def _trade_input(self, **overrides) -> dict:
         base = {
             "broker": "alpaca",
@@ -292,22 +318,24 @@ class TestExecuteTrade:
         assert result["status"] == "pending_confirmation"
         assert "trade_details" in result
 
-    async def test_auto_mode_executes_and_persists(self):
+    async def test_auto_mode_cannot_execute_without_accepted_authority(self):
         mock_order = {"order_id": "auto-1", "status": "submitted"}
         with patch("src.tools.dispatcher.settings") as mock_cfg:
             mock_cfg.trading_mode = "auto"
             mock_cfg.auto_allowed_symbols_set = set()
 
-            with patch("src.tools.dispatcher._route_order", return_value=mock_order):
-                with patch("src.tools.dispatcher.async_session") as mock_session_cls:
-                    session = AsyncMock()
-                    session.__aenter__ = AsyncMock(return_value=session)
-                    session.__aexit__ = AsyncMock(return_value=False)
-                    mock_session_cls.return_value = session
+            with (
+                patch('src.tools.dispatcher._route_order', return_value=mock_order),
+                patch('src.tools.dispatcher.async_session') as mock_session_cls,
+            ):
+                session = AsyncMock()
+                session.__aenter__ = AsyncMock(return_value=session)
+                session.__aexit__ = AsyncMock(return_value=False)
+                mock_session_cls.return_value = session
 
-                    result = await _execute_trade(self._trade_input())
+                result = await _execute_trade(self._trade_input())
 
-        assert result["order_id"] == "auto-1"
+        assert result["blocked"] is True
 
     async def test_auto_mode_symbol_blocked_when_not_in_allowlist(self):
         with patch("src.tools.dispatcher.settings") as mock_cfg:
@@ -318,22 +346,24 @@ class TestExecuteTrade:
 
         assert result["blocked"] is True
 
-    async def test_auto_mode_symbol_allowed_when_in_allowlist(self):
+    async def test_allowlist_alone_cannot_authorize_order(self):
         mock_order = {"order_id": "1", "status": "submitted"}
         with patch("src.tools.dispatcher.settings") as mock_cfg:
             mock_cfg.trading_mode = "auto"
             mock_cfg.auto_allowed_symbols_set = {"SPY", "AAPL"}
 
-            with patch("src.tools.dispatcher._route_order", return_value=mock_order):
-                with patch("src.tools.dispatcher.async_session") as mock_session_cls:
-                    session = AsyncMock()
-                    session.__aenter__ = AsyncMock(return_value=session)
-                    session.__aexit__ = AsyncMock(return_value=False)
-                    mock_session_cls.return_value = session
+            with (
+                patch('src.tools.dispatcher._route_order', return_value=mock_order),
+                patch('src.tools.dispatcher.async_session') as mock_session_cls,
+            ):
+                session = AsyncMock()
+                session.__aenter__ = AsyncMock(return_value=session)
+                session.__aexit__ = AsyncMock(return_value=False)
+                mock_session_cls.return_value = session
 
-                    result = await _execute_trade(self._trade_input(symbol="AAPL"))
+                result = await _execute_trade(self._trade_input(symbol="AAPL"))
 
-        assert "blocked" not in result
+        assert result["blocked"] is True
 
     async def test_db_persist_failure_does_not_raise(self):
         """A DB outage blocks auto-trading instead of bypassing the loss guard."""
@@ -342,11 +372,10 @@ class TestExecuteTrade:
             mock_cfg.trading_mode = "auto"
             mock_cfg.auto_allowed_symbols_set = set()
 
-            with patch("src.tools.dispatcher._route_order", return_value=mock_order):
-                with patch(
-                    "src.tools.dispatcher.async_session", side_effect=RuntimeError("db down")
-                ):
-                    result = await _execute_trade(self._trade_input())
+            with patch("src.tools.dispatcher._route_order", return_value=mock_order), patch(
+                "src.tools.dispatcher.async_session", side_effect=RuntimeError("db down")
+            ):
+                result = await _execute_trade(self._trade_input())
 
         assert result["blocked"] is True
         assert "database" in result["reason"].lower() or "halt" in result["reason"].lower()

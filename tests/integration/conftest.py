@@ -1,55 +1,62 @@
-"""Integration test fixtures — require a running PostgreSQL instance.
-
-Set DATABASE_URL in your environment (or .env.test) before running:
-    DATABASE_URL=postgresql+asyncpg://user:pass@localhost/test_investments pytest -m integration
-"""
+"""Integration fixtures refuse databases without an explicit disposable marker."""
 
 from __future__ import annotations
 
 import os
+import re
 
 import pytest
+from sqlalchemy import text
 import pytest_asyncio
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
+from sqlalchemy.engine import make_url
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from src.db.models import Base
-
-# ---------------------------------------------------------------------------
-# Engine / session scoped to the whole integration test session
-# ---------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="session")
 def integration_db_url() -> str:
-    url = os.environ.get(
-        "TEST_DATABASE_URL",
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/test_investments",
-    )
+    url = os.environ.get("TEST_DATABASE_URL")
+    marker = os.environ.get("TEST_DATABASE_DISPOSABLE_TOKEN")
+    if not url or not marker:
+        pytest.fail("Explicit TEST_DATABASE_URL and disposable marker token are required")
+    parsed = make_url(url)
+    if not re.fullmatch(r"test_[a-z0-9_]+", parsed.database or ""):
+        pytest.fail("Disposable database name must begin with test_")
+    if parsed.drivername != "postgresql+asyncpg":
+        pytest.fail("Integration requires real PostgreSQL through asyncpg")
     return url
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(loop_scope="function")
 async def integration_engine(integration_db_url):
-    """Create a single engine for the entire integration test session."""
-    engine = create_async_engine(integration_db_url, echo=False, pool_pre_ping=True)
-    # Create all tables once
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """One loop owns engine lifetime. Prove identity before schema mutations."""
+    engine = create_async_engine(integration_db_url, poolclass=NullPool)
+    try:
+        async with engine.begin() as conn:
+            database = await conn.scalar(text("SELECT current_database()"))
+            if database != make_url(integration_db_url).database:
+                pytest.fail("Unexpected connected database identity")
+            token = await conn.scalar(text("SELECT token FROM public.ia_disposable_marker"))
+            if token != os.environ["TEST_DATABASE_DISPOSABLE_TOKEN"]:
+                pytest.fail("Database disposable marker does not match this test run")
+            await conn.run_sync(Base.metadata.create_all)
+        yield engine
+    finally:
+        # No DROP TABLE needed. Every test uses an outer rollback transaction.
+        await engine.dispose()
 
-    yield engine
 
-    # Drop all tables after the session
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-    await engine.dispose()
-
-
-@pytest_asyncio.fixture
-async def db_session(integration_engine) -> AsyncSession:
-    """Provide a transaction-rolled-back session for each test (keeps tests isolated)."""
-    factory = async_sessionmaker(integration_engine, expire_on_commit=False, class_=AsyncSession)
-    async with factory() as session:
-        async with session.begin():
+@pytest_asyncio.fixture(loop_scope="function")
+async def db_session(integration_engine):
+    async with integration_engine.connect() as connection:
+        outer = await connection.begin()
+        session = AsyncSession(
+            bind=connection, expire_on_commit=False, join_transaction_mode="create_savepoint"
+        )
+        try:
             yield session
-            # Roll back so each test starts with a clean slate
-            await session.rollback()
+        finally:
+            await session.close()
+            await outer.rollback()

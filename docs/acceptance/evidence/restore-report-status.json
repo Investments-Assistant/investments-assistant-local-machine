@@ -1,0 +1,120 @@
+{
+  "status": "PASS",
+  "tier": "real-postgresql-disposable-backup-restore",
+  "timestamp": "2026-09-15T10:55:43.112931+00:00",
+  "source": "test_browser_expenses",
+  "target": "test_restore_report_20260915",
+  "revision": "0010_report_status",
+  "tables": {
+    "alembic_version": {
+      "count": 1,
+      "sha256": "e901f07669b25d12030dcf909ad97276e749e3b39e573867dbba1edf0c2e1fb0"
+    },
+    "analyses": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bank_sync_states": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "broker_accounts": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "chat_messages": {
+      "count": 24,
+      "sha256": "9b7817f6b925d1944e33ece994cf74cb0fca2da8e3be81d7f6b1ccac31b8279c"
+    },
+    "conversations": {
+      "count": 27,
+      "sha256": "7912e22d9a1b22b9fe4e50f8e7a228785a2232c1c8eedfa4916062416475b6b1"
+    },
+    "daily_pnl": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "execution_events": {
+      "count": 42,
+      "sha256": "0ca432a93d31f1726e6183c50102ecbe57c38848365c8b205f5fd0603bff156d"
+    },
+    "expense_audit": {
+      "count": 11,
+      "sha256": "0a0ddf8744c1192ecbb0c070d988b1b29c9a1315c66fd1539930bb745bc4ba3a"
+    },
+    "expense_transactions": {
+      "count": 2828,
+      "sha256": "15937d8808f9fa9ff54ed0bb1dd20b287a2478e55fdf7777270e9cc7bdadd60b"
+    },
+    "ia_disposable_marker": {
+      "count": 1,
+      "sha256": "f996feb0ac8ac007b2e93d7e1afda4763885f757a79dc7f943e8abd7cc7fd2a4"
+    },
+    "job_leases": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "news_articles": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "news_revisions": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "operational_alerts": {
+      "count": 14,
+      "sha256": "be21152511ee96c46cbb17a61ced080404416cb4d1ddba18e72dbeabe95e76c2"
+    },
+    "projects": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reports": {
+      "count": 12,
+      "sha256": "f0ce45942e1d2b3c3f15373e97bd430774499454810a37a8c201b2c25b345a05"
+    },
+    "session_revocations": {
+      "count": 11,
+      "sha256": "ac1f4ae45885f23f1de4235055ebda8f45f57d806011625be43710035997f40e"
+    },
+    "simulation_results": {
+      "count": 12,
+      "sha256": "997558ea79f86543e82b28694fc455dcc2324aade06b5e78cc482f7a2885a2dc"
+    },
+    "simulator_accounts": {
+      "count": 14,
+      "sha256": "d2be2b0d580a64a7e97920f06365476e43e3574a0d21aa8c87cc4ff7e615cb86"
+    },
+    "simulator_instruments": {
+      "count": 14,
+      "sha256": "b758e7fbac451c224860deae5962853ef842f7e231a0a96c46bb84ef8efaaefa"
+    },
+    "simulator_mandates": {
+      "count": 14,
+      "sha256": "0e85a13d30a6fb8677c06c05a24798fff0fcef8eb927903918411f02f2a4053a"
+    },
+    "simulator_orders": {
+      "count": 14,
+      "sha256": "be43801041ab3ccdcaecbb1ac8cc9ebea0fbcd3959e38eb3832c67a4f6e6eb32"
+    },
+    "simulator_positions": {
+      "count": 14,
+      "sha256": "36c2978ddc9d4fe9abf7a9aca0da6d1c2d461cf75423c73f2a9655c4709b7653"
+    },
+    "trades": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "users": {
+      "count": 30,
+      "sha256": "3a498b5e716e689a440fef2a59ee545275e7a13eb0b44e6cc8f56ea5e4c30e2a"
+    }
+  },
+  "archive": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/restore-report-status/test_restore_report_20260915.dump",
+  "archive_sha256": "50a9b8a663650af0fcff4dd7ff89bd8d4f831de3931ddc4cf8108515e242d824",
+  "production_data": false,
+  "limitations": [
+    "Database only; reports/model/vault-key filesystem recovery is separate."
+  ]
+}

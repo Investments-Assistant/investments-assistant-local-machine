@@ -2,51 +2,53 @@
 
 from __future__ import annotations
 
-import asyncio
-from contextlib import contextmanager
-from contextvars import ContextVar
-from datetime import UTC, datetime
-import inspect
+import re
+from copy import deepcopy
 import json
 import math
-import re
-import secrets
 import time
 import uuid
+import asyncio
+from decimal import Decimal, InvalidOperation
+import inspect
+import secrets
+from datetime import UTC, datetime
+from contextlib import contextmanager
+from contextvars import ContextVar
 
 from sqlalchemy import select, update
 
-from src.agent.utils.logger import get_logger
 from src.config import settings
+from src.db.models import Trade, DailyPnL, SimulationResult
+from src.tools.nft import assess_nft_risk
+from src.tools.news import search_market_news
 from src.db.database import async_session
-from src.db.models import DailyPnL, SimulationResult, Trade, User
+from src.tools.forex import get_forex_data, get_forex_rates, get_central_bank_rates
+from src.tools.brokers import (
+    ibkr as ibkr_tool,
+    alpaca as alpaca_tool,
+    binance as binance_tool,
+    coinbase,
+)
+from src.tools.portfolio import get_account_info, get_trade_history, get_portfolio_summary
+from src.tools.simulator import run_simulation_async
+from src.tools.market_data import (
+    search_ticker,
+    get_stock_data,
+    get_crypto_data,
+    get_options_chain,
+    get_market_overview,
+    get_earnings_calendar,
+    get_technical_indicators,
+)
+from src.tools.news_memory import get_latest_news, search_stored_news
+from src.agent.utils.logger import get_logger
 from src.tools.broker_accounts import (
     BrokerAccountConfig,
     BrokerVaultUnavailable,
     capability_unavailable,
     load_user_broker_accounts,
 )
-from src.tools.brokers import (
-    alpaca as alpaca_tool,
-    binance as binance_tool,
-    coinbase,
-    ibkr as ibkr_tool,
-)
-from src.tools.forex import get_central_bank_rates, get_forex_data, get_forex_rates
-from src.tools.market_data import (
-    get_crypto_data,
-    get_earnings_calendar,
-    get_market_overview,
-    get_options_chain,
-    get_stock_data,
-    get_technical_indicators,
-    search_ticker,
-)
-from src.tools.news import search_market_news
-from src.tools.news_memory import get_latest_news, search_stored_news
-from src.tools.nft import assess_nft_risk
-from src.tools.portfolio import get_account_info, get_portfolio_summary, get_trade_history
-from src.tools.simulator import run_simulation
 
 logger = get_logger(__name__)
 
@@ -79,9 +81,14 @@ def tool_context(
 
 async def dispatch_tool(tool_name: str, tool_input: dict) -> str:
     """Call the appropriate tool and return a JSON string result."""
-    logger.info("Tool call: %s(%s)", tool_name, json.dumps(tool_input)[:200])
+    logger.info("Tool call: %s", tool_name)
     try:
+        if settings.is_production is True and _tool_user_id.get():
+            from src.security.sessions import check_tool_authority
+            await check_tool_authority(_tool_user_id.get())
         result = await _dispatch(tool_name, tool_input)
+        if settings.is_production is True and _tool_user_id.get():
+            await check_tool_authority(_tool_user_id.get())
     except Exception as exc:
         logger.exception("Tool %s raised an exception", tool_name)
         result = {"error": str(exc), "tool": tool_name}
@@ -140,21 +147,21 @@ async def _load_current_user_accounts(
     broker: str | None = None,
     account_id: str | None = None,
 ) -> tuple[list[BrokerAccountConfig] | None, dict | None]:
-    """Load account configs for a user, preserving the global scheduler fallback."""
+    """Require explicit user ownership; never fall back to global credentials."""
     user_id = _tool_user_id.get()
     if not user_id:
-        return None, None
+        return None, {"blocked": True, "reason": "Authenticated user identity required."}
     try:
         return await load_user_broker_accounts(user_id, broker=broker, account_id=account_id), None
     except BrokerVaultUnavailable as exc:
-        logger.warning("Broker vault unavailable for user %s: %s", user_id, exc)
+        logger.warning("Broker vault unavailable (%s)", type(exc).__name__)
         return None, {
             "available": False,
             "capability": "brokerage access",
             "error": str(exc),
         }
     except Exception as exc:
-        logger.error("Broker account lookup failed for user %s: %s", user_id, exc)
+        logger.error("Broker account lookup failed (%s)", type(exc).__name__)
         return None, {
             "available": False,
             "capability": "brokerage access",
@@ -427,53 +434,35 @@ def _setting_number(name: str, default: float) -> float:
 
 
 def _live_route_allowed(broker: str, account: BrokerAccountConfig | None = None) -> bool:
-    """Allow paper/testnet routes by default; live routes need an explicit flag."""
-    if bool(getattr(settings, "live_trading_enabled", False)):
-        return True
-    if account is not None:
-        config = account.config
-        if broker == "alpaca":
-            return bool(config.get("paper", True))
-        if broker == "binance":
-            return bool(config.get("testnet", True))
-        if broker == "ibkr":
-            return bool(config.get("enabled", False)) and int(config.get("port", 4002)) == 4002
-        return False
-    if broker == "alpaca":
-        return bool(getattr(settings, "alpaca_paper", True))
-    if broker == "binance":
-        return bool(getattr(settings, "binance_testnet", True))
-    if broker == "ibkr":
-        return int(getattr(settings, "ibkr_port", 4002)) == 4002
+    """External execution is unavailable until independently accepted and authorized.
+
+    A boolean setting or network port cannot attest to an account environment.
+    Simulator execution uses its own isolated ledger, never a broker SDK.
+    """
     return False
 
 
 def _auto_notional_ok(trade: dict) -> tuple[bool, str | None]:
-    """Enforce a dollar cap without guessing the value of market orders."""
-    allow_market_setting = getattr(settings, "auto_allow_market_orders", False)
-    if trade["order_type"] == "market" and allow_market_setting is False:
-        return False, "Auto mode requires limit orders unless AUTO_ALLOW_MARKET_ORDERS=true."
-    raw_notional = trade.get("estimated_notional_usd")
-    if raw_notional is None and trade.get("limit_price") is not None:
-        raw_notional = trade["quantity"] * trade["limit_price"]
-        if trade.get("asset_type") == "option":
-            # Standard US equity options represent 100 underlying shares.
-            raw_notional *= 100
+    """Reject excessive lower-bound limit notionals; this never grants authority.
+
+    Legacy callers lack qualified quotes/FX. This preliminary check can reject
+    risk but cannot authorize a broker write. Caller estimates are ignored.
+    """
+    if trade.get("order_type") not in {"limit", "stop_limit"}:
+        return False, "A trusted priced order is required; market orders are not authorized."
     try:
-        notional = float(str(raw_notional))
-    except (TypeError, ValueError):
-        notional = 0.0
-    # Test doubles and older external callers may not provide the new policy
-    # field.  Real Settings always supplies a bool; only that explicit
-    # production value is allowed to bypass the fail-closed check below.
-    if notional <= 0 and not isinstance(allow_market_setting, bool):
-        return True, None
-    max_trade = _setting_number("auto_max_trade_usd", 500.0)
-    if not math.isfinite(notional) or notional <= 0:
-        return False, "Auto mode needs a positive estimated_notional_usd or limit_price."
-    if notional > max_trade:
-        return False, f"Estimated trade value ${notional:.2f} exceeds the ${max_trade:.2f} cap."
-    return True, None
+        quantity = Decimal(str(trade.get("quantity")))
+        price = Decimal(str(trade.get("limit_price")))
+        cap = Decimal(str(settings.auto_max_trade_usd))
+        values = (quantity, price, cap)
+        if any(not value.is_finite() or value <= 0 for value in values):
+            raise ValueError("Invalid risk input")
+        notional = quantity * price
+        if notional > cap:
+            return False, "Order notional exceeds the configured cap."
+    except (InvalidOperation, ValueError, TypeError):
+        return False, "Finite positive quantity, price and risk cap required."
+    return False, "Qualified contract, quote, multiplier and dated FX required for authorization."
 
 
 def _remember_proposal(trade: dict) -> str:
@@ -485,7 +474,7 @@ def _remember_proposal(trade: dict) -> str:
     _pending_trade_proposals[proposal_id] = {
         "session_id": _tool_session_id.get(),
         "user_id": _tool_user_id.get(),
-        "trade": trade,
+        "trade": deepcopy(trade),
         "expires_at": now + _PROPOSAL_TTL_SECONDS,
     }
     return proposal_id
@@ -653,29 +642,13 @@ async def _execute_trade(inp: dict) -> dict:
 
 
 async def _confirm_trade(inp: dict) -> dict:
-    """Execute one server-created proposal after explicit user approval."""
-    confirmation_id = str(inp.get("confirmation_id", ""))
-    proposal = _pending_trade_proposals.get(confirmation_id)
-    if not proposal or proposal["expires_at"] <= time.time():
-        _pending_trade_proposals.pop(confirmation_id, None)
-        return {"blocked": True, "reason": "Unknown or expired confirmation ID."}
-    if (
-        proposal["session_id"] != _tool_session_id.get()
-        or proposal["user_id"] != _tool_user_id.get()
-    ):
-        return {"blocked": True, "reason": "Confirmation belongs to another chat session."}
-    _pending_trade_proposals.pop(confirmation_id, None)
-    trade = proposal["trade"]
-    account, account_error = await _resolve_single_account(
-        trade["broker"],
-        trade.get("account_id"),
-        "trade execution",
-    )
-    if account_error:
-        return account_error
-    result = await _execute_validated_trade(trade, "manual", account)
-    result["confirmation_id"] = confirmation_id
-    return result
+    """A tool call, including a same-session token, is not a human approval."""
+    return {
+        "blocked": True,
+        "reason": ("Independent authenticated human approval is required; "
+                   "tool confirmation is disabled."),
+        "reason_code": "HUMAN_APPROVAL_REQUIRED",
+    }
 
 
 def _route_order(
@@ -692,6 +665,8 @@ def _route_order(
     option_right: str | None = None,
     account: BrokerAccountConfig | None = None,
 ) -> dict:
+    if not _live_route_allowed(broker, account):
+        return {"blocked": True, "reason": "External broker execution is not authorized."}
     if broker == "alpaca":
         if account is None:
             return alpaca_tool.submit_alpaca_order(
@@ -747,6 +722,8 @@ def _route_order(
 
 
 def _cancel_order(inp: dict, account: BrokerAccountConfig | None = None) -> dict:
+    if not _live_route_allowed(inp.get("broker", ""), account):
+        return {"blocked": True, "reason": "External order cancellation is not authorized."}
     broker = inp["broker"]
     order_id = inp["order_id"]
     if broker == "alpaca":
@@ -792,27 +769,10 @@ async def _cancel_order_for_user(inp: dict) -> dict:
 
 
 async def _set_trading_mode(mode: str) -> dict:
-    if mode not in ("recommend", "auto"):
-        return {"error": "mode must be 'recommend' or 'auto'"}
-    user_id = _tool_user_id.get()
-    if not user_id:
-        return {"blocked": True, "reason": "A user session is required to change trading mode."}
-    try:
-        async with async_session() as session:
-            result = await session.execute(select(User).where(User.id == user_id))
-            user = result.scalar_one_or_none()
-            if user is None or not user.is_active:
-                return {"blocked": True, "reason": "Authenticated user was not found."}
-            user.trading_mode = mode
-            await session.commit()
-        _tool_trading_mode.set(mode)
-    except Exception as exc:
-        logger.error("Could not persist trading mode for user %s: %s", user_id, exc)
-        return {"blocked": True, "reason": "Trading mode could not be persisted."}
     return {
-        "success": True,
-        "trading_mode": mode,
-        "message": f"Trading mode switched to '{mode}'.",
+        "blocked": True,
+        "reason": "Tools cannot change trading authority. Use an independently approved mandate.",
+        "reason_code": "OPERATOR_AUTHORITY_REQUIRED",
     }
 
 
@@ -830,7 +790,7 @@ async def _generate_report(inp: dict) -> dict:
 
 async def _run_simulation_and_persist(inp: dict) -> dict:
     """Run a backtest simulation and persist the result to the DB."""
-    result = run_simulation(**inp)
+    result = await run_simulation_async(**inp)
     if "error" in result:
         return result
 
@@ -855,6 +815,8 @@ async def _run_simulation_and_persist(inp: dict) -> dict:
             result["simulation_id"] = sim.id
             logger.info("Simulation '%s' persisted (id=%s)", sim.name, sim.id)
     except Exception as exc:
-        logger.warning("Failed to persist simulation result: %s", exc)
+        logger.warning("Failed to persist simulation result: %s", type(exc).__name__)
+        result["status"] = "partial_failure"
+        result["persistence_error"] = "Simulation calculated but not persisted."
 
     return result

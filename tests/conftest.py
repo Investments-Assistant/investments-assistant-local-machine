@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
+import os
 from unittest.mock import AsyncMock, MagicMock, patch
+
+# Never inherit the developer application database from .env.
+os.environ["DATABASE_URL"] = os.environ.get(
+    "TEST_DATABASE_URL", "postgresql+asyncpg://fixture:fixture@127.0.0.1:1/test_disconnected"
+)
 
 import pytest
 
@@ -39,8 +45,8 @@ def force_development_env(monkeypatch):
     # Import these modules before replacing src.config.settings. Resolving a
     # patch target imports the module, and email_reader imports the database;
     # importing it after the patch would give SQLAlchemy a MagicMock URL.
-    import src.news.email_reader as email_reader
     import src.news.sources as sources
+    import src.news.email_reader as email_reader
 
     with (
         patch("src.config.settings", mock_cfg),

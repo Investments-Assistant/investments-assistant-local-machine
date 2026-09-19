@@ -1,230 +1,260 @@
-"""Interactive Brokers brokerage tool via ib_insync.
+"""Explicit-account read-only IBKR adapter via ib_insync.
 
-Requires IB Gateway or TWS to be running and configured.
-Set IBKR_ENABLED=false in .env to disable without errors.
+The worker owns its event loop and always disconnects. Live/paper writes remain
+unavailable pending independent external-account and durable broker acceptance.
 """
 
 from __future__ import annotations
 
-from typing import Any
+import asyncio
+from decimal import Decimal
+import hashlib
+from datetime import UTC, datetime
+import threading
+from contextlib import contextmanager
 
-from src.agent.utils.logger import get_logger
-from src.config import settings
+from src.execution.external import disabled_external_write
 from src.tools.broker_accounts import BrokerAccountConfig
 
-logger = get_logger(__name__)
+_connection_lock = threading.Lock()
 
 
 def _config(account: BrokerAccountConfig | None) -> dict:
-    return account.config if account else {
-        "host": settings.ibkr_host,
-        "port": settings.ibkr_port,
-        "client_id": settings.ibkr_client_id,
-        "enabled": settings.ibkr_enabled,
-    }
+    if account is None or not account.id or not account.user_id or account.broker != "ibkr":
+        raise ValueError("AUTHENTICATED_ACCOUNT_REQUIRED")
+    config = account.config
+    if config.get("enabled") is not True or config.get("read_authorized") is not True:
+        raise ValueError("IBKR_READ_CONSENT_REQUIRED")
+    if not config.get("broker_account_id") or config.get("environment") not in {"paper", "live"}:
+        raise ValueError("EXPLICIT_BROKER_ACCOUNT_AND_ENVIRONMENT_REQUIRED")
+    if int(config.get("client_id", 0)) <= 0:
+        raise ValueError("DEDICATED_NONZERO_CLIENT_ID_REQUIRED")
+    return config
 
 
-def _enabled(account: BrokerAccountConfig | None = None) -> bool:
-    return bool(_config(account).get("enabled", False))
+def _account_ref(actual: str) -> str:
+    return "masked-" + hashlib.sha256(actual.encode()).hexdigest()[:12]
 
 
-def _get_ib(account: BrokerAccountConfig | None = None):
-    """Connect to IB Gateway and return an IB instance."""
-    from ib_insync import IB
-
-    ib = IB()
+@contextmanager
+def _connection(account: BrokerAccountConfig | None):
     config = _config(account)
-    ib.connect(
-        host=config.get("host", "127.0.0.1"),
-        port=int(config.get("port", 4002)),
-        clientId=int(config.get("client_id", 1)),
-        timeout=10,
-        readonly=False,
-    )
-    return ib
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        pass
+    else:
+        raise RuntimeError("IBKR_SYNC_ADAPTER_REQUIRES_WORKER_THREAD")
+    if not _connection_lock.acquire(timeout=10):
+        raise RuntimeError("IBKR_CLIENT_BUSY")
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    ib = None
+    try:
+        from ib_insync import IB
+
+        ib = IB()
+        ib.RequestTimeout = 10
+        ib.RaiseRequestErrors = True
+        actual = config["broker_account_id"]
+        ib.connect(
+            host=config.get("host", "127.0.0.1"),
+            port=int(config.get("port", 4002)),
+            clientId=int(config["client_id"]),
+            account=actual,
+            timeout=10,
+            readonly=True,
+            raiseSyncErrors=True,
+        )
+        if actual not in ib.managedAccounts():
+            raise ValueError("BROKER_ACCOUNT_NOT_MANAGED")
+        yield ib, actual
+    finally:
+        try:
+            if ib is not None:
+                ib.disconnect()
+        finally:
+            loop.close()
+            asyncio.set_event_loop(None)
+            _connection_lock.release()
 
 
-def _disabled() -> dict:
+def _error(exc):
+    # Provider exception text can contain account IDs or connection credentials.
+    allowed = {
+        "AUTHENTICATED_ACCOUNT_REQUIRED",
+        "IBKR_READ_CONSENT_REQUIRED",
+        "EXPLICIT_BROKER_ACCOUNT_AND_ENVIRONMENT_REQUIRED",
+        "DEDICATED_NONZERO_CLIENT_ID_REQUIRED",
+        "BROKER_ACCOUNT_NOT_MANAGED",
+        "IBKR_CLIENT_BUSY",
+        "IBKR_SYNC_ADAPTER_REQUIRES_WORKER_THREAD",
+        "INCOMPLETE_CONTRACT",
+        "AMBIGUOUS_CONTRACT",
+        "CONTRACT_MISMATCH",
+        "AMBIGUOUS_CONTRACT_DETAILS",
+        "CONTRACT_PRECISION_UNAVAILABLE",
+    }
+    code = str(exc) if str(exc) in allowed else "IBKR_READ_UNAVAILABLE"
+    return {"broker": "ibkr", "available": False, "error": code}
+
+
+def summarize_account(values, actual: str) -> dict:
+    """Never flatten accounts or currencies. Base-currency facts must be explicit."""
+    rows = [value for value in values if value.account == actual]
+    by_currency: dict[str, dict] = {}
+    base = next((row.value for row in rows if row.tag == "Currency" and len(row.value) == 3), None)
+    for row in rows:
+        by_currency.setdefault(row.currency or "unspecified", {})[row.tag] = row.value
+    metrics = by_currency.get(base, {}) if base else {}
     return {
-        "error": "IBKR integration is disabled. \
-            Set IBKR_ENABLED=true and ensure IB Gateway is running.",
-        "help": "See docs/ibkr-gateway.md for setup instructions.",
+        "broker": "ibkr",
+        "broker_account_ref": _account_ref(actual),
+        "currency": base,
+        "values_by_currency": by_currency,
+        "net_liquidation": metrics.get("NetLiquidation"),
+        "cash_balance": metrics.get("CashBalance"),
+        "buying_power": metrics.get("BuyingPower"),
+        "available_funds": metrics.get("AvailableFunds"),
+        "unrealized_pnl": metrics.get("UnrealizedPnL"),
+        "realized_pnl": metrics.get("RealizedPnL"),
+        "as_of": datetime.now(UTC).isoformat(),
     }
 
 
 def get_ibkr_account(account: BrokerAccountConfig | None = None) -> dict:
-    if not _enabled(account):
-        return _disabled()
     try:
-        ib = _get_ib(account)
-        summary = ib.accountSummary()
-        result: dict[str, Any] = {"broker": "ibkr", "account": {}}
-        for item in summary:
-            result["account"][item.tag] = item.value
-        ib.disconnect()
-        # Extract key fields
-        acc = result["account"]
-        return {
-            "broker": "ibkr",
-            "net_liquidation": acc.get("NetLiquidation"),
-            "cash_balance": acc.get("CashBalance"),
-            "buying_power": acc.get("BuyingPower"),
-            "available_funds": acc.get("AvailableFunds"),
-            "unrealized_pnl": acc.get("UnrealizedPnL"),
-            "realized_pnl": acc.get("RealizedPnL"),
-        }
+        with _connection(account) as (ib, actual):
+            result = summarize_account(ib.accountSummary(account=actual), actual)
+            result.update(
+                declared_environment=account.config["environment"],
+                verified_environment=None,
+                environment_verification="operator_configuration_only",
+                managed_account_match=True,
+                execution_permission="read_only_external_writes_disabled",
+            )
+            return result
     except Exception as exc:
-        logger.error("IBKR account fetch failed: %s", exc)
-        return {"broker": "ibkr", "error": str(exc)}
+        return _error(exc)
 
 
 def get_ibkr_positions(account: BrokerAccountConfig | None = None) -> list[dict]:
-    if not _enabled(account):
-        return [_disabled()]
     try:
-        ib = _get_ib(account)
-        portfolio = ib.portfolio()
-        ib.disconnect()
-        return [
-            {
-                "symbol": item.contract.symbol,
-                "security_type": item.contract.secType,
-                "currency": item.contract.currency,
-                "qty": item.position,
-                "avg_cost": item.averageCost,
-                "market_price": item.marketPrice,
-                "market_value": item.marketValue,
-                "unrealized_pnl": item.unrealizedPNL,
-                "realized_pnl": item.realizedPNL,
-            }
-            for item in portfolio
-        ]
+        with _connection(account) as (ib, actual):
+            return [
+                {
+                    "symbol": item.contract.symbol,
+                    "con_id": item.contract.conId,
+                    "security_type": item.contract.secType,
+                    "exchange": item.contract.exchange,
+                    "primary_exchange": item.contract.primaryExchange,
+                    "currency": item.contract.currency,
+                    "qty": str(item.position),
+                    "avg_cost": str(item.averageCost),
+                    "market_price": str(item.marketPrice),
+                    "market_value": str(item.marketValue),
+                    "unrealized_pnl": str(item.unrealizedPNL),
+                    "realized_pnl": str(item.realizedPNL),
+                    "broker_account_ref": _account_ref(actual),
+                    "as_of": datetime.now(UTC).isoformat(),
+                }
+                for item in ib.portfolio(account=actual)
+                if item.account == actual
+            ]
     except Exception as exc:
-        logger.error("IBKR positions fetch failed: %s", exc)
-        return [{"error": str(exc)}]
+        return [_error(exc)]
 
 
 def get_ibkr_orders(account: BrokerAccountConfig | None = None) -> list[dict]:
-    if not _enabled(account):
-        return [_disabled()]
     try:
-        ib = _get_ib(account)
-        trades = ib.trades()
-        ib.disconnect()
-        return [
-            {
-                "order_id": trade.order.orderId,
-                "symbol": trade.contract.symbol,
-                "action": trade.order.action,
-                "qty": trade.order.totalQuantity,
-                "order_type": trade.order.orderType,
-                "limit_price": trade.order.lmtPrice,
-                "status": trade.orderStatus.status,
-                "filled": trade.orderStatus.filled,
-                "avg_fill_price": trade.orderStatus.avgFillPrice,
-            }
-            for trade in trades
-        ]
-    except Exception as exc:
-        logger.error("IBKR orders fetch failed: %s", exc)
-        return [{"error": str(exc)}]
-
-
-def _is_forex_pair(symbol: str) -> bool:
-    """Return True for symbols like 'EURUSD', 'EUR/USD', 'EUR-USD'."""
-    clean = symbol.upper().replace("/", "").replace("-", "")
-    return len(clean) == 6 and clean.isalpha()
-
-
-def submit_ibkr_order(
-    symbol: str,
-    side: str,
-    quantity: float,
-    order_type: str = "market",
-    limit_price: float | None = None,
-    stop_price: float | None = None,
-    asset_type: str | None = None,
-    option_expiry: str | None = None,
-    option_strike: float | None = None,
-    option_right: str | None = None,
-    account: BrokerAccountConfig | None = None,
-) -> dict:
-    if not _enabled(account):
-        return _disabled()
-    try:
-        from ib_insync import Forex, LimitOrder, MarketOrder, Option, Stock, StopLimitOrder
-
-        ib = _get_ib(account)
-        normalized_asset_type = (asset_type or "").lower().strip()
-        if normalized_asset_type == "option":
-            if not option_expiry or option_strike is None or option_right not in {"C", "P"}:
-                return {
-                    "success": False,
-                    "error": "Option orders require expiry, strike, and right (C or P).",
+        with _connection(account) as (ib, actual):
+            # Explicit snapshot request; do not present a fresh client's empty cache as history.
+            trades = ib.reqAllOpenOrders()
+            return [
+                {
+                    "order_id": trade.order.orderId,
+                    "client_id": trade.order.clientId,
+                    "permanent_id": trade.order.permId,
+                    "symbol": trade.contract.symbol,
+                    "con_id": trade.contract.conId,
+                    "currency": trade.contract.currency,
+                    "action": trade.order.action,
+                    "qty": str(trade.order.totalQuantity),
+                    "order_type": trade.order.orderType,
+                    "limit_price": str(trade.order.lmtPrice),
+                    "status": trade.orderStatus.status,
+                    "filled": str(trade.orderStatus.filled),
+                    "avg_fill_price": str(trade.orderStatus.avgFillPrice),
+                    "scope": "open_order_snapshot_not_execution_history",
+                    "ownership": "external_or_unknown",
                 }
-            expiry = option_expiry.replace("-", "")
-            contract = Option(
-                symbol,
-                expiry,
-                float(option_strike),
-                option_right,
-                "SMART",
-                multiplier="100",
-                currency="USD",
-            )
-        elif normalized_asset_type == "forex" or (
-            not normalized_asset_type and _is_forex_pair(symbol)
-        ):
-            clean = symbol.upper().replace("/", "").replace("-", "")
-            contract = Forex(clean)
-        else:
-            contract = Stock(symbol, "SMART", "USD")
-        ib.qualifyContracts(contract)
-
-        action = "BUY" if side.lower() == "buy" else "SELL"
-        if order_type == "market":
-            order = MarketOrder(action, quantity)
-        elif order_type == "limit":
-            if limit_price is None:
-                return {"error": "limit_price required"}
-            order = LimitOrder(action, quantity, limit_price)
-        elif order_type == "stop_limit":
-            if limit_price is None or stop_price is None:
-                return {"error": "limit_price and stop_price required"}
-            order = StopLimitOrder(action, quantity, limit_price, stop_price)
-        else:
-            return {"error": f"Unsupported order type: {order_type}"}
-
-        trade = ib.placeOrder(contract, order)
-        ib.sleep(1)
-        ib.disconnect()
-        return {
-            "success": True,
-            "order_id": trade.order.orderId,
-            "symbol": symbol,
-            "asset_type": normalized_asset_type or ("forex" if _is_forex_pair(symbol) else "stock"),
-            "status": trade.orderStatus.status,
-        }
+                for trade in trades
+                if trade.order.account == actual
+            ]
     except Exception as exc:
-        logger.error("IBKR order submission failed: %s", exc)
-        return {"success": False, "error": str(exc)}
+        return [_error(exc)]
 
 
-def cancel_ibkr_order(
-    order_id: str, account: BrokerAccountConfig | None = None
+def qualify_stock(ib, *, symbol: str, exchange: str, currency: str) -> dict:
+    """Explicit stock contract resolution; a symbol or port never selects a market."""
+    from ib_insync import Stock
+
+    if not symbol or not exchange or len(currency) != 3:
+        raise ValueError("INCOMPLETE_CONTRACT")
+    contracts = ib.qualifyContracts(Stock(symbol, exchange, currency))
+    if len(contracts) != 1 or not contracts[0].conId:
+        raise ValueError("AMBIGUOUS_CONTRACT")
+    contract = contracts[0]
+    if contract.currency != currency or contract.secType != "STK":
+        raise ValueError("CONTRACT_MISMATCH")
+    details = ib.reqContractDetails(contract)
+    if len(details) != 1:
+        raise ValueError("AMBIGUOUS_CONTRACT_DETAILS")
+    detail = details[0]
+    tick = Decimal(str(detail.minTick))
+    lot = Decimal(str(getattr(detail, "minSize", 0)))
+    if not tick.is_finite() or not lot.is_finite() or tick <= 0 or lot <= 0:
+        raise ValueError("CONTRACT_PRECISION_UNAVAILABLE")
+    return {
+        "con_id": contract.conId,
+        "symbol": contract.symbol,
+        "security_type": contract.secType,
+        "exchange": exchange,
+        "primary_exchange": contract.primaryExchange,
+        "currency": currency,
+        "tick": str(tick),
+        "lot": str(lot),
+        "multiplier": contract.multiplier or "1",
+    }
+
+
+def resolve_ibkr_contract(
+    symbol: str, exchange: str, currency: str, account: BrokerAccountConfig | None = None
 ) -> dict:
-    if not _enabled(account):
-        return _disabled()
     try:
-        ib = _get_ib(account)
-        open_trades = ib.openTrades()
-        target = next((t for t in open_trades if str(t.order.orderId) == str(order_id)), None)
-        if not target:
-            ib.disconnect()
-            return {"error": f"Order {order_id} not found"}
-        ib.cancelOrder(target.order)
-        ib.sleep(1)
-        ib.disconnect()
-        return {"success": True, "order_id": order_id}
+        with _connection(account) as (ib, _):
+            return qualify_stock(ib, symbol=symbol, exchange=exchange, currency=currency)
     except Exception as exc:
-        return {"success": False, "error": str(exc)}
+        return _error(exc)
+
+
+@disabled_external_write
+def submit_ibkr_order(
+    symbol,
+    side,
+    quantity,
+    order_type="market",
+    limit_price=None,
+    stop_price=None,
+    asset_type=None,
+    option_expiry=None,
+    option_strike=None,
+    option_right=None,
+    account=None,
+) -> dict:
+    return {"blocked": True, "success": False, "error": "EXTERNAL_EXECUTION_NOT_AUTHORIZED"}
+
+
+@disabled_external_write
+def cancel_ibkr_order(order_id, account=None) -> dict:
+    return {"blocked": True, "success": False, "error": "EXTERNAL_CANCELLATION_NOT_AUTHORIZED"}

@@ -1,0 +1,30 @@
+scripts/verify_browser.py:268:121: E501 Line too long (125 > 120)
+src/config.py:74:13: SIM105 Use `contextlib.suppress(ValueError)` instead of `try`-`except`-`pass`
+src/news/email_reader.py:231:9: SIM105 Use `contextlib.suppress(Exception)` instead of `try`-`except`-`pass`
+src/tools/brokers/binance.py:88:17: SIM105 Use `contextlib.suppress(Exception)` instead of `try`-`except`-`pass`
+src/tools/market_data.py:159:9: ERA001 Found commented-out code
+src/tools/market_data.py:184:9: ERA001 Found commented-out code
+src/tools/market_data.py:275:9: SIM108 Use ternary operator `target_exps = [expiry] if expiry and expiry in exps else list(exps[:3])` instead of `if`-`else`-block
+src/tools/simulator.py:102:5: SIM108 Use ternary operator `sharpe = 0.0 if daily_ret.std() == 0 else float(daily_ret.mean() / daily_ret.std() * math.sqrt(annual_factor))` instead of `if`-`else`-block
+src/web/routes.py:224:9: SIM105 Use `contextlib.suppress(Exception)` instead of `try`-`except`-`pass`
+tests/integration/sessions_test.py:93:33: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+tests/integration/sessions_test.py:128:32: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+tests/unit/acceptance_broker_test.py:74:5: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/broker_accounts_test.py:56:5: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/dispatcher_test.py:71:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/dispatcher_test.py:87:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/dispatcher_test.py:323:13: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/dispatcher_test.py:349:13: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/email_reader_test.py:215:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/news_memory_test.py:17:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/news_memory_test.py:27:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/news_memory_test.py:39:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/news_memory_test.py:63:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/news_memory_test.py:84:5: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/news_sources_test.py:305:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/news_sources_test.py:324:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/public_fetch_test.py:67:5: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/public_fetch_test.py:73:5: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+tests/unit/public_fetch_test.py:81:5: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+Found 179 errors (151 fixed, 28 remaining).
+No fixes available (5 hidden fixes can be enabled with the `--unsafe-fixes` option).

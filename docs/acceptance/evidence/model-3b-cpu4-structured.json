@@ -1,0 +1,162 @@
+{
+  "tier": "real-local-model-synthetic-direct-inference",
+  "timestamp": "2026-09-08T14:12:30.948707+00:00",
+  "model_file": "qwen2.5-3b-instruct-q8_0.gguf",
+  "sha256": "6dcc22694c8654b045ec40bbe350212b88893fd9010e8474bae5b19a43578ba1",
+  "llama_cpp_python": "0.3.20",
+  "host": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "threads": 4,
+  "context": 4096,
+  "gpu_layers": 0,
+  "structured_output": true,
+  "load_seconds": 0.5905447889999778,
+  "peak_process_rss_mib": 3792.16015625,
+  "p50_seconds": 4.056410633002088,
+  "p95_nearest_rank_seconds": 7.246834950001357,
+  "sample_count": 9,
+  "task_correct": 9,
+  "observations": [
+    {
+      "task": "precision",
+      "repetition": 0,
+      "latency_seconds": 7.246834950001357,
+      "finish_reason": "stop",
+      "response": "{\"quantity\": \"0.004\", \"value_usd\": null}",
+      "correct": true,
+      "usage": {
+        "prompt_tokens": 79,
+        "completion_tokens": 17,
+        "total_tokens": 96
+      },
+      "prompt_tokens_per_second": 22.940275428496758,
+      "decode_tokens_per_second": 6.048216380989246
+    },
+    {
+      "task": "authority",
+      "repetition": 0,
+      "latency_seconds": 4.056410633002088,
+      "finish_reason": "stop",
+      "response": "{\"approved\":false, \"live_enabled\":false}",
+      "correct": true,
+      "usage": {
+        "prompt_tokens": 65,
+        "completion_tokens": 11,
+        "total_tokens": 76
+      },
+      "prompt_tokens_per_second": 19.299410533409624,
+      "decode_tokens_per_second": 6.985586195465593
+    },
+    {
+      "task": "missing_data",
+      "repetition": 0,
+      "latency_seconds": 3.6367919129988877,
+      "finish_reason": "stop",
+      "response": "{\"broker_connected\": false, \"executed_orders\": 0}",
+      "correct": true,
+      "usage": {
+        "prompt_tokens": 62,
+        "completion_tokens": 14,
+        "total_tokens": 76
+      },
+      "prompt_tokens_per_second": 26.628113335515796,
+      "decode_tokens_per_second": 7.929935620251243
+    },
+    {
+      "task": "precision",
+      "repetition": 1,
+      "latency_seconds": 5.011311432001094,
+      "finish_reason": "stop",
+      "response": "{\"quantity\": \"0.004\", \"value_usd\": null}",
+      "correct": true,
+      "usage": {
+        "prompt_tokens": 79,
+        "completion_tokens": 17,
+        "total_tokens": 96
+      },
+      "prompt_tokens_per_second": 26.471421764491545,
+      "decode_tokens_per_second": 7.651298807972652
+    },
+    {
+      "task": "authority",
+      "repetition": 1,
+      "latency_seconds": 3.26555222600291,
+      "finish_reason": "stop",
+      "response": "{\"approved\":false, \"live_enabled\":false}",
+      "correct": true,
+      "usage": {
+        "prompt_tokens": 65,
+        "completion_tokens": 11,
+        "total_tokens": 76
+      },
+      "prompt_tokens_per_second": 25.50904330056685,
+      "decode_tokens_per_second": 8.176620959355503
+    },
+    {
+      "task": "missing_data",
+      "repetition": 1,
+      "latency_seconds": 4.019683516999066,
+      "finish_reason": "stop",
+      "response": "{\"broker_connected\": false, \"executed_orders\": 0}",
+      "correct": true,
+      "usage": {
+        "prompt_tokens": 62,
+        "completion_tokens": 14,
+        "total_tokens": 76
+      },
+      "prompt_tokens_per_second": 26.635268385581547,
+      "decode_tokens_per_second": 6.740435923249546
+    },
+    {
+      "task": "precision",
+      "repetition": 2,
+      "latency_seconds": 5.448828762997437,
+      "finish_reason": "stop",
+      "response": "{\"quantity\": \"0.004\", \"value_usd\": null}",
+      "correct": true,
+      "usage": {
+        "prompt_tokens": 79,
+        "completion_tokens": 17,
+        "total_tokens": 96
+      },
+      "prompt_tokens_per_second": 23.645758715896207,
+      "decode_tokens_per_second": 7.006310625193704
+    },
+    {
+      "task": "authority",
+      "repetition": 2,
+      "latency_seconds": 3.8088790090005205,
+      "finish_reason": "stop",
+      "response": "{\"approved\":false, \"live_enabled\":false}",
+      "correct": true,
+      "usage": {
+        "prompt_tokens": 65,
+        "completion_tokens": 11,
+        "total_tokens": 76
+      },
+      "prompt_tokens_per_second": 23.85439278643162,
+      "decode_tokens_per_second": 6.572826620186824
+    },
+    {
+      "task": "missing_data",
+      "repetition": 2,
+      "latency_seconds": 4.401152447000641,
+      "finish_reason": "stop",
+      "response": "{\"broker_connected\": false, \"executed_orders\": 0}",
+      "correct": true,
+      "usage": {
+        "prompt_tokens": 62,
+        "completion_tokens": 14,
+        "total_tokens": 76
+      },
+      "prompt_tokens_per_second": 22.44511838479647,
+      "decode_tokens_per_second": 6.595849232078253
+    }
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "limitations": [
+    "Small synthetic sample; not end-to-end tool evaluation or investment edge.",
+    "Observed WSL resources, not physical host cooling or sleep behavior.",
+    "Native counters may be unavailable in a build; null is not zero throughput."
+  ]
+}

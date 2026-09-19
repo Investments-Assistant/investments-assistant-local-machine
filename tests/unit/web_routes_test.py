@@ -5,9 +5,9 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
 
 from src.web.auth import hash_password
 
@@ -82,6 +82,13 @@ class TestHealthEndpoint:
 
 @pytest.mark.unit
 class TestAuthenticationEndpoints:
+    @pytest.fixture(autouse=True)
+    def current_session_store(self):
+        # This tier tests route marshalling with mocked persistence. Real account
+        # activity/revocation checks run in integration/sessions_test and Chromium.
+        with patch("src.web.auth.validate_principal", new_callable=AsyncMock):
+            yield
+
     def _settings(self):
         cfg = MagicMock()
         cfg.is_development = False
@@ -212,10 +219,13 @@ class TestAuthenticationEndpoints:
             patch("src.web.routes.async_session", return_value=session),
         ):
             client = _make_client()
-            assert client.post(
-                "/api/auth/login",
-                json={"username": "admin", "password": "a-long-and-private-password"},
-            ).status_code == 200
+            assert (
+                client.post(
+                    "/api/auth/login",
+                    json={"username": "admin", "password": "a-long-and-private-password"},
+                ).status_code
+                == 200
+            )
             response = client.put(
                 "/api/profile",
                 headers={"X-CSRF-Token": client.cookies.get("ia_csrf")},
@@ -261,10 +271,13 @@ class TestAuthenticationEndpoints:
             patch("src.web.routes.async_session", return_value=session),
         ):
             client = _make_client()
-            assert client.post(
-                "/api/auth/login",
-                json={"username": "admin", "password": "a-long-and-private-password"},
-            ).status_code == 200
+            assert (
+                client.post(
+                    "/api/auth/login",
+                    json={"username": "admin", "password": "a-long-and-private-password"},
+                ).status_code
+                == 200
+            )
             response = client.delete(
                 f"/api/conversations/{conversation.id}",
                 headers={"X-CSRF-Token": client.cookies.get("ia_csrf")},
@@ -297,10 +310,13 @@ class TestAuthenticationEndpoints:
             patch("src.web.routes.async_session", return_value=session),
         ):
             client = _make_client()
-            assert client.post(
-                "/api/auth/login",
-                json={"username": "admin", "password": "a-long-and-private-password"},
-            ).status_code == 200
+            assert (
+                client.post(
+                    "/api/auth/login",
+                    json={"username": "admin", "password": "a-long-and-private-password"},
+                ).status_code
+                == 200
+            )
             response = client.delete(
                 "/api/conversations/22222222-2222-4222-8222-222222222222",
                 headers={"X-CSRF-Token": client.cookies.get("ia_csrf")},
@@ -334,10 +350,13 @@ class TestAuthenticationEndpoints:
             patch("src.web.routes.async_session", return_value=session),
         ):
             client = _make_client()
-            assert client.post(
-                "/api/auth/login",
-                json={"username": "admin", "password": "a-long-and-private-password"},
-            ).status_code == 200
+            assert (
+                client.post(
+                    "/api/auth/login",
+                    json={"username": "admin", "password": "a-long-and-private-password"},
+                ).status_code
+                == 200
+            )
             response = client.get("/api/chat/history?session_id=tab-1")
 
         assert response.status_code == 200
@@ -510,7 +529,7 @@ class TestSimulationEndpoints:
         }
         with (
             patch("src.web.routes.async_session", return_value=session),
-            patch("src.web.routes.run_simulation", return_value=result) as run,
+            patch("src.web.routes.run_simulation_async", new=AsyncMock(return_value=result)) as run,
         ):
             response = _make_client().post(
                 "/api/simulations",

@@ -86,6 +86,7 @@ function handleEvent(event) {
       // work and validated the response as a final answer.
       discardAssistantMessage();
       if (event.text) appendAssistantMessage(event.text);
+      appendTurnEvidence(event.turn);
       break;
     case 'text_delta':
       // Never render raw model deltas. Only the server's validated
@@ -732,7 +733,7 @@ async function saveProfile() {
 
 const DEFAULT_BROKER_PROVIDERS = {
   alpaca: {fields: ['api_key', 'paper', 'secret_key'], secret_fields: ['api_key', 'secret_key']},
-  ibkr: {fields: ['client_id', 'enabled', 'host', 'port'], secret_fields: []},
+  ibkr: {fields: ['broker_account_id', 'environment', 'read_authorized', 'client_id', 'enabled', 'host', 'port'], secret_fields: ['broker_account_id']},
   coinbase: {fields: ['api_key', 'api_secret'], secret_fields: ['api_key', 'api_secret']},
   binance: {fields: ['api_key', 'secret_key', 'testnet'], secret_fields: ['api_key', 'secret_key']},
 };
@@ -759,10 +760,10 @@ function renderBrokerFields() {
     ? (editingBrokerAccount.configured_fields || {}) : {};
   const fieldsEl = document.getElementById('broker-fields');
   fieldsEl.innerHTML = (definition.fields || []).map(field => {
-    const isBoolean = ['paper', 'testnet', 'enabled'].includes(field);
+    const isBoolean = ['paper', 'testnet', 'enabled', 'read_authorized'].includes(field);
     const inputType = secretFields.has(field) ? 'password' : isBoolean ? 'checkbox' : field === 'port' || field === 'client_id' ? 'number' : 'text';
     if (isBoolean) {
-      const defaultChecked = editingBrokerAccountId ? Boolean(publicConfig[field]) : provider === 'ibkr' ? true : true;
+      const defaultChecked = editingBrokerAccountId ? Boolean(publicConfig[field]) : provider !== 'ibkr';
       return `<label class="broker-field broker-check"><input id="broker-field-${field}" data-broker-field="${field}" type="checkbox" ${defaultChecked ? 'checked' : ''} /> ${escapeHtml(brokerFieldLabel(field))}</label>`;
     }
     const placeholder = secretFields.has(field)
@@ -787,15 +788,56 @@ function renderBrokerAccounts() {
     return `<div class="broker-account">
       <div class="broker-account-head"><span class="broker-account-name">${escapeHtml(account.display_name)}</span><span class="broker-account-provider">${escapeHtml(brokerLabel(account.broker))}</span></div>
       <div class="broker-account-fields">${fields || 'No fields configured'}</div>
-      <div class="broker-account-actions"><button data-edit-account="${escapeHtml(account.id)}">Edit</button><button data-delete-account="${escapeHtml(account.id)}">Disable</button></div>
+      <div class="broker-account-actions"><button data-edit-account="${escapeHtml(account.id)}">Edit</button><button data-delete-account="${escapeHtml(account.id)}">Disable</button>${account.broker === 'ibkr' ? `<button data-broker-evidence="${escapeHtml(account.id)}">Saved execution evidence</button><button data-broker-refresh="${escapeHtml(account.id)}">Read broker evidence</button>` : ''}</div><pre class="broker-evidence" data-broker-result="${escapeHtml(account.id)}" hidden></pre>
     </div>`;
   }).join('');
+  el.querySelectorAll('[data-broker-evidence]').forEach(button => {
+    button.addEventListener('click', () => brokerExecutionEvidence(button, false));
+  });
+  el.querySelectorAll('[data-broker-refresh]').forEach(button => {
+    button.addEventListener('click', () => brokerExecutionEvidence(button, true));
+  });
   el.querySelectorAll('[data-edit-account]').forEach(button => {
     button.addEventListener('click', () => editBrokerAccount(button.dataset.editAccount));
   });
   el.querySelectorAll('[data-delete-account]').forEach(button => {
     button.addEventListener('click', () => deleteBrokerAccount(button.dataset.deleteAccount));
   });
+}
+
+async function brokerExecutionEvidence(button, refresh) {
+  const accountId = refresh ? button.dataset.brokerRefresh : button.dataset.brokerEvidence;
+  const account = brokerAccounts.find(item => item.id === accountId);
+  if (!account) return;
+  if (refresh && !window.confirm(`Connect read-only to ${account.display_name} and collect available executions, fees, positions and currency cash balances? This does not verify paper/live status or submit orders.`)) return;
+  const output = button.closest('.broker-account').querySelector('[data-broker-result]');
+  output.hidden = false;
+  output.textContent = refresh ? 'Reading available broker evidence…' : 'Loading saved evidence…';
+  button.disabled = true;
+  try {
+    const url = `/api/broker-accounts/${encodeURIComponent(accountId)}/observations`;
+    const cursor = !refresh && button.dataset.cursor;
+    const readUrl = cursor ? `${url}?cursor=${encodeURIComponent(cursor)}` : url;
+    const response = await fetch(refresh ? `${url}/refresh` : readUrl, refresh ? {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({confirm_broker_read: true}),
+    } : {});
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.detail?.reason_code || 'Broker evidence unavailable');
+    output.textContent = 'Available evidence only; history and late fees may be incomplete. External order ownership is unverified.\n' + JSON.stringify(result, null, 2);
+    if (!refresh) {
+      button.dataset.cursor = result.next_cursor || '';
+      button.textContent = result.next_cursor ? 'Next saved evidence page' : 'Saved execution evidence';
+    } else {
+      const saved = button.closest('.broker-account').querySelector('[data-broker-evidence]');
+      saved.dataset.cursor = '';
+      saved.textContent = 'Saved execution evidence';
+    }
+  } catch (error) {
+    output.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
 }
 
 function setBrokerStatus(message, kind = '') {
@@ -1195,7 +1237,7 @@ async function moveActiveConversation(projectId) {
 function appendWelcomeMessage() {
   appendAssistantMessage(
     '**Welcome to your Investment Assistant! 📈**\n\n'
-    + 'I can analyse markets, news, simulations, and — depending on your trading mode — execute bounded trades on your behalf.\n\n'
+    + 'I can analyse scoped portfolio evidence, news, reports and simulations. Order practice uses separately approved simulator actions.\n\n'
     + 'Use the quick prompts on the left, or ask me anything.'
   );
 }
@@ -1222,7 +1264,10 @@ async function loadHistory() {
     messagesEl().replaceChildren();
     for (const message of conversation.messages || []) {
       if (message.role === 'user') appendStoredUserMessage(message.content, message.created_at);
-      if (message.role === 'assistant') appendAssistantMessage(message.content, message.created_at);
+      if (message.role === 'assistant') {
+        appendAssistantMessage(message.content || 'This turn has no completed answer.', message.created_at);
+        appendTurnEvidence(message.turn);
+      }
     }
     updateConversationHeader(conversation);
     if (!conversation.messages?.length) appendWelcomeMessage();
@@ -1243,6 +1288,11 @@ async function loadReports() {
     el.innerHTML = reports.slice(0, 5).map(r => `
       <div class="report-item">
         <span>${r.period_start.slice(0, 10)} → ${r.period_end.slice(0, 10)}</span>
+        <span class="report-status">${r.generation_status === 'complete' ? 'Generation complete' :
+          r.generation_status === 'retired' ? 'Content removed by owner' :
+          r.generation_status === 'retention_pending' ? 'Content removed — PDF cleanup pending' :
+          r.generation_status === 'partial_failure' ? 'Partial report — review data gaps' :
+          'Historical report — completion unverified'}</span>
         ${r.pdf_available ? `<a href="/api/reports/${r.id}/pdf" target="_blank">PDF ↗</a>` : ''}
       </div>
     `).join('');
@@ -1252,13 +1302,124 @@ async function loadReports() {
   }
 }
 
+let reportRetentionPlan = null;
+function resetReportRetention() {
+  reportRetentionPlan = null;
+  const approval = document.getElementById('report-retention-confirm');
+  approval.checked = false; approval.disabled = true;
+  document.getElementById('report-retention-apply').disabled = true;
+  document.getElementById('report-retention-status').textContent = 'Choose an age and preview before approving removal.';
+}
+function updateReportRetentionApproval() {
+  document.getElementById('report-retention-apply').disabled =
+    !reportRetentionPlan || !document.getElementById('report-retention-confirm').checked;
+}
+async function previewReportRetention() {
+  resetReportRetention();
+  const days = Number(document.getElementById('report-retain-days').value);
+  const status = document.getElementById('report-retention-status');
+  if (!Number.isInteger(days) || days < 1 || days > 36525) {
+    status.textContent = 'Enter a whole number of days between 1 and 36525.'; return;
+  }
+  const button = document.getElementById('report-retention-preview'); button.disabled = true;
+  try {
+    const response = await fetch('/api/reports/retention/preview', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({retain_days: days}),
+    });
+    if (!response.ok) throw new Error('Report retention preview unavailable.');
+    const plan = await response.json();
+    if (Number(document.getElementById('report-retain-days').value) !== days) return;
+    if (!plan.count) { status.textContent = 'No reports match this age.'; return; }
+    reportRetentionPlan = plan;
+    status.textContent = `${plan.count} reports in this batch. Preview expires after 10 minutes. ` +
+      'Report IDs and dates, source records and chat copies remain. ' +
+      (plan.may_have_more ? 'Additional reports may need another preview.' : '');
+    document.getElementById('report-retention-confirm').disabled = false;
+  } catch (error) { status.textContent = error.message; }
+  finally { button.disabled = false; }
+}
+async function applyReportRetention() {
+  if (!reportRetentionPlan || !document.getElementById('report-retention-confirm').checked) return;
+  const plan = reportRetentionPlan;
+  resetReportRetention();
+  const status = document.getElementById('report-retention-status');
+  try {
+    const response = await fetch('/api/reports/retention/apply', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({policy: plan.policy, plan_sha256: plan.plan_sha256, confirm_report_content_removal: true}),
+    });
+    if (!response.ok) throw new Error('Removal was not confirmed. Reload reports and preview again to check status.');
+    const result = await response.json();
+    status.textContent = `Removed content from ${result.content_removed} reports; ${result.pending} PDF cleanups pending. ` +
+      (result.pending ? 'Review storage access and preview again to retry.' : 'Report tombstones remain.');
+    await loadReports();
+  } catch (error) { status.textContent = error.message; }
+}
+
+let chatRetentionPlan = null;
+function resetChatRetention() {
+  chatRetentionPlan = null;
+  const approval = document.getElementById('chat-retention-confirm');
+  approval.checked = false; approval.disabled = true;
+  document.getElementById('chat-retention-apply').disabled = true;
+  document.getElementById('chat-retention-status').textContent = 'Choose an age and preview before approving removal.';
+}
+function updateChatRetentionApproval() {
+  document.getElementById('chat-retention-apply').disabled =
+    !chatRetentionPlan || !document.getElementById('chat-retention-confirm').checked;
+}
+async function previewChatRetention() {
+  resetChatRetention();
+  const days = Number(document.getElementById('chat-retain-days').value);
+  const status = document.getElementById('chat-retention-status');
+  if (!Number.isInteger(days) || days < 1 || days > 36525) {
+    status.textContent = 'Enter a whole number of days between 1 and 36525.'; return;
+  }
+  const button = document.getElementById('chat-retention-preview'); button.disabled = true;
+  try {
+    const response = await fetch('/api/chat/retention/preview', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({retain_days: days}),
+    });
+    if (!response.ok) throw new Error('Chat retention preview unavailable.');
+    const plan = await response.json();
+    if (Number(document.getElementById('chat-retain-days').value) !== days) return;
+    if (!plan.message_count) { status.textContent = 'No inactive chats match this age. Unfinished turns are excluded.'; return; }
+    chatRetentionPlan = plan;
+    status.textContent = `${plan.message_count} messages in this batch. Preview expires after 10 minutes. ` +
+      'Chat IDs, dates and digests remain; reports and source records are separate. Unfinished turns are excluded. ' +
+      (plan.may_have_more ? 'Additional messages may need another preview.' : '');
+    document.getElementById('chat-retention-confirm').disabled = false;
+  } catch (error) { status.textContent = error.message; }
+  finally { button.disabled = false; }
+}
+async function applyChatRetention() {
+  if (!chatRetentionPlan || !document.getElementById('chat-retention-confirm').checked) return;
+  const plan = chatRetentionPlan;
+  resetChatRetention();
+  const status = document.getElementById('chat-retention-status');
+  try {
+    const response = await fetch('/api/chat/retention/apply', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({policy: plan.policy, plan_sha256: plan.plan_sha256, confirm_chat_content_removal: true}),
+    });
+    if (!response.ok) throw new Error('Removal was not confirmed. Reload chats and preview again to check status.');
+    const result = await response.json();
+    status.textContent = `Removed ${result.removed_messages} chat messages. Tombstones remain; unfinished turns were excluded. ` +
+      (result.may_have_more ? 'Preview again for another batch.' : '');
+    await loadConversationWorkspace();
+    if (!activeMessage && !messageQueue.length) await loadHistory();
+  } catch (error) { status.textContent = error.message; }
+}
+
 // ── Expense dashboard ────────────────────────────────────────────────────────
 
-function formatExpenseMoney(value, currency = 'EUR') {
-  if (value == null || Number.isNaN(Number(value))) return '—';
+function formatExpenseMoney(value, currency) {
+  if (value == null || !Number.isFinite(Number(value)) || !currency) return '—';
   return new Intl.NumberFormat(undefined, {
     style: 'currency',
-    currency: currency || 'EUR',
+    currency,
     maximumFractionDigits: 2,
   }).format(Number(value));
 }
@@ -1277,8 +1438,15 @@ async function loadExpenseCategories() {
   }
 }
 
-async function loadExpenses(force = false) {
-  if (expensesLoading || (!force && expenseSnapshot)) return;
+let pendingExpenseRefresh = null;
+
+async function loadExpenses(force = false, offset = null) {
+  offset = offset ?? (expenseSnapshot?.offset || 0);
+  if (expensesLoading) {
+    if (force) pendingExpenseRefresh = {offset};
+    return;
+  }
+  if (!force && expenseSnapshot) return;
   expensesLoading = true;
   const status = document.getElementById('expenses-status');
   const refreshButton = document.getElementById('expenses-refresh');
@@ -1290,7 +1458,7 @@ async function loadExpenses(force = false) {
   await loadExpenseCategories();
   const period = document.getElementById('expenses-period')?.value || 'month';
   const category = document.getElementById('expenses-category')?.value || '';
-  const query = new URLSearchParams({period});
+  const query = new URLSearchParams({period, offset: String(offset), limit: '200'});
   if (category) query.set('category', category);
   try {
     const resp = await fetch(`/api/expenses?${query.toString()}`, {cache: 'no-store'});
@@ -1298,12 +1466,18 @@ async function loadExpenses(force = false) {
     const data = await resp.json().catch(() => ({}));
     if (!resp.ok) throw new Error(data.detail || 'Expenses could not be loaded.');
     renderExpenses(data);
+    void loadBankConnections();
   } catch (error) {
     console.error('Expense load failed', error);
     renderExpensesError(error.message);
   } finally {
     expensesLoading = false;
     if (refreshButton) refreshButton.disabled = false;
+    if (pendingExpenseRefresh) {
+      const pending = pendingExpenseRefresh;
+      pendingExpenseRefresh = null;
+      void loadExpenses(true, pending.offset);
+    }
   }
 }
 
@@ -1345,18 +1519,22 @@ function renderExpenseTransactions(transactions, currency) {
   const rows = (transactions || []).slice(0, 200);
   count.textContent = `${rows.length} record${rows.length === 1 ? '' : 's'}`;
   body.innerHTML = rows.map((transaction) => {
-    const isIncome = transaction.transaction_type === 'income';
+    const isIncome = ['income', 'refund'].includes(transaction.transaction_type);
     const isTransfer = transaction.transaction_type === 'transfer';
     const amountClass = isIncome ? 'up' : isTransfer ? '' : 'down';
-    const amountPrefix = isIncome ? '+' : isTransfer ? '' : '−';
+    const signed = transaction.signed_amount;
+    const amountPrefix = signed != null ? (String(signed).startsWith('-') ? '−' : '+') : isIncome ? '+' : isTransfer ? '' : '−';
     const date = new Date(transaction.occurred_at);
     const dateLabel = Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString([], {month: 'short', day: 'numeric'});
     return `<tr>
       <td><div class="asset-cell"><span class="asset-symbol">${escapeHtml(transaction.merchant)}</span><span class="asset-meta">${escapeHtml(transaction.description || transaction.provider || '')}</span></div></td>
-      <td><span class="expense-category-pill">${escapeHtml(transaction.category_label || transaction.category)}</span><span class="asset-meta">${escapeHtml(transaction.subcategory || '')}</span></td>
+      <td><label class="asset-meta" for="category-${escapeHtml(transaction.id)}">Category</label>
+      <select id="category-${escapeHtml(transaction.id)}" data-transaction="${escapeHtml(transaction.id)}" onchange="changeExpenseCategory(this)">
+      ${Array.from(document.getElementById('expenses-category').options).filter(option => option.value).map(option => `<option value="${escapeHtml(option.value)}" ${option.value === transaction.category ? 'selected' : ''}>${escapeHtml(option.textContent)}</option>`).join('')}
+      </select><span class="asset-meta">${escapeHtml(transaction.subcategory || '')}</span></td>
       <td>${escapeHtml(transaction.account_name || 'Bank account')}</td>
       <td>${escapeHtml(dateLabel)}${transaction.pending ? ' · pending' : ''}</td>
-      <td class="${amountClass}">${amountPrefix}${formatExpenseMoney(transaction.amount, transaction.currency || currency)}</td>
+      <td class="${amountClass}">${amountPrefix}${formatExpenseMoney(transaction.amount_exact ?? transaction.amount, transaction.currency)}</td>
     </tr>`;
   }).join('');
   empty.hidden = rows.length > 0;
@@ -1364,16 +1542,16 @@ function renderExpenseTransactions(transactions, currency) {
 
 function renderExpenses(data) {
   expenseSnapshot = data;
-  const currency = data.currency || 'EUR';
+  const currency = data.currency;
   const categories = data.category_totals || [];
   const transactions = data.transactions || [];
   const sync = data.sync || {};
   const hasData = transactions.length > 0 || Number(data.total_expenses || 0) > 0 || Number(data.total_income || 0) > 0;
   const status = document.getElementById('expenses-status');
   status.className = `portfolio-status ${hasData ? 'ready' : 'neutral'}`;
-  status.textContent = hasData ? 'Live-ready' : 'Not connected';
-  document.getElementById('expenses-updated').textContent = sync.last_synced_at
-    ? `Last bank sync ${formatMessageTime(sync.last_synced_at)} · ${data.period_start} → ${data.period_end}`
+  status.textContent = hasData ? 'Imported data' : 'Not connected';
+  document.getElementById('expenses-updated').textContent = sync.provider_last_success_at
+    ? `Latest provider success ${formatMessageTime(sync.provider_last_success_at)} · ${data.period_start} → ${data.period_end}`
     : `${data.period_start} → ${data.period_end} · ${sync.message || 'Waiting for a bank feed'}`;
   document.getElementById('expenses-total').textContent = formatExpenseMoney(data.total_expenses, currency);
   document.getElementById('expenses-income').textContent = formatExpenseMoney(data.total_income, currency);
@@ -1393,8 +1571,19 @@ function renderExpenses(data) {
   renderExpenseCategoryBars(categories, currency);
   renderExpenseTransactions(transactions, currency);
   document.getElementById('expenses-empty').hidden = hasData;
-  document.getElementById('expenses-content').hidden = !hasData;
-  document.getElementById('expenses-alerts').innerHTML = '';
+  document.getElementById('expenses-content').hidden = !hasData && !data.offset;
+  document.getElementById('expenses-prev').disabled = !data.offset;
+  document.getElementById('expenses-next').disabled = data.next_offset == null;
+  const currencyTotals = Object.entries(data.totals_by_currency || {});
+  const notes = currencyTotals.length > 1
+    ? currencyTotals.map(([code, values]) => `${code}: expenses ${values.total_expenses}, income ${values.total_income}`).join(' · ')
+    : '';
+  document.getElementById('expenses-alerts').textContent = [notes,
+    data.summary_scope === 'page' ? 'Totals cover the displayed page.' : '',
+    data.next_offset != null ? 'More transactions are available through pagination.' : '',
+    sync.last_received_at ? `Application received data ${formatMessageTime(sync.last_received_at)}.` : '',
+    sync.provider_last_success_at ? 'The latest provider timestamp covers your connections; it does not guarantee every account is current.' : 'No successful provider synchronization recorded.'
+  ].filter(Boolean).join(' ');
 }
 
 function connectExpenseStream() {
@@ -1445,7 +1634,7 @@ function setSimulationStatus(text, state = 'neutral') {
   el.textContent = text;
 }
 
-function renderSimulationCurve(curve) {
+function renderSimulationCurve(curve, currency) {
   const el = document.getElementById('simulation-equity-curve');
   if (!el) return;
   if (!curve?.length) {
@@ -1459,7 +1648,7 @@ function renderSimulationCurve(curve) {
   el.innerHTML = curve.slice(-24).map((point) => {
     const value = Number(point.value) || 0;
     const height = Math.max(8, Math.round(((value - min) / span) * 92) + 8);
-    return `<div class="simulation-bar-wrap" title="${escapeHtml(point.date)}: $${value.toLocaleString(undefined, {maximumFractionDigits: 2})}">
+    return `<div class="simulation-bar-wrap" title="${escapeHtml(point.date)}: ${formatExpenseMoney(value, currency)}">
       <div class="simulation-bar" style="height:${height}%"></div><span>${escapeHtml(point.date.slice(5))}</span></div>`;
   }).join('');
 }
@@ -1468,11 +1657,19 @@ function renderSimulationResult(result) {
   document.getElementById('simulation-result').hidden = false;
   document.getElementById('simulation-result-title').textContent = result.name || 'Latest run';
   document.getElementById('sim-result-period').textContent = `${result.period_start} → ${result.period_end}`;
-  document.getElementById('sim-final-value').textContent = `$${Number(result.final_value || 0).toLocaleString(undefined, {maximumFractionDigits: 2})}`;
+  const currency = result.base_currency || result.strategy?.base_currency;
+  document.getElementById('sim-final-value').textContent = formatExpenseMoney(result.final_value, currency);
+  const research = result.research_summary;
+  document.getElementById('simulation-research-note').textContent = research
+    ? `Research evidence is insufficient for live use. Fees: ${formatExpenseMoney(research.fees, currency)}. Open positions are marked, not recorded as sales. ${(research.source?.limitations || []).join('. ')}`
+    : 'Legacy result: source currency and cost-aware evidence are unavailable.';
+  const evidenceLink = document.getElementById('simulation-evidence-link');
+  evidenceLink.hidden = !result.evidence_available;
+  if (result.evidence_available) evidenceLink.href = `/api/simulations/${encodeURIComponent(result.id)}/evidence`;
   document.getElementById('sim-return').textContent = `${Number(result.total_return_pct || 0) >= 0 ? '+' : ''}${Number(result.total_return_pct || 0).toFixed(2)}%`;
   document.getElementById('sim-drawdown').textContent = result.max_drawdown_pct == null ? 'n/a' : `${Number(result.max_drawdown_pct).toFixed(2)}%`;
   document.getElementById('sim-trades').textContent = String(result.trades_count ?? 0);
-  renderSimulationCurve(result.equity_curve);
+  renderSimulationCurve(result.equity_curve, currency);
 }
 
 function renderSimulationHistory(runs) {
@@ -1532,6 +1729,7 @@ async function submitSimulation(event) {
         symbols: document.getElementById('simulation-symbols').value,
         strategy: {type: strategyType, params},
         initial_capital: Number(document.getElementById('simulation-capital').value),
+        base_currency: document.getElementById('simulation-currency').value,
         period_start: document.getElementById('simulation-start').value,
         period_end: document.getElementById('simulation-end').value || null,
       }),
@@ -1738,3 +1936,346 @@ globalThis.addEventListener('DOMContentLoaded', async () => {
   }, 30 * 1000); // bank feeds are refreshed as often as provider limits allow
   setSendEnabled(true);
 });
+
+// Synthetic order practice uses separate human actions; chat tools cannot approve.
+let executionFixture = null;
+let executionProposal = null;
+async function fixtureRequest(path, body = {}) {
+  const response = await fetch('/api/simulator' + path, {method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+    body: JSON.stringify(body)});
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.detail?.reason_code || result.detail || 'Simulator unavailable');
+  return result;
+}
+function fixtureDisplay(value) {
+  document.getElementById('fixture-approve').disabled = true;
+  document.getElementById('fixture-mandate-approve').disabled = true;
+  document.getElementById('fixture-details').textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+}
+async function createExecutionFixture() {
+  try {
+    executionFixture = await fixtureRequest('/fixtures');
+    executionProposal = null;
+    executionMandate = null;
+    document.getElementById('fixture-mandate-review').disabled = false;
+    fixtureDisplay(executionFixture);
+    document.getElementById('fixture-propose').disabled = false;
+    document.getElementById('fixture-halt').disabled = false;
+    document.getElementById('fixture-approve').disabled = true;
+    document.getElementById('fixture-tick').disabled = true;
+  } catch (error) { fixtureDisplay(error.message); }
+}
+async function proposeFixtureOrder() {
+  try {
+    executionProposal = await fixtureRequest(`/accounts/${executionFixture.account_id}/proposals`, {
+      instrument_id: executionFixture.instrument_id, quantity: '1', limit_price: '100', idempotency_key: crypto.randomUUID()});
+    // Nonce is kept in memory, not rendered or stored in browser persistence.
+    const {nonce, ...display} = executionProposal;
+    fixtureDisplay(display);
+    document.getElementById('fixture-approve').disabled = false;
+  } catch (error) { fixtureDisplay(error.message); }
+}
+async function approveFixtureOrder() {
+  document.getElementById('fixture-approve').disabled = true;
+  try {
+    fixtureDisplay(await fixtureRequest(`/accounts/${executionFixture.account_id}/orders/${executionProposal.order_id}/approve`, {
+      nonce: executionProposal.nonce, details_hash: executionProposal.details_hash}));
+    document.getElementById('fixture-tick').disabled = false;
+  } catch (error) { fixtureDisplay(error.message); }
+}
+async function tickFixtureOrder() {
+  document.getElementById('fixture-tick').disabled = true;
+  try { fixtureDisplay(await fixtureRequest(`/accounts/${executionFixture.account_id}/orders/${executionProposal.order_id}/tick`)); }
+  catch (error) { fixtureDisplay(error.message); }
+}
+async function haltFixtureAccount() {
+  try {
+    fixtureDisplay(await fixtureRequest(`/accounts/${executionFixture.account_id}/halt`));
+    document.getElementById('fixture-propose').disabled = true;
+    await loadOperationalAlerts();
+  } catch (error) { fixtureDisplay(error.message); }
+}
+
+// A desktop sidebar must not obscure the main workflow after a narrow resize.
+globalThis.matchMedia?.('(max-width: 768px)').addEventListener('change', (event) => {
+  if (event.matches) document.getElementById('sidebar').classList.add('hidden');
+});
+
+async function loadOperationalAlerts() {
+  const target = document.getElementById('operational-alerts');
+  try {
+    const response = await fetch('/api/alerts', {cache: 'no-store'});
+    if (!response.ok) throw new Error('Alerts unavailable');
+    const alerts = await response.json();
+    target.replaceChildren();
+    for (const alert of alerts) {
+      const row = document.createElement('div');
+      row.textContent = `${alert.severity}: ${alert.message} (${alert.status}) `;
+      if (alert.status === 'open') {
+        const button = document.createElement('button');
+        button.className = 'dashboard-btn';
+        button.textContent = 'Acknowledge';
+        button.onclick = async () => {
+          const result = await fetch(`/api/alerts/${encodeURIComponent(alert.id)}/acknowledge`, {
+            method: 'POST', headers: {'X-CSRF-Token': csrfToken()}});
+          if (result.ok) await loadOperationalAlerts();
+          else target.textContent = 'Alert acknowledgment failed';
+        };
+        row.append(button);
+      }
+      target.append(row);
+    }
+    if (!alerts.length) target.textContent = 'No monitoring alerts.';
+  } catch (error) { target.textContent = error.message; }
+}
+
+let executionMandate = null;
+async function reviewFixtureMandate() {
+  try {
+    executionMandate = await fixtureRequest(`/accounts/${executionFixture.account_id}/mandates`, {
+      environment: 'simulator', strategy: 'periodic_fixture_buy', strategy_version: '1',
+      instrument_ids: [executionFixture.instrument_id], capital_limit: '500', max_position: '300',
+      max_order: '150', daily_loss_limit: '25', drawdown_limit: '40', max_orders_per_day: 3,
+      min_interval_seconds: 60, max_quote_age_seconds: 30, max_fee_bps: '10', max_spread_bps: '5',
+      trading_timezone: 'UTC', start_hour: 0, end_hour: 24, weekdays: [0,1,2,3,4,5,6],
+      expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(), quantity_per_order: '1'
+    });
+    const {nonce, ...display} = executionMandate;
+    fixtureDisplay(display);
+    document.getElementById('fixture-mandate-approve').disabled = false;
+  } catch (error) { fixtureDisplay(error.message); }
+}
+async function approveFixtureMandate() {
+  document.getElementById('fixture-mandate-approve').disabled = true;
+  try {
+    fixtureDisplay(await fixtureRequest(`/accounts/${executionFixture.account_id}/mandates/${executionMandate.mandate_id}/approve`, {
+      nonce: executionMandate.nonce, details_hash: executionMandate.details_hash
+    }));
+  } catch (error) { fixtureDisplay(error.message); }
+}
+
+async function importExpenseFile() {
+  const file = document.getElementById('expense-import-file').files[0];
+  const status = document.getElementById('expense-import-status');
+  const button = document.getElementById('expense-import-submit');
+  button.disabled = true;
+  try {
+    if (!file) throw new Error('Choose a JSON file first.');
+    if (file.size > 1024 * 1024) throw new Error('Import files must be at most 1 MiB.');
+    const body = JSON.parse(await file.text());
+    if (!body || !Array.isArray(body.transactions)) throw new Error('Expected an object with a transactions array.');
+    const response = await fetch('/api/expenses/import', {method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify(body)});
+    const result = await response.json();
+    if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : 'Import unavailable.');
+    status.textContent = `Imported ${result.imported}; updated ${result.updated}. Bank connectivity is unchanged.`;
+    await loadExpenses(true);
+  } catch (error) {
+    status.textContent = error instanceof SyntaxError ? 'The file is not valid JSON.' : error.message;
+  } finally { button.disabled = false; }
+}
+
+async function changeExpenseCategory(control) {
+  control.disabled = true;
+  try {
+    const response = await fetch(`/api/expenses/${encodeURIComponent(control.dataset.transaction)}/category`, {
+      method: 'PATCH', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({category: control.value})});
+    const result = await response.json();
+    if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : 'Category update failed.');
+    await loadExpenses(true, expenseSnapshot?.offset || 0);
+  } catch (error) {
+    document.getElementById('expense-import-status').textContent = error.message;
+    await loadExpenses(true, expenseSnapshot?.offset || 0);
+  } finally { control.disabled = false; }
+}
+function exportExpensePage() {
+  if (!expenseSnapshot) return;
+  const data = {scope: 'displayed_page', period_start: expenseSnapshot.period_start,
+    period_end: expenseSnapshot.period_end, offset: expenseSnapshot.offset,
+    next_offset: expenseSnapshot.next_offset, transactions: expenseSnapshot.transactions};
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'}));
+  const link = document.createElement('a');
+  link.href = url; link.download = 'expense-page.json'; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function bankRequest(path, method = 'GET', body) {
+  const response = await fetch(`/api/banks${path}`, {method, cache: 'no-store',
+    headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+    ...(body === undefined ? {} : {body: JSON.stringify(body)})});
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.detail?.reason_code || (typeof result.detail === 'string' ? result.detail : 'Bank service unavailable.'));
+  return result;
+}
+
+async function loadBankConnections() {
+  const status = document.getElementById('bank-access-status');
+  const button = document.getElementById('bank-consent');
+  button.disabled = true;
+  try {
+    const data = await bankRequest('');
+    button.disabled = !data.consent_setup_available;
+    status.textContent = data.external_access_enabled
+      ? (data.consent_setup_available ? 'Provider access configured. Bank consent and account selection are still required.' : 'Bank access enabled, but provider consent credentials are unavailable.')
+      : 'Bank access is disabled. Transaction file imports remain available.';
+    const container = document.getElementById('bank-connections');
+    container.replaceChildren();
+    for (const connection of data.connections || []) {
+      const row = document.createElement('div');
+      const text = document.createElement('p');
+      text.textContent = `${connection.provider}: ${connection.status}${connection.error_code ? ` · ${connection.error_code}` : ''}. Latest provider success: ${connection.provider_last_success_at ? formatMessageTime(connection.provider_last_success_at) : 'never'}. Application receipt: ${connection.last_received_at ? formatMessageTime(connection.last_received_at) : 'never'}.`;
+      row.append(text);
+      const action = (label, handler, disabled = false) => {
+        const control = document.createElement('button');
+        control.className = 'dashboard-btn'; control.textContent = label; control.disabled = disabled;
+        control.addEventListener('click', async () => {
+          control.disabled = true;
+          try { await handler(); } catch (error) { document.getElementById('bank-action-status').textContent = error.message; }
+          finally { control.disabled = disabled; }
+        });
+        row.append(control);
+      };
+      action('Choose consented account', () => chooseBankAccount(connection.id, row), !data.external_access_enabled);
+      action('Renew bank consent', () => beginBankConsent(connection.id), !data.consent_setup_available);
+      action('Stop local synchronization', async () => {
+        await bankRequest(`/${encodeURIComponent(connection.id)}`, 'DELETE');
+        document.getElementById('bank-action-status').textContent = 'Local synchronization stopped and local tokens removed. Revoke provider consent at your bank or provider separately.';
+        await loadBankConnections();
+      }, connection.status === 'disconnected');
+      container.append(row);
+    }
+  } catch (error) { status.textContent = error.message; }
+}
+
+async function beginBankConsent(connectionId) {
+  const status = document.getElementById('bank-action-status');
+  const button = document.getElementById('bank-consent');
+  button.disabled = true;
+  status.replaceChildren();
+  try {
+    const institution = document.getElementById('bank-institution').value.trim();
+    if (!/^[A-Za-z0-9_-]{1,128}$/.test(institution)) throw new Error('Enter the institution identifier from your provider setup.');
+    const result = await bankRequest(connectionId ? `/${encodeURIComponent(connectionId)}/reconnect` : '/consent', 'POST', {institution});
+    const url = new URL(result.consent_url);
+    if (url.protocol !== 'https:' || url.hostname !== 'ob.gocardless.com' || url.username || url.password || (url.port && url.port !== '443')) throw new Error('Provider consent link was rejected.');
+    const link = document.createElement('a');
+    link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer';
+    link.textContent = 'Continue consent at the bank provider';
+    status.append(link, document.createTextNode('. Return here after consent and choose the authorized account.'));
+    await loadBankConnections();
+  } catch (error) { status.textContent = error.message; }
+  finally { await loadBankConnections(); }
+}
+
+async function chooseBankAccount(connectionId, row) {
+  row.querySelector('[data-bank-selection]')?.remove();
+  const result = await bankRequest(`/${encodeURIComponent(connectionId)}/accounts`);
+  if (!result.accounts?.length) throw new Error('No consented accounts returned. Complete bank consent first.');
+  const selection = document.createElement('div'); selection.dataset.bankSelection = 'true';
+  const select = document.createElement('select'); select.setAttribute('aria-label', 'Consented bank account');
+  for (const account of result.accounts) {
+    const option = document.createElement('option'); option.value = account.handle; option.textContent = account.label; select.append(option);
+  }
+  const button = document.createElement('button'); button.textContent = 'Use selected account'; button.className = 'dashboard-btn';
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    try {
+      await bankRequest(`/${encodeURIComponent(connectionId)}/account`, 'POST', {account_handle: select.value});
+      document.getElementById('bank-action-status').textContent = 'Account selected. Scheduled retrieval is subject to bank availability and rate limits.';
+      await loadBankConnections();
+    } catch (error) { document.getElementById('bank-action-status').textContent = error.message; }
+    finally { button.disabled = false; }
+  });
+  selection.append(select, button); row.append(selection);
+}
+
+function appendTurnEvidence(turn) {
+  if (!turn) return;
+  const note = document.createElement('div'); note.className = 'chat-evidence-note';
+  const labels = {retired: 'Content removed by owner', complete: 'Saved answer', in_progress: 'Unfinished turn', failed: 'Incomplete answer', interrupted: 'Interrupted turn'};
+  note.textContent = `${labels[turn.state] || 'Historical turn'} · ${turn.evidence_count || 0} saved tool observations. `;
+  if (turn.omitted_events) note.append(document.createTextNode('Some events exceeded the evidence limit. '));
+  if (/^\/api\/chat\/turns\/[A-Za-z0-9_-]{1,36}\/evidence$/.test(turn.evidence_url || '')) {
+    const link = document.createElement('a'); link.href = turn.evidence_url; link.textContent = 'Download evidence';
+    note.append(link);
+  }
+  note.append(document.createTextNode(' Historical evidence does not confirm a current broker fill.'));
+  messagesEl().append(note);
+}
+
+async function exportExpensePeriod() {
+  if (!expenseSnapshot) return;
+  const button = document.getElementById('expenses-export-period');
+  const status = document.getElementById('expense-import-status');
+  button.disabled = true;
+  try {
+    const query = new URLSearchParams({from_date: expenseSnapshot.period_start, to_date: expenseSnapshot.period_end});
+    const response = await fetch(`/api/expenses/export?${query}`, {cache: 'no-store'});
+    if (!response.ok) throw new Error('Export unavailable.');
+    const text = await response.text();
+    const lines = text.trimEnd().split('\n');
+    const completion = JSON.parse(lines[lines.length - 1]);
+    if (completion.kind !== 'completion' || completion.status !== 'complete') throw new Error('Export did not complete. Try a narrower date interval.');
+    const url = URL.createObjectURL(new Blob([text], {type: 'application/x-ndjson'}));
+    const link = document.createElement('a'); link.href = url; link.download = 'expenses-period.jsonl';
+    link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    status.textContent = `Exported ${completion.records} transactions across all categories in the selected period.`;
+  } catch (error) { status.textContent = error.message; }
+  finally { button.disabled = false; }
+}
+
+let expenseRetentionPlan = null;
+function resetExpenseRetention() {
+  expenseRetentionPlan = null;
+  const approval = document.getElementById('expense-retention-confirm');
+  approval.checked = false; approval.disabled = true;
+  document.getElementById('expense-retention-apply').disabled = true;
+  document.getElementById('expense-retention-status').textContent = 'Preview the chosen age before approving cleanup.';
+}
+function updateExpenseRetentionApproval() {
+  document.getElementById('expense-retention-apply').disabled =
+    !expenseRetentionPlan || !document.getElementById('expense-retention-confirm').checked;
+}
+async function previewExpenseRetention() {
+  resetExpenseRetention();
+  const days = Number(document.getElementById('expense-retain-days').value);
+  const status = document.getElementById('expense-retention-status');
+  if (!Number.isInteger(days) || days < 1 || days > 36525) {
+    status.textContent = 'Enter a whole number of days between 1 and 36525.'; return;
+  }
+  const button = document.getElementById('expense-retention-preview'); button.disabled = true;
+  try {
+    const response = await fetch('/api/expenses/retention/preview', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({retain_days: days}),
+    });
+    if (!response.ok) throw new Error('Cleanup preview unavailable.');
+    const plan = await response.json();
+    // Changing the age while the request was in flight invalidates its response.
+    if (Number(document.getElementById('expense-retain-days').value) !== days) return;
+    if (!plan.count) { status.textContent = 'No raw copies match this age.'; return; }
+    expenseRetentionPlan = plan;
+    status.textContent = `${plan.count} raw copies in this batch. Preview expires after 10 minutes. ` +
+      (plan.may_have_more ? 'Additional copies may need another preview. ' : '') + 'Transaction history remains.';
+    document.getElementById('expense-retention-confirm').disabled = false;
+  } catch (error) { status.textContent = error.message; }
+  finally { button.disabled = false; }
+}
+async function applyExpenseRetention() {
+  if (!expenseRetentionPlan || !document.getElementById('expense-retention-confirm').checked) return;
+  const plan = expenseRetentionPlan;
+  resetExpenseRetention();
+  const status = document.getElementById('expense-retention-status');
+  try {
+    const response = await fetch('/api/expenses/retention/apply', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({policy: plan.policy, plan_sha256: plan.plan_sha256, confirm_raw_payload_removal: true}),
+    });
+    if (!response.ok) throw new Error('Cleanup did not complete. Preview again; the data or authorization may have changed.');
+    const result = await response.json();
+    status.textContent = `Removed ${result.removed_raw_payloads} raw copies. Transaction history remains.`;
+  } catch (error) { status.textContent = error.message; }
+}

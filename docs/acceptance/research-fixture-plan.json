@@ -1,0 +1,14 @@
+{
+  "experiment": "daily-single-instrument-engineering-v1",
+  "purpose": "Synthetic engineering verification, not market edge or live eligibility",
+  "strategies": ["cash", "buy_and_hold", "momentum", "momentum_news"],
+  "lookback_sessions": 10,
+  "split_sessions": {"train": 120, "validation": 60, "test": 60},
+  "capital": "10000",
+  "base_currency": "EUR",
+  "costs": {"commission_bps": "10", "minimum_commission": "1", "spread_bps": "5", "slippage_bps": "5", "fx_bps": "10", "volume_participation": "0.01", "lot": "0.001"},
+  "illustrative_economic_criteria": {"minimum_closed_trades": 20, "maximum_drawdown_pct": 10, "minimum_excess_return_over_buy_hold_pct": 0},
+  "deployment_standard_approved": false,
+  "holdout_rule": "No fitting or parameter changes in the evaluator. Preserve plan hash and every result, including failure.",
+  "real_strategy_conclusion": "INSUFFICIENT EVIDENCE until attributable historical availability, model outputs, instrument universe and forward observations exist"
+}

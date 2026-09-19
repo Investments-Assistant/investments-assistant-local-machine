@@ -11,12 +11,12 @@ self-registration is disabled.
 
 from __future__ import annotations
 
-import argparse
+import re
+import sys
 import asyncio
 import getpass
 from pathlib import Path
-import re
-import sys
+import argparse
 
 # Make direct execution from the repository root work without requiring an
 # editable install or a manually configured PYTHONPATH.
@@ -26,9 +26,9 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from sqlalchemy import select  # noqa: E402
 
-from src.db.database import async_session, create_all_tables  # noqa: E402
-from src.db.models import User  # noqa: E402
 from src.web.auth import hash_password  # noqa: E402
+from src.db.models import User  # noqa: E402
+from src.db.database import async_session, create_all_tables  # noqa: E402
 
 
 def _parse_args() -> argparse.Namespace:

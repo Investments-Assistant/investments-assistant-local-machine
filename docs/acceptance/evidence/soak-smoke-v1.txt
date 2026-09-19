@@ -1,0 +1,5 @@
+{"status": "RUNNING", "cycles": 1, "current_window_seconds": 2.5764447799992922, "control_p95_ms": 28.657474998908583, "restarts": 0}
+{"status": "RUNNING", "cycles": 11, "current_window_seconds": 32.561411438000505, "control_p95_ms": 41.47969499899773, "restarts": 1}
+{"status": "RUNNING", "cycles": 21, "current_window_seconds": 62.56765664699924, "control_p95_ms": 34.38684399952763, "restarts": 2}
+{"status": "RUNNING", "cycles": 31, "current_window_seconds": 94.65843706799933, "control_p95_ms": 34.38684399952763, "restarts": 4}
+{"status": "SMOKE_PASS", "cycles": 36, "current_window_seconds": 108.16789264800173, "restarts": 4, "failures": []}

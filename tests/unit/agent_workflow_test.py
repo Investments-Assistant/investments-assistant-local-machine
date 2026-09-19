@@ -2,22 +2,22 @@
 
 from __future__ import annotations
 
+import json
 import asyncio
 from datetime import UTC, datetime
-import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from src.agent.clients import llama_cpp_client
 from src.agent.clients.llama_cpp_client import (
-    _format_market_overview_result,
-    _format_news_result,
-    _format_simulation_result,
-    _looks_like_intermediate_response,
-    _prefetch_request,
     _report_request,
+    _prefetch_request,
+    _format_news_result,
     _simulation_request,
+    _format_simulation_result,
+    _format_market_overview_result,
+    _looks_like_intermediate_response,
 )
 
 

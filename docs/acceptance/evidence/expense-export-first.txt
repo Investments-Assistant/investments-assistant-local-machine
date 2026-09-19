@@ -1,0 +1,14 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 3 items
+
+tests/integration/expense_export_test.py::test_export_is_complete_exact_owned_and_consistent_during_concurrent_import PASSED [ 33%]
+tests/integration/expense_export_test.py::test_limit_and_revocation_never_claim_complete PASSED [ 66%]
+tests/integration/expense_export_test.py::test_other_owner_exports_only_their_rows PASSED [100%]
+
+============================== 3 passed in 2.11s ===============================

@@ -5,18 +5,16 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 from src.agent.utils.logger import get_logger
-from src.config import settings
+from src.execution.external import disabled_external_write
 from src.tools.broker_accounts import BrokerAccountConfig
 
 logger = get_logger(__name__)
 
 
 def _config(account: BrokerAccountConfig | None) -> dict:
-    return account.config if account else {
-        "api_key": settings.alpaca_api_key,
-        "secret_key": settings.alpaca_secret_key,
-        "paper": settings.alpaca_paper,
-    }
+    if account is None or not account.id or not account.user_id or account.broker != "alpaca":
+        return {}
+    return account.config
 
 
 def _configured(account: BrokerAccountConfig | None = None) -> bool:
@@ -119,6 +117,7 @@ def get_alpaca_orders(
         return [{"error": str(exc)}]
 
 
+@disabled_external_write
 def submit_alpaca_order(
     symbol: str,
     side: str,
@@ -186,6 +185,7 @@ def submit_alpaca_order(
         return {"success": False, "error": str(exc)}
 
 
+@disabled_external_write
 def cancel_alpaca_order(
     order_id: str, account: BrokerAccountConfig | None = None
 ) -> dict:

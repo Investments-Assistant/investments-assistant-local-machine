@@ -1,0 +1,1 @@
+{"status": "PASS", "evidence": "docs/acceptance/evidence/full-fixture-recovery.json", "restored_model_tasks": 3}

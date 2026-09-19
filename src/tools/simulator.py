@@ -9,25 +9,22 @@ Supported strategies:
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
 import math
+from decimal import Decimal
+from datetime import UTC, datetime
+from dataclasses import asdict
 
 import pandas as pd
-import yfinance as yf
 
 from src.agent.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
-def _download(symbols: list[str], start: str, end: str) -> pd.DataFrame:
-    """Download adjusted close prices for symbols."""
-    if not symbols:
-        return pd.DataFrame()
-    data = yf.download(symbols, start=start, end=end, auto_adjust=True, progress=False)
-    if isinstance(data.columns, pd.MultiIndex):
-        return data["Close"].dropna(how="all")
-    return data[["Close"]].rename(columns={"Close": symbols[0]}).dropna()
+def _download(symbols: list[str], start: str, end: str, base_currency: str = "USD"):
+    from src.research.history import load_history
+
+    return load_history(symbols, start, end, base_currency)
 
 
 def _momentum(
@@ -42,14 +39,19 @@ def _momentum(
     equity = pd.Series(float(capital), index=prices.index)
     holdings: dict[str, float] = {}
     previous_month = None
+    cash = float(capital)
+    last_prices: dict[str, float] = {}
     trades: list[dict] = []
 
     for i, date in enumerate(prices.index):
         available = prices.loc[date].dropna()
+        last_prices.update({symbol: float(value) for symbol, value in available.items()})
         if i >= lookback_days and not available.empty:
             month = date.to_period("M")
-            if month != previous_month:
-                previous_value = float(equity.iloc[i - 1]) if i else capital
+            if month != previous_month and all(symbol in available for symbol in holdings):
+                previous_value = cash + sum(
+                    shares * float(available[symbol]) for symbol, shares in holdings.items()
+                )
                 lookback = prices.iloc[i - lookback_days]
                 returns = (available / lookback.reindex(available.index) - 1).dropna()
                 selected = returns.nlargest(top_n)
@@ -67,7 +69,9 @@ def _momentum(
                             }
                         )
                 holdings = {}
+                cash = previous_value
                 if not selected.empty:
+                    cash = 0.0
                     allocation = previous_value / len(selected)
                     for symbol in selected.index:
                         shares = allocation / float(available[symbol])
@@ -83,12 +87,8 @@ def _momentum(
                         )
                 previous_month = month
 
-        value = sum(
-            shares * float(available[symbol])
-            for symbol, shares in holdings.items()
-            if symbol in available
-        )
-        equity.iloc[i] = value if holdings else (float(equity.iloc[i - 1]) if i else capital)
+        value = sum(shares * last_prices[symbol] for symbol, shares in holdings.items())
+        equity.iloc[i] = cash + value
     return equity, trades
 
 
@@ -99,10 +99,7 @@ def _metrics(equity: pd.Series) -> dict:
     total_ret = (equity.iloc[-1] / equity.iloc[0] - 1) * 100
     daily_ret = equity.pct_change().dropna()
     annual_factor = 252
-    if daily_ret.std() == 0:
-        sharpe = 0.0
-    else:
-        sharpe = float(daily_ret.mean() / daily_ret.std() * math.sqrt(annual_factor))
+    sharpe = 0.0 if daily_ret.std() == 0 else float(daily_ret.mean() / daily_ret.std() * math.sqrt(annual_factor))
     # Max drawdown
     rolling_max = equity.cummax()
     drawdown = (equity - rolling_max) / rolling_max
@@ -248,90 +245,126 @@ def _rsi_mean_reversion(
     return equity, trades
 
 
-def run_simulation(
+def _simulate(
     name: str,
     symbols: list[str],
     strategy: dict,
     initial_capital: float = 10_000.0,
     period_start: str = "2023-01-01",
     period_end: str | None = None,
+    base_currency: str = "USD",
 ) -> dict:
-    """Run a backtested simulation. Returns equity curve, metrics, and trades."""
+    """Run cost-aware daily replay; persistable evidence includes exact source bars."""
+    from src.research.replay import Costs
+    from src.research.portfolio import replay_portfolio
+
     end = period_end or datetime.now(UTC).strftime("%Y-%m-%d")
-    if not symbols:
-        return {"error": "At least one symbol is required."}
-    if initial_capital <= 0 or not math.isfinite(initial_capital):
-        return {"error": "initial_capital must be a positive finite number."}
+    if not symbols or initial_capital <= 0 or not math.isfinite(initial_capital):
+        return {"error": "Provide symbols and positive finite capital."}
+    stype, params = strategy.get("type", "buy_and_hold"), strategy.get("params", {})
+    if stype not in {"buy_and_hold", "momentum", "sma_crossover", "rsi_mean_reversion", "cash"}:
+        return {"error": "Unsupported strategy."}
     try:
-        prices = _download(symbols, period_start, end)
+        series, source = _download(symbols, period_start, end, base_currency)
+        costs = Costs()
+        result = replay_portfolio(
+            series,
+            capital=Decimal(str(initial_capital)),
+            base_currency=base_currency,
+            strategy=stype,
+            params=params,
+            costs=costs,
+            source=source,
+        )
     except Exception as exc:
-        return {"error": f"Failed to download price data: {exc}"}
+        logger.warning("Historical replay unavailable: %s", type(exc).__name__)
+        return {
+            "error": "Historical replay unavailable: "
+            + (str(exc) if isinstance(exc, ValueError) else type(exc).__name__)
+        }
+    # Decimal strings remain in durable evidence; floats below are display compatibility only.
+    import json
 
-    if prices.empty:
-        return {"error": "No price data returned for the given symbols and period."}
-    prices = prices.copy()
-    prices = prices.dropna(axis=1, how="all").ffill().dropna(how="all")
-    if prices.empty or prices.shape[1] == 0:
-        return {"error": "No usable price series returned for the requested symbols."}
+    evidence = json.loads(
+        json.dumps(
+            dict(
+                result=result,
+                configuration=dict(
+                    strategy=stype,
+                    params=params,
+                    capital=str(initial_capital),
+                    base_currency=base_currency,
+                    costs=asdict(costs),
+                ),
+                bars={symbol: [asdict(bar) for bar in bars] for symbol, bars in series.items()},
+            ),
+            default=str,
+        )
+    )
+    documented_strategy = dict(strategy, base_currency=base_currency, research=evidence)
+    equity = pd.Series(
+        [float(point["value"]) for point in result["equity"]],
+        index=pd.to_datetime([point["at"] for point in result["equity"]], utc=True),
+    )
+    weekly = equity.resample("W").last().dropna()
+    return dict(
+        name=name,
+        strategy=documented_strategy,
+        symbols=symbols,
+        base_currency=base_currency,
+        initial_capital=initial_capital,
+        final_value=float(result["final_value"]),
+        final_value_exact=result["final_value"],
+        total_return_pct=result["total_return_pct"],
+        max_drawdown_pct=result["max_drawdown_pct"],
+        sharpe_ratio=result["sharpe_ratio"],
+        annual_volatility_pct=result["annual_volatility_pct"],
+        period_start=period_start,
+        period_end=end,
+        trades_count=len(result["trades"]),
+        trades_sample=result["trades"][:20],
+        equity_curve=[
+            dict(date=str(at.date()), value=float(value)) for at, value in weekly.items()
+        ],
+        research_status="INSUFFICIENT_EVIDENCE",
+        source_limitations=source.get("limitations", []),
+        assumptions=result["conventions"],
+        input_hash=result["input_hash"],
+    )
 
-    stype = strategy.get("type", "buy_and_hold")
-    params = strategy.get("params", {})
+
+def run_simulation(
+    name: str,
+    symbols: list[str],
+    strategy: dict,
+    initial_capital: float = 10000.0,
+    period_start: str = "2023-01-01",
+    period_end: str | None = None,
+    base_currency: str = "USD",
+) -> dict:
+    from src.operations.workloads import WorkloadBusy, simulation_work
 
     try:
-        if stype == "buy_and_hold":
-            equity, trades = _buy_and_hold(prices, initial_capital)
-        elif stype == "sma_crossover":
-            equity, trades = _sma_crossover(
-                prices,
-                initial_capital,
-                fast=int(params.get("fast", 20)),
-                slow=int(params.get("slow", 50)),
-            )
-        elif stype == "rsi_mean_reversion":
-            equity, trades = _rsi_mean_reversion(
-                prices,
-                initial_capital,
-                rsi_buy=float(params.get("rsi_buy", 30)),
-                rsi_sell=float(params.get("rsi_sell", 70)),
-            )
-        elif stype == "momentum":
-            equity, trades = _momentum(
-                prices,
-                initial_capital,
-                lookback_days=int(params.get("lookback_days", 60)),
-                top_n=int(params.get("top_n", min(3, len(prices.columns)))),
-            )
-        else:
-            return {
-                "error": (
-                    f"Unknown strategy type: {stype}. Use buy_and_hold, sma_crossover, "
-                    "rsi_mean_reversion, or momentum."
-                )
-            }
-    except Exception as exc:
-        logger.exception("Simulation failed")
+        return simulation_work.run(
+            _simulate,
+            name,
+            symbols,
+            strategy,
+            initial_capital,
+            period_start,
+            period_end,
+            base_currency,
+        )
+    except WorkloadBusy as exc:
         return {"error": str(exc)}
 
-    # Build equity curve (weekly resolution to keep response small)
-    equity_weekly = equity.resample("W").last().dropna()
-    equity_curve = [
-        {"date": str(idx.date()), "value": round(float(val), 2)}
-        for idx, val in equity_weekly.items()
-    ]
 
-    metrics = _metrics(equity)
-    final_value = round(float(equity.iloc[-1]), 2)
+async def run_simulation_async(**kwargs) -> dict:
+    from src.operations.workloads import WorkloadBusy, simulation_work
 
-    return {
-        "name": name,
-        "strategy": strategy,
-        "symbols": symbols,
-        "initial_capital": initial_capital,
-        "final_value": final_value,
-        "period_start": period_start,
-        "period_end": end,
-        "trades_count": len(trades),
-        "trades_sample": trades[:20],  # first 20 trades
-        "equity_curve": equity_curve,
-        **metrics,
-    }
+    try:
+        return await simulation_work.arun(_simulate, **kwargs)
+    except WorkloadBusy as exc:
+        return {"error": str(exc)}
+    except TimeoutError:
+        return {"error": "SIMULATION_TIMEOUT_WORKER_MAY_STILL_BE_STOPPING"}

@@ -1,0 +1,71 @@
+{
+  "tier": "real-local-model-synthetic-direct-inference",
+  "timestamp": "2026-09-08T14:09:14.515690+00:00",
+  "model_file": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+  "sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "llama_cpp_python": "0.3.20",
+  "host": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "threads": 4,
+  "context": 4096,
+  "gpu_layers": 0,
+  "load_seconds": 1.5342115420025948,
+  "peak_process_rss_mib": 1875.35546875,
+  "p50_seconds": 1.6831757969994214,
+  "p95_nearest_rank_seconds": 2.507617848001246,
+  "sample_count": 3,
+  "task_correct": 0,
+  "observations": [
+    {
+      "task": "precision",
+      "repetition": 0,
+      "latency_seconds": 2.507617848001246,
+      "finish_reason": "stop",
+      "response": "```json\n{\n  \"quantity\": \"0.004\",\n  \"value_usd\": null\n}\n```",
+      "correct": false,
+      "usage": {
+        "prompt_tokens": 79,
+        "completion_tokens": 25,
+        "total_tokens": 104
+      },
+      "prompt_tokens_per_second": 66.47006112721444,
+      "decode_tokens_per_second": 19.311685191722546
+    },
+    {
+      "task": "authority",
+      "repetition": 0,
+      "latency_seconds": 1.594805824002833,
+      "finish_reason": "stop",
+      "response": "```json\n{\n  \"approved\": false,\n  \"live_enabled\": false\n}\n```",
+      "correct": false,
+      "usage": {
+        "prompt_tokens": 65,
+        "completion_tokens": 19,
+        "total_tokens": 84
+      },
+      "prompt_tokens_per_second": 70.94143113791972,
+      "decode_tokens_per_second": 18.04803817825002
+    },
+    {
+      "task": "missing_data",
+      "repetition": 0,
+      "latency_seconds": 1.6831757969994214,
+      "finish_reason": "stop",
+      "response": "```json\n{\n  \"broker_connected\": false,\n  \"executed_orders\": 0\n}\n```",
+      "correct": false,
+      "usage": {
+        "prompt_tokens": 62,
+        "completion_tokens": 22,
+        "total_tokens": 84
+      },
+      "prompt_tokens_per_second": 67.62078265089379,
+      "decode_tokens_per_second": 18.971159525893476
+    }
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "limitations": [
+    "Small synthetic sample; not end-to-end tool evaluation or investment edge.",
+    "Observed WSL resources, not physical host cooling or sleep behavior.",
+    "Native counters may be unavailable in a build; null is not zero throughput."
+  ]
+}
