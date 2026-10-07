@@ -1,6 +1,6 @@
 """Provider normalization. Display rounding must never change source precision."""
 
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, localcontext
 from datetime import datetime
 
 
@@ -25,13 +25,13 @@ def first_portfolio_number(data: dict, *keys: str) -> float | None:
     return None
 
 
-def usd_value(value: object, data: dict) -> float | None:
+def usd_decimal_value(value: object, data: dict) -> Decimal | None:
     amount = decimal_value(value)
     if amount is None:
         return None
     currency = str(data.get("currency") or "").upper()
     if currency == "USD":
-        return float(amount)
+        return amount
     rate = decimal_value(data.get("fx_to_usd"))
     try:
         timestamp = datetime.fromisoformat(str(data.get("fx_as_of")).replace("Z", "+00:00"))
@@ -41,7 +41,14 @@ def usd_value(value: object, data: dict) -> float | None:
         return None
     if not currency or rate is None or rate <= 0:
         return None
-    return float(amount * rate)
+    with localcontext() as ctx:
+        ctx.prec = 100
+        return amount * rate
+
+
+def usd_value(value: object, data: dict) -> float | None:
+    amount = usd_decimal_value(value, data)
+    return float(amount) if amount is not None else None
 
 
 def portfolio_position(position: dict) -> dict:

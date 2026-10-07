@@ -1,0 +1,1 @@
+{"status": "PASS", "tables": 29, "revision": "0015_account_events", "evidence": "/home/lulu/investments-assistant/investments-assistant-local-machine/docs/acceptance/evidence/dividend-recovery-database.json"}

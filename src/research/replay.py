@@ -8,9 +8,12 @@ import json
 import math
 from decimal import ROUND_DOWN, Decimal
 import hashlib
+from pathlib import Path
 from datetime import datetime, timedelta
 import statistics
 from dataclasses import asdict, dataclass
+
+from src.research.dividends import DividendLedger, validate_payment
 
 ZERO = Decimal(0)
 ONE = Decimal(1)
@@ -30,6 +33,9 @@ class Bar:
     # Actions apply before the open to holdings carried from previous sessions.
     split: Decimal = ONE
     dividend: Decimal = ZERO
+    dividend_pay_at: datetime | None = None
+    dividend_payment_fx: Decimal | None = None
+    dividend_payment_fx_as_of: datetime | None = None
 
 
 @dataclass(frozen=True)
@@ -66,6 +72,13 @@ def canonical_hash(value):
     ).hexdigest()
 
 
+
+def engine_fingerprint():
+    return hashlib.sha256(b"".join(
+        (Path(__file__).parent / name).read_bytes() for name in ("portfolio.py", "replay.py", "dividends.py")
+    )).hexdigest()
+
+
 def validate(bars, costs, capital, base_currency):
     if not bars or not capital.is_finite() or capital <= 0 or len(base_currency) != 3:
         raise ValueError("Explicit positive capital, bars and base currency are required")
@@ -87,6 +100,8 @@ def validate(bars, costs, capital, base_currency):
         for value in (costs.commission_bps, costs.spread_bps, costs.slippage_bps, costs.fx_bps)
     ):
         raise ValueError("Invalid bps")
+    if costs.spread_bps / 2 + costs.slippage_bps >= 10000:
+        raise ValueError("Combined execution impact must be less than 10000 bps")
     if (
         min(costs.signal_latency_seconds, costs.max_fx_age_seconds, costs.max_signal_age_seconds)
         < 0
@@ -120,6 +135,7 @@ def validate(bars, costs, capital, base_currency):
             raise ValueError("Invalid volume/dividend")
         if bar.currency == base_currency and bar.fx_to_base != ONE:
             raise ValueError("Base-currency FX must equal one")
+        validate_payment(bar, base_currency, costs.max_fx_age_seconds)
         if bar.fx_as_of > bar.open_at:
             raise ValueError("FX unavailable at the simulated execution time")
 
@@ -155,16 +171,16 @@ def replay(
             or not item.model_version
         ):
             raise ValueError("Invalid attributable model/news evidence")
-    cash, quantity, basis, fees, realized, dividends = capital, ZERO, ZERO, ZERO, ZERO, ZERO
+    cash, quantity, basis, fees, realized = capital, ZERO, ZERO, ZERO, ZERO
+    distributions = DividendLedger()
     pending = None
     equity, exposures, trades, rejected, closed_pnl = [], [], [], [], []
     volume_notional = ZERO
     for i, bar in enumerate(bars):
         # Corporate actions are input events, not discovered using future prices.
         quantity *= bar.split
-        distribution = quantity * bar.dividend * bar.fx_to_base
-        cash += distribution
-        dividends += distribution
+        distributions.accrue(bar, quantity, base_currency)
+        cash += distributions.settle(bar.open_at)
         if pending:
             action, signal_at, source_ids = pending
             pending = None  # unfilled residuals expire; no automatic stale replay
@@ -228,8 +244,9 @@ def replay(
                     )
                     if cash < 0 or quantity < 0:
                         raise AssertionError("Replay created leverage or a short position")
+        cash += distributions.settle(bar.close_at)
         holding_value = quantity * bar.close * bar.fx_to_base
-        value = cash + holding_value
+        value = cash + holding_value + distributions.receivable({bar.symbol: bar.fx_to_base})
         equity.append(value)
         exposures.append(holding_value / value if value else ZERO)
         target = None
@@ -268,13 +285,18 @@ def replay(
         peak = max(peak, value)
         drawdown = min(drawdown, value / peak - 1)
     volatility = statistics.stdev(returns) if len(returns) > 1 else 0
+    dividend_summary = distributions.summary({bars[-1].symbol: bars[-1].fx_to_base})
+    engine_hash = engine_fingerprint()
     result = {
+        "engine_sha256": engine_hash,
+        **dividend_summary,
         "strategy": strategy,
         "base_currency": base_currency,
         "source_version": source_version,
         "fixture": fixture,
         "valuation_status": "partial"
-        if any((b.close_at - b.fx_as_of).total_seconds() > costs.max_fx_age_seconds for b in bars)
+        if dividend_summary["dividend_payment_dates_missing"]
+        or any((b.close_at - b.fx_as_of).total_seconds() > costs.max_fx_age_seconds for b in bars)
         else "complete",
         "initial_capital": str(capital),
         "final_value": str(equity[-1]),
@@ -291,7 +313,6 @@ def replay(
         "hit_rate": sum(p > 0 for p in closed_pnl) / len(closed_pnl) if closed_pnl else None,
         "fees": str(fees),
         "realized_pnl": str(realized),
-        "dividends": str(dividends),
         "unrealized_pnl": str(quantity * bars[-1].close * bars[-1].fx_to_base - basis),
         "cash": str(cash),
         "quantity": str(quantity),
@@ -302,6 +323,7 @@ def replay(
             for b, v in zip(bars, equity, strict=True)
         ],
         "conventions": {
+            "dividends": "gross entitlement at ex-open; cash only at evidenced payment time; no withholding assumed",
             "annual_sessions": 252,
             "risk_free_rate": 0,
             "fill": "later session open",
@@ -313,6 +335,7 @@ def replay(
         },
         "input_hash": canonical_hash(
             {
+                "engine_sha256": engine_hash,
                 "bars": [asdict(b) for b in bars],
                 "news": [asdict(n) for n in evidence],
                 "costs": asdict(costs),

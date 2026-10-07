@@ -380,6 +380,31 @@
           I approve removing the raw copies in this preview.</label>
         <button class="dashboard-btn" id="expense-retention-apply" disabled onclick="applyExpenseRetention()">Remove previewed raw copies</button>
       </details>
+      <details class="dashboard-card" id="expense-history-controls">
+        <summary>Export and remove expense history</summary>
+        <p>Remove old settled transactions and their raw copies from expense history and summaries.
+        Pending transactions and recently received revisions are excluded. Download and verify this batch first.
+        This cannot be undone here. Matching imports stay blocked; reports, chats and backups remain separate.</p>
+        <label for="expense-history-days">Keep transactions occurring or received within this many days</label>
+        <input id="expense-history-days" type="number" min="1" max="36525" step="1" oninput="resetExpenseHistory()">
+        <button class="dashboard-btn" id="expense-history-preview" onclick="previewExpenseHistory()">Export and preview removal</button>
+        <p id="expense-history-status" role="status">No history removal policy selected.</p>
+        <label><input id="expense-history-confirm" type="checkbox" disabled onchange="updateExpenseHistoryApproval()">
+          I saved and verified this export, and approve removing the previewed history.</label>
+        <button class="dashboard-btn" id="expense-history-apply" disabled onclick="applyExpenseHistory()">Remove previewed history</button>
+      </details>
+      <details class="dashboard-card" id="expense-reconciliation-controls">
+        <summary>Resolve an unmatched pending transaction</summary>
+        <p>If your bank changes the transaction identifier when booking, you can review the two entries here.
+        Select the pending entry and then its booked entry in the table below. We do not guess matches.
+        Confirmation removes the pending entry and blocks future imports of its identity; the booked amount is unchanged.
+        Download and verify the pair first. Reports, chats and backups remain separate.</p>
+        <p id="expense-reconciliation-status" role="status">Select a pending transaction below, then its booked entry. No match is inferred.</p>
+        <label><input id="expense-reconciliation-confirm" type="checkbox" disabled onchange="updatePendingReconciliationApproval()">
+          I saved and verified the export, confirm these are the same transaction, and approve removing the pending entry.</label>
+        <button class="dashboard-btn" id="expense-reconciliation-apply" disabled onclick="applyPendingReconciliation()">Resolve reviewed pair</button>
+        <button class="dashboard-btn" onclick="resetPendingReconciliation()">Clear selection</button>
+      </details>
       <section class="dashboard-card" aria-label="Bank connections">
         <h2>Bank connections</h2>
         <p id="bank-access-status" role="status">Loading connection status…</p>
@@ -463,17 +488,44 @@
       <section class="dashboard-card" aria-label="Synthetic execution practice">
         <h2>Order approval practice</h2>
         <p>Create a synthetic €1,000 account. The fixture instrument costs €100;
-        fee assumption is 0.1%, order cap €500. These are practice values.</p>
+        fee assumption is 0.1%, order cap €500, per-instrument exposure cap €500 and total exposure cap €750 (including pending reservations). These are practice values.</p>
+        <label><input type="checkbox" id="fixture-allow-sales"> Allow manually approved sales of practice holdings</label>
         <button class="dashboard-btn" id="fixture-create" onclick="createExecutionFixture()">Create practice account</button>
+        <label for="fixture-side">Order side</label>
+        <select id="fixture-side"><option value="buy">Buy</option><option value="sell" disabled>Sell owned practice shares</option></select>
         <button class="dashboard-btn" id="fixture-propose" onclick="proposeFixtureOrder()" disabled>Propose 1 fixture share</button>
         <button class="dashboard-btn" id="fixture-approve" onclick="approveFixtureOrder()" disabled>Approve displayed order</button>
         <button class="dashboard-btn" id="fixture-tick" onclick="tickFixtureOrder()" disabled>Advance simulated fill</button>
         <button class="dashboard-btn" id="fixture-halt" onclick="haltFixtureAccount()" disabled>Stop new simulated orders</button>
         <p>Optional automated practice: review a 30-minute mandate for up to three
-        fixture purchases, one per minute. Prices remain synthetic and constant;
+        fixture orders, one per minute. Prices remain synthetic and constant;
         this tests operation, not investment returns. Stop new orders persists across restart.</p>
+        <label for="fixture-mandate-strategy">Practice strategy</label>
+        <select id="fixture-mandate-strategy" onchange="document.getElementById('fixture-mandate-approve').disabled = true">
+          <option value="periodic_fixture_buy">Periodic purchases only</option>
+          <option value="price_band_fixture">Price band: buy low, sell this mandate's holdings high</option>
+        </select>
+        <label for="fixture-buy-below">Price-band buy at or below (synthetic EUR)</label>
+        <input id="fixture-buy-below" type="number" min="0.01" step="0.01" value="100"
+          onchange="document.getElementById('fixture-mandate-approve').disabled = true">
+        <label for="fixture-sell-above">Price-band sell at or above (synthetic EUR)</label>
+        <input id="fixture-sell-above" type="number" min="0.01" step="0.01" value="110"
+          onchange="document.getElementById('fixture-mandate-approve').disabled = true">
+        <p>A new mandate cannot sell manual holdings or holdings from an earlier mandate.</p>
         <button class="dashboard-btn" id="fixture-mandate-review" onclick="reviewFixtureMandate()" disabled>Review practice mandate</button>
         <button class="dashboard-btn" id="fixture-mandate-approve" onclick="approveFixtureMandate()" disabled>Approve displayed practice mandate</button>
+        <section class="valuation-controls" aria-label="Practice account valuations">
+          <h3>Observed valuations</h3>
+          <p>Save the current reconciled value, then compare two saved observations.
+          Missing historical prices are never filled in. Price and FX contributions require saved boundary evidence. Benchmark attribution is unavailable.</p>
+          <button class="dashboard-btn" id="fixture-valuation-capture" disabled onclick="captureFixtureValuation()">Save current valuation</button>
+          <label for="fixture-valuation-start">Opening observation</label>
+          <select id="fixture-valuation-start" aria-label="Opening observation"></select>
+          <label for="fixture-valuation-end">Closing observation</label>
+          <select id="fixture-valuation-end" aria-label="Closing observation"></select>
+          <button class="dashboard-btn" id="fixture-valuation-compare" disabled onclick="compareFixtureValuations()">Compare observations</button>
+          <p id="fixture-valuation-status" role="status">Create a practice account to save valuations.</p>
+        </section>
         <pre id="fixture-details" aria-live="polite">No practice account. No broker connection.</pre>
         <h3>Monitoring alerts</h3>
         <button class="dashboard-btn" onclick="loadOperationalAlerts()">Refresh alerts</button>

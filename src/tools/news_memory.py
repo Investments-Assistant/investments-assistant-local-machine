@@ -42,6 +42,8 @@ async def search_stored_news(
         "query": query,
         "results_found": len(articles),
         "total_articles_in_memory": total,
+        "evidence_note": "Stored article count includes copies. Results group exact retrieved text; "
+        "distinct groups do not prove independent corroboration.",
         "filters": {
             "days_back": days_back,
             "sources": sources,
@@ -60,6 +62,8 @@ async def get_latest_news(limit: int = 20) -> dict:
     total = await get_article_count(user_id=user_id)
     return {
         "total_articles_in_memory": total,
+        "evidence_note": "Stored article count includes copies. Results group exact retrieved text; "
+        "distinct groups do not prove independent corroboration.",
         "articles": articles,
     }
 

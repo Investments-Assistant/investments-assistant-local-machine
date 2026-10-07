@@ -17,6 +17,7 @@ from src.execution.models import (
     SimulatorOrder,
     SimulatorAccount,
     SimulatorPosition,
+    ValuationSnapshot,
     SimulatorInstrument,
 )
 from src.execution.policy import PolicyDenied
@@ -56,6 +57,7 @@ async def account_fixture(integration_engine, monkeypatch):
             await session.execute(delete(SimulatorOrder).where(SimulatorOrder.account_id == ids[1]))
             await session.execute(delete(SimulatorPosition).where(SimulatorPosition.account_id == ids[1]))
             await session.execute(delete(SimulatorInstrument).where(SimulatorInstrument.account_id == ids[1]))
+            await session.execute(delete(ValuationSnapshot).where(ValuationSnapshot.account_id == ids[1]))
             await session.execute(delete(SimulatorAccount).where(SimulatorAccount.id == ids[1]))
             await session.execute(delete(OperationalAlert).where(OperationalAlert.user_id == ids[0]))
             await session.execute(delete(User).where(User.id == ids[0]))
@@ -68,6 +70,8 @@ async def account_fixture(integration_engine, monkeypatch):
         ("stale", "VALUATION_STALE"),
         ("uncertain", "RECONCILIATION_REQUIRED"),
         ("cash_discrepancy", "LEDGER_RECONCILIATION_DISCREPANT"),
+        ("realized_discrepancy", "LEDGER_RECONCILIATION_DISCREPANT"),
+        ("allocation_provenance", "LEDGER_RECONCILIATION_UNVERIFIED"),
     ],
 )
 async def test_manual_approval_cannot_bypass_marked_risk_and_halt_survives_denial(account_fixture, trigger, reason):
@@ -78,6 +82,12 @@ async def test_manual_approval_cannot_bypass_marked_risk_and_halt_survives_denia
             instrument.price, instrument.as_of = Decimal(40), datetime.now(UTC)
         elif trigger == "stale":
             instrument.as_of = datetime.now(UTC) - timedelta(minutes=2)
+        elif trigger == "allocation_provenance":
+            previous = await session.get(SimulatorOrder, first["order_id"])
+            previous.approval = dict(previous.approval, mandate_id="unapproved-allocation")
+        elif trigger == "realized_discrepancy":
+            account = await session.get(SimulatorAccount, ids[1])
+            account.realized_pnl = Decimal(1)
         elif trigger == "cash_discrepancy":
             account = await session.get(SimulatorAccount, ids[1])
             account.cash += 1
@@ -92,7 +102,7 @@ async def test_manual_approval_cannot_bypass_marked_risk_and_halt_survives_denia
         account = await session.get(SimulatorAccount, ids[1])
         order = await session.get(SimulatorOrder, pending["order_id"])
         assert account.halted and account.halt_reason == reason
-        assert account.realized_pnl == 0  # old realized-only check would miss the mark loss
+        assert account.realized_pnl == (1 if trigger == "realized_discrepancy" else 0)
         assert account.reserved == 0 and order.status == "proposed" and order.approval is None
         alert = await session.scalar(select(OperationalAlert).where(OperationalAlert.user_id == ids[0]))
         assert alert is not None and alert.account_id == ids[1]
@@ -105,3 +115,47 @@ async def test_manual_approval_cannot_bypass_marked_risk_and_halt_survives_denia
         instrument.as_of = datetime.now(UTC)
         with pytest.raises(PolicyDenied, match="OPERATOR_HALTED"):
             await proposal(session, ids)
+
+
+async def test_marked_risk_uses_exact_precision_independent_of_caller(db_session):
+    from decimal import Decimal, localcontext
+
+    from src.execution.risk import enforce_account_risk
+    from src.execution.models import SimulatorInstrument
+    from tests.integration.simulator_sales_test import owned
+
+    ids, account, _ = await owned(db_session)
+    instrument = await db_session.get(SimulatorInstrument, ids[2])
+    instrument.price = Decimal('120.0000000001')
+    await db_session.flush()
+    with localcontext() as context:
+        context.prec = 6
+        observed = await enforce_account_risk(db_session, account)
+        assert context.prec == 6
+    assert Decimal(observed['equity']) == Decimal('1040.0000000002')
+    assert Decimal(observed['unrealized']) == Decimal('40.0000000002')
+
+
+async def test_manual_lifecycle_and_fee_correction_preserve_callers_decimal_context(db_session):
+    from decimal import ROUND_UP, Decimal, localcontext
+    from datetime import UTC, datetime
+
+    from src.execution.service import record_fill
+    from src.execution.commissions import record_commission
+    from src.execution.reconciliation import reconcile_account
+    from tests.integration.execution_test import confirmation
+    from tests.integration.commissions_test import callback
+    from tests.integration.simulator_sales_test import sell, owned
+
+    with localcontext() as context:
+        context.prec, context.rounding = 6, ROUND_UP
+        ids, account, buy = await owned(db_session)
+        sale = await sell(db_session, ids, quantity='1')
+        await confirmation(db_session, ids, sale)
+        await record_fill(db_session, user_id=ids[0], account_id=ids[1], order_id=sale['order_id'],
+                          execution_id='precision-sale', quantity='1', price='120', fee='0.1')
+        await record_commission(db_session, **callback(ids, buy['order_id'], datetime.now(UTC),
+                                                       execution_id='buy', amount='0.2'))
+        assert context.prec == 6 and context.rounding == ROUND_UP
+    assert account.cash == Decimal('919.70') and account.realized_pnl == Decimal('19.80')
+    assert (await reconcile_account(db_session, account))['status'] == 'consistent'

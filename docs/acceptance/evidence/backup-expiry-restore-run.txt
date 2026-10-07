@@ -1,0 +1,1 @@
+{"status": "PASS", "tables": 31, "revision": "0017_valuation_snapshots", "evidence": "docs/acceptance/evidence/backup-expiry-restore.json"}

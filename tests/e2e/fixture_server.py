@@ -37,14 +37,13 @@ from src.agent import clients  # noqa: E402
 
 
 class DeterministicReadClient:
-    async def stream_response(self, messages, system, max_tokens=None):
+    async def stream_response(self, messages, system, max_tokens=None, response_schema=None):
         from src.tools.dispatcher import dispatch_tool
 
         if "NO_TOOL_CALLING" in system:
             yield {
                 "type": "final_answer",
-                "text": "Synthetic report fixture. Base currency EUR. "
-                "Realized and unrealized returns unavailable; no external execution is claimed.",
+                "text": '{"status":"abstain","observations":[]}',
             }
             yield {"type": "done"}
             return

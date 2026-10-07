@@ -76,3 +76,147 @@ HTTP, in-app alerts and simulator halt controls remain independent of inference.
 The degraded model-load behavior has focused tests; full target-stack outage and
 24-hour observation remain pending. Docker Desktop Linux daemon was unavailable,
 so container restart/TLS/host-source-address validation remains a separate gate.
+
+## Scope workflow evaluation v2 (2026-09-23)
+
+Actual existing1.5B Q4 CPU4, context4096,128 output tokens, synthetic tools:
+`evidence/workflow-scope-v2-cpu.json`. Five fixed cases (portfolio, scanner,
+exclusion, exclusion follow-up, Portuguese portfolio) all used the expected
+read scopes and completed final_answer/done. Load1.70s, peak RSS1987.3MiB;
+individual latencies11.99/6.48/2.52/0.84/2.58s. One observation per case is not
+production p95 or sustained-load acceptance. Native-tool comparison remains pending.
+
+The harness PASS is explicitly limited to scope/events. Manual review FAILS
+financial-answer quality (`evidence/workflow-scope-v2-review.json`): Portuguese
+answer invented EUR4.00 for0.004 units atEUR100, whose quantity×price isEUR0.400;
+no supplied multiplier/FX/total supportedEUR4.00. The English portfolio answer
+used deterministic fallback, not successful model synthesis. News-only prose also
+inferred more than the synthetic headline established. These findings block broader
+L06/model-quality acceptance despite correctly enforced read exclusions.
+
+Next repair: deterministic exact portfolio facts and explicit missing inputs must
+bound financial answers; model prose cannot establish valuation. Retain this
+unfavorable result and rerun fixed cases after correction. No threshold tuning,
+model download, provider/broker connection or live action was performed.
+
+Financial boundary rerun: `workflow-financial-facts-cpu.json`, same five cases,
+existing model/profile.5/5 scope/event checks pass. Portfolio/scanner/Portuguese
+answers identify deterministic_financial_evidence and preserve exact0.004/EUR100,
+missing market value and missing USD total. `workflow-financial-facts-review.json`
+parses and verifies those actual answers. Sub-millisecond financial-path timings
+reflect skipped inference, not accelerated model synthesis. Load1.33s/peak1979.25MiB.
+News-only model output still infers market activity/changes from a synthetic title;
+broader model-quality acceptance remains FAIL/pending. No favorable-edge claim.
+
+## Resumed real-model comparisons (2026-09-24)
+
+Existing1.5B Q4 CPU4/context4096/output128, synthetic tools only.
+Default headline and substantive runs each pass5/5 scope/event checks:
+workflow-news-abstention-cpu.json and workflow-news-substantive-cpu.json.
+Headline abstention removes prior unsupported market prose. Substantive evidence
+also produces abstention; no useful causal analysis or investment edge established.
+Parsed review is workflow-news-review.json. Portfolio/scanner generation remains
+deterministic source facts, so its latency cannot measure inference improvement.
+
+Native comparison workflow-native-headline-cpu.json FAILS4/5 scope checks:
+portfolio/scanner/news-only responses emit tool-call markup without executing
+required tools; Portuguese portfolio asks for account/broker without reading.
+Only excluded-portfolio follow-up has the expected empty scope. Native case times
+18.22/20.43/13.49/1.82/7.37s, load1.02s, peak1995.49MiB. Keep native tools off
+for this measured profile. Five cases cannot establish general quality or p95.
+No external broker/provider calls, model downloads or orders occurred.
+
+Substantive output also invented source_unavailable. Collection metadata now comes
+from observed tool results; regression coverage verifies model assertions cannot
+introduce missing body/source failure. Broader useful interpretation remains open.
+
+Native recovery rerun: workflow-native-recovery-cpu.json passes5/5 scope/event
+checks after application repair. Four cases explicitly record deterministic_read_recovery;
+this proves scoped fallback behavior, not working native tool generation. Parsed
+portfolio answers preserve0.004/EUR100 and unavailable totals; headline news
+abstains; excluded follow-up performs no read. Timings26.04/27.82/17.50/2.16/9.85s,
+load1.17s, peak1995.67MiB. Measurements overlapped local unit verification and are
+not isolated latency or p95 claims. Keep the deterministic default; native adds
+latency without proven benefit on this profile. Original failed benchmark retained.
+
+## Report structured inference (2026-09-26)
+
+`benchmark_reports.py` runs the actual report pipeline with the existing1.5B CPU
+GGUF (SHA256 in evidence), synthetic account/news inputs and explicit PDF/storage
+sinks. No downloads, broker connections, provider calls or orders. Command:
+
+```sh
+.venv/bin/python scripts/benchmark_reports.py --model models/qwen2.5-1.5b-instruct-q4_k_m.gguf --output docs/acceptance/evidence/report-model-schema-cpu.json
+```
+
+Prompt-only report output failed schema validation in all3 cases; reports remained
+truthful partial failures with deterministic financial facts (`report-model-cpu.json`).
+Schema-constrained local inference passed substantive-news and source-injection
+cases in16.94s/21.85s; the empty-source case still failed semantic validation
+(`report-model-schema-cpu.json`, overall FAIL). Empty-source schema was then
+restricted to abstention/zero extracts and the affected case rerun:
+
+```sh
+.venv/bin/python scripts/benchmark_reports.py --model models/qwen2.5-1.5b-instruct-q4_k_m.gguf --case no_news --output docs/acceptance/evidence/report-model-empty-source-cpu.json
+```
+
+That case PASS8.11s, explicit abstention. Reuse the unaffected source cases; no
+claim of an all-three fresh run. Structured inference bypasses tool routing and
+prose repair, preserves all context or errors, and rejects truncated completion.
+Output budget512, context4096, CPU4threads, no GPU; these are benchmark settings,
+not evidence that the full production output budget or workload meets an SLA.
+One injection-case extract quoted the injected instruction itself, labelled as an
+unverified source quotation. No instruction execution occurred, but useful source
+selection/analytical quality remains a separate unresolved requirement. These tiny
+samples prove neither p95 latency, independent corroboration nor investment edge.
+
+
+## Read follow-up benchmark (2026-10-06)
+Existing1.5BQ4 CPU4/context4096/output128, synthetic tools only; no downloads.
+`workflow-followup-cpu-20261006.json` passes8/8scope/eventcases, including refresh of
+portfolio evidence, holdings+news, and refreshed news preserving portfolio exclusion.
+Load6.30s, peak1976.18MiB. Financial answers retain0.004/EUR100 and unknown totals;
+headline-only news abstains. Seven paths bypass inference for deterministic evidence
+or abstention; their~1–9ms timings do not demonstrate model acceleration. The excluded
+portfolio follow-up uses inference17.55s and returns a generic refusal rather than
+explaining the explicit user restriction; this remains a conversational-quality gap.
+No broader analysis, ambiguity, p95 or financial-edge claim.0brokerconnections/orders.
+
+The above excluded-followup quality defect is fixed in
+workflow-exclusion-answer-cpu-20261006.json (8/8 scope/event/content checks PASS).
+Existing1.5BQ4 CPU profile loaded in1.418s, peak1955.61MiB; excludedfollowup0.0001s
+now returns the precise user restriction and read-preference option. That latency
+comes from bypassing unnecessary inference, not faster model generation. Wider
+portfolio interpretation and useful source selection still need quality evidence.
+
+## Combined scanner and source-selection quality (2026-10-07)
+The predeclared benchmark now checks factual source selection, not just valid JSON
+or completed events. The first scanner run safely abstained but failed usefulness
+in both cases (workflow-scanner-quality-cpu-20261007.json). Bounded exact candidate
+sentences now exclude recognized direct instructions before tool-free inference;
+quote enums, source attribution, mandatory limitations and bounded retries remain.
+No classifier is treated as an authority boundary or proof arbitrary text is safe.
+
+workflow-scanner-candidates-cpu-20261007.json passes both default-mode cases:
+combined scanner10.976s and scoped news with portfolio excluded9.133s. The source
+revenue statement is selected, the injected order command is absent, and exact
+financial facts, independent scopes and missing evidence stay visible. Existing
+1.5BQ4, CPU4/context4096/output512; load1.020s, peak2012.73MiB. No model download.
+workflow-scanner-native-cpu-20261007.json passes the same scanner content checks in
+38.508s, using deterministic read recovery after native selection did not supply
+all required reads. Load0.950s, peak2022.70MiB. This supports retaining the existing
+default deterministic read routing; native mode has no measured advantage here.
+These tiny samples are not p95, production-output768 acceptance or a full soak.
+
+The report injection case initially failed (report-source-quality-cpu-20261007.json).
+The first candidate report had a nominal PASS but manual review found an injected
+Enable live sentence among its observations: that result is invalid for quality.
+The benchmark now checks every selected quote against the directive filter, and
+the candidate filter includes mode/limit commands. The final
+report-source-candidates-final-cpu-20261007.json passes13.654s with only the factory
+closure statement and its no-forecast/no-price limitation. Load0.982s, peak2032.47MiB.
+Report prompts now receive candidate excerpts and the period; financial source
+context stays in deterministic rendering/persisted evidence. Existing report
+collection/context size limits remain enforced. PDF/storage are sinks in this
+model tier; browser/PostgreSQL verification is separately required. No external
+broker connection/order occurred, and no return or investment-edge claim follows.

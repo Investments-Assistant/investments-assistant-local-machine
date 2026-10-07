@@ -19,7 +19,7 @@ TEST_DATABASE_DISPOSABLE_TOKEN=fixture-soak-20260909 \
 ```
 
 The separate `test_soak_acceptance` database must already have disposable marker
-`fixture-soak-20260909` and migration head `0011_retention_index`. The runner refuses
+`fixture-soak-20260909` and migration head `0015_account_events`. The runner refuses
 other locations or identities. Raw control samples, checkpoints, and benchmark
 JSON stay under the specified ignored directory; retain these before cleaning it.
 SIGINT/SIGTERM saves progress and terminates only owned application/model children.
@@ -48,3 +48,15 @@ invalidate a window; start the full observation only against a stable candidate.
   27.112ms (budget250ms), existing local1.5B structured benchmark PASS. Current
   manual marked-risk and commission code included in fingerprint. Raw checkpoints
   and model result remain in `.qa/soak-smoke-v3`. Still SMOKE_PASS, not PASS_24H.
+
+- `evidence/soak-smoke-guards.txt`: 90.165 seconds, 49 cycles, four restarts,
+  halt p95 30.805 ms; existing local model benchmark PASS. Raw data remain in
+  `.qa/soak-20260928-guards`. This predates only the CLI exit-status correction.
+
+Database identity, disposable marker, schema revision and control gates are
+unconditional checks, including under Python `-O`. The CLI exits zero only for
+`SMOKE_PASS` or `PASS_24H`; failed or interrupted observations return nonzero.
+Always inspect the saved status: a short successful run is not a 24-hour pass.
+CLI regression tests use marked PostgreSQL and real loopback HTTP, including a
+deliberately missed restart gate. Their synthetic users and observation artifacts
+remain in the disposable database and ignored `.qa/soak-cli-*` directories.

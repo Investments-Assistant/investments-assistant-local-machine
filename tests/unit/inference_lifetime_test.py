@@ -128,3 +128,37 @@ async def test_missing_model_is_visible_and_deterministic_reads_remain_available
         read.assert_awaited_once_with("get_portfolio_summary", {})
         assert events[-1]["type"] == "done"
         assert "deterministic evidence" in events[-2]["text"]
+
+
+def test_repair_budget_cannot_discard_original_request_and_evidence():
+    from src.inference.budget import InferenceUnavailable, fit_messages
+
+    messages = [
+        {"role": "system", "content": "Use evidence only."},
+        {"role": "user", "content": "Report for original account; evidence: " + "x" * 2000},
+        {"role": "assistant", "content": "I will prepare the report."},
+        {"role": "user", "content": "Finish the answer now."},
+    ]
+    with pytest.raises(InferenceUnavailable, match="MODEL_CONTEXT_BUDGET_EXCEEDED"):
+        fit_messages(messages, [], tokenize=list, context_tokens=1200, output_tokens=128, preserve_context=True)
+    fitted = fit_messages(messages, [], tokenize=list, context_tokens=5000, output_tokens=128, preserve_context=True)
+    assert fitted == messages
+
+
+@pytest.mark.parametrize("role", ["user", "tool"])
+def test_repair_budget_preserves_tool_evidence_or_rejects(role):
+    from src.inference.budget import InferenceUnavailable, fit_messages
+
+    messages = [
+        {"role": "system", "content": "Use evidence only."},
+        {"role": "user", "content": "Summarize the scoped portfolio."},
+        {"role": role, "content": "Untrusted tool evidence; " + "x" * 2000},
+        {"role": "assistant", "content": "Preparing an answer."},
+        {"role": "user", "content": "Finish the answer now."},
+    ]
+    with pytest.raises(InferenceUnavailable, match="MODEL_CONTEXT_BUDGET_EXCEEDED"):
+        fit_messages(messages, [], tokenize=list, context_tokens=1200, output_tokens=128, preserve_context=True)
+    assert fit_messages(
+        messages, [], tokenize=list, context_tokens=5000, output_tokens=128, preserve_context=True
+    ) == messages
+    assert messages[2]["content"].endswith("x" * 2000)

@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "revision": "0016_expense_retirement",
+  "removed_rows_absent": true,
+  "retirement_hashes_preserved": 2,
+  "reimport_suppressed": true,
+  "production_data": false,
+  "bank_connections": 0
+}

@@ -688,3 +688,8 @@ header {
 .chat-evidence-note { padding: 0.5rem 1rem; font-size: 0.8rem; opacity: 0.85; overflow-wrap: anywhere; }
 
 .broker-evidence { max-height: 20rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .75rem; }
+
+.valuation-controls { margin: 1rem 0; max-width: 100%; }
+.valuation-controls label { display: block; margin-top: .5rem; }
+.valuation-controls select { display: block; width: 100%; max-width: 100%; margin-bottom: .5rem; }
+.valuation-controls [role="status"] { overflow-wrap: anywhere; }

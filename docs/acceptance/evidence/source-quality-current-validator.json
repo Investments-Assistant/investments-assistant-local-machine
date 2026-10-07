@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "validated_saved_actual_model_outputs": [
+    "workflow-scanner-candidates-cpu-20261007.json:scanner",
+    "workflow-scanner-candidates-cpu-20261007.json:explicit_exclusion",
+    "workflow-scanner-native-cpu-20261007.json:scanner",
+    "report-source-candidates-final-cpu-20261007.json:source_injection"
+  ],
+  "validator_sha256": {
+    "src/agent/clients/news_analysis.py": "dcc6005607dd2a06f113dcca7d6a6edf66318baec60040c2a6ce9080cc79409b",
+    "src/scheduler/report_analysis.py": "7ac206c11c8e48d435a538e9224299f10e6fbc9dc6f6f61ac93f47f7b8e0c9c5"
+  }
+}

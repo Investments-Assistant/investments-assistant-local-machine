@@ -3,6 +3,7 @@
 from fastapi import Depends, Request, APIRouter, HTTPException
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
+from sqlalchemy.orm.attributes import flag_modified
 
 from src.web.auth import require_csrf, require_authenticated
 from src.db.models import ExpenseTransaction
@@ -42,6 +43,7 @@ async def set_category(transaction_id: str, body: CategoryInput, request: Reques
         before = dict(
             category=row.category, subcategory=row.subcategory, override=row.category_override
         )
+        flag_modified(row, "synced_at")  # User categorization is not a provider receipt.
         row.category, row.subcategory, row.category_override = body.category, subcategory, True
         after = dict(category=row.category, subcategory=row.subcategory, override=True)
         if before != after:

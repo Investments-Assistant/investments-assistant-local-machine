@@ -1,0 +1,37 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 9 items
+
+tests/integration/expense_reconciliation_test.py F........               [100%]
+
+=================================== FAILURES ===================================
+_____ test_review_export_atomic_resolution_audit_and_reimport_suppression ______
+
+db_session = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7d1e968b4bc0>
+
+    async def test_review_export_atomic_resolution_audit_and_reimport_suppression(db_session):
+        owners, rows, args = await pair(db_session)
+        pending, booked = rows[:2]
+        item = {column.name: getattr(pending, column.name) for column in ExpenseTransaction.__table__.columns
+                if column.name not in {"id", "user_id", "created_at", "updated_at", "synced_at"}}
+        before = booked.amount, booked.currency, booked.occurred_at, booked.synced_at
+        plan, exported, _, _ = await reconciliation_plan(db_session, **args)
+        assert "secret_fixture" not in str(exported) and "raw_data" not in exported["pending"]
+        assert plan["copy_pending_category"]
+        result = await reconcile_pending(db_session, **args, expected_plan=plan["plan_sha256"],
+                                         export_sha256=plan["export_sha256"])
+        assert result["removed_pending"] == 1 and not result["booked_amount_changed"]
+>       assert (booked.amount, booked.currency, booked.occurred_at, booked.synced_at) == before
+E       AssertionError: assert (Decimal('0.0...timezone.utc)) == (Decimal('0.0...timezone.utc))
+E         
+E         At index 3 diff: datetime.datetime(2026, 10, 6, 6, 24, 14, 648392, tzinfo=datetime.timezone.utc) != datetime.datetime(2026, 10, 6, 6, 24, 14, 639156, tzinfo=datetime.timezone.utc)
+E         Use -v to get more diff
+
+tests/integration/expense_reconciliation_test.py:40: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/expense_reconciliation_test.py::test_review_export_atomic_resolution_audit_and_reimport_suppression
+========================= 1 failed, 8 passed in 0.52s ==========================

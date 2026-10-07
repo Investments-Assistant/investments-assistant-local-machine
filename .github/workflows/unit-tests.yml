@@ -42,7 +42,7 @@ jobs:
           ENVIRONMENT: development
           DATABASE_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/investments"
         run: |
-          poetry run pytest -m unit \
+          poetry run pytest tests/unit \
             --cov=src \
             --cov-report=xml:coverage.xml \
             --cov-report=term-missing \

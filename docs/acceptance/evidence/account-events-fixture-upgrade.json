@@ -1,0 +1,23 @@
+[
+  {
+    "database": "test_acceptance_expenses",
+    "status": "PASS",
+    "from_revision": "0014_strategy_decisions",
+    "to_revision": "0015_account_events",
+    "replaced_empty_fixture_table": true
+  },
+  {
+    "database": "test_browser_expenses",
+    "status": "PASS",
+    "from_revision": "0014_strategy_decisions",
+    "to_revision": "0015_account_events",
+    "replaced_empty_fixture_table": false
+  },
+  {
+    "database": "test_soak_acceptance",
+    "status": "PASS",
+    "from_revision": "0014_strategy_decisions",
+    "to_revision": "0015_account_events",
+    "replaced_empty_fixture_table": false
+  }
+]

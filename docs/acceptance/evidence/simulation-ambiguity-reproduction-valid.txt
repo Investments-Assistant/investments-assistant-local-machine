@@ -1,0 +1,139 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/unit/simulation_clarification_test.py FFFF                         [100%]
+
+=================================== FAILURES ===================================
+_ test_ambiguous_instrument_requests_clarification_without_simulation[Backtest it again.] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7017e14e41a0>
+prompt = 'Backtest it again.'
+
+    @pytest.mark.parametrize("prompt", [
+        "Backtest it again.",
+        "Simulate Apple from 2024-01-01.",
+        "Backtest a momentum strategy for SPYL on Xetra from 2024-01-01.",
+    ])
+    async def test_ambiguous_instrument_requests_clarification_without_simulation(monkeypatch, prompt):
+        local = client.LlamaCppClient.__new__(client.LlamaCppClient)
+        local._inference_lock = asyncio.Lock()
+        monkeypatch.setattr(client, "settings", Settings(_env_file=None, llm_native_tool_calling=False))
+        dispatch = AsyncMock(return_value='{"status":"unavailable"}')
+        monkeypatch.setattr(client, "dispatch_tool", dispatch)
+        events = [event async for event in local.stream_response([{"role": "user", "content": prompt}], "fixture")]
+>       dispatch.assert_not_awaited()
+
+tests/unit/simulation_clarification_test.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <AsyncMock id='123247868028944'>
+
+    def assert_not_awaited(self):
+        """
+        Assert that the mock was never awaited.
+        """
+        if self.await_count != 0:
+            msg = (f"Expected {self._mock_name or 'mock'} to not have been awaited."
+                   f" Awaited {self.await_count} times.")
+>           raise AssertionError(msg)
+E           AssertionError: Expected mock to not have been awaited. Awaited 1 times.
+
+/usr/lib/python3.12/unittest/mock.py:2400: AssertionError
+_ test_ambiguous_instrument_requests_clarification_without_simulation[Simulate Apple from 2024-01-01.] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7017e1515eb0>
+prompt = 'Simulate Apple from 2024-01-01.'
+
+    @pytest.mark.parametrize("prompt", [
+        "Backtest it again.",
+        "Simulate Apple from 2024-01-01.",
+        "Backtest a momentum strategy for SPYL on Xetra from 2024-01-01.",
+    ])
+    async def test_ambiguous_instrument_requests_clarification_without_simulation(monkeypatch, prompt):
+        local = client.LlamaCppClient.__new__(client.LlamaCppClient)
+        local._inference_lock = asyncio.Lock()
+        monkeypatch.setattr(client, "settings", Settings(_env_file=None, llm_native_tool_calling=False))
+        dispatch = AsyncMock(return_value='{"status":"unavailable"}')
+        monkeypatch.setattr(client, "dispatch_tool", dispatch)
+        events = [event async for event in local.stream_response([{"role": "user", "content": prompt}], "fixture")]
+>       dispatch.assert_not_awaited()
+
+tests/unit/simulation_clarification_test.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <AsyncMock id='123247854216128'>
+
+    def assert_not_awaited(self):
+        """
+        Assert that the mock was never awaited.
+        """
+        if self.await_count != 0:
+            msg = (f"Expected {self._mock_name or 'mock'} to not have been awaited."
+                   f" Awaited {self.await_count} times.")
+>           raise AssertionError(msg)
+E           AssertionError: Expected mock to not have been awaited. Awaited 1 times.
+
+/usr/lib/python3.12/unittest/mock.py:2400: AssertionError
+_ test_ambiguous_instrument_requests_clarification_without_simulation[Backtest a momentum strategy for SPYL on Xetra from 2024-01-01.] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7017e091e1b0>
+prompt = 'Backtest a momentum strategy for SPYL on Xetra from 2024-01-01.'
+
+    @pytest.mark.parametrize("prompt", [
+        "Backtest it again.",
+        "Simulate Apple from 2024-01-01.",
+        "Backtest a momentum strategy for SPYL on Xetra from 2024-01-01.",
+    ])
+    async def test_ambiguous_instrument_requests_clarification_without_simulation(monkeypatch, prompt):
+        local = client.LlamaCppClient.__new__(client.LlamaCppClient)
+        local._inference_lock = asyncio.Lock()
+        monkeypatch.setattr(client, "settings", Settings(_env_file=None, llm_native_tool_calling=False))
+        dispatch = AsyncMock(return_value='{"status":"unavailable"}')
+        monkeypatch.setattr(client, "dispatch_tool", dispatch)
+        events = [event async for event in local.stream_response([{"role": "user", "content": prompt}], "fixture")]
+>       dispatch.assert_not_awaited()
+
+tests/unit/simulation_clarification_test.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <AsyncMock id='123247854673200'>
+
+    def assert_not_awaited(self):
+        """
+        Assert that the mock was never awaited.
+        """
+        if self.await_count != 0:
+            msg = (f"Expected {self._mock_name or 'mock'} to not have been awaited."
+                   f" Awaited {self.await_count} times.")
+>           raise AssertionError(msg)
+E           AssertionError: Expected mock to not have been awaited. Awaited 1 times.
+
+/usr/lib/python3.12/unittest/mock.py:2400: AssertionError
+_____ test_unavailable_simulation_result_cannot_become_zero_return_success _____
+
+    def test_unavailable_simulation_result_cannot_become_zero_return_success():
+        answer = client._format_simulation_result({"status": "unavailable"})
+>       assert "Simulation complete" not in answer
+E       AssertionError: assert 'Simulation complete' not in '# Simulatio...ure returns.'
+E         
+E         'Simulation complete' is contained here:
+E           # Simulation complete — Paper simulation
+E           
+E           - **Symbols:** 
+E           - **Period:** None → None
+E           - **Fake starting capital:** $0.00...
+E         
+E         ...Full output truncated (7 lines hidden), use '-vv' to show
+
+tests/unit/simulation_clarification_test.py:33: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/simulation_clarification_test.py::test_ambiguous_instrument_requests_clarification_without_simulation[Backtest it again.]
+FAILED tests/unit/simulation_clarification_test.py::test_ambiguous_instrument_requests_clarification_without_simulation[Simulate Apple from 2024-01-01.]
+FAILED tests/unit/simulation_clarification_test.py::test_ambiguous_instrument_requests_clarification_without_simulation[Backtest a momentum strategy for SPYL on Xetra from 2024-01-01.]
+FAILED tests/unit/simulation_clarification_test.py::test_unavailable_simulation_result_cannot_become_zero_return_success
+============================== 4 failed in 1.17s ===============================

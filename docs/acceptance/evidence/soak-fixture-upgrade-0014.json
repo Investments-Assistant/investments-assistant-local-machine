@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "database": "test_soak_acceptance",
+  "from_revision": "0012_broker_observations",
+  "to_revision": "0014_strategy_decisions",
+  "execution_payloads_unchanged": true
+}

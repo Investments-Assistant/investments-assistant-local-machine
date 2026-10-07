@@ -61,8 +61,30 @@ async def test_reviewed_schema_upgrades_without_assigning_unknown_owner(integrat
                 "0010_report_status.py",
                 "0011_retention_index.py",
                 "0012_broker_observations.py",
+                "0013_execution_sequence.py",
+                "0014_strategy_decisions.py",
+                "0015_account_events.py",
+                "0016_expense_retirement.py",
+                "0017_valuation_snapshots.py",
+                "0018_job_lease_clock.py",
             ]:
+                if version == "0018_job_lease_clock.py":
+                    await connection.execute(text(
+                        "INSERT INTO job_leases (id,user_id,name,token,lease_until,next_due,checkpoint) "
+                        "VALUES ('legacy-lease','legacy-owner','legacy-job','old-token',now(),now(),'{}')"
+                    ))
                 await connection.run_sync(upgrade, version)
+            legacy_lease = (await connection.execute(text(
+                "SELECT leased_at, token, checkpoint FROM job_leases WHERE id='legacy-lease'"
+            ))).one()
+            assert legacy_lease.leased_at is None and legacy_lease.token == "old-token"
+            assert legacy_lease.checkpoint == {}
+            unique_tick = await connection.scalar(text(
+                "SELECT indexdef FROM pg_indexes WHERE schemaname = :schema "
+                "AND indexname = 'uq_strategy_decision_tick'"
+            ), {"schema": schema})
+            assert "UNIQUE INDEX" in unique_tick and "(account_id, tick_key)" in unique_tick
+            assert await connection.scalar(text("SELECT count(*) FROM strategy_decisions")) == 0
             ownership = (
                 await connection.execute(text("SELECT id, user_id, visibility FROM news_articles ORDER BY id"))
             ).all()
@@ -104,5 +126,52 @@ async def test_reviewed_schema_upgrades_without_assigning_unknown_owner(integrat
                 {"schema": schema},
             )
             assert "(user_id, synced_at, id)" in definition and "WHERE" in definition
+        finally:
+            await transaction.rollback()
+
+
+@pytest.mark.integration
+async def test_event_sequence_upgrade_preserves_evidence_and_ignores_future_clock_regression(integration_engine):
+    async with integration_engine.connect() as connection:
+        transaction = await connection.begin()
+        schema = "sequence_" + uuid.uuid4().hex
+        try:
+            await connection.execute(text(f"CREATE SCHEMA {schema}"))
+            await connection.execute(text(f"SET LOCAL search_path TO {schema}"))
+            await connection.execute(text("""CREATE TABLE execution_events (
+                id text PRIMARY KEY, observed_at timestamptz NOT NULL, payload jsonb NOT NULL)"""))
+            await connection.execute(text("""INSERT INTO execution_events VALUES
+                ('later', '2026-01-02T00:00:00Z', '{"quantity":"0.004"}'),
+                ('earlier', '2026-01-01T00:00:00Z', '{"quantity":"1"}')"""))
+            before = (await connection.execute(text(
+                "SELECT id, observed_at, payload FROM execution_events ORDER BY id"
+            ))).all()
+
+            def upgrade(sync_connection):
+                spec = importlib.util.spec_from_file_location(
+                    "sequence_migration", "migrations/versions/0013_execution_sequence.py"
+                )
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                with Operations.context(MigrationContext.configure(sync_connection)):
+                    module.upgrade()
+
+            await connection.run_sync(upgrade)
+            after = (await connection.execute(text(
+                "SELECT id, observed_at, payload FROM execution_events ORDER BY id"
+            ))).all()
+            assert before == after
+            assert (await connection.execute(text(
+                "SELECT id, ledger_sequence FROM execution_events ORDER BY ledger_sequence"
+            ))).all() == [("earlier", 1), ("later", 2)]
+            assert await connection.scalar(text("""INSERT INTO execution_events (id, observed_at, payload)
+                VALUES ('clock-regressed', '2020-01-01T00:00:00Z', '{}') RETURNING ledger_sequence""")) == 3
+            async with connection.begin_nested() as nested:
+                rolled_back = await connection.scalar(text("""INSERT INTO execution_events (id, observed_at, payload)
+                    VALUES ('rolled-back', now(), '{}') RETURNING ledger_sequence"""))
+                await nested.rollback()
+            final = await connection.scalar(text("""INSERT INTO execution_events (id, observed_at, payload)
+                VALUES ('after-rollback', now(), '{}') RETURNING ledger_sequence"""))
+            assert final > rolled_back
         finally:
             await transaction.rollback()

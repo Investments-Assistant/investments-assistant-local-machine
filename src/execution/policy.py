@@ -5,6 +5,8 @@ from decimal import Decimal, InvalidOperation
 import hashlib
 from datetime import datetime, timedelta
 
+from src.execution.numeric import execution_precision
+
 
 class PolicyDenied(ValueError):
     def __init__(self, code: str):
@@ -12,6 +14,7 @@ class PolicyDenied(ValueError):
         super().__init__(code)
 
 
+@execution_precision
 def positive(value) -> Decimal:
     try:
         result = Decimal(str(value))
@@ -29,6 +32,7 @@ def digest(value) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True, default=str, separators=(",", ":")).encode()).hexdigest()
 
 
+@execution_precision
 def order_details(order) -> dict:
     def canonical(value):
         return str(value.normalize()) if isinstance(value, Decimal) else str(value)
@@ -49,7 +53,8 @@ def order_details(order) -> dict:
     }
 
 
-def preflight(account, instrument, quantity, price, side: str, now: datetime) -> Decimal:
+@execution_precision
+def preflight(account, instrument, quantity, price, side: str, now: datetime, *, mandate_spec=None) -> Decimal:
     """Trusted simulator feed supplies contract multiplier/FX; client estimates absent."""
     if account.halted:
         raise PolicyDenied("OPERATOR_HALTED")
@@ -61,8 +66,15 @@ def preflight(account, instrument, quantity, price, side: str, now: datetime) ->
         raise PolicyDenied("PROTECTED_ALLOCATION")
     if instrument.security_type not in {"stock", "etf"} or instrument.multiplier != 1:
         raise PolicyDenied("UNSUPPORTED_INSTRUMENT")
-    if side != "buy":
-        # Selling needs strategy-owned position reservations; no shorting fallback.
+    if side not in {"buy", "sell"}:
+        raise PolicyDenied("UNSUPPORTED_SIDE")
+    if side == "sell" and not (
+        account.mandate.get("fixture") is True and (
+            account.mandate.get("manual_sales") is True
+            or (mandate_spec is not None and mandate_spec.strategy == "price_band_fixture"
+                and mandate_spec.environment == "simulator")
+        )
+    ):
         raise PolicyDenied("SELL_CAPABILITY_UNAVAILABLE")
     expiry = datetime.fromisoformat(account.mandate["expires_at"])
     if now >= expiry:
@@ -75,12 +87,20 @@ def preflight(account, instrument, quantity, price, side: str, now: datetime) ->
     multiplier, fx = positive(instrument.multiplier), positive(instrument.fx_to_base)
     if quantity % positive(instrument.lot) or price % positive(instrument.tick):
         raise PolicyDenied("LOT_OR_TICK_PRECISION")
-    if price < positive(instrument.price):
+    quote = positive(instrument.price)
+    if (side == "buy" and price < quote) or (side == "sell" and price > quote):
         raise PolicyDenied("LIMIT_NOT_MARKETABLE")
-    notional = quantity * price * multiplier * fx
+    notional = quantity * max(price, quote) * multiplier * fx
     # Explicit fixture fee bound, consumed/released by actual fill events.
-    reservation = positive(notional * (1 + Decimal(account.mandate["fee_bps"]) / 10000))
-    if reservation > account.max_order:
+    try:
+        fee_bps = Decimal(str(account.mandate["fee_bps"]))
+    except (KeyError, InvalidOperation, TypeError, ValueError):
+        raise PolicyDenied("INVALID_FEE_POLICY") from None
+    if not fee_bps.is_finite() or not 0 <= fee_bps <= 100:
+        raise PolicyDenied("INVALID_FEE_POLICY")
+    gross_budget = positive(notional * (1 + fee_bps / 10000))
+    reservation = gross_budget if side == "buy" else gross_budget - notional
+    if gross_budget > account.max_order:
         raise PolicyDenied("ORDER_CAP")
     if reservation > account.cash - account.reserved:
         raise PolicyDenied("INSUFFICIENT_UNRESERVED_CASH")

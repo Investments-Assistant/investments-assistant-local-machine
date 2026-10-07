@@ -7,21 +7,20 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from src.db.models import NewsArticle
 from src.news.search import search_news, get_recent_headlines
 
 
-def _make_db_article(**kwargs) -> MagicMock:
-    """Return a MagicMock that behaves like a NewsArticle ORM row."""
-    row = MagicMock()
-    row.title = kwargs.get("title", "Headline")
-    row.summary = kwargs.get("summary", "Summary text")
-    row.source = kwargs.get("source", "Reuters")
-    row.url = kwargs.get("url", "https://reuters.com/1")
-    row.published_at = kwargs.get("published_at", datetime(2024, 1, 1, tzinfo=UTC))
-    row.sentiment_label = kwargs.get("sentiment_label", "neutral")
-    row.sentiment_score = kwargs.get("sentiment_score", 0.0)
-    row.tags = kwargs.get("tags", [])
-    return row
+def _make_db_article(**kwargs) -> NewsArticle:
+    """Construct actual ORM values; mocks must not substitute for nullable text."""
+    values = dict(
+        title="Headline", summary="Summary text", content=None, source="Reuters",
+        url="https://reuters.com/1", published_at=datetime(2024, 1, 1, tzinfo=UTC),
+        fetched_at=datetime(2024, 1, 2, tzinfo=UTC), available_at=None,
+        content_hash=None, provenance={}, sentiment_label="neutral", sentiment_score=0.0, tags=[],
+    )
+    values.update(kwargs)
+    return NewsArticle(**values)
 
 
 # ---------------------------------------------------------------------------

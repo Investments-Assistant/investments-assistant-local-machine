@@ -1,9 +1,10 @@
 # Audit findings and current evidence
 
-Reference commit: `65ea1d769c79bf77df3de1d4a3b6274168d92085`. Current HEAD remains
-that commit; implementation and evidence are staged/unstaged working-tree changes.
-The initial checkout was clean. Resumes preserve both staged and unstaged changes;
-no commits, pushes or production deployment have been performed. Historical logs
+Historical reference: `65ea1d769c79bf77df3de1d4a3b6274168d92085`. Current HEAD is
+`0e18029fe882497cd7bb998f5b855777ac474889`; prior completed work was committed
+externally. Current news-policy/retention and CI changes remain in the working tree.
+The initial checkout was clean. Resumes preserve existing changes; the agent has
+not committed, pushed or deployed to production. Historical logs
 remain evidence of their recorded runs, not assertions that later code was tested.
 
 ## Required regression cases
@@ -44,9 +45,9 @@ results and limitations), `REPLAY.md` (new engine and offline reproduction).
 | Monolithic web concerns | Finance normalization, expense persistence/category/provider handling, risk/execution, research and alert routes extracted; web module remains large and further focused extraction is possible. |
 | Reports silently truncate/fail | Structured evidence/period helpers and typed source/PDF/persistence failures implemented; actual PDF reload/isolation tested. Reconciled broker performance remains unavailable. |
 | Synchronous simulation/PDF blocks async handlers | Shared bounded workers with timeout/cancellation permit retention; actual browser replay/PDF pass. |
-| Scheduled/MCP global credentials | Explicit active-user binding enforced; SDK fallback removed. Public news/market job durable service identity still pending. |
+| Scheduled/MCP global credentials | Explicit active-user binding enforced; SDK fallback removed. Public news uses explicit active principal, durable fenced leases/checkpoints and reviewed source policies; newsletter reads require bound private policy. Real provider access is unverified. |
 | Bank consent/sync incomplete | Fixture-tested adapter/token/consent/account/recovery and explicit browser controls added. Real bank access requires separate consent/configuration. |
-| Startup create_all/raw alterations/owner backfill | Versioned reviewed-schema upgrades through0009, explicit startup schema checks and unknown-owner quarantine. Full current filesystem/key restore pending. |
+| Startup create_all/raw alterations/owner backfill | Versioned reviewed-schema upgrades through0012, explicit startup schema checks and unknown-owner quarantine. Full fixture filesystem/key/model restore verified at0009 and database restore at0010; full0012 restore not yet exercised. |
 | Nginx all-interface publication | Compose now defaults loopback with explicit LAN bind and exact proxy peer; offline config and origin fixtures pass. Actual Docker/WSL ingress remains unobserved. |
 | CPU image mistaken for GPU path | Build remains CPU; installed native library reports no GPU offload. No GPU acceleration claim. |
 | CI integration loop/transaction/FTS errors | Function-loop NullPool fixtures, positively marked database, outer rollback/savepoints and real PostgreSQL FTS pass locally. Remote historical run has not been rerun. |

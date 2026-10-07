@@ -13,7 +13,7 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from src.web import expense_export as export
-from src.db.models import ExpenseTransaction
+from src.db.models import User, ExpenseTransaction
 from src.expenses.sync import normalise_transaction
 from src.expenses.persistence import upsert_transaction
 
@@ -29,6 +29,8 @@ async def export_fixture(integration_engine, monkeypatch):
     monkeypatch.setattr(export, "BATCH_SIZE", 2)
     async with factory.begin() as session:
         for user, count in ((owner, 5), (other, 1)):
+            session.add(User(id=user, username=uuid.uuid4().hex, password_hash="fixture", is_active=True))
+            await session.flush()
             for index in range(count):
                 item = normalise_transaction(
                     dict(
@@ -48,6 +50,7 @@ async def export_fixture(integration_engine, monkeypatch):
     finally:
         async with factory.begin() as session:
             await session.execute(delete(ExpenseTransaction).where(ExpenseTransaction.user_id.in_([owner, other])))
+            await session.execute(delete(User).where(User.id.in_([owner, other])))
 
 
 async def response():

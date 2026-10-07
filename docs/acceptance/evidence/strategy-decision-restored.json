@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "revision": "0014_strategy_decisions",
+  "decision_evidence_hash": "25403b94f25589a35162d27239792b58eadc4d44101bf240760fd5158be1642b",
+  "no_trade_and_original_quote_preserved": true,
+  "scope": "synthetic disposable database restore",
+  "broker_connections": 0
+}

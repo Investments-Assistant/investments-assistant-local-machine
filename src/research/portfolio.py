@@ -7,13 +7,12 @@ synthetic prices or fills; carried marks are labelled in the evidence.
 
 import math
 from decimal import ROUND_DOWN, Decimal
-import hashlib
-from pathlib import Path
 import statistics
 from collections import defaultdict
 from dataclasses import asdict
 
-from src.research.replay import Bar, Costs, validate, canonical_hash
+from src.research.replay import Bar, Costs, validate, canonical_hash, engine_fingerprint
+from src.research.dividends import DividendLedger
 
 ZERO = Decimal(0)
 ONE = Decimal(1)
@@ -99,7 +98,8 @@ def replay_portfolio(
     for bars in series.values():
         for bar in bars:
             days[bar.close_at.date()].append(bar)
-    cash, fees, realized, dividends, turnover = capital, ZERO, ZERO, ZERO, ZERO
+    cash, fees, realized, turnover = capital, ZERO, ZERO, ZERO
+    distributions = DividendLedger()
     quantity = {symbol: ZERO for symbol in series}
     basis = dict(quantity)
     history = {symbol: [] for symbol in series}
@@ -118,9 +118,8 @@ def replay_portfolio(
             history[symbol] = [value / bar.split for value in history[symbol]]
             rsi_states[symbol]["gain"] /= bar.split
             rsi_states[symbol]["loss"] /= bar.split
-            distribution = quantity[symbol] * bar.dividend * bar.fx_to_base
-            cash += distribution
-            dividends += distribution
+            distributions.accrue(bar, quantity[symbol], base_currency)
+            cash += distributions.settle(bar.open_at)
             if symbol not in pending:
                 continue
             delta, signal_at = pending.pop(symbol)
@@ -208,7 +207,8 @@ def replay_portfolio(
             (quantity[symbol] * marks[symbol].close * marks[symbol].fx_to_base for symbol in marks),
             ZERO,
         )
-        value = cash + held
+        cash += distributions.settle(at)
+        value = cash + held + distributions.receivable({s: mark.fx_to_base for s, mark in marks.items()})
         exposure_samples.append(held / value if value else ZERO)
         carried = [
             symbol for symbol in marks if quantity[symbol] and marks[symbol].close_at.date() != day
@@ -248,8 +248,14 @@ def replay_portfolio(
     for value in values:
         high = max(high, value)
         drawdown = min(drawdown, value / high - 1)
-    engine_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    engine_hash = engine_fingerprint()
+    dividend_summary = distributions.summary({s: mark.fx_to_base for s, mark in marks.items()})
     return dict(
+        **dividend_summary,
+        valuation_status="partial" if dividend_summary["dividend_payment_dates_missing"] or any(
+            (bar.close_at - bar.fx_as_of).total_seconds() > costs.max_fx_age_seconds
+            for bars in series.values() for bar in bars
+        ) else "complete",
         engine_sha256=engine_hash,
         parameters=dict(strategy=strategy, params=params),
         initial_capital=str(capital),
@@ -262,7 +268,6 @@ def replay_portfolio(
         trades=trades,
         rejected=rejected,
         fees=str(fees),
-        dividends=str(dividends),
         realized_pnl=str(realized),
         unrealized_pnl=str(
             sum(
@@ -291,6 +296,7 @@ def replay_portfolio(
             )
         ),
         conventions=dict(
+            dividends="gross entitlement at ex-open; cash only at evidenced payment time; no withholding assumed",
             costs=asdict(costs),
             signal="end of observed UTC session-date group",
             fill="later actual session open",

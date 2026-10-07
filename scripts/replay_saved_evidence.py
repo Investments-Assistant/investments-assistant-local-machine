@@ -14,16 +14,16 @@ from src.research.portfolio import replay_portfolio  # noqa: E402
 
 def reproduce(evidence):
     config = evidence["configuration"]
-    numeric = {"open", "close", "volume", "fx_to_base", "split", "dividend"}
-    temporal = {"open_at", "close_at", "fx_as_of"}
+    numeric = {"open", "close", "volume", "fx_to_base", "split", "dividend", "dividend_payment_fx"}
+    temporal = {"open_at", "close_at", "fx_as_of", "dividend_pay_at", "dividend_payment_fx_as_of"}
     series = {
         symbol: [
             Bar(
                 **{
                     key: Decimal(value)
-                    if key in numeric
+                    if key in numeric and value is not None
                     else datetime.fromisoformat(value)
-                    if key in temporal
+                    if key in temporal and value is not None
                     else value
                     for key, value in row.items()
                 }

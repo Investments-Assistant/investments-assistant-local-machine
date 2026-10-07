@@ -1,0 +1,1 @@
+{"status": "PASS", "tables": 31, "revision": "0018_job_lease_clock", "evidence": "/home/lulu/investments-assistant/investments-assistant-local-machine/docs/acceptance/evidence/pending-recovery-20261006-database.json"}

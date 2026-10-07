@@ -16,7 +16,7 @@ from src.execution.service import account_for_user
 class MandateSpec(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     environment: Literal["simulator"]
-    strategy: Literal["periodic_fixture_buy"]
+    strategy: Literal["periodic_fixture_buy", "price_band_fixture"]
     strategy_version: Literal["1"]
     instrument_ids: list[str] = Field(min_length=1, max_length=20)
     capital_limit: Decimal = Field(gt=0, max_digits=28, decimal_places=10)
@@ -36,8 +36,16 @@ class MandateSpec(BaseModel):
     expires_at: AwareDatetime
     quantity_per_order: Decimal = Field(gt=0, max_digits=28, decimal_places=10)
 
+    buy_below: Decimal | None = Field(default=None, gt=0, max_digits=28, decimal_places=10)
+    sell_above: Decimal | None = Field(default=None, gt=0, max_digits=28, decimal_places=10)
+
     @model_validator(mode="after")
     def consistent(self):
+        if self.strategy == "price_band_fixture":
+            if self.buy_below is None or self.sell_above is None or self.buy_below >= self.sell_above:
+                raise ValueError("Price band requires explicit buy_below < sell_above in instrument currency")
+        elif self.buy_below is not None or self.sell_above is not None:
+            raise ValueError("Buy-only mandate cannot carry sale thresholds")
         if not self.max_order <= self.max_position <= self.capital_limit:
             raise ValueError("Order <= position <= capital is required")
         if self.start_hour >= self.end_hour:

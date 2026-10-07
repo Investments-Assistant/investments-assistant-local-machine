@@ -231,6 +231,7 @@ async def test_metadata_correction_retains_prior_evidence_and_first_seen(db_sess
     original_evidence = dict(before.evidence)
     corrected = original | {
         "source": "Fixture corrected source",
+        "language": "pt-PT",
         "license": "synthetic-test-only",
         "retention": "fixture-explicit-policy",
         "tags": ["FIXTURE"],
@@ -244,7 +245,11 @@ async def test_metadata_correction_retains_prior_evidence_and_first_seen(db_sess
     assert article.fetched_at == first_seen and article.available_at > first_available
     assert article.source == corrected["source"]
     assert article.provenance["license"] == "synthetic-test-only"
-    assert article.provenance["entities"] == ["FIXTURE"]
+    assert article.provenance["source_tags"] == ["FIXTURE"]
+    assert article.provenance["language_observation"]["tag"] == "pt-pt"
+    assert article.provenance["language_observation"]["status"] == "declared_unverified"
+    assert article.provenance["entity_mentions"][0]["mapping_status"] == "unresolved"
+    assert article.provenance["entity_mentions"][0]["qualified_instrument"] is None
     revisions = (
         await db_session.scalars(
             select(NewsRevision).where(NewsRevision.article_id == article.id).order_by(NewsRevision.available_at)

@@ -186,6 +186,8 @@ async def test_sync_clocks_are_owner_scoped_and_independent_of_transaction_page(
         "Fixture",
     )
     later = success + timedelta(days=1)
+    db_session.add(User(id=owner, username=uuid.uuid4().hex, password_hash="fixture", is_active=True))
+    await db_session.flush()
     await upsert_transaction(db_session, user_id=owner, item=item, received_at=later)
     clocks = await sync_clocks(db_session, owner)
     assert clocks["last_received_at"] == later.isoformat()

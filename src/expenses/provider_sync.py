@@ -8,7 +8,7 @@ import json
 import asyncio
 import hashlib
 import secrets
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from sqlalchemy import func, select
 from cryptography.fernet import InvalidToken
@@ -74,9 +74,7 @@ async def begin_consent(
     reference = secrets.token_urlsafe(32)
     async with asyncio.timeout(30):
         tokens = await provider.token(credentials)
-        consent = await provider.consent(
-            tokens, institution=institution, redirect=redirect, reference=reference
-        )
+        consent = await provider.consent(tokens, institution=institution, redirect=redirect, reference=reference)
     encrypted = seal(
         vault,
         {
@@ -104,9 +102,7 @@ async def begin_consent(
     return {"connection_id": state.id, "status": state.status, "consent_url": consent["link"]}
 
 
-async def choose_account(
-    session, *, user_id, state_id, selected_account, provider, vault, human_event
-):
+async def choose_account(session, *, user_id, state_id, selected_account, provider, vault, human_event):
     state = await owned_state(session, user_id, state_id)
     if human_event is not True or state.status != "consent_pending":
         raise ProviderError("HUMAN_ACCOUNT_SELECTION_REQUIRED")
@@ -127,21 +123,23 @@ async def choose_account(
     return {"status": state.status, "connection_id": state.id}
 
 
-async def sync_account(session, *, user_id, state_id, provider, vault):
+async def sync_account(session, *, user_id, state_id, provider, vault, history_from=None):
     state = await owned_state(session, user_id, state_id)
     if state.status not in {"connected", "retry_wait"}:
         raise ProviderError("BANK_CONNECTION_DISCONNECTED")
     now = await session.scalar(select(func.clock_timestamp()))
+    if history_from is not None and (
+        type(history_from) is not date or not now.date() - timedelta(days=730) <= history_from <= now.date()
+    ):
+        raise ProviderError("BANK_HISTORY_RANGE_INVALID")
     retry = state.checkpoint.get("retry_at")
     if retry and datetime.fromisoformat(retry) > now:
         return {"status": "retry_wait", "error_code": state.error_code}
     # Account data is polled with a 7-day overlap for revisions, not claimed real-time.
     cursor = state.checkpoint.get("through")
-    since = (
-        datetime.fromisoformat(cursor).date() - timedelta(days=7)
-        if cursor
-        else now.date() - timedelta(days=90)
-    )
+    since = datetime.fromisoformat(cursor).date() - timedelta(days=7) if cursor else now.date() - timedelta(days=90)
+    if history_from is not None:
+        since = history_from
     try:
         async with asyncio.timeout(30):
             tokens = await provider.token(unseal(vault, state.encrypted_credentials))
@@ -153,26 +151,48 @@ async def sync_account(session, *, user_id, state_id, provider, vault):
             records = await provider.transactions(tokens, since=since)
             if len(records) > 5000:
                 raise ProviderError("PROVIDER_BATCH_TOO_LARGE")
-            normalised = [
-                normalise_transaction(item, provider.name, "Consented bank account")
-                for item in records
-            ]
+            normalised = [normalise_transaction(item, provider.name, "Consented bank account") for item in records]
             if any(item["account_key"] != state.account_key for item in normalised):
                 raise ProviderError("BANK_ACCOUNT_IDENTITY_MISMATCH")
             # Roll back the entire batch if any record/database check fails. No partial cursor.
             async with session.begin_nested():
+                suppressed = 0
                 for item in normalised:
-                    await upsert_transaction(session, user_id=user_id, item=item, received_at=now)
+                    if await upsert_transaction(session, user_id=user_id, item=item, received_at=now) is None:
+                        suppressed += 1
                 await assert_active(session, user_id)
         state.encrypted_credentials = seal(vault, tokens)
         state.last_received_at = now
         state.last_success_at = now
-        state.checkpoint = {"schema": 1, "through": now.isoformat(), "records": len(records)}
+        history = state.checkpoint.get("last_history_retrieval")
+        if history_from is not None:
+            history = {
+                "requested_from": history_from.isoformat(),
+                "completed_at": now.isoformat(),
+                "records": len(records),
+                "coverage_verified": False,
+            }
+        state.checkpoint = {
+            **({"last_history_retrieval": history} if history else {}),
+            "schema": 1,
+            # A narrow manual request must not skip missed incremental history.
+            **(
+                {"through": cursor}
+                if history_from is not None and cursor
+                else {}
+                if history_from is not None
+                else {"through": now.isoformat()}
+            ),
+            "records": len(records),
+            "suppressed_retired": suppressed,
+        }
         state.status, state.error_code = "connected", None
         await session.flush()
         return {
             "status": "complete",
+            "last_history_retrieval": history,
             "records": len(records),
+            "suppressed_retired": suppressed,
             "provider_last_success_at": now.isoformat(),
             "last_received_at": now.isoformat(),
         }
@@ -211,7 +231,5 @@ async def disconnect(session, *, user_id, state_id):
     return {
         "status": "disconnected",
         "provider_consent_revoked": False,
-        "message": (
-            "Local polling stopped and local tokens removed. Manage bank consent with the provider."
-        ),
+        "message": ("Local polling stopped and local tokens removed. Manage bank consent with the provider."),
     }

@@ -31,7 +31,7 @@ async def finish_refresh(session, *, lease, user_id, summary, failure_code=None,
         .with_for_update()
     )
     now = await session.scalar(select(func.clock_timestamp()))
-    if row is None or row.lease_until <= now:
+    if row is None or row.leased_at is None or row.leased_at > now or row.lease_until <= now:
         raise PolicyDenied("STALE_JOB_LEASE")
     if keep_lease:
         # Timed-out/cancelled native reads may still be cleaning up. Do not release

@@ -1,0 +1,109 @@
+{
+  "tier": "real-application-model-synthetic-tools",
+  "native_tools": true,
+  "evaluation_version": "workflow-scope-v2",
+  "news_fixture": "headline_only",
+  "timestamp": "2026-09-24T22:25:06.798194+00:00",
+  "load_seconds": 1.0187584110026364,
+  "model": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+  "peak_process_rss_mib": 1995.4921875,
+  "observations": [
+    {
+      "case_id": "portfolio",
+      "required_tools": [
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [],
+      "scope_correct": false,
+      "latency_seconds": 18.22393148500123,
+      "final_answer": "<tool_call>\n{\"name\": \"get_portfolio_summary\", \"arguments\": {\"broker\": \"alpaca\"}}\n</tool_call>",
+      "answer_generation": [
+        "model_or_repair"
+      ],
+      "event_types": [
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "scanner",
+      "required_tools": [
+        "get_latest_news",
+        "get_market_overview",
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [],
+      "scope_correct": false,
+      "latency_seconds": 20.434023295005318,
+      "final_answer": "<tool_call>\n{\n  \"name\": \"get_latest_news\",\n  \"arguments\": {}\n}",
+      "answer_generation": [
+        "model_or_repair"
+      ],
+      "event_types": [
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "explicit_exclusion",
+      "required_tools": [
+        "get_latest_news"
+      ],
+      "observed_tools": [],
+      "scope_correct": false,
+      "latency_seconds": 13.486399937995884,
+      "final_answer": "<tool_call>\n{{\"name\": \"search_stored_news\", \"arguments\": {\"query\": \"SPYL\", \"limit\": 5, \"sources\": [\"reuters\", \"bloomberg\"]}}}}\n</tool_call>",
+      "answer_generation": [
+        "model_or_repair"
+      ],
+      "event_types": [
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "exclusion_followup",
+      "required_tools": [],
+      "observed_tools": [],
+      "scope_correct": true,
+      "latency_seconds": 1.8229269129951717,
+      "final_answer": "I'm sorry, but I can't provide that information. Portfolio access is not allowed.",
+      "answer_generation": [
+        "model_or_repair"
+      ],
+      "event_types": [
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "portuguese_portfolio",
+      "required_tools": [
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [],
+      "scope_correct": false,
+      "latency_seconds": 7.372639287998027,
+      "final_answer": "Para fornecer uma resposta precisa sobre sua carteira, preciso que me informe qual \u00e9 o seu n\u00famero de conta ou que broker voc\u00ea est\u00e1 usando. Isso me ajudar\u00e1 a localizar sua carteira e fornecer informa\u00e7\u00f5es relevantes.",
+      "answer_generation": [
+        "model_or_repair"
+      ],
+      "event_types": [
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    }
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "status": "FAIL",
+  "limitations": [
+    "Tools return synthetic evidence; no external freshness, broker, DB or browser claim.",
+    "Final text needs factual review; complete events alone do not prove correctness."
+  ]
+}

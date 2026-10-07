@@ -1,0 +1,61 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 5 items
+
+tests/unit/portfolio_review_test.py FFFFF                                [100%]
+
+=================================== FAILURES ===================================
+_ test_review_explains_partial_currency_and_freshness_without_inventing_value __
+
+    def test_review_explains_partial_currency_and_freshness_without_inventing_value():
+        text = answer([dict(symbol="FIXTURE", quantity_exact="0.004", price="100", currency="EUR")],
+                      valuation_status="partial")
+>       assert "Portfolio review" in text
+E       assert 'Portfolio review' in '## Portfolio evidence\n\nAmounts are source-reported. null means unavailable. No totals, FX rates or executions were ...unrealized_pnl": null,\n      "as_of": null\n    }\n  ],\n  "omitted_positions": 0,\n  "source_error_count": 0\n}\n```'
+
+tests/unit/portfolio_review_test.py:20: AssertionError
+__ test_review_concentration_is_per_qualified_account_currency_and_timestamp ___
+
+    def test_review_concentration_is_per_qualified_account_currency_and_timestamp():
+        text = answer([row(1, "80"), row(2, "20"), row(3, "100", "USD"), row(4, "900", account="other")])
+>       assert "80%" in text and "100 EUR" in text
+E       assert ('80%' in '## Portfolio evidence\n\nAmounts are source-reported. null means unavailable. No totals, FX rates or executions were ...n      "as_of": "2026-10-07T00:00:00+00:00"\n    }\n  ],\n  "omitted_positions": 0,\n  "source_error_count": 0\n}\n```')
+
+tests/unit/portfolio_review_test.py:29: AssertionError
+____ test_ambiguous_duplicate_or_short_positions_do_not_claim_concentration ____
+
+    def test_ambiguous_duplicate_or_short_positions_do_not_claim_concentration():
+        for rows in ([row(1, "80"), row(1, "20")], [row(1, "-80"), row(2, "100")],
+                     [row(None, "80"), row(None, "20")]):
+            text = answer(rows)
+>           assert "concentration is unavailable" in text
+E           assert 'concentration is unavailable' in '## Portfolio evidence\n\nAmounts are source-reported. null means unavailable. No totals, FX rates or executions were ...n      "as_of": "2026-10-07T00:00:00+00:00"\n    }\n  ],\n  "omitted_positions": 0,\n  "source_error_count": 0\n}\n```'
+
+tests/unit/portfolio_review_test.py:39: AssertionError
+_____ test_omitted_and_cross_time_positions_cannot_form_full_concentration _____
+
+    def test_omitted_and_cross_time_positions_cannot_form_full_concentration():
+        text = answer([row(i + 1, "10") for i in range(21)])
+>       assert "concentration is unavailable" in text
+E       assert 'concentration is unavailable' in '## Portfolio evidence\n\nAmounts are source-reported. null means unavailable. No totals, FX rates or executions were ...n      "as_of": "2026-10-07T00:00:00+00:00"\n    }\n  ],\n  "omitted_positions": 1,\n  "source_error_count": 0\n}\n```'
+
+tests/unit/portfolio_review_test.py:45: AssertionError
+____ test_unavailable_empty_and_source_errors_are_not_safe_portfolio_claims ____
+
+    def test_unavailable_empty_and_source_errors_are_not_safe_portfolio_claims():
+        unavailable = financial_answer({"get_portfolio_summary": '{"status":"unavailable"}'})
+>       assert "Portfolio review is unavailable" in unavailable
+E       assert 'Portfolio review is unavailable' in '## Portfolio evidence\n\nAmounts are source-reported. null means unavailable. No totals, FX rates or executions were inferred.\n\n```json\n{\n  "status": "unavailable",\n  "reason": "PORTFOLIO_SOURCE_UNAVAILABLE"\n}\n```'
+
+tests/unit/portfolio_review_test.py:53: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/portfolio_review_test.py::test_review_explains_partial_currency_and_freshness_without_inventing_value
+FAILED tests/unit/portfolio_review_test.py::test_review_concentration_is_per_qualified_account_currency_and_timestamp
+FAILED tests/unit/portfolio_review_test.py::test_ambiguous_duplicate_or_short_positions_do_not_claim_concentration
+FAILED tests/unit/portfolio_review_test.py::test_omitted_and_cross_time_positions_cannot_form_full_concentration
+FAILED tests/unit/portfolio_review_test.py::test_unavailable_empty_and_source_errors_are_not_safe_portfolio_claims
+============================== 5 failed in 0.48s ===============================

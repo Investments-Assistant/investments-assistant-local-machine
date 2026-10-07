@@ -72,7 +72,7 @@ jobs:
           DATABASE_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/investments"
           TEST_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/test_investments"
         run: |
-          poetry run pytest -m integration \
+          poetry run pytest tests/integration \
             --cov=src \
             --cov-report=xml:coverage-integration.xml \
             --cov-report=term-missing \

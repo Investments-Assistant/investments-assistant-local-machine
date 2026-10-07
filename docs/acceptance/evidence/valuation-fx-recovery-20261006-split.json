@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "revision": "0018_job_lease_clock",
+  "reconciliation_hash": "ac05dabde3b9457c298c7aa1c5b00067f8ab2e39b5d59e6d692d7d4e79e687ba",
+  "split_receipt": "88eb525c-a124-4e44-a5bd-fd531fe3ff5d",
+  "dividend_receipt": "87a9de70-f84f-46fd-90cb-dd610e2f764a",
+  "dividend_income_verified": true,
+  "exact_period_valuation_verified": true,
+  "split_quantity_basis_cash_and_halt_preserved": true,
+  "production_data": false,
+  "broker_connections": 0
+}

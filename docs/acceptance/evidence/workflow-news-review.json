@@ -1,0 +1,46 @@
+{
+  "scope": "default-path fixed workflow-scope-v2, synthetic tools, actual existing CPU model",
+  "results": [
+    {
+      "evidence": "workflow-news-abstention-cpu.json",
+      "scope_event_checks": "5/5 PASS",
+      "news_status": "abstain",
+      "news_reason": "INSUFFICIENT_SOURCE_TEXT",
+      "model_missing_data": [
+        "independent_corroboration",
+        "price_context",
+        "entity_resolution",
+        "body"
+      ],
+      "load_seconds": 1.4634852489980403,
+      "peak_process_rss_mib": 1976.5,
+      "limitations": [
+        "No causal analysis or strategy signal established.",
+        "Deterministic financial path skips inference; latency is not model speed."
+      ]
+    },
+    {
+      "evidence": "workflow-news-substantive-cpu.json",
+      "scope_event_checks": "5/5 PASS",
+      "news_status": "abstain",
+      "news_reason": null,
+      "model_missing_data": [
+        "source_unavailable",
+        "independent_corroboration",
+        "price_context",
+        "entity_resolution",
+        "publication_time"
+      ],
+      "load_seconds": 1.1688664680041256,
+      "peak_process_rss_mib": 2007.51171875,
+      "limitations": [
+        "No causal analysis or strategy signal established.",
+        "Deterministic financial path skips inference; latency is not model speed."
+      ]
+    }
+  ],
+  "overall_analysis_quality": "INCOMPLETE",
+  "broker_connections": 0,
+  "external_orders": 0,
+  "remaining_defect": "Substantive fixture output labels source_unavailable despite supplied source; source availability must come from collection evidence."
+}

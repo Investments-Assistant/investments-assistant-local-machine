@@ -56,25 +56,34 @@ def save(path, value):
     temporary.replace(path)
 
 
+def require_gate(condition, code):
+    if not condition:
+        raise RuntimeError(code)
+
+
 async def verify_database(url, marker):
+    if not marker:
+        raise ValueError("DISPOSABLE_MARKER_REQUIRED")
     parsed = make_url(url)
-    if parsed.drivername != "postgresql+asyncpg" or not re.fullmatch(
-        r"test_[a-z0-9_]+", parsed.database or ""
-    ):
+    if parsed.drivername != "postgresql+asyncpg" or not re.fullmatch(r"test_[a-z0-9_]+", parsed.database or ""):
         raise ValueError("Explicit disposable PostgreSQL database required")
     host = Path(parsed.query.get("host", "")).resolve()
     if not host.is_relative_to(ROOT / ".qa"):
         raise ValueError("Soak accepts only the isolated .qa Unix socket")
-    engine = create_async_engine(
-        url, poolclass=NullPool, connect_args={"timeout": 5, "command_timeout": 5}
-    )
+    engine = create_async_engine(url, poolclass=NullPool, connect_args={"timeout": 5, "command_timeout": 5})
     try:
         async with engine.connect() as connection:
-            assert await connection.scalar(text("SELECT current_database()")) == parsed.database
-            assert await connection.scalar(text("SELECT token FROM ia_disposable_marker")) == marker
-            assert (
-                await connection.scalar(text("SELECT version_num FROM alembic_version"))
-                == "0012_broker_observations"
+            require_gate(
+                await connection.scalar(text("SELECT current_database()")) == parsed.database,
+                "DISPOSABLE_DATABASE_IDENTITY_MISMATCH",
+            )
+            require_gate(
+                await connection.scalar(text("SELECT token FROM public.ia_disposable_marker")) == marker,
+                "DISPOSABLE_MARKER_MISMATCH",
+            )
+            require_gate(
+                await connection.scalar(text("SELECT version_num FROM alembic_version")) == "0018_job_lease_clock",
+                "DISPOSABLE_SCHEMA_REVISION_MISMATCH",
             )
     finally:
         await engine.dispose()
@@ -117,20 +126,21 @@ def start_server(state, output, env):
     client = httpx.Client(base_url=base, timeout=5, trust_env=False)
     try:
         startup_deadline = time.monotonic() + 15
-        for _ in range(100):
-            if time.monotonic() >= startup_deadline:
+        while True:
+            remaining = startup_deadline - time.monotonic()
+            if remaining <= 0:
                 raise RuntimeError("FIXTURE_STARTUP_BUDGET")
             if process.poll() is not None:
                 raise RuntimeError("FIXTURE_SERVICE_EXITED")
             try:
-                if client.get("/api/health", timeout=1).status_code == 200:
+                if client.get("/api/health", timeout=min(1, remaining)).status_code == 200:
+                    if time.monotonic() >= startup_deadline:
+                        raise RuntimeError("FIXTURE_STARTUP_BUDGET")
                     break
             except httpx.TransportError:
                 pass
-            if STOP.wait(0.1):
+            if STOP.wait(min(0.1, max(0, startup_deadline - time.monotonic()))):
                 raise RuntimeError("INTERRUPTED")
-        else:
-            raise RuntimeError("FIXTURE_SERVICE_START_TIMEOUT")
         response = client.post(
             "/api/auth/login",
             json={"username": state["user"], "password": "fixture-browser-password"},
@@ -171,9 +181,7 @@ def main():
     fingerprint = hashlib.sha256(url.encode()).hexdigest()
     if checkpoint.exists():
         if not args.resume:
-            raise SystemExit(
-                "Output exists; inspect live PID and explicitly --resume only after it stopped"
-            )
+            raise SystemExit("Output exists; inspect live PID and explicitly --resume only after it stopped")
         state = json.loads(checkpoint.read_text())
         if state["database_fingerprint"] != fingerprint:
             raise SystemExit("Resume database mismatch")
@@ -248,9 +256,7 @@ def main():
                 raise RuntimeError("CODE_CHANGED_OBSERVATION_INVALIDATED")
             # A slow local model process contends for CPU/RAM while deterministic controls run.
             if args.model and model_process is None and cycle >= next_model:
-                model_output = (
-                    output / f"model-{len(state['model_runs']):04d}-{uuid.uuid4().hex[:8]}.json"
-                )
+                model_output = output / f"model-{len(state['model_runs']):04d}-{uuid.uuid4().hex[:8]}.json"
                 log = (output / "model.log").open("a")
                 model_process = subprocess.Popen(
                     [
@@ -276,7 +282,7 @@ def main():
             halted = client.post(f"/api/simulator/accounts/{state['halt_account']}/halt")
             elapsed = (time.perf_counter() - started) * 1000
             halted.raise_for_status()
-            assert halted.json()["halted"] is True
+            require_gate(halted.json()["halted"] is True, "HALT_NOT_PERSISTED")
             latencies.append(elapsed)
             with (output / "latency-samples.jsonl").open("a") as samples:
                 samples.write(
@@ -285,18 +291,20 @@ def main():
                             window=state["observation_windows"],
                             elapsed_seconds=cycle - began,
                             latency_ms=elapsed,
-                            model_process_active=model_process is not None
-                            and model_process.poll() is None,
+                            model_process_active=model_process is not None and model_process.poll() is None,
                         )
                     )
                     + "\n"
                 )
             snapshot = client.get(f"/api/simulator/accounts/{state['halt_account']}")
             snapshot.raise_for_status()
-            assert snapshot.json()["halted"] and snapshot.json()["orders"] == []
+            require_gate(
+                snapshot.json()["halted"] is True and snapshot.json()["orders"] == [],
+                "HALT_OR_NO_ORDER_INVARIANT_FAILED",
+            )
             ready = client.get("/api/ready")
             ready_payload = ready.json().get("detail", ready.json())
-            assert ready_payload["checks"]["database"] is True
+            require_gate(ready_payload["checks"]["database"] is True, "DATABASE_READINESS_FAILED")
             if cycle - began > 65:
                 rejected = client.post(
                     f"/api/simulator/accounts/{state['stale_account']}/proposals",
@@ -307,9 +315,9 @@ def main():
                         idempotency_key="stale-soak-probe",
                     ),
                 )
-                assert (
-                    rejected.status_code == 409
-                    and rejected.json()["detail"]["reason_code"] == "STALE_QUOTE"
+                require_gate(
+                    rejected.status_code == 409 and rejected.json()["detail"]["reason_code"] == "STALE_QUOTE",
+                    "STALE_QUOTE_GATE_FAILED",
                 )
             if cycle - last_restart >= args.restart_every:
                 restart_started = time.monotonic()
@@ -333,10 +341,7 @@ def main():
                 if model_process.returncode:
                     raise RuntimeError("LOCAL_MODEL_BENCHMARK_FAILED")
                 model_data = json.loads((output / state["model_runs"][-1]["path"]).read_text())
-                if (
-                    model_data["sample_count"] < 3
-                    or model_data["task_correct"] != model_data["sample_count"]
-                ):
+                if model_data["sample_count"] < 3 or model_data["task_correct"] != model_data["sample_count"]:
                     raise RuntimeError("LOCAL_MODEL_TASK_GATE_FAILED")
                 state["model_runs"][-1]["status"] = "PASS"
                 model_process = None
@@ -370,8 +375,7 @@ def main():
                 max(
                     0,
                     min(
-                        (min(args.interval, 1) if model_process else args.interval)
-                        - (time.monotonic() - cycle),
+                        (min(args.interval, 1) if model_process else args.interval) - (time.monotonic() - cycle),
                         deadline - time.monotonic(),
                     ),
                 )
@@ -423,8 +427,10 @@ def main():
             flush=True,
         )
 
+    return 0 if state["status"] in {"PASS_24H", "SMOKE_PASS"} else 1
+
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, lambda *_: STOP.set())
     signal.signal(signal.SIGTERM, lambda *_: STOP.set())
-    main()
+    raise SystemExit(main())

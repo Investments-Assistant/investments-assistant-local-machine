@@ -14,6 +14,7 @@ class JobLease(Base):
     user_id: Mapped[str] = mapped_column(String(36), index=True)
     name: Mapped[str] = mapped_column(String(64))
     token: Mapped[str] = mapped_column(String(36))
+    leased_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     lease_until: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     next_due: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     last_success: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

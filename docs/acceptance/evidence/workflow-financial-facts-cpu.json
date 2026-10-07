@@ -1,0 +1,130 @@
+{
+  "tier": "real-application-model-synthetic-tools",
+  "native_tools": false,
+  "evaluation_version": "workflow-scope-v2",
+  "timestamp": "2026-09-23T09:20:35.944065+00:00",
+  "load_seconds": 1.3335181930000317,
+  "model": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+  "peak_process_rss_mib": 1979.24609375,
+  "observations": [
+    {
+      "case_id": "portfolio",
+      "required_tools": [
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [
+        "get_portfolio_summary"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 0.0009516100000155348,
+      "final_answer": "## Portfolio evidence\n\nAmounts are source-reported. null means unavailable. No totals, FX rates or executions were inferred.\n\n```json\n{\n  \"status\": \"source_evidence_only\",\n  \"source_valuation_status\": \"partial\",\n  \"as_of\": null,\n  \"reported_total_market_value_usd\": null,\n  \"reported_total_unrealized_pnl_usd\": null,\n  \"positions\": [\n    {\n      \"symbol\": \"FIXTURE\",\n      \"account_id\": \"synthetic-account\",\n      \"quantity\": \"0.004\",\n      \"source_currency\": \"EUR\",\n      \"source_price\": \"100\",\n      \"source_market_value\": null,\n      \"source_unrealized_pnl\": null,\n      \"as_of\": null\n    }\n  ],\n  \"omitted_positions\": 0,\n  \"source_error_count\": 0\n}\n```",
+      "answer_generation": [
+        "deterministic_financial_evidence"
+      ],
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "scanner",
+      "required_tools": [
+        "get_latest_news",
+        "get_market_overview",
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [
+        "get_portfolio_summary",
+        "get_latest_news",
+        "get_market_overview"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 0.00041212099995391327,
+      "final_answer": "## Portfolio evidence\n\nAmounts are source-reported. null means unavailable. No totals, FX rates or executions were inferred.\n\n```json\n{\n  \"status\": \"source_evidence_only\",\n  \"source_valuation_status\": \"partial\",\n  \"as_of\": null,\n  \"reported_total_market_value_usd\": null,\n  \"reported_total_unrealized_pnl_usd\": null,\n  \"positions\": [\n    {\n      \"symbol\": \"FIXTURE\",\n      \"account_id\": \"synthetic-account\",\n      \"quantity\": \"0.004\",\n      \"source_currency\": \"EUR\",\n      \"source_price\": \"100\",\n      \"source_market_value\": null,\n      \"source_unrealized_pnl\": null,\n      \"as_of\": null\n    }\n  ],\n  \"omitted_positions\": 0,\n  \"source_error_count\": 0\n}\n```\n\n## get_latest_news\n\n```json\n{\n  \"fixture\": true,\n  \"articles\": [\n    {\n      \"title\": \"Synthetic market observation\",\n      \"source\": \"fixture\",\n      \"url\": \"https://example.invalid/synthetic\",\n      \"available_at\": \"2026-09-08T00:00:00Z\"\n    }\n  ]\n}\n```\n\n## get_market_overview\n\n```json\n{\n  \"fixture\": true,\n  \"as_of\": \"2026-09-08T00:00:00Z\",\n  \"indices\": [],\n  \"status\": \"unavailable\"\n}\n```",
+      "answer_generation": [
+        "deterministic_financial_evidence"
+      ],
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "tool_call",
+        "tool_result",
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "explicit_exclusion",
+      "required_tools": [
+        "get_latest_news"
+      ],
+      "observed_tools": [
+        "get_latest_news"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 8.429025971000101,
+      "final_answer": "The latest news article indicates a synthetic market observation. This suggests ongoing market activity and potential changes in market conditions. However, it does not provide specific details or actionable insights for portfolio management.",
+      "answer_generation": [
+        "model_or_repair"
+      ],
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "exclusion_followup",
+      "required_tools": [],
+      "observed_tools": [],
+      "scope_correct": true,
+      "latency_seconds": 0.8710156600000118,
+      "final_answer": "I'm sorry, but I can't provide that information.",
+      "answer_generation": [
+        "model_or_repair"
+      ],
+      "event_types": [
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "portuguese_portfolio",
+      "required_tools": [
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [
+        "get_portfolio_summary"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 0.0003732709999439976,
+      "final_answer": "## Dados da carteira\n\nValores provenientes das fontes. null significa indispon\u00edvel. N\u00e3o foram inferidos totais, c\u00e2mbio ou execu\u00e7\u00f5es.\n\n```json\n{\n  \"status\": \"source_evidence_only\",\n  \"source_valuation_status\": \"partial\",\n  \"as_of\": null,\n  \"reported_total_market_value_usd\": null,\n  \"reported_total_unrealized_pnl_usd\": null,\n  \"positions\": [\n    {\n      \"symbol\": \"FIXTURE\",\n      \"account_id\": \"synthetic-account\",\n      \"quantity\": \"0.004\",\n      \"source_currency\": \"EUR\",\n      \"source_price\": \"100\",\n      \"source_market_value\": null,\n      \"source_unrealized_pnl\": null,\n      \"as_of\": null\n    }\n  ],\n  \"omitted_positions\": 0,\n  \"source_error_count\": 0\n}\n```",
+      "answer_generation": [
+        "deterministic_financial_evidence"
+      ],
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    }
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "status": "PASS",
+  "limitations": [
+    "Tools return synthetic evidence; no external freshness, broker, DB or browser claim.",
+    "Final text needs factual review; complete events alone do not prove correctness."
+  ]
+}

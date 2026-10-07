@@ -18,20 +18,21 @@ async def acquire(session, *, user_id: str, name: str, lease_seconds=60):
         select(User.id).where(User.id == user_id, User.is_active.is_(True))
     ):
         raise PolicyDenied("PRINCIPAL_INACTIVE")
-    now = await session.scalar(select(func.now()))
+    now = await session.scalar(select(func.clock_timestamp()))
     token = str(uuid.uuid4())
     statement = insert(JobLease).values(
         id=str(uuid.uuid4()),
         user_id=user_id,
         name=name,
         token=token,
+        leased_at=now,
         lease_until=now + timedelta(seconds=lease_seconds),
         next_due=now,
         checkpoint={},
     )
     statement = statement.on_conflict_do_update(
         index_elements=["user_id", "name"],
-        set_={"token": token, "lease_until": now + timedelta(seconds=lease_seconds)},
+        set_={"token": token, "leased_at": now, "lease_until": now + timedelta(seconds=lease_seconds)},
         where=(JobLease.lease_until <= now) & (JobLease.next_due <= now),
     ).returning(JobLease.id)
     lease_id = await session.scalar(statement)
@@ -49,8 +50,9 @@ async def complete(
 ):
     if not 1 <= interval_seconds <= 86400:
         raise ValueError("Invalid job interval")
-    now = await session.scalar(select(func.now()))
+    now = await session.scalar(select(func.clock_timestamp()))
     values = dict(
+        token=str(uuid.uuid4()),  # Completed authority must never survive a clock regression.
         lease_until=now,
         next_due=now + timedelta(seconds=interval_seconds),
         failure_code=failure_code,
@@ -59,7 +61,8 @@ async def complete(
         values.update(last_success=now, checkpoint=checkpoint)
     result = await session.execute(
         update(JobLease)
-        .where(JobLease.id == lease_id, JobLease.token == token, JobLease.lease_until >= now)
+        .where(JobLease.id == lease_id, JobLease.token == token,
+               JobLease.leased_at.is_not(None), JobLease.leased_at <= now, JobLease.lease_until > now)
         .values(**values)
     )
     if result.rowcount != 1:

@@ -1,0 +1,115 @@
+{
+  "tier": "real-application-model-synthetic-tools",
+  "native_tools": false,
+  "evaluation_version": "workflow-scope-v2",
+  "timestamp": "2026-09-23T09:12:46.581553+00:00",
+  "load_seconds": 1.696706125999981,
+  "model": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+  "peak_process_rss_mib": 1987.328125,
+  "observations": [
+    {
+      "case_id": "portfolio",
+      "required_tools": [
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [
+        "get_portfolio_summary"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 11.988277628000048,
+      "final_answer": "Portfolio evidence: {\"fixture\": true, \"account_id\": \"synthetic-account\", \"holdings\": [{\"symbol\": \"FIXTURE\", \"quantity_exact\": \"0.004\", \"price\": \"100\", \"currency\": \"EUR\", \"value_usd\": null}], \"valuation_status\": \"partial\", \"broker_connected\": false, \"execution_count\": 0}",
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "scanner",
+      "required_tools": [
+        "get_latest_news",
+        "get_market_overview",
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [
+        "get_portfolio_summary",
+        "get_latest_news",
+        "get_market_overview"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 6.478582352000046,
+      "final_answer": "The latest news indicates a synthetic market observation titled \"Synthetic market observation\" from fixture. This news does not provide specific details about the portfolio exposure or market overview. The portfolio exposure shows 0.004 FIXTURE shares with a price of 100 EUR and a value in USD that is not available. The market overview is unavailable as of the provided date.",
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "tool_call",
+        "tool_result",
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "explicit_exclusion",
+      "required_tools": [
+        "get_latest_news"
+      ],
+      "observed_tools": [
+        "get_latest_news"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 2.524456133000001,
+      "final_answer": "The latest news article indicates a synthetic market observation. This suggests ongoing market activity and potential future developments. However, it does not provide specific details or actionable insights.",
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "exclusion_followup",
+      "required_tools": [],
+      "observed_tools": [],
+      "scope_correct": true,
+      "latency_seconds": 0.8369615110000268,
+      "final_answer": "I'm sorry, but I can't provide that information.",
+      "event_types": [
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "portuguese_portfolio",
+      "required_tools": [
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [
+        "get_portfolio_summary"
+      ],
+      "scope_correct": true,
+      "latency_seconds": 2.5763731289999896,
+      "final_answer": "A sua carteira est\u00e1 atualmente com 0.004 FIXTUREs, cujo valor total em EUR \u00e9 de 4,00.",
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    }
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "status": "PASS",
+  "limitations": [
+    "Tools return synthetic evidence; no external freshness, broker, DB or browser claim.",
+    "Final text needs factual review; complete events alone do not prove correctness."
+  ]
+}

@@ -8,6 +8,7 @@ from sqlalchemy import select
 
 from src.execution.models import ExecutionEvent, SimulatorOrder, SimulatorPosition
 from src.execution.policy import PolicyDenied, digest, positive
+from src.execution.numeric import execution_precision
 
 
 async def latest_commission(session, order_id, execution_id):
@@ -33,6 +34,7 @@ def commission_amount(value):
         raise PolicyDenied("INVALID_COMMISSION") from None
 
 
+@execution_precision
 async def record_commission(
     session,
     *,
@@ -112,38 +114,61 @@ async def record_commission(
         )
     )
     state = "awaiting_fill" if fill is None else "applied"
+    before_ledger = None
+    apply_revision = fill is not None and not (latest and latest.payload["revision"] > revision)
     if latest and latest.payload["revision"] > revision:
         state = "older_revision_recorded"
-    elif fill is not None:
-        previous = Decimal(latest.payload["fee_base"] if latest else fill.payload["fee"])
-        delta = base_amount - previous
-        position = await session.scalar(
-            select(SimulatorPosition).where(
-                SimulatorPosition.account_id == account_id,
-                SimulatorPosition.instrument_id == order.instrument_id,
-            )
-        )
-        if position is None:
-            raise PolicyDenied("COMMISSION_POSITION_RECONCILIATION_REQUIRED")
-        account.cash -= delta
-        order.fees += delta
-        position.cost_basis += delta
-        # Preserve observed costs even if they exceed reserved capital. Stop new orders.
-        fills = (
-            await session.scalars(
-                select(ExecutionEvent).where(
-                    ExecutionEvent.order_id == order_id,
-                    ExecutionEvent.kind == "fill",
-                )
-            )
-        ).all()
-        reservation = (order.approval or {}).get("reserved_base")
-        if reservation is None or any("principal_base" not in event.payload for event in fills):
+    if apply_revision:
+        from src.execution.reconciliation import reconcile_account
+
+        before, before_ledger = await reconcile_account(session, account, _include_ledger=True)
+        if before["status"] != "consistent" or before_ledger is None:
             account.halted, account.halt_reason = True, "COMMISSION_RECONCILIATION_REQUIRED"
-        elif account.cash < account.reserved or sum(
-            Decimal(event.payload["principal_base"]) for event in fills
-        ) + order.fees + order.reserve > Decimal(reservation):
-            account.halted, account.halt_reason = True, "COMMISSION_BUDGET_EXCEEDED"
+            state = "reconciliation_required"
+            apply_revision = False
     session.add(ExecutionEvent(order_id=order_id, event_key=key, kind="commission", payload=payload))
+    await session.flush()
+    if apply_revision:
+        previous = Decimal(latest.payload["fee_base"] if latest else fill.payload["applied_fee_base"])
+        order.fees += base_amount - previous
+        await session.flush()
+        _, after_ledger = await reconcile_account(session, account, _include_ledger=True)
+        if after_ledger is None:
+            account.halted, account.halt_reason = True, "COMMISSION_RECONCILIATION_REQUIRED"
+            state = "reconciliation_required"
+        else:
+            # Apply only the revision's delta. Never overwrite unrelated stored balances.
+            account.cash += after_ledger.cash - before_ledger.cash
+            account.realized_pnl += after_ledger.realized_pnl - before_ledger.realized_pnl
+            basis_changes = {}
+            for allocation_key, position in after_ledger.positions.items():
+                before_position = before_ledger.positions[allocation_key]
+                instrument_id = allocation_key[1]
+                basis_changes[instrument_id] = basis_changes.get(instrument_id, Decimal(0)) + (
+                    position.cost_basis - before_position.cost_basis
+                )
+            for instrument_id, delta in basis_changes.items():
+                if not delta:
+                    continue
+                position = await session.scalar(select(SimulatorPosition).where(
+                    SimulatorPosition.account_id == account_id, SimulatorPosition.instrument_id == instrument_id,
+                ))
+                if position is None:
+                    # The pre-revision reconciliation normally proves this exists.
+                    account.halted, account.halt_reason = True, "COMMISSION_RECONCILIATION_REQUIRED"
+                    state = "reconciliation_required"
+                    break
+                position.cost_basis += delta
+            fills = (await session.scalars(select(ExecutionEvent).where(
+                ExecutionEvent.order_id == order_id, ExecutionEvent.kind == "fill",
+            ))).all()
+            reservation = (order.approval or {}).get("reserved_base")
+            if reservation is None or any("principal_base" not in event.payload for event in fills):
+                account.halted, account.halt_reason = True, "COMMISSION_RECONCILIATION_REQUIRED"
+            else:
+                principal = sum((Decimal(event.payload["principal_base"]) for event in fills), Decimal(0))
+                consumed = (principal if order.side == "buy" else Decimal(0)) + order.fees
+                if account.cash < account.reserved or consumed + order.reserve > Decimal(reservation):
+                    account.halted, account.halt_reason = True, "COMMISSION_BUDGET_EXCEEDED"
     await session.flush()
     return {"status": state, "environment": "simulator", "fee_base": str(base_amount), "halted": account.halted}

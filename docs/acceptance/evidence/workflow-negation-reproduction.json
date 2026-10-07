@@ -1,0 +1,20 @@
+{
+  "tier": "offline-intent-parser-only",
+  "prompt": "Do not access my portfolio. Show stored news only.",
+  "actual": [
+    [
+      "get_portfolio_summary",
+      {}
+    ],
+    [
+      "get_latest_news",
+      {
+        "limit": 10
+      }
+    ]
+  ],
+  "expected_tools": [
+    "get_latest_news"
+  ],
+  "broker_connections": 0
+}

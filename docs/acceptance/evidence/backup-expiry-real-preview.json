@@ -1,0 +1,9 @@
+{
+  "candidate_bytes": 0,
+  "candidate_count": 0,
+  "deleted": 0,
+  "plan_sha256": "32e0981166b648fcea825f8c71fb2a359607a1384b4d693b160c5496f0452117",
+  "protected_count": 1,
+  "scope": "verified_database_archives_only",
+  "status": "preview"
+}

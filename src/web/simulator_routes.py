@@ -1,5 +1,6 @@
 """Browser-only synthetic order workflow; never an external account or price feed."""
 
+from typing import Literal
 import asyncio
 from decimal import Decimal
 from datetime import UTC, datetime, timedelta
@@ -12,7 +13,7 @@ from src.web.auth import SESSION_COOKIE, require_csrf, require_authenticated
 from src.db.models import User
 from src.db.database import async_session
 from src.execution.risk import RiskDenied
-from src.execution.models import SimulatorOrder, SimulatorAccount, SimulatorInstrument
+from src.execution.models import SimulatorOrder, SimulatorAccount, StrategyDecision, SimulatorInstrument
 from src.execution.policy import PolicyDenied, digest
 from src.execution.service import halt, approve, propose, record_fill, account_for_user
 from src.execution.mandates import MandateSpec, approve_mandate, propose_mandate
@@ -21,9 +22,15 @@ from src.execution.reconciliation import reconcile_account
 router = APIRouter(prefix="/api/simulator", dependencies=[Depends(require_authenticated)])
 
 
+class FixtureInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    manual_sales: bool = Field(default=False, strict=True)
+
+
 class ProposalInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     instrument_id: str
+    side: Literal["buy", "sell"] = "buy"
     quantity: Decimal = Field(gt=0)
     limit_price: Decimal = Field(gt=0)
     idempotency_key: str = Field(min_length=1, max_length=64)
@@ -63,7 +70,7 @@ async def risk_checked_command(command, **kwargs):
 
 
 @router.post("/fixtures", dependencies=[Depends(require_csrf)])
-async def create_fixture(request: Request):
+async def create_fixture(request: Request, body: FixtureInput | None = None):
     """An explicit user click creates only a labelled synthetic allocation."""
     user_id, _ = await browser_identity(request)
     async with async_session.begin() as session:
@@ -93,9 +100,11 @@ async def create_fixture(request: Request):
             mandate={
                 "environment": "simulator",
                 "fixture": True,
+                "manual_sales": body.manual_sales if body else False,
                 "fee_bps": "10",
                 "expires_at": (now + timedelta(hours=1)).isoformat(),
                 "strategy": "manual-fixture-v1",
+                "global_exposure_limits": {"max_position_base": "500", "max_exposure_base": "750"},
             },
         )
         session.add(account)
@@ -122,6 +131,7 @@ async def create_fixture(request: Request):
             "environment": "simulator",
             "cash": "1000",
             "currency": "EUR",
+            "manual_sales": account.mandate["manual_sales"],
             "message": "Synthetic fixture only; no bank or broker connection.",
         }
 
@@ -146,11 +156,28 @@ async def snapshot(account_id: str, request: Request):
                 .scalars()
                 .all()
             )
+            decisions = (
+                await session.scalars(
+                    select(StrategyDecision)
+                    .where(
+                        StrategyDecision.account_id == account_id,
+                        StrategyDecision.user_id == user_id,
+                    )
+                    .order_by(StrategyDecision.created_at.desc(), StrategyDecision.id.desc())
+                    .limit(101)
+                )
+            ).all()
             return {
+                "strategy_decisions": [
+                    dict(id=row.id, evidence=row.evidence, evidence_hash=row.evidence_hash) for row in decisions[:100]
+                ],
+                "strategy_decisions_truncated": len(decisions) > 100,
                 "account_id": account_id,
                 "environment": "simulator",
                 "currency": account.currency,
                 "cash": str(account.cash),
+                "realized_pnl": str(account.realized_pnl),
+                "manual_sales": account.mandate.get("manual_sales") is True,
                 "reserved": str(account.reserved),
                 "halted": account.halted,
                 "halt_reason": account.halt_reason,
@@ -159,6 +186,7 @@ async def snapshot(account_id: str, request: Request):
                     {
                         "id": o.id,
                         "status": o.status,
+                        "side": o.side,
                         "quantity": str(o.quantity),
                         "filled": str(o.filled),
                         "fees": str(o.fees),
@@ -259,5 +287,71 @@ async def approve_strategy_mandate(account_id: str, mandate_id: str, body: Appro
                 human_event=True,
                 **body.model_dump(),
             )
+    except PolicyDenied as exc:
+        raise denied(exc) from exc
+
+
+class ValuationInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    snapshot_key: str = Field(min_length=1, max_length=128)
+
+
+@router.post("/accounts/{account_id}/valuations", dependencies=[Depends(require_csrf)])
+async def capture_account_valuation(account_id: str, body: ValuationInput, request: Request):
+    from src.execution.valuation import capture_valuation
+
+    user_id, _ = await browser_identity(request)
+    try:
+        async with asyncio.timeout(10), async_session.begin() as session:
+            await session.execute(text("SET LOCAL statement_timeout = '5s'"))
+            await session.execute(text("SET LOCAL lock_timeout = '2s'"))
+            return await capture_valuation(
+                session, user_id=user_id, account_id=account_id, snapshot_key=body.snapshot_key
+            )
+    except PolicyDenied as exc:
+        raise denied(exc) from exc
+
+
+@router.get("/accounts/{account_id}/valuations")
+async def account_valuations(account_id: str, request: Request):
+    from src.execution.models import ValuationSnapshot
+    from src.execution.valuation import receipt, validate
+
+    user_id, _ = await browser_identity(request)
+    try:
+        async with asyncio.timeout(10), async_session.begin() as session:
+            await session.execute(text("SET LOCAL statement_timeout = '5s'"))
+            await session.execute(text("SET LOCAL lock_timeout = '2s'"))
+            account = await account_for_user(session, account_id, user_id)
+            rows = (
+                await session.scalars(
+                    select(ValuationSnapshot)
+                    .where(ValuationSnapshot.account_id == account_id)
+                    .order_by(ValuationSnapshot.as_of.desc())
+                    .limit(101)
+                )
+            ).all()
+            for row in rows:
+                validate(row, account)
+            return dict(
+                snapshots=[
+                    dict(**receipt(row), equity=row.payload["equity"], currency=account.currency) for row in rows[:100]
+                ],
+                truncated=len(rows) > 100,
+            )
+    except PolicyDenied as exc:
+        raise denied(exc) from exc
+
+
+@router.get("/accounts/{account_id}/performance")
+async def account_performance(account_id: str, start: datetime, end: datetime, request: Request):
+    from src.execution.valuation import period_performance
+
+    user_id, _ = await browser_identity(request)
+    try:
+        async with asyncio.timeout(10), async_session.begin() as session:
+            await session.execute(text("SET LOCAL statement_timeout = '5s'"))
+            await session.execute(text("SET LOCAL lock_timeout = '2s'"))
+            return await period_performance(session, user_id=user_id, account_id=account_id, start=start, end=end)
     except PolicyDenied as exc:
         raise denied(exc) from exc

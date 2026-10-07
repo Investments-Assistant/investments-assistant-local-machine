@@ -1,0 +1,97 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 7 items
+
+tests/integration/manual_risk_test.py ......F                            [100%]
+
+=================================== FAILURES ===================================
+_________ test_marked_risk_uses_exact_precision_independent_of_caller __________
+
+session = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7d1602aa7b90>
+account = <src.execution.models.SimulatorAccount object at 0x7d1602b005c0>
+
+    async def enforce_account_risk(session, account, *, now=None):
+        """Account lock is held by the caller; no model or external network is involved.
+    
+        loss_limit caps both marked loss versus initial synthetic capital and loss
+        since the first UTC-day observation, excluding verified synthetic cash flows.
+        Missing valuation is a durable halt, never a fabricated zero mark.
+        """
+        now = now or datetime.now(UTC)
+        if now.tzinfo is None:
+            raise PolicyDenied("INVALID_RISK_TIME")
+        now = now.astimezone(UTC)
+        if account.halted:
+            raise PolicyDenied("OPERATOR_HALTED")
+    
+        async def breach(reason):
+            from src.execution.service import halt
+    
+            await halt(session, user_id=account.user_id, account_id=account.id, reason=reason)
+            raise RiskDenied(reason)
+    
+        try:
+>           initial_capital, loss_limit = positive(account.initial_capital), positive(account.loss_limit)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/execution/risk.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = Decimal('1000.0000000000')
+
+    def positive(value) -> Decimal:
+        try:
+            result = Decimal(str(value))
+        except (InvalidOperation, TypeError, ValueError):
+            raise PolicyDenied("INVALID_NUMBER") from None
+        if not result.is_finite() or result <= 0 or result >= Decimal("1e18"):
+            raise PolicyDenied("INVALID_NUMBER")
+        # Ledger precision is explicit; reject quantities that cannot be represented.
+>       if result != result.quantize(Decimal("0.0000000001")):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       decimal.InvalidOperation: [<class 'decimal.InvalidOperation'>]
+
+src/execution/policy.py:23: InvalidOperation
+
+During handling of the above exception, another exception occurred:
+
+db_session = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7d1602aa7b90>
+
+    async def test_marked_risk_uses_exact_precision_independent_of_caller(db_session):
+        from decimal import Decimal, localcontext
+        from src.execution.models import SimulatorInstrument
+        from src.execution.risk import enforce_account_risk
+        from tests.integration.simulator_sales_test import owned
+    
+        ids, account, _ = await owned(db_session)
+        instrument = await db_session.get(SimulatorInstrument, ids[2])
+        instrument.price = Decimal('120.0000000001')
+        await db_session.flush()
+        with localcontext() as context:
+            context.prec = 6
+>           observed = await enforce_account_risk(db_session, account)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/manual_risk_test.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/execution/risk.py:42: in enforce_account_risk
+    await breach("RISK_BUDGET_UNAVAILABLE")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+reason = 'RISK_BUDGET_UNAVAILABLE'
+
+    async def breach(reason):
+        from src.execution.service import halt
+    
+        await halt(session, user_id=account.user_id, account_id=account.id, reason=reason)
+>       raise RiskDenied(reason)
+E       src.execution.risk.RiskDenied: RISK_BUDGET_UNAVAILABLE
+
+src/execution/risk.py:34: RiskDenied
+=========================== short test summary info ============================
+FAILED tests/integration/manual_risk_test.py::test_marked_risk_uses_exact_precision_independent_of_caller
+========================= 1 failed, 6 passed in 1.53s ==========================

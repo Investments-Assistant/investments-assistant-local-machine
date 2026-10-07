@@ -22,7 +22,6 @@ from __future__ import annotations
 import re
 import email
 from typing import Any
-import asyncio
 import hashlib
 import imaplib
 from datetime import UTC, datetime, timedelta
@@ -32,11 +31,15 @@ from email.header import decode_header
 
 from src.config import settings
 from src.db.database import async_session
+from src.news.policy import source_policy, newsletter_identity
 from src.news.ingestion import ingest_articles
+from src.execution.policy import PolicyDenied
 from src.security.sessions import SessionInactive, assert_active
 from src.agent.utils.logger import get_logger
+from src.operations.workloads import WorkPool, WorkloadBusy
 
 logger = get_logger(__name__)
+newsletter_work = WorkPool(1, "NEWSLETTER_FETCH")
 
 
 # ---------------------------------------------------------------------------
@@ -171,11 +174,33 @@ async def read_and_ingest_newsletters(since_days: int = 8) -> dict:
             await assert_active(session, owner)
     except SessionInactive:
         return {"fetched": 0, "inserted": 0, "status": "blocked", "reason": "PRINCIPAL_INACTIVE"}
-    articles = await asyncio.to_thread(_fetch_newsletters, since_days)
+    identity = newsletter_identity(settings)
+    try:
+        policy = source_policy(settings, identity)
+        if policy.transport != "private_newsletter":
+            raise PolicyDenied("SOURCE_POLICY_SCOPE_MISMATCH")
+    except PolicyDenied as exc:
+        return {"fetched": 0, "inserted": 0, "status": "blocked", "reason": exc.code}
+    except ValueError:
+        return {"fetched": 0, "inserted": 0, "status": "blocked", "reason": "SOURCE_POLICY_INVALID"}
+    try:
+        articles = await newsletter_work.arun(_fetch_newsletters, since_days, timeout=60)
+    except (WorkloadBusy, TimeoutError):
+        return {"fetched": 0, "inserted": 0, "status": "unavailable", "reason": "NEWSLETTER_WORK_UNAVAILABLE"}
     if articles is None:
         return {"fetched": 0, "inserted": 0, "status": "unavailable"}
     # Revalidate after fetching; a deactivated owner cannot persist new private data.
-    inserted = await ingest_articles(articles, owner_user_id=owner)
+    try:
+        current = source_policy(settings, newsletter_identity(settings))
+        if newsletter_identity(settings) != identity or current.fingerprint != policy.fingerprint:
+            raise PolicyDenied("SOURCE_POLICY_CHANGED_DURING_FETCH")
+        inserted = await ingest_articles(
+            articles, owner_user_id=owner, source_policy=policy, source_identity=identity,
+        )
+    except PolicyDenied as exc:
+        return {"fetched": len(articles), "inserted": 0, "status": "blocked", "reason": exc.code}
+    except ValueError:
+        return {"fetched": len(articles), "inserted": 0, "status": "blocked", "reason": "SOURCE_POLICY_INVALID"}
     logger.info("Newsletter ingestion: fetched=%d new=%d", len(articles), inserted)
     return {"fetched": len(articles), "inserted": inserted, "status": "complete"}
 

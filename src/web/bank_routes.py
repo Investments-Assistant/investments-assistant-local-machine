@@ -5,10 +5,11 @@ IDs stay encrypted; the browser selects an opaque account handle.
 """
 
 import asyncio
+from datetime import date
 
 from fastapi import Depends, Request, APIRouter, HTTPException
 from pydantic import Field, BaseModel, ConfigDict
-from sqlalchemy import select
+from sqlalchemy import text, select
 
 from src import config
 from src.web.auth import require_csrf, require_authenticated
@@ -22,6 +23,7 @@ from src.expenses.provider_sync import (
     disconnect,
     account_key,
     owned_state,
+    sync_account,
     begin_consent,
     choose_account,
 )
@@ -37,6 +39,11 @@ class ConsentInput(BaseModel):
 class AccountInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     account_handle: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+class HistoryInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    date_from: date
 
 
 async def browser(request):
@@ -57,10 +64,7 @@ async def status(request: Request):
         rows = (
             (
                 await session.execute(
-                    select(BankSyncState)
-                    .where(BankSyncState.user_id == user_id)
-                    .order_by(BankSyncState.id)
-                    .limit(50)
+                    select(BankSyncState).where(BankSyncState.user_id == user_id).order_by(BankSyncState.id).limit(50)
                 )
             )
             .scalars()
@@ -68,21 +72,17 @@ async def status(request: Request):
         )
     return {
         "external_access_enabled": configured(),
-        "consent_setup_available": configured() and bool(
-            config.settings.gocardless_secret_id and config.settings.gocardless_secret_key
-        ),
+        "consent_setup_available": configured()
+        and bool(config.settings.gocardless_secret_id and config.settings.gocardless_secret_key),
         "connections": [
             {
                 "id": row.id,
                 "provider": row.provider,
                 "status": row.status,
                 "error_code": row.error_code,
-                "last_received_at": row.last_received_at.isoformat()
-                if row.last_received_at
-                else None,
-                "provider_last_success_at": row.last_success_at.isoformat()
-                if row.last_success_at
-                else None,
+                "last_history_retrieval": row.checkpoint.get("last_history_retrieval"),
+                "last_received_at": row.last_received_at.isoformat() if row.last_received_at else None,
+                "provider_last_success_at": row.last_success_at.isoformat() if row.last_success_at else None,
             }
             for row in rows
         ],
@@ -99,11 +99,7 @@ async def consent(body: ConsentInput, request: Request):
         async with async_session.begin() as session:
             await session.execute(select(User.id).where(User.id == user_id).with_for_update())
             ids = (
-                (
-                    await session.execute(
-                        select(BankSyncState.id).where(BankSyncState.user_id == user_id).limit(10)
-                    )
-                )
+                (await session.execute(select(BankSyncState.id).where(BankSyncState.user_id == user_id).limit(10)))
                 .scalars()
                 .all()
             )
@@ -161,11 +157,7 @@ async def select_account(state_id: str, body: AccountInput, request: Request):
             async with asyncio.timeout(30):
                 credentials = await provider.token(unseal(vault, state.encrypted_credentials))
                 ids = await provider.accounts(credentials)
-                selected = [
-                    value
-                    for value in ids
-                    if account_key(provider.name, value) == body.account_handle
-                ]
+                selected = [value for value in ids if account_key(provider.name, value) == body.account_handle]
                 if len(selected) != 1:
                     raise ProviderError("ACCOUNT_NOT_CONSENTED")
                 return await choose_account(
@@ -215,3 +207,25 @@ async def reconnect(state_id: str, body: ConsentInput, request: Request):
         raise denied(exc) from exc
     except TimeoutError as exc:
         raise HTTPException(504, "Consent provider timed out; verify before retrying") from exc
+
+
+@router.post("/{state_id}/history", dependencies=[Depends(require_csrf)])
+async def retrieve_history(state_id: str, body: HistoryInput, request: Request):
+    user_id = await browser(request)
+    try:
+        provider, vault = dependencies()
+        async with asyncio.timeout(40), async_session.begin() as session:
+            await session.execute(text("SET LOCAL statement_timeout = '5s'"))
+            await session.execute(text("SET LOCAL lock_timeout = '2s'"))
+            result = await sync_account(
+                session, user_id=user_id, state_id=state_id, provider=provider, vault=vault, history_from=body.date_from
+            )
+        if result["status"] == "complete":
+            from src.web.routes import _publish_expense_event
+
+            await _publish_expense_event(user_id, {"kind": "bank_history_retrieved", **result})
+        return result
+    except ProviderError as exc:
+        raise denied(exc) from exc
+    except TimeoutError as exc:
+        raise HTTPException(504, "History retrieval timed out; check status before retrying") from exc

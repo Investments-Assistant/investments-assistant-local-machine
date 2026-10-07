@@ -8,11 +8,15 @@ from datetime import UTC, datetime, timedelta
 import feedparser
 
 from src.config import settings
+from src.news.policy import source_policy, permitted_articles
+from src.news.sources import ArticleBatch
+from src.execution.policy import PolicyDenied
+from src.news.syndication import group_evidence
 from src.agent.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# Financial RSS feeds (always available, no API key required)
+# Candidate RSS URLs; availability and permission are not established by this catalog.
 RSS_FEEDS = {
     "Reuters Business": "https://feeds.reuters.com/reuters/businessNews",
     "CNBC": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
@@ -93,16 +97,36 @@ def _simple_sentiment(text: str) -> dict:
     return {"label": label, "score": round(score, 3), "positive": pos, "negative": neg}
 
 
-def _rss_entries(source: str, url: str):
-    """Yield (source, entry) pairs from a single RSS feed, suppressing fetch errors."""
-    try:
-        from src.news.http import fetch_public
+def _public_policy(identity):
+    policy = source_policy(settings, identity)
+    if policy.transport != "public_https":
+        raise PolicyDenied("SOURCE_POLICY_SCOPE_MISMATCH")
+    return policy
 
-        feed = feedparser.parse(fetch_public(url).body)
-        for entry in feed.entries:
-            yield source, entry
-    except Exception as exc:
-        logger.debug("RSS feed %s failed: %s", source, exc)
+
+def _project(articles, identity, policy):
+    if _public_policy(identity).fingerprint != policy.fingerprint:
+        raise PolicyDenied("SOURCE_POLICY_CHANGED")
+    projected = permitted_articles(articles, policy, identity=identity)
+    for row in projected:
+        row["sentiment"] = _simple_sentiment(f"{row['title']} {row.get('summary') or ''} {row.get('content') or ''}")
+    return projected
+
+
+def _failure(batch, source, exc):
+    # Never expose provider response bodies, API keys or exception messages.
+    code = exc.code if isinstance(exc, PolicyDenied) else "SOURCE_FETCH_FAILED"
+    if isinstance(exc, ValueError) and not isinstance(exc, PolicyDenied):
+        code = "SOURCE_POLICY_OR_RESPONSE_INVALID"
+    batch.failures.append({"source": source, "code": code})
+
+
+def _rss_entries(source: str, url: str):
+    from src.news.http import fetch_public
+
+    feed = feedparser.parse(fetch_public(url).body)
+    for entry in feed.entries[:200]:
+        yield source, entry
 
 
 def _entry_to_article(entry, source: str, query_words: set[str]) -> dict | None:
@@ -124,24 +148,34 @@ def _entry_to_article(entry, source: str, query_words: set[str]) -> dict | None:
 
 
 def _fetch_rss(query: str, max_articles: int) -> list[dict]:
-    """Fetch articles from RSS feeds matching the query."""
+    """Fetch only reviewed sources; retain typed failure instead of empty success."""
     query_words = set(re.findall(r"\b\w+\b", query.lower()))
-    articles = []
+    articles = ArticleBatch()
     for source, url in RSS_FEEDS.items():
-        for src, entry in _rss_entries(source, url):
-            article = _entry_to_article(entry, src, query_words)
-            if article:
-                articles.append(article)
-            if len(articles) >= max_articles * 3:
-                break
-    return articles[:max_articles]
+        identity = "rss:" + url
+        try:
+            policy = _public_policy(identity)
+            raw = [_entry_to_article(entry, src, set()) for src, entry in _rss_entries(source, url)]
+            rows = _project(raw, identity, policy)
+            articles.extend(row for row in rows if not query_words or any(
+                word in f"{row['title']} {row.get('summary') or ''}".lower() for word in query_words
+            ))
+        except Exception as exc:
+            _failure(articles, source, exc)
+        if len(articles) >= max_articles:
+            break
+    del articles[max_articles:]
+    return articles
 
 
 def _fetch_newsapi(query: str, max_articles: int) -> list[dict]:
     """Fetch articles from NewsAPI (requires API key)."""
     if not settings.newsapi_key or not bool(getattr(settings, "news_api_adapters_enabled", False)):
         return []
+    articles = ArticleBatch()
+    identity = "newsapi:everything"
     try:
+        policy = _public_policy(identity)
         from newsapi import NewsApiClient
 
         client = NewsApiClient(api_key=settings.newsapi_key)
@@ -153,8 +187,7 @@ def _fetch_newsapi(query: str, max_articles: int) -> list[dict]:
             page_size=min(max_articles, 20),
             from_param=from_date,
         )
-        articles = []
-        for art in resp.get("articles", []):
+        for art in resp.get("articles", [])[:200]:
             title = art.get("title", "")
             description = art.get("description", "")
             content = art.get("content", "")
@@ -162,17 +195,18 @@ def _fetch_newsapi(query: str, max_articles: int) -> list[dict]:
             articles.append(
                 {
                     "title": title,
-                    "summary": description or content[:400] if content else "",
+                    "summary": description or (content[:400] if content else ""),
                     "source": art.get("source", {}).get("name", ""),
                     "url": art.get("url", ""),
                     "published_at": art.get("publishedAt", ""),
                     "sentiment": _simple_sentiment(full_text),
                 }
             )
-        return articles
+        return ArticleBatch(_project(articles, identity, policy))
     except Exception as exc:
-        logger.warning("NewsAPI failed: %s", exc)
-        return []
+        articles.clear()
+        _failure(articles, "NewsAPI", exc)
+        return articles
 
 
 def search_market_news(
@@ -185,13 +219,18 @@ def search_market_news(
 
     # Try NewsAPI first; fall back to RSS
     articles = _fetch_newsapi(query, max_articles)
+    failures = list(getattr(articles, "failures", []))
     if not articles:
         articles = _fetch_rss(query, max_articles)
+        failures.extend(getattr(articles, "failures", []))
 
     # Filter by source if requested
     if sources:
         src_lower = {s.lower() for s in sources}
         articles = [a for a in articles if any(s in a["source"].lower() for s in src_lower)]
+
+    # Repeated syndicated text is one observation, not additional votes.
+    articles = group_evidence(articles)
 
     # Aggregate sentiment
     sentiments = [a["sentiment"]["label"] for a in articles]
@@ -203,9 +242,13 @@ def search_market_news(
     )
 
     return {
+        "status": "partial_failure" if failures and articles else "unavailable" if failures else "complete",
+        "source_failures": failures,
         "query": query,
         "articles_found": len(articles),
-        "overall_sentiment": overall,
-        "avg_sentiment_score": avg_score,
+        "overall_sentiment": "unavailable" if failures and not articles else overall,
+        "avg_sentiment_score": None if failures and not articles else avg_score,
+        "evidence_note": "Exact retrieved-text copies grouped; independent corroboration is unverified. "
+        "Lexical sentiment is not a trading signal.",
         "articles": articles,
     }

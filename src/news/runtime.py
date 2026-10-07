@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 from src import config
 from src.news.http import PublicFetchError
 from src.db.database import async_session
+from src.news.policy import source_policy
 from src.news.sources import (
     RSS_FEEDS,
     _SCRAPE_TARGETS,
@@ -42,6 +43,14 @@ def source_key(identity):
 async def run_source(user_id, identity, fetch, *, interval_seconds=3600):
     """Fetch outside DB transactions; persist evidence and fenced checkpoint together."""
     name = source_key(identity)
+    try:
+        policy = source_policy(config.settings, identity)
+        if policy.transport != "public_https":
+            raise PolicyDenied("SOURCE_POLICY_SCOPE_MISMATCH")
+    except PolicyDenied as exc:
+        return {"status": "blocked", "error_code": exc.code, "fetched": 0, "inserted": 0}
+    except ValueError:
+        return {"status": "blocked", "error_code": "SOURCE_POLICY_INVALID", "fetched": 0, "inserted": 0}
     async with async_session.begin() as session:
         lease = await acquire(session, user_id=user_id, name=name, lease_seconds=180)
         if lease is None:
@@ -56,6 +65,11 @@ async def run_source(user_id, identity, fetch, *, interval_seconds=3600):
             }
         row = await session.get(JobLease, lease[0])
         previous = dict(row.checkpoint or {})
+    if previous.get("source_policy_sha256") != policy.fingerprint:
+        # A changed permitted scope must fetch a fresh representation rather
+        # than reusing validators from a more permissive historical policy.
+        previous.pop("etag", None)
+        previous.pop("last_modified", None)
     headers = {}
     for field, header in (("etag", "If-None-Match"), ("last_modified", "If-Modified-Since")):
         if validator(previous.get(field)):
@@ -79,13 +93,18 @@ async def run_source(user_id, identity, fetch, *, interval_seconds=3600):
                 select(JobLease).where(JobLease.id == lease[0]).with_for_update()
             )
             now = await session.scalar(select(func.clock_timestamp()))
-            if row.token != lease[1] or row.lease_until <= now:
+            if row.token != lease[1] or row.leased_at is None or row.leased_at > now or row.lease_until <= now:
                 raise PolicyDenied("STALE_JOB_LEASE")
             await assert_active(session, user_id)
-            inserted = await ingest_articles(articles, db_session=session)
+            if source_policy(config.settings, identity).fingerprint != policy.fingerprint:
+                raise PolicyDenied("SOURCE_POLICY_CHANGED_DURING_FETCH")
+            inserted = await ingest_articles(
+                articles, db_session=session, source_policy=policy, source_identity=identity,
+            )
             metadata = response.headers if response else {}
             checkpoint = {
                 "schema": 1,
+                "source_policy_sha256": policy.fingerprint,
                 "validated_at": now.isoformat(),
                 "failures": 0,
                 "fetched": len(articles),
@@ -120,7 +139,7 @@ async def run_source(user_id, identity, fetch, *, interval_seconds=3600):
                 select(JobLease).where(JobLease.id == lease[0]).with_for_update()
             )
             now = await session.scalar(select(func.clock_timestamp()))
-            if row.token != lease[1] or row.lease_until <= now:
+            if row.token != lease[1] or row.leased_at is None or row.leased_at > now or row.lease_until <= now:
                 return {
                     "status": "failed",
                     "error_code": "STALE_JOB_LEASE",
@@ -200,9 +219,10 @@ async def run_sources(*, user_id, days_back=1):
             return await function(), None
 
         results.append(await run_source(user_id, name, batch, interval_seconds=interval))
-    failures = [result for result in results if result["status"] in {"failed", "retry_wait"}]
+    failures = [result for result in results if result["status"] in {"failed", "retry_wait", "blocked"}]
     return {
-        "status": "partial_failure" if failures else "complete",
+        "status": "blocked" if results and all(r["status"] == "blocked" for r in results)
+        else "partial_failure" if failures else "complete",
         "fetched": sum(result["fetched"] for result in results),
         "inserted": sum(result["inserted"] for result in results),
         "source_failures": failures,

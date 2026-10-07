@@ -1,0 +1,23 @@
+[
+  {
+    "database": "test_acceptance_expenses",
+    "status": "PASS",
+    "from_revision": "0015_account_events",
+    "to_revision": "0016_expense_retirement",
+    "replaced_empty_fixture_table": false
+  },
+  {
+    "database": "test_browser_expenses",
+    "status": "PASS",
+    "from_revision": "0015_account_events",
+    "to_revision": "0016_expense_retirement",
+    "replaced_empty_fixture_table": false
+  },
+  {
+    "database": "test_soak_acceptance",
+    "status": "PASS",
+    "from_revision": "0015_account_events",
+    "to_revision": "0016_expense_retirement",
+    "replaced_empty_fixture_table": false
+  }
+]

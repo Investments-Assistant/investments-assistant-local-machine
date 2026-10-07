@@ -236,7 +236,7 @@ class NewsArticle(Base):
 
 
 class NewsRevision(Base):
-    """Immutable observed content; callers only append and read revisions."""
+    """Append-only observations; explicit retention may replace text with a digest tombstone."""
 
     __tablename__ = "news_revisions"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))

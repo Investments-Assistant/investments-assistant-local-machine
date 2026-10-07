@@ -1,0 +1,52 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 5 items / 4 deselected / 1 selected
+
+tests/integration/soak_guard_test.py F                                   [100%]
+
+=================================== FAILURES ===================================
+_ test_soak_cli_exit_matches_observed_acceptance[60-FAILED_BUDGET_OR_RESTART_GATE-1] _
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x7b8ef30251d0>
+restart_seconds = 60, expected_status = 'FAILED_BUDGET_OR_RESTART_GATE'
+expected_exit = 1
+
+    @pytest.mark.parametrize('restart_seconds, expected_status, expected_exit', [
+        (60, 'FAILED_BUDGET_OR_RESTART_GATE', 1),
+        (5, 'SMOKE_PASS', 0),
+    ])
+    async def test_soak_cli_exit_matches_observed_acceptance(integration_engine, restart_seconds, expected_status, expected_exit):
+        import json
+        import uuid
+        from pathlib import Path
+    
+        root = Path(__file__).resolve().parents[2]
+        output = root / '.qa' / ('soak-cli-' + uuid.uuid4().hex)
+        process = await asyncio.create_subprocess_exec(
+            sys.executable, 'scripts/soak_acceptance.py', '--hours', '0.003',
+            '--interval', '1', '--restart-every', str(restart_seconds), '--output', str(output),
+            cwd=root, env=os.environ.copy(), stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+        )
+        try:
+            stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=40)
+        finally:
+            if process.returncode is None:
+                process.terminate()
+                await asyncio.wait_for(process.wait(), timeout=20)
+        state = json.loads((output / 'checkpoint.json').read_text())
+        assert state['status'] == expected_status, (stdout.decode(), stderr.decode())
+        assert state['runner_pid'] is None
+        assert state['service_pid'] is None
+>       assert process.returncode == expected_exit, 'CLI result contradicts persisted acceptance status'
+E       AssertionError: CLI result contradicts persisted acceptance status
+E       assert 0 == 1
+E        +  where 0 = <Process 226857>.returncode
+
+tests/integration/soak_guard_test.py:76: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/soak_guard_test.py::test_soak_cli_exit_matches_observed_acceptance[60-FAILED_BUDGET_OR_RESTART_GATE-1]
+======================= 1 failed, 4 deselected in 11.54s =======================

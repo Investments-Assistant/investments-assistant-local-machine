@@ -222,9 +222,10 @@ async def test_stream_response_repairs_progress_only_output_before_emitting_fina
     client._inference_lock = asyncio.Lock()
     calls = 0
 
-    async def fake_stream(_messages, _tools, max_tokens=None):
+    async def fake_stream(_messages, _tools, max_tokens=None, preserve_context=False):
         nonlocal calls
         calls += 1
+        assert preserve_context is (calls > 1)
         text = (
             "I will analyze the news and sentiment and provide a summary."
             if calls == 1
@@ -330,4 +331,5 @@ async def test_tool_progress_text_is_buffered_until_the_final_turn():
         "done",
     ]
     assert all("I will analyze" not in event.get("text", "") for event in events)
-    assert events[2]["text"] == "## Final answer\nNeutral sentiment."
+    assert '"status": "abstain"' in events[2]["text"]
+    assert "INSUFFICIENT_SOURCE_TEXT" in events[2]["text"]

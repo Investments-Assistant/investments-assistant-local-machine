@@ -15,6 +15,7 @@ from src.execution.service import account_for_user
 from src.operations.alerts import emit
 from src.operations.models import JobLease
 from src.agent.utils.logger import get_logger
+from src.execution.valuation import capture_valuation
 
 logger = get_logger(__name__)
 
@@ -67,6 +68,7 @@ async def _monitor_cycle(results, *, user_id):
                     .where(
                         JobLease.id == lease[0],
                         JobLease.token == lease[1],
+                        JobLease.leased_at <= func.clock_timestamp(),
                         JobLease.lease_until > func.clock_timestamp(),
                     )
                     .with_for_update()
@@ -90,6 +92,30 @@ async def _monitor_cycle(results, *, user_id):
                             "execution": "risk_only_no_orders",
                             "observed_at": observation["at"],
                         }
+                        # One immutable first observation per UTC date, not a
+                        # fabricated midnight opening/closing mark. Risk remains
+                        # independent of archival capacity or missing history.
+                        try:
+                            async with session.begin_nested():
+                                valuation = await capture_valuation(
+                                    session,
+                                    user_id=user_id,
+                                    account_id=account_id,
+                                    snapshot_key="risk-daily:" + observation["day"],
+                                )
+                            outcome.update(valuation_status="recorded", valuation=valuation)
+                        except PolicyDenied as exc:
+                            outcome.update(valuation_status="unavailable", valuation_reason=exc.code)
+                            await emit(
+                                session,
+                                user_id=user_id,
+                                account_id=account_id,
+                                rule="valuation_observation_unavailable",
+                                observed_value=exc.code,
+                                threshold="retained daily observation",
+                                message="Simulator valuation history needs attention; current risk check completed.",
+                                evidence_at=await session.scalar(select(func.clock_timestamp())),
+                            )
                     except RiskDenied as exc:
                         outcome = {"status": "halted", "reason": exc.code, "execution": "risk_only_no_orders"}
                 # Use live DB time, not the transaction-start timestamp, at the final fence.

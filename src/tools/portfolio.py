@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import Decimal, localcontext
 
 import yfinance as yf
 
@@ -13,7 +13,7 @@ from src.tools.brokers import (
     coinbase,
 )
 from src.agent.utils.logger import get_logger
-from src.finance.normalization import usd_value
+from src.finance.normalization import usd_decimal_value
 from src.tools.broker_accounts import BrokerAccountConfig
 
 logger = get_logger(__name__)
@@ -81,12 +81,18 @@ def _collect_broker(
                     ("total_market_value_usd", p.get("market_value")),
                     ("total_unrealized_pnl_usd", p.get("unrealized_pnl", p.get("unrealized_pl"))),
                 ):
-                    value = usd_value(source_value, p)
+                    exact_target = target + "_exact"
+                    value = usd_decimal_value(source_value, p)
                     if value is None:
                         result[target] = None
+                        result[exact_target] = None
                         result["valuation_status"] = "partial"
                     elif result.get(target) is not None:
-                        result[target] = float(Decimal(str(result[target])) + Decimal(str(value)))
+                        with localcontext() as ctx:
+                            ctx.prec = 100
+                            total = Decimal(str(result.get(exact_target, result[target]))) + value
+                        result[exact_target] = str(total)
+                        result[target] = float(total)
             else:
                 error = str(p["error"])
                 if not any(
@@ -112,6 +118,8 @@ def get_portfolio_summary(
         "errors": [],
         "total_market_value_usd": 0.0,
         "total_unrealized_pnl_usd": 0.0,
+        "total_market_value_usd_exact": "0",
+        "total_unrealized_pnl_usd_exact": "0",
     }
     if accounts is None:
         result["errors"].append({"error": "AUTHENTICATED_ACCOUNT_REQUIRED"})
@@ -126,6 +134,8 @@ def get_portfolio_summary(
         result["valuation_status"] = "partial"
         result["total_market_value_usd"] = None
         result["total_unrealized_pnl_usd"] = None
+        result["total_market_value_usd_exact"] = None
+        result["total_unrealized_pnl_usd_exact"] = None
     else:
         result.setdefault("valuation_status", "complete")
     return result

@@ -1519,3 +1519,1942 @@ source retention workflow. NEWS.md describes this honestly. Continue with explic
 source-policy schema/enforcement and synthetic fixtures, without asserting real
 publisher licensing or fetching private/paid sources. Other financial/host/model/
 research and deployment acceptance gaps remain; original goal active.
+
+## Milestone verified: public news-source permission boundary
+
+Checkout was externally advanced to0e18029fe882497cd7bb998f5b855777ac474889 with
+prior work committed; observed clean before these new policy changes. I did not
+commit/push/reset. Added explicit SourcePolicy/NEWS_SOURCE_POLICIES boundary before
+persistent public-source fetch: reviewed/date-bound operator attestation, exact
+article hosts, permitted headline/summary/full-text projection, stored policy digest,
+post-fetch revocation check and validator reset after policy change. Empty registry
+blocks persistent sources. No publisher license inferred or real source activated.
+24 unit/marked PostgreSQL policy/checkpoint tests passed1.10s
+(`evidence/news-source-policy-recovered.txt`), session37122 exited0. First run had
+16unitPASS/5fixture connection errors because owned PostgreSQL was stopped after
+host interruption. Existing .qa cluster restarted with private Unix socket/noTCP,
+pg_ctl handle30987 finished0; recovery log confirms interrupted shutdown recovery.
+No new cluster, production DB or migrations. Earlier failure log retained.
+All handles terminal. Ruff passed. Current next work: newsletter policy boundary,
+stored-policy expiry/read exclusion and explicit cleanup; source documentation/config
+examples and aggregate regression. retention_days currently records a constraint,
+not yet a completed expiration/cleanup implementation.521suite remains historical.
+
+## Milestone verified: stored source expiry and private permission binding
+
+48 focused unit/PostgreSQL tests passed2.07s
+(`evidence/news-policy-private-expiry.txt`), session56035 exited0. Stored declared
+policies now fail closed at current review/retention expiry, measured from immutable
+first-seen time; malformed metadata guarded by PostgreSQL16 input validation.
+Private newsletter policies bind owner/mailbox/server/filter, recheck after fetch,
+retain private visibility and use one bounded native worker. All IMAP calls mocked.
+A second host interruption had stopped .qa PostgreSQL: expiry first run16connection
+errors, preserved in news-policy-expiry.txt; existing cluster restarted handle35972
+finished0, recovered16cases passed1.74s (news-policy-expiry-recovered.txt), handle47515
+finished0. No new cluster or production mutation. All current handles terminal.
+Added JSON schema/.env empty-default guidance and NEWS.md boundary documentation.
+Added one further private/public-scope denial unit test after48run; aggregate next.
+Physical expired-content/revision cleanup, legacy policy review, ephemeral read
+adapter policy and downstream-copy retention are explicitly still incomplete.
+Current HEAD0e18029; new policy edits unstaged, prior committed work preserved.
+
+## Milestone verified: source-policy aggregate
+
+542 unit + marked real PostgreSQL integration tests passed27.62s in
+`evidence/suite-news-source-policy.txt`, session69904 exited0. Standard marked
+acceptance command unchanged. This includes final public/private transport-scope
+denial, mailbox policy binding, expiry parsing and all previous core regressions.
+Ruff/diff checks passed. No UI changes since last Chromium chat-retention PASS;
+source-policy-only changes covered by aggregate. PLAN evidence updated542 without
+claiming broader gates complete. Current HEAD0e18029; only this source-policy work
+and its evidence/docs are dirty. All operations terminal.
+Next: bounded explicit expired-news text/revision cleanup with retained digest
+references and no silent resurrection; then source deduplication/quality coverage
+and a requirement-by-requirement gate audit to distinguish actual missing work
+from already satisfied constraints. No real publisher/IMAP access, data purge,
+production changes, broker connection/order or live enablement occurred.
+
+## Milestone verified: expired news cleanup and committed CLI
+
+Added src/news/cleanup.py and operator-only scripts/cleanup_news.py with exact
+source/public-or-private-owner scope,10-minute content-bound preview,20article/
+1000revision capacity and5sSQL/2slock/15srequest budgets. Confirmed cleanup atomically
+scrubs article/revision text into digest tombstones while preserving IDs/URLs/
+availability clocks. Private owners must be active; source revisions and article
+changes invalidate the plan. Retired rows cannot be resurrected by normal upsert
+or reappear after clock regression. No automatic/model-invoked cleanup.
+24 PostgreSQL tests passed2.60s (`evidence/news-cleanup-committed.txt`), including
+actual CLI preview and committed confirmation; session38006 finished0. Earlier23
+case pass in news-expired-cleanup.txt, session22965 finished0. Ruff/diff checks passed.
+No active handles at this milestone. NEWS/RETENTION docs distinguish controlled
+retention erasure from ordinary append-only revisions and remaining derived copies.
+Next: aggregate verification after visibility/upsert changes, then requirement-level
+gate audit and remaining source deduplication/quality work. HEAD0e18029 unchanged;
+prior work preserved, no production/real-data/broker/provider actions.
+
+## Milestone verified: aggregate and complete CI tier selection
+
+Aggregate completed: 550 passed in21.15s, evidence/suite-news-cleanup.txt,
+session64193 exited0. Reuse this result for unchanged application code.
+CI audit found `pytest -m unit` selected294 of407 unit tests, excluding113
+unmarked tests; no automatic collection marker exists. Workflows now select
+`tests/unit` and `tests/integration` explicitly. Read-only collection verified
+407 unit +143 integration =550 tests; integration marker previously selected all143.
+Collection session8730 exited0. Both edited workflows parsed as valid YAML and
+explicit directory selectors were checked; git diff --check passed. No remote CI
+run is claimed and no test threshold/quality gate was disabled.
+PLAN/AUDIT baseline headers now reflect externally committed HEAD0e18029 and
+preserved dirty news-policy/cleanup work; PLAN links550-suite evidence.
+No interrupted operation or active test process remains at this checkpoint.
+Next: finish requirement-level gate audit (especially browser L12 and stale AUDIT
+rows), then news syndicated-copy grouping/quality and other concrete local gaps.
+Completion estimate given to user: roughly65%, uncertain and not a gate score.
+Live remains disabled; no actual broker connection/order or external notification.
+
+## Milestone verified: L12 browser acceptance
+
+Inspected the required login/account evidence/proposal/independent simulator
+approval/fill/fees/alert/report/isolation path and ran real Chromium against the
+existing marked test_browser_expenses database. Owned PostgreSQL was already
+running; no restart needed. Session99393 exited0, evidence/browser-gate-audit.txt
+reports PASS and no console errors. Synthetic broker collector and model are
+explicit; bank control rendering uses interception. No real connection/order.
+L12 minimum gate is PASS, independently of blocked external-paper L15. Current
+UI also passes expense/replay/retention and logout/open-WebSocket revocation.
+Corrected stale audit rows for durable news identity and restore/migration scope.
+Next: conservative syndicated-copy grouping with provenance, privacy and
+historical-availability regression coverage. No active operation remains.
+
+## Milestone: syndicated-copy grouping, focused verification
+
+Added conservative normalized exact-text grouping in src/news/syndication.py,
+versioned ingestion provenance, and bounded authorized search/recent/as-of grouping.
+Preserves original DB records and each visible copy's source/hash/availability;
+never counts another owner's or future evidence. Added ephemeral news grouping
+before lexical sentiment aggregation and explicit corroboration limitations.
+21 focused tests PASS4.94s, session66513 exited0, news-syndication-verified.txt.
+Initial run23804 failed collection due to duplicate test basenames; integration
+file renamed news_syndication_visibility_test.py. An additional ephemeral sentiment
+vote regression is included in aggregate run87782, currently running; poll it before
+retrying. Evidence path: evidence/suite-news-syndication.txt.
+HEAD remains0e18029. An external operation staged prior changes during this work;
+agent did not change index. Preserve staged and unstaged layers. Trimmed trailing
+whitespace only from two historical failure logs in worktree (not index); failure
+content retained. Full Ruff and git diff HEAD --check pass. Current browser L12
+PASS remains valid for unchanged UI; aggregate verifies altered news consumers.
+Next: finish aggregate; close ephemeral source-permission bypass, then continue
+entity/language quality, broader model/financial/operations and deployment gaps.
+
+## Milestone verified: copy grouping and final fingerprint consistency
+
+Full suite12243 exited0:556 PASS53.95s, suite-news-syndication-final.txt.
+Prior aggregate87782 exited1 (5 failed,551 passed): old search fixtures had
+MagicMock content instead of PostgreSQL text/null. Replaced row fixtures with
+actual NewsArticle instances and explicit clocks/provenance; preserved assertions.
+Failure log retained, whitespace only normalized.
+Final review moved ingestion fingerprint computation after canonical owner-bound
+URL/content hash construction. Added short-text stored/retrieved identity regression.
+All47 affected news tests PASS10.31s, session44635 exited0, evidence path
+news-syndication-fingerprint-final.txt. Reuse556 aggregate for unchanged paths;
+this47-test run verifies subsequent small ingestion adjustment. Full Ruff and
+git diff HEAD --check passed. Index staging remains externally managed/preserved.
+No running test handles remain. HEAD0e18029 unchanged, new grouping code/tests and
+docs are mixed staged/unstaged/untracked; do not reset or restage unrelated work.
+
+Commands (from checkout):
+- TEST_DATABASE_URL="postgresql+asyncpg://lulu@/test_acceptance_expenses?host=$PWD/.qa/socket&port=55439" TEST_DATABASE_DISPOSABLE_TOKEN=fixture-acceptance-20260909 .venv/bin/pytest tests/unit tests/integration -q
+- Same marked environment: .venv/bin/pytest tests/unit/news_syndication_test.py tests/unit/news_search_test.py tests/integration/news_syndication_visibility_test.py tests/integration/news_privacy_test.py tests/integration/news_runtime_test.py tests/integration/news_policy_expiry_test.py tests/integration/news_cleanup_test.py tests/integration/news_pipeline_test.py -q
+
+Next highest confirmed news gap: src/tools/news.py ephemeral RSS/NewsAPI fetches
+still lack SourcePolicy gating, unlike durable src/news/runtime.py. Apply permission
+before network and recheck/project permitted fields before returning; fixture-test
+missing/expired/revoked policies without real provider calls. Keep typed failure
+truthful. Syndication handles exact observed copies only; edited/translated copies,
+language/entity quality and actual source freshness remain incomplete. Continue
+broader requirement audit and model/financial/operations/deployment gates afterward.
+L12 PASS (real browser with explicit fixture providers/model); L01 PASS; other
+local gates still IN PROGRESS, L15/L16 blocked. No broker connection/order, production
+change, external notification or live enablement performed.
+
+## Milestone verified: on-demand source-policy boundary
+
+src/tools/news.py now requires current public source policies before RSS/NewsAPI
+calls and revalidates policy fingerprint after each response. Uses permitted text
+for search filtering and sentiment; unauthorized article hosts discard the source
+batch. Redacted typed failures distinguish unavailable/partial failure from empty
+successful search. Chat deterministic fallback preserves unavailable status and
+never calls it no matching news. NewsAPI description-with-null-content bug fixed.
+Optional API still requires configured enablement/key; no real provider call made.
+
+New tests/unit/news_ephemeral_policy_test.py covers missing/expired/private/revoked
+policy, pre-network denial, headline-only information boundaries, unpermitted hosts,
+redacted errors, API projection and truthful chat fallback. Initial test79960 failed
+2 code assertions because PolicyDenied subclasses ValueError; precedence fixed,
+11 focused PASS3.24s(session57165), then additional host/fallback cases included in
+aggregate. Full unit/PostgreSQL suite565 PASS61.47s, session86222 exited0,
+evidence/suite-ephemeral-news-policy.txt. Ruff and git diff HEAD --check PASS.
+All operations terminal. Prior browser L12 evidence remains valid for unchanged UI;
+formatter behavior covered in new tests and aggregate. HEAD0e18029, preserve mixed
+external staging; no git index/commit/push action taken.
+
+Next: explicit news entity/language provenance quality (currently raw ticker tags
+are called entities), remaining follow-up/ambiguity/model validation, and wider
+financial/operations/deployment acceptance audit. Source policies are operator
+attestations, not external license verification. No real source/broker/bank access,
+orders, notifications, production changes or live enablement occurred.
+
+## In-progress milestone: news provenance quality
+
+Added src/news/quality.py: bounded unverified language declarations and currency/
+ticker candidates, always unresolved/no qualified instrument. RSS declaration flows
+through ingestion. Source tags no longer labelled verified entities; metadata-only
+corrections keep immutable first-seen/text hash and append evidence. Policy text
+omission/truncation now recomputes tags/sentiment only from permitted text, avoiding
+derived restricted-text leakage.49 focused unit/PostgreSQL tests PASS9.94s,
+session81517 exited0, evidence/news-quality.txt. Added real RSS language parser test.
+Full suite27251:568 PASS,1 failure (optional feed metadata absent in an older fixture).
+Corrected nullable language extraction using getattr consistent with other fields.
+Focused sandbox run10403 stalled at async source tests; explicitly interrupted and
+confirmed exit130 before retry. Retain news-quality-rss-fixed.txt as partial only.
+Full approved-mode rerun now active session17828, evidence/suite-news-quality-final.txt;
+poll the actual handle recorded by the tool before any retry. Ruff/diff HEAD checks
+pass. Also corrected stale ACCOUNTING/BROKER_CAPABILITIES claims about implemented
+simulator commissions and bounded journal callbacks; complete reconciliation still
+incomplete. Next: finish this verification, then requirement-level financial/model
+acceptance audit separating missing local behavior from external observation gates.
+
+## Milestone verified: news provenance and derived-data scope
+
+Full rerun17828 exited0;569 tests PASS, evidence/suite-news-quality-final.txt.
+This supersedes initial568-pass/1-fail aggregate after nullable feed metadata fix.
+Ruff and git diff HEAD --check PASS. No active operation remains. HEAD0e18029 and
+externally staged changes preserved. L01/L12 PASS; other local gates not promoted.
+
+Next concrete failing reproduction saved in workflow-negation-reproduction.json:
+_factual_requests for "Do not access my portfolio. Show stored news only." returns
+get_portfolio_summary plus get_latest_news, violating explicit scope restriction.
+Offline parser only; no inference/network/broker activity. Fix explicit negation
+across deterministic requests and native catalog/execution paths, add durable
+regressions for independent allowed requests and follow-ups without interpreting
+external evidence as intent. See llama_cpp_client.py lines111-170 (current layout).
+Then continue requirement-level financial/model/operations/deployment review;
+full entity-to-qualified-instrument resolution and actual provider observations
+remain unverified. Live stays disabled; no external account/provider connections,
+orders, notifications or production deployment.
+
+## Read-scope guard resume (2026-09-23)
+
+Implemented src/agent/clients/read_scope.py and _dispatch_scoped in the local GGUF
+client: explicit user exclusions narrow deterministic reads, selected native catalog,
+native dispatch and degraded-client reads. Portfolio exclusions also prevent report
+collection and proposals that could access account data. Tool/assistant messages
+cannot clear exclusions; explicit supported user allow phrases can. This is a
+conservative history-bound intent rule, not a persistent account-policy replacement
+or complete natural-language interpretation. Existing financial authority unchanged.
+24 focused tests PASS3.95s (read-scope-fixed.txt, session92717 exited0). Added native
+stream regression after that run. Prior aggregate launch was rejected before start
+by automatic approval review due to usage limit, not by tests; no running handle.
+After new-day resume, approved aggregate started as session90049, evidence path
+suite-read-scope.txt. Poll that handle; do not duplicate. HEAD0e18029; external
+staging now includes newer work and is preserved. No agent git index/commit changes.
+Next: verify aggregate/native path, document limits, continue follow-up/ambiguity
+coverage and native structured-evidence truncation repair identified during review.
+
+## Read-scope verification recovery
+
+Aggregate90049 finished1:430 unit tests passed,1 new test failed invalid fixture
+agent_max_tokens64 (<128 minimum),145 PostgreSQL setup errors because the owned
+fixture cluster was stopped. pg_ctl status confirmed no server running. Corrected
+test to128; did not weaken application validation. Restart script94117 finished0,
+existing pgdata recovered without reinitialization. Full rerun active15152, output
+suite-read-scope-recovered.txt; poll before retry. Original failed run retained.
+READ_SCOPE.md documents guard coverage and supported-phrase/history limitations.
+No external account/provider connection, production deployment or live enablement.
+
+## Milestone verified: explicit read-scope exclusions
+
+Recovered aggregate15152 exited0:576 PASS17.63s (suite-read-scope-recovered.txt).
+Includes actual local-client native event loop rejecting a hallucinated excluded
+portfolio tool without dispatch, default/degraded scope filtering, independent
+news reads, history follow-up exclusion and explicit user reauthorization. Production
+Settings used in native regression. All operations terminal; HEAD0e18029 preserved,
+externally staged/unstaged changes retained. No live/broker/provider actions.
+Next confirmed original requirement gap found during review: native tool loop
+still character-truncates oversized structured result at llama_cpp_client.py~835,
+while deterministic prefetch uses _bounded_evidence. Repair with structured budget
+status and native event-loop regression; then broader ambiguity/follow-up/real-model
+and financial/operations gates remain. READ_SCOPE.md states grammar/history limits.
+
+## Milestone verified: native structured evidence budget
+
+Removed native-loop character slicing. Full result remains unchanged in tool_result
+event; only model context gets JSON-serialized _bounded_evidence, matching the
+existing deterministic path. Oversized results use evidence_budget_exceeded instead
+of malformed JSON or fake complete evidence. Added actual local-client native loop
+regression with oversized Unicode JSON, production Settings, complete event check
+and next-inference context parsing.26 affected tests PASS0.96s, session4058 exited0,
+evidence/native-evidence-budget.txt. Reuse576 aggregate for unchanged paths; new
+client adjustment verified by26 affected tests. Ruff/diff HEAD checks pass.
+No active operations. Next: extend actual local model workflow evaluation for
+negation/follow-up/ambiguous/multiple requests, retain deterministic-vs-model evidence,
+then continue financial/operations/deployment acceptance audit. Live disabled.
+
+## Active real-model evaluation
+
+Extended scripts/benchmark_workflows.py to fixed workflow-scope-v2 cases: original
+portfolio/scanner plus explicit exclusion, exclusion follow-up and Portuguese
+portfolio. Added explicit --native-tools mode for later comparison; current run is
+default deterministic reads. Existing 1.5B Q4 GGUF, CPU4/context4096/max output128,
+synthetic tools only, no download/cloud/provider/broker calls. Run64551 currently
+active; output workflow-scope-v2-cpu.json, log workflow-scope-v2-cpu.log. Poll before
+retry. Classify tool-scope/event results separately from factual/synthesis quality;
+five observations cannot establish production p95 or general multilingual quality.
+Command: .venv/bin/python scripts/benchmark_workflows.py --model models/qwen2.5-1.5b-instruct-q4_k_m.gguf --output docs/acceptance/evidence/workflow-scope-v2-cpu.json
+
+## Milestone: real-model scope evaluation and factual failure
+
+Run64551 exited0. workflow-scope-v2-cpu.json contains actual1.5B CPU results,
+5/5 expected read scopes and complete events; load1.70s,peak1987.3MiB. Manual
+quality review FAIL in workflow-scope-v2-review.json: Portuguese answer claims
+EUR4.00 from0.004 units atEUR100 with no supporting multiplier/FX/total; arithmetic
+product isEUR0.400. Portfolio English uses deterministic fallback, not model synthesis.
+News-only answer adds unsupported generic market inference. Preserve these findings;
+harness PASS means scope/event checks only. MODEL_HOST documents limits and L06
+remains IN PROGRESS. No active operations. Source/model unchanged after run.
+Next highest-priority defect: bound portfolio responses to deterministic exact
+facts/missing-data states; do not let model prose invent authoritative valuation.
+Then rerun fixed actual-model cases and perform native-tool comparison with typed
+per-case failures. Original broader financial/operations/deployment gates remain.
+HEAD0e18029, mixed externally staged/unstaged/untracked work preserved. No broker
+connection/order, real provider/bank/notification or live enablement.
+
+## Milestone verified: deterministic financial chat facts
+
+Added finance/answers.py exact source-value rendering with explicit missing currency/
+as-of/total values and no inferred valuation. Default portfolio/scanner evidence
+renders deterministically; scanner retains other source results. Native path collects
+tools then replaces unchecked financial prose with the same evidence representation.
+Final event records deterministic_financial_evidence. Portuguese portfolio catalog
+alias fixed. FINANCIAL_ANSWERS.md explicitly leaves qualitative analysis/schema and
+broader accounting acceptance incomplete; do not call this model synthesis.
+30 affected tests PASS1.02s (14052 exited0), then582 aggregate PASS27.89s (98763
+exited0), suite-financial-answers.txt. Model counterexample covered by native stream
+regression. Ruff/diff HEAD checks passed. Now rerunning unchanged five-case workflow
+scope-v2 harness with generation provenance added: handle60766,
+output workflow-financial-facts-cpu.json/log. Poll before retry. Existing1.5B CPU4,
+synthetic tools, no downloads/external calls. No broker orders/live enablement.
+
+## Milestone verified: fixed-case financial boundary rerun
+
+Benchmark60766 exited0; workflow-financial-facts-cpu.json contains5/5 expected
+scope/event results. Parsed three financial answers: exact0.004,EUR100 and missing
+source market value/USD total preserved. All three label deterministic generation.
+Evidence review: workflow-financial-facts-review.json. Load1.33s,peak1979.25MiB;
+financial sub-ms timings are skipped inference, not improved model synthesis.
+News-only model answer still makes unsupported inference from a synthetic title;
+recorded failure, L06 remains IN PROGRESS.582 aggregate evidence remains current
+for application code; later harness only added generation provenance.
+No active operations. Next: typed grounded model-analysis/abstention for news and
+portfolio interpretation (without letting model set numbers), native-tool benchmark
+comparison with honest per-case failure handling, and remaining financial/operations/
+deployment gates. Source facts alone are not claimed as complete qualitative analysis.
+HEAD0e18029; preserve staged/unstaged work. No real broker/provider/bank connection,
+order, notification, production deployment or live enablement.
+
+## In-progress milestone: typed news extracts/abstention
+
+Added agent/clients/news_analysis.py strict Pydantic schema: supported_extracts or
+abstain, at most3 exact quotes tied to computed source IDs, bounded missing-data
+labels. Extra fields, fake IDs/quotes and duplicate extracts fail. Source envelopes
+bounded10 excerpts×1200characters with clipping flags; headline-only/short evidence
+abstains without inference. Source excerpts are data, never instructions.
+Local client uses JSON-schema response_format supported by installed llama_cpp
+llama_chat_format.py~991; at most2 inference attempts, then typed abstention. Provider
+failure and missing publication/availability/entity/price/corroboration metadata
+remain explicit. Native and deterministic news paths use the contract; mixed
+news/market preserves independent evidence. This is grounded extraction, not proven
+causal/recommendation/strategy analysis. Financial deterministic boundary retained.
+30 focused PASS1.03s (22282 exited0, news-analysis-fixed.txt). Initial2 fixture
+failures retained: new schema kwarg unsupported by old stub and old expected neutral
+prose. Fixtures updated to assert structured abstention while retaining original
+progress/event/full-evidence assertions. Added2 mixed/failure tests afterward.
+Full unit/PostgreSQL run53070 active, suite-news-analysis.txt. Poll before retry.
+Ruff/diff HEAD checks pass. No external provider/broker/model download/live action.
+Next: finish aggregate, constrain source-ID schema enum, rerun real fixed headline
+cases and actual schema inference with separately labelled substantive synthetic
+news evidence; retain both failures and distinctions from model causal analysis.
+
+## Resumption milestone: workspace access and affected verification
+
+Original attached instructions reread completely. HEAD remains
+0e18029fe882497cd7bb998f5b855777ac474889; existing externally staged changes
+preserved. No applicable AGENTS.md found. No pytest/browser/benchmark process
+was running at resumption. Previous run53070 completed:588 PASS17.47s in
+evidence/suite-news-analysis.txt, confirmed from saved terminal result.
+Normal sandbox still fails on /mnt/wslg/distro; individually approved escalated
+commands now work. No mount/security/OS settings changed. The earlier rejected
+benchmark did not start.
+Fixed source-ID enum assertion line length. Ruff for affected client/schema/test/
+benchmark passes;25 affected offline tests PASS1.38s, run48095 exited0,
+evidence/news-resume-verification.txt. Reuse588 aggregate for unchanged paths.
+Actual existing1.5B CPU headline benchmark is running as session57819; poll before
+retry. Output workflow-news-abstention-cpu.json/log. Synthetic tools only.
+Next: review headline result, substantive schema inference, native comparison,
+then broader remaining acceptance gates. No broker connection/order, provider
+connection, paid call, production deployment or live enablement.
+
+## Milestone verified: default-path news model benchmarks
+
+Headline run57819 and substantive run93215 exited0. Each fixed five-case run
+passes scope/event checks. Evidence workflow-news-abstention-cpu.json and
+workflow-news-substantive-cpu.json; parsed review workflow-news-review.json.
+Headline abstains with INSUFFICIENT_SOURCE_TEXT, no invented market narrative.
+Substantive source also abstains; schema works on actual existing1.5B CPU model,
+but no useful extract/causal analysis is proven. It invents source_unavailable
+in missing_data despite supplied evidence: fix collection-owned metadata before
+promoting quality. Load1.46s/1.17s, peak1976.5/2007.5MiB respectively.
+Native-tool headline comparison currently running session51193; poll before
+retry, evidence workflow-native-headline-cpu.json/log. No external calls.
+
+## Milestone verified: collection metadata and native comparison
+
+Native run51193 exited0 but benchmark status FAIL:4/5 read scopes failed, no
+required tools dispatched. Tool-call markup appeared as final text. Preserve
+workflow-native-headline-cpu.json/log. Native setting remains disabled;
+MODEL_HOST.md records comparison and observed latency/resource limits.
+
+Fixed observed false source_unavailable: collection missing-data fields now derive
+only from tool evidence. Model can abstain, not invent provider failure or absent
+body. Added behavioral regression.26 affected tests PASS1.01s, session49275
+exited0, evidence/news-collection-metadata.txt. Ruff and diff HEAD check pass.
+Real-model substantive rerun9261 exited0, workflow-news-substantive-metadata-fixed-cpu.json:
+5/5 scope/events pass; parsed news missing_data contains neither false source
+failure nor missing body. Abstention remains; useful qualitative analysis is not
+complete. All benchmark processes terminal; no active operation at checkpoint.
+Reuse prior588 aggregate for unaffected code; affected changes verified by26 tests.
+Next: repair native tool-call handling or explicit degraded failure with scoped
+factual fallback; complete useful analysis evaluation and broader financial,
+operations, restoration/deployment gates. L06/L13 remain IN PROGRESS. No broker
+connection/order, paid call, real notification, production deployment or live enablement.
+
+## In progress: native read recovery
+
+Shared native final-answer path now completes missing user-derived factual reads
+through _dispatch_scoped, preserving exclusions/NO_TOOL_CALLING and full events.
+Model textual tool markup is never executed. Final event records
+execution_path=deterministic_read_recovery, also captured in benchmark output.
+Added5 behavioral tests for invented writes/arguments/malformed calls/exclusions.
+Existing native exclusion test now requires requested bounded news read while
+retaining denied-portfolio evidence. Initial fixture assertion failures retained
+in native-read-recovery*.txt; accidental direct-dispatch expectation edit restored.
+Complete unit rerun active12345, unit-native-recovery-final.txt. Native real-model
+fixed-case rerun active59084, workflow-native-recovery-cpu.json/log. Poll these
+handles before retrying. No broker/provider calls, orders or live enablement.
+
+## Milestone verified: native factual recovery
+
+Run12345 exited0:449 unit tests PASS10.64s, unit-native-recovery-final.txt.
+Ruff affected files and diff HEAD whitespace checks pass. Initial fixture failures
+remain recorded; direct-dispatch assertion restored, native exclusion assertion
+now verifies authorized news only and unchanged denied-portfolio evidence.
+Run59084 exited0: workflow-native-recovery-cpu.json5/5 scope/events PASS.
+Four cases use explicitly recorded deterministic_read_recovery; no claim of
+working native tool generation. Financial answers retain exact0.004/EUR100 and
+missing totals, news abstains, excluded follow-up reads nothing. MODEL_HOST.md
+records real timings and concurrent unit-load caveat. No active operation.
+Original broader gates remain open: qualitative analysis, financial reconciliation/
+corporate actions, full restoration/deployment and host soak. Reuse prior145
+PostgreSQL tests for untouched persistence code; current449 unit tests verified.
+Next: audit remaining financial/report correctness against authoritative ledger
+and acceptance matrix; avoid endless model tuning. Native default stays off.
+No broker connection/order, provider connection, notification, production
+deployment, paid download or live enablement. Existing staged changes preserved.
+
+## Milestone verified: exact portfolio totals
+
+Added usd_decimal_value and decimal aggregate totals with100-digit local context.
+Existing floats remain display compatibility fields; *_usd_exact strings persist
+through API serialization and financial chat prefers them. Missing FX/source
+errors invalidate exact and display totals together. Source precision cannot
+recover values already rounded by a provider. No broader cash/PnL claim.
+61 focused financial/broker checks PASS1.11s (77989);452 unit tests PASS5.08s
+(86145), evidence/portfolio-exact-totals.txt and unit-portfolio-exact.txt. Ruff passes.
+Next confirmed report defect: tool contract says YYYY-MM-DD but parsing accepts
+timezone timestamps and replaces their offset. Enforce calendar-date contract
+and verify inclusive UTC boundaries. No active tests/model benchmarks.
+
+## Report-date verification and PostgreSQL recovery
+
+Calendar boundary tests8 PASS0.45s; Ruff passes. Original report tool contract
+requires YYYY-MM-DD; timestamp/noncanonical inputs now reject rather than silently
+replacing timezone. Offset-aware evidence inclusion/exclusion verified.
+Owned fixture startup65159 exited0 after automatic crash recovery; log confirms
+private Unix socket55439, server ready. No files removed or cluster reinitialized.
+Full unit+PostgreSQL suite active2243, evidence/suite-financial-calendar.txt;
+fixtures require test_acceptance_expenses and fixture-acceptance-20260909 marker
+before mutation. Poll before retry. No external broker/provider/write/live action.
+
+## Milestone verified: financial/calendar aggregate
+
+Run2243 exited0:603 unit/PostgreSQL tests PASS18.04s,
+evidence/suite-financial-calendar.txt. Whitespace checks pass. Matrix updated.
+Current owned disposable source revision confirmed0012_broker_observations;
+marker/identity matched. New recovery target test_recovery_20260925_v1 and
+.qa/recovery-test_recovery_20260925_v1 did not exist before starting.
+Full database/filesystem/vault/PDF/existing-model recovery now active29687;
+evidence/full-fixture-recovery-0012.json/log. Poll before retrying; never reuse
+or overwrite the target on interruption. Runner checks disk and source identity,
+seeds only inactive synthetic records, preserves private archives, verifies hashes
+and restored model tasks, cleans its own source fixture IDs. No external calls.
+
+## Milestone verified: current-schema full recovery
+
+Run29687 exited0. evidence/full-fixture-recovery-0012.json PASS:revision
+0012_broker_observations,27 tables match counts/hashes, vault decryption/wrong-key
+rejection PASS, PDF/settings/model filesystem hashes match,3 restored-model tasks
+PASS (sample nearest-rank p95=2.65s, not production SLA). Source synthetic rows
+removed; private target/archive retained. No active test/benchmark/recovery process.
+PLAN and RUNBOOK link current evidence.603 aggregate result remains valid;
+subsequent changes are evidence/docs only. No production migration/deployment,
+broker/provider connection/order, real notification, paid service or live enablement.
+Next: report collection/reconciled execution presentation and broader financial
+coverage remain; inspect operational/host validation gaps after those. L09 still
+requires broader retention review; local restore evidence alone is not full gate PASS.
+
+## Milestone verified: report history failure propagation
+
+Confirmed broker error rows were discarded by period filtering, masquerading as
+successful empty history. Added bounded _history_evidence before date filtering:
+invalid containers/over2000 records unavailable, error/undated/malformed entries
+counted with partial_failure, valid out-of-period/empty history remains complete.
+Provider failure text is not retained or passed to the model. Source history is
+explicitly not reconciled execution proof.
+13 unit checks PASS (81318).18 focused unit/real-PG checks PASS1.63s (3503),
+evidence/report-history-persistence.txt: real collector with synthetic providers
+propagates failure into stored Report status, owner and redacted HTML. Ruff
+auto-corrected import ordering only. Reuse603 aggregate for unaffected paths;
+new helper/collector behavior verified by focused suite. No active processes.
+Original permissions unchanged; no actual broker/provider connections or orders.
+Remaining: comprehensive deterministic report numbers/reconciled execution
+presentation, broader financial/operations/host/deployment gates. L07 incomplete.
+
+## Milestone verified: explicit report source completeness
+
+Report collection now recognizes available=false, partial/unavailable/unverified
+valuation_status and blocked source status as SOURCE_INCOMPLETE. Complete empty
+sources remain successful. Failure-stage fixtures now independently test each
+stage rather than sharing an unavailable portfolio in every case.27 focused
+unit/real-PG tests PASS1.49s, run86154 exited0, report-missing-sources.txt.
+Only formatting changed after that run; lint/whitespace verification follows.
+No active operations. Broader deterministic narrative/reconciliation and remaining
+acceptance gates remain unfinished. No real broker/provider call or live action.
+
+## Milestone verified: bounded report database coverage
+
+Report audit collection now fetches at most1001 rows and includes1000; simulation
+collection fetches11 and includes10. Stable id/date ordering, explicit included
+counts/has_more and SOURCE_INCOMPLETE propagation prevent silent truncation.
+Fallback labels included counts rather than claiming period totals. Real PG
+fixtures test empty/exact-limit/overflow and foreign-owner/out-of-period rows.
+30 focused tests PASS2.66s,97898 exited0, report-coverage.txt. Ruff/diff checks
+pass after formatting-only corrections. Full suite running87702,
+evidence/suite-report-coverage.txt; poll before retry. No real provider/broker
+connection, order, notification, production deployment or live enablement.
+
+Aggregate87702 exited0: 621 unit/PostgreSQL tests PASS18.31s. Matrix updated; no active test handles. Remaining full report arithmetic/reconciliation and broader gates are unchanged.
+
+## Milestone verified: fallback financial attribution and report HTML
+
+Fallback report now uses exact portfolio_facts values: application account,
+source currency, exact quantity/value, source valuation timestamp and distinct
+collection timestamp. Missing-currency values unavailable; exact aggregate USD
+strings preferred.20-position summary cap exposes omitted count and points to
+evidence snapshot. Explicitly unavailable period realized PnL/flows/fees/FX/
+benchmark performance; audits/simulation counts do not imply reconciled fills.
+Model-authored successful prose still requires a broader numerical authority
+boundary; this repair does not claim that gap closed.
+HTML renderer now closes a list before a following heading and retains escaping.
+Initial new test had a multiline literal syntax error, recorded in
+report-attribution-html.txt; fixture corrected without weakening assertions.
+Final32 focused unit/PG tests PASS (32429 exited0),
+evidence/report-attribution-html-fixed.txt. Earlier31 attribution checks PASS
+1.81s in report-fallback-attribution.txt. Ruff passes. No active operations.
+Reuse621 aggregate for unaffected paths. No real broker/provider connection,
+orders, production deployment or live enablement.
+
+## Milestone verified: report source admission/deadlines
+
+Replaced unrestricted report asyncio.to_thread reads with existing WorkPool
+admission:2 slots,30-second per-source timeout, explicit REPORT_SOURCE_BUSY/
+TIMEOUT unavailable results. Native slot retained until real completion; scoped
+context preserved. Stored-news coroutine has30-second deadline.35 focused
+unit/real-PG tests PASS2.29s,72652 exited0, report-source-bounds.txt. Ruff passes.
+No end-to-end deadline or dedicated-executor isolation claim.
+Browser revalidation active41027, browser-report-source-bounds.txt; actual
+Chromium/marked test_browser_expenses with synthetic providers. No prior browser
+process was running. Poll before retry. No external broker/provider/write actions.
+
+Browser41027 exited1 at obsolete report generation_status=complete assertion.
+Fixture explicitly supplies portfolio.available=false; application correctly
+persists partial_failure after completeness repair. Updated assertion to require
+exact SOURCE_INCOMPLETE/portfolio error and visible partial-report label. PDF,
+reload, cross-user and retention assertions retained. Original failure evidence
+preserved. Rerun active35603, browser-report-source-bounds-fixed.txt; poll first.
+Also corrected SOAK.md migration prerequisite0012 to match existing runner.
+
+## Milestone verified: browser report revalidation
+
+Browser35603 exited0: real Chromium/real disposable PostgreSQL/stub-model PASS,
+evidence/browser-report-source-bounds-fixed.txt. Desktop/mobile, simulator
+independent approval/fills/fees/halt, account isolation, expense/replay/bank UI
+fixtures, real PDF generation and reload, partial-report status with exact
+portfolio SOURCE_INCOMPLETE cause, report/chat retention, logout/WS revocation
+all passed. Console errors empty; expected synthetic409 retained. Fixture server
+terminated normally. No actual broker connection or external orders. L12 updated.
+Earlier browser41027 failure remains documented. Trimmed only trailing whitespace
+from four earlier native-recovery failure logs newly staged externally; no index
+mutations. Ruff and diff HEAD check pass. No active operations.
+Remaining report numerical authority and full financial/reconciliation/operations/
+host/deployment gates still open. Source admission bounds are verified, but
+not an end-to-end report SLA. Continue independent authorized work.
+
+## Milestone: report model evidence-budget authority
+
+Confirmed failing reproduction87594: oversized collected evidence was replaced
+with an omission marker while model still generated fabricated USD999999 report.
+Synthetic model and disposable PG only; report-budget-reproduction.txt retained.
+Generator now detects whole-context omission and skips model generation with
+REPORT_EVIDENCE_BUDGET_EXCEEDED partial status. Deterministic attributed fallback
+uses collected facts; full retained snapshot/hash persists for review. This fixes
+an evidence-free inference path, not arbitrary model prose validation when the
+context fits. Broader numerical authority requirement remains open.
+Focused repaired report suite70739 exited0, report-budget-fixed.txt. No active
+operation. No actual broker/provider calls, orders, paid use or live enablement.
+
+## Milestone verified: repair preserves complete inference context (2026-09-26)
+
+HEAD remains 0e18029fe882497cd7bb998f5b855777ac474889; existing staged,
+unstaged and untracked work preserved. Interrupted prior run completed:473 unit
+checks PASS24.40s (unit-repair-context-fixed.txt); no pytest process remained.
+Approval service temporarily rejected a read command for usage limit; a fresh
+review subsequently approved the read and scoped regression work. No bypass.
+
+Repair and news schema retries pass preserve_context=True to token budgeting.
+Original request, history and tool evidence must all fit or inference raises
+MODEL_CONTEXT_BUDGET_EXCEEDED. Added reproduction proved the prior safeguard
+still omitted user-role tool evidence; repair-evidence-reproduction.txt records
+1 failed/6 passed. Fixed budget to reject before any evidence/history omission
+in preserve mode. Tests cover user/tool evidence, unchanged original messages,
+sufficient budget and actual repair-path flag propagation.
+
+Session94906 exited0:475 unit checks PASS6.16s in
+[evidence/unit-repair-evidence-fixed.txt](evidence/unit-repair-evidence-fixed.txt).
+Scoped Ruff and git diff --check pass. No active test operation. Existing browser
+and PG evidence retained for unaffected paths; this milestone is not a new
+real-model or browser acceptance result. No broker/provider connection, order,
+production deployment, paid use or live enablement occurred.
+
+Next: report successful-model prose still bypasses deterministic numerical
+validation when evidence fits. Review typed evidence-linked analysis/rendering
+before closing L07. Full PnL/reconciliation, operations, host/soak/deployment and
+conditional external gates remain as recorded in PLAN.md. Goal remains active.
+
+## Milestone: deterministic report authority, browser revalidation running
+
+2026-09-26 HEAD unchanged. First reproduction could not connect to the stopped
+owned fixture PostgreSQL (report-authority-reproduction.txt). Confirmed no live
+server; existing startup script recovered the cluster via PostgreSQL crash
+recovery, logs reached READY, no reinitialization/deletion. Real marked database
+then reproduced false complete status for fabricated USD999999/purchase prose
+(report-authority-reproduction-running-db.txt,61766 exit1).
+
+Report now always renders financial sections from collected evidence. New
+report_analysis.py validates strict typed source selections (maximum3), exact
+quoted substring and known source hash; rejects extra fields, inconsistent
+status, unknown/duplicate/invented extracts and oversized output. Quotes retain
+source/publication/availability metadata, explicitly are not reconciled executions
+or trading signals, and cannot introduce Markdown structure via source newlines.
+Valid selected evidence/assessment are retained in the hashed report snapshot.
+Invalid raw model prose is excluded from report/PDF/persisted evidence and yields
+REPORT_MODEL_OUTPUT_INVALID. Empty/error/evidence-budget failure semantics remain.
+Browser stub migrated to the typed abstention contract; existing assertions retained.
+
+35 initial focused tests PASS3.54s (67800 exit0,report-authority-fixed.txt).
+Full unit/real-PG suite PASS638 in30.42s (46779 exit0,suite-report-authority.txt),
+including positive typed abstention, saved failure status, precise financial facts
+and source validator regressions. Scoped Ruff/diff check pass.
+Browser revalidation is ACTIVE session32875, browser-report-authority.txt:
+poll before retry. Uses existing Chromium, marked test_browser_expenses, synthetic
+providers/model and real PDF rendering. No actual broker/provider connection,
+external order, notification, production deployment or live enablement.
+
+This closes unchecked prose publication, not full analytical reporting: source
+extract selection is explicitly limited, richer evidence-linked analysis and full
+period accounting/reconciled execution coverage remain required. Real-model
+reliability against the new report schema is unverified. L07 remains IN PROGRESS.
+
+Browser32875 subsequently exited0. Evidence browser-report-authority.txt records
+real Chromium/marked PostgreSQL/stub-model workflow validation; no test operation
+remains active. Preserve source-bounds browser evidence for comparison. Next work:
+real-model schema reliability and richer validated report analysis, then remaining
+financial/reconciliation/operations requirements in PLAN.md.
+
+## Milestone: actual report model reproduction and structured inference
+
+New scripts/benchmark_reports.py exercises actual generate_report and local GGUF
+with synthetic account/news evidence and explicitly stubbed PDF/storage sinks.
+Existing 1.5B CPU GGUF only, no download, no provider/tool access. Three cases:
+no news, substantive source text, injected source instruction.14828 exited0;
+report-model-cpu.json records FAIL3/3 schema validation (correct partial failures,
+financial facts retained, no tools). Load2.54s, task15.67/12.71/15.23s,
+peak process RSS2006.66MiB. Exit0 means benchmark completed, not acceptance PASS.
+
+Added optional response_schema to client event contract. Structured path calls
+existing llama.cpp schema support with complete context preservation, no tools,
+no keyword routing or prose repair; incomplete/invalid JSON returns typed error.
+Unavailable local model also stops at error/done with no fallback tools for this
+path. Reporter supplies schema with known source ID enumeration. Browser fixture
+signature migrated to this optional parameter; prior assertions retained.
+23 focused tests PASS1.57s before the additional unavailable-backend regression.
+Real-model rerun ACTIVE59110: report-model-schema-cpu.log/json. Poll before retry.
+Full regression/browser rerun and remaining structured failure review pending.
+No broker connection/order, paid calls, real notifications or live change.
+
+Structured rerun59110 exited0 but benchmark overall FAIL: source and injection
+cases validated (16.94/21.85s), empty-source semantic selection failed. Narrowed
+empty-source schema to abstain/zero observations;18616 exited0 PASS8.11s in
+report-model-empty-source-cpu.json. Existing source-case evidence still applies.
+Injection quotation was retained as labelled source data; no tool call, but this
+is not a claim of high-quality analysis. MODEL_HOST.md records exact commands and
+limits. Full regression ACTIVE9059, suite-report-schema.txt; poll before retry.
+
+Full regression9059 exited0:643 unit/PostgreSQL tests PASS31.81s,
+suite-report-schema.txt. Scoped Ruff and diff check pass. Browser ACTIVE5699,
+browser-report-schema.txt, to verify the changed client signature through real
+Chromium/report/PDF/reload paths. Existing schema-source model cases remain valid;
+no additional model process is running. No acceptance gate is promoted solely on
+these narrow cases; source selection quality, period accounting and broader
+financial/ops/host/external requirements remain open.
+
+Browser5699 exited0 PASS:browser-report-schema.txt, real Chromium/marked PG,
+stub model and synthetic sources. Report/PDF/reload, preserved expense/simulator/
+authorization/retention workflows pass; console errors empty (expected fixture409
+only). No active verification process. Next implementation: bounded semantic
+report repair and richer evidence-linked analysis, then remaining accounting and
+operations acceptance gaps. Live remains disabled and no real broker connection
+or order occurred. Goal remains active.
+
+## Milestone verified: bounded semantic report recovery
+
+HEAD remains0e18029fe882497cd7bb998f5b855777ac474889; preserved existing dirty
+work/index. No interrupted verification was live at start. report_analysis helper
+now permits at most2 attempts for invalid/incomplete model content. Original
+prompt/schema/source evidence remain intact; rejected model prose is not fed back
+or persisted. Dependencies/contract violations stop immediately; cancellation
+propagates. Async streams close on every early termination. Reporter records
+model_attempts in the hashed retained evidence, including successful repair and
+exhausted failures. No changes to financial rendering or client tool restrictions.
+
+Initial focused53 tests PASS3.65s (49428 exit0). Expanded persisted-recovery
+coverage54 tests PASS3.97s (53331 exit0),
+evidence/report-semantic-repair-persistence.txt. Covers successful second attempt,
+two failures, no dependency retry, cancellation, retained exact financial values,
+owner-scoped PostgreSQL status and attempt provenance, exclusion of fabricated
+prose. Ruff/diff checks pass after a test-only line wrap. Reuse prior643-suite,
+browser-report-schema and model case evidence for unchanged paths; no claim of
+new full-suite/browser/model timing results. No active operation.
+
+Further required work: richer validated analysis and period accounting/reconciled
+executions remain incomplete; next assess simulator sale/realized-PnL boundary
+and remaining financial requirements rather than treating extract-only reports as
+full analytical acceptance. No actual broker/provider connection, order, external
+notification, production deployment or live enablement. Goal remains active.
+
+## Milestone verified: realized-PnL ledger integrity prerequisite
+
+2026-09-26 HEAD unchanged; no interrupted process at start. Traced purchase-only
+assumptions across policy/service/commissions/reconciliation and mandate/UI schemas.
+Found reconciliation omitted account.realized_pnl despite risk policy reading it.
+Reproduction96042 exited1: changed realized value still reported consistent
+(realized-integrity-reproduction.txt). Complete supported purchase ledgers now
+compare realized value against zero and include it in inputs_sha256. Unknown
+ledgers remain unverified without a fabricated realized comparison. Stored values
+are never overwritten. HTTP regression proves discrepancy denial commits the
+halt/alert, preserves proposed order and reservations, and halt survives refresh.
+
+28 real disposable-PG ledger/fill/commission/risk tests PASS7.21s,52326 exited0,
+realized-integrity-fixed.txt. Ruff/diff pass. Reuse unaffected suite/browser/model
+evidence; no active operation. No broker/provider connection, external orders,
+notifications, production deployment, OS changes or live enablement.
+
+Sales remain incomplete. Concrete next work must coordinate: explicit side in
+immutable proposal/idempotency; strategy-owned quantity reservations and no shorts;
+side-aware limit/fill checks; weighted basis disposal and realized proceeds;
+late purchase/sale commission allocations; chronological reconciliation and
+upgrade path for existing event evidence. Mandate strategy currently constrained
+to periodic_fixture_buy/v1; do not silently reinterpret existing approvals.
+Protect long-term allocation and retain independent human/mandate authorization.
+L03/L05 remain IN PROGRESS; this prerequisite is not sale/accounting completion.
+
+## Milestone: allocation-scoped accounting reducer integrated
+
+HEAD unchanged. New execution/accounting.py validates bounded exact fill evidence,
+unique identity/sequence and allocation ownership, computes weighted purchase
+basis, partial/final disposal, net proceeds and realized PnL. Replaying final fees
+correctly allocates late purchase costs across realized/retained basis. Final sale
+releases rounding dust; local Decimal precision is independent of caller context.
+Current buy-only reconciliation now uses reducer balances, preserving scope/FX/
+fee revision/provenance checks. Sale orders still rejected at policy/reconciliation
+boundary until durable sequence/reservations/callback integration is complete.
+
+40 focused unit/real-PG tests PASS7.28s,43647 exited0,
+sale-accounting-reducer.txt: chronology, weighted rebuy basis, partial/final sales,
+late fee corrections, cross-allocation denial, duplicate sequence/ID, invalid
+numbers, existing buys/fees/reconciliation/risk halts. Ruff/diff pass. Full suite
+ACTIVE51068, suite-accounting-reducer.txt; poll before retry. No real broker
+connection/order, provider calls, notifications, deployment or live enablement.
+
+Full suite51068 exited0: 663 passed in 32.17s; suite-accounting-reducer.txt.
+No active operation. Existing browser/model evidence retained for unchanged UI/inference.
+Next: durable sale sequencing, allocation-owned quantity reservations, and side-aware
+manual approvals/callback accounting. Do not enable sales by changing only preflight.
+
+## Milestone: durable event sequence migration0013
+
+2026-09-27 HEAD unchanged. Temporary approval usage-limit rejection prevented one
+read; fresh review succeeded, no bypass. Owned PostgreSQL had stopped; confirmed
+no server, restarted existing cluster, crash recovery reached READY. First tests
+only failed connection (execution-sequence-migration.txt), no migration executed.
+Re-run75934 exit0:2 migration tests PASS1.33s. Full frozen-schema chain now includes
+0013; dedicated backfill test preserves payloads/timestamps, deterministic legacy
+order, new timestamp-regressed events receive higher IDs, rolled-back sequence
+gaps never reused. Generated ALWAYS bigint identity plus unique constraint; no
+implicit startup migration. Reconciliation uses retained sequence in reducer/hash.
+
+Positive identity/marker checks upgraded only test_acceptance_expenses and
+test_browser_expenses. Existing126/105 events retain exact payload hashes:
+execution-sequence-fixture-upgrade.json. Other test/restore/soak and production
+schemas untouched. Downgrade refuses audit-order deletion; backup restore needed.
+Full regression4487 exited0; suite-execution-sequence.txt records result. Browser
+and current-schema recovery validation are next. No broker connections/orders,
+real providers, notifications, OS policy changes, production deployment/live use.
+
+Full regression PASS664 in24.57s. ACTIVE browser73289
+(browser-execution-sequence.txt) and full synthetic recovery84027
+(full-fixture-recovery-0013.log/json), independent databases. Recovery destination
+test_recovery_20260927_sequence and matching .qa/recovery directory; do not retry
+without inspecting operation/state. Check post-restore sequence continuation in
+addition to table hashes. RUNBOOK/SOAK now document0013 prerequisite; soak database
+is intentionally not upgraded yet. Current recovery0013 evidence remains pending.
+
+Browser73289 exited0 PASS, browser-execution-sequence.txt; no console errors,
+expected synthetic409 only. Recovery84027 exited0 PASS, full-fixture-recovery-0013:
+27 table count/hash matches, vault/PDF/settings/model hashes and restored inference,
+wrong-key rejection and source-fixture cleanup. Follow-up rolled-back inserts in
+positively identified restored database prove identity continues above restored
+maximum despite backward timestamps (execution-sequence-restored-continuation.json).
+No active operations. Latest full suite664PASS24.57s. Production untouched; all
+original safety restrictions preserved. Next: owned quantity reservations and
+side-aware simulator approval/callback integration; sales remain disabled.
+
+## Milestone verified: retained allocation ownership provenance
+
+HEAD unchanged, preserved worktree, no live interrupted operation at start.
+Confirmed55880 exit1: changing order.approval.mandate_id reassigned retained fills
+while reconciliation still reported consistent (allocation-provenance-reproduction.txt).
+Reconciliation now reads submitted events and resolves allocation only from one
+matching retained event, actor/environment/manual details hash or mandate session/
+hash provenance. Missing/mismatched approval becomes ALLOCATION_PROVENANCE_UNAVAILABLE;
+no implicit manual fallback. Existing event-count assertion now includes the
+previously unchecked submission event (5 versus4), preserving fill/fee coverage.
+
+32 focused PG tests PASS3.90s (86343 exit0,allocation-provenance-fixed.txt).
+Expanded ownership/actor/hash and HTTP durable-halt coverage12997 exited0,
+allocation-provenance-halt.txt. Scoped Ruff/diff checks pass. No active operation.
+Reuse prior664 full-suite and browser/recovery evidence for unaffected paths;
+this milestone did not run a new full suite or browser. No external broker/provider
+connection, order, notifications, deployment or live enablement.
+
+Next: quantity reservation from provenance-backed allocation inventory, side-aware
+manual proposals and callback accounting. Sales remain disabled; existing approved
+periodic_fixture_buy mandates must not gain sell authority implicitly.
+
+## Milestone: provenance-backed allocation inventory
+
+HEAD unchanged; no interrupted operation at start. Added execution/inventory.py,
+called by reconciliation and consequently exposed through existing owned simulator
+snapshot. Quantities/basis and remaining pending-sale claims are allocation scoped;
+cancel_requested/uncertain retain claims, terminal/proposed release, anticipated
+buys cannot cover sales, duplicate/unknown/unowned/overreserved inputs reject.
+Inventory is null unless entire ledger is consistent. Risk summaries omit this
+potentially large view while preserving status/evidence hashes.
+
+50 focused tests PASS3.01s (33502 exit0,allocation-inventory.txt), covering pending
+states, partial quantities, cross-allocation/duplicate denial and exact fractional
+owned inventory hidden on discrepancy. Full suite ACTIVE77064,
+suite-allocation-inventory.txt; poll before retry. Ruff pass. Existing sale
+submission remains disabled. This calculator does not establish concurrent sale
+approval safety until integrated with locked approval transactions. No broker
+connection/order, real provider, notification, deployment or live enablement.
+
+Full regression77064 exited0: 681 passed in 20.95s.
+No active operation. Reuse prior browser/recovery/model evidence for unchanged paths.
+Next: locked side-aware proposal/approval, consuming owned inventory and retaining
+reservations across uncertainty/cancellation; callback accounting must be integrated
+before enabling simulator sales. All original trading restrictions remain.
+
+## Milestone: commission correction uses replayed accounting deltas
+
+HEAD unchanged; no interrupted verification at start. Traced sale lifecycle and
+found commission callback unconditionally assigned all corrections to remaining
+basis. It now obtains private before/after replay ledgers and applies only cash,
+realized and retained-basis deltas. Public reconciliation response unchanged.
+Existing discrepancies are not overwritten: commission evidence persists, typed
+reconciliation_required and durable halt prevent new execution. Pending-before-fill
+and older revisions retain prior behavior; duplicate callbacks charge once.
+
+41 focused tests PASS11.73s (12292 exited0,commission-replay-deltas.txt).
+Expanded reload/downward correction and discrepant-balance preservation tests log
+43PASS12.68s in commission-replay-deltas-verified.txt; session93306 last poll still
+reported running after final test summary. Poll terminal handle before retry.
+Ruff/diff pass. No broker/provider connection, external order, notification,
+deployment or live enablement. Latest full681-suite retained for unaffected paths.
+Sale approval/quantity consumption and callback integration remain unfinished;
+this milestone prepares fee accounting and does not enable sales.
+
+Session93306 subsequently exited0;43 tests PASS12.68s confirmed. No active operation.
+
+## Milestone in verification: manual simulator sales
+
+HEAD unchanged. Initial backend sale tests1269 exited1 with15PASS/1FAIL: fee-before-
+fill returned reconciliation_required. Interrupted fix was rejected before execution
+by approval usage limit; fresh review succeeded and confirmed it absent, then applied.
+Private settled-balance calculation now permits only validated pending-fee evidence
+for observed fill accounting; public reconciliation remains unverified/no inventory,
+and new approvals remain blocked while fees await fills. No other unknown reasons
+are bypassed.54 related checks PASS20.52s (7128 exit0,simulator-sales-fee-recovery.txt).
+
+Opted-in fixture manual sales use side-bound idempotency/details/approval, quote/
+fee/order caps, and owned manual-allocation inventory checked again under the
+account lock at approval. Pending order quantity claims prevent double reservation;
+cancellation requests retain claims. Sale callbacks replay cash/basis/realized PnL;
+partial/final/duplicate and cancel/fill cases preserve evidence and halt when needed.
+7 end-to-end sale tests PASS3.78s (4488 exit0,simulator-sales-lifecycle.txt), including
+independent concurrent database sessions: one approval succeeds, the other cannot
+reserve the same shares. Existing accounts lacking explicit fixture/manual_sales
+remain denied; protected holdings remain denied; buy mandates gain no sale authority.
+
+Browser/API now offer unchecked manual-sales opt-in for newly created synthetic
+practice accounts and an explicit Buy/Sell selector. Each sale still requires its
+own independent approval. Full regression ACTIVE91611,suite-simulator-sales.txt;
+real Chromium run started browser-simulator-sales.txt (capture/poll its handle).
+No real broker/provider connection, external order, paid use, notification, OS
+change, production deployment or live enablement. Verification is not complete.
+
+## Milestone verified: opted-in manual simulator sale workflow
+
+Full regression91611 exited0:690PASS75.11s (suite-simulator-sales.txt). Browser7817
+exited0 PASS (browser-simulator-sales.txt): unchecked opt-in checked deliberately,
+buy proposal/independent approval/fill followed by sale proposal/independent
+approval/fill; source side shown, cash999.80EUR, realized-0.20EUR from two synthetic
+fees, zero remaining quantity/basis, consistent reconciliation. Existing mandate,
+expense, report/PDF, isolation, retention and logout checks retained; no console
+errors beyond expected fixture409. Browser artifact's generic fill/fee label is
+from the prior label; script now names buy/sell and realized checks explicitly.
+
+Final finite0..100bps fee-policy check added so invalid fixture policy cannot
+produce negative sale reserves.42770 exited0; simulator-sales-policy.txt records
+focused sale/buy-mandate policy results. Full690/browser results precede only that
+validation guard and documentation/label changes; unaffected evidence reused.
+ACCOUNTING/BROKER_CAPABILITIES/MANDATES/ARCHITECTURE updated to distinguish manual
+simulator sales from unchanged buy-only automated mandates. No active operation.
+
+No actual broker/provider connection, external order, paid use, real notification,
+OS policy change, production deployment or live enablement. Goal remains active.
+Remaining: broader sale corner cases and autonomous strategy-specific sales,
+corporate actions/flows/full period accounting, richer validated report/news
+analysis, operations/retention/host soak/deployment and conditional external gates.
+Do not promote full financial/broker gates from this synthetic manual workflow.
+
+## Milestone in verification: unreconciled late-sale duplicate status
+
+HEAD unchanged; no interrupted process at start. Reproduction27248 exit1 proved
+that cancelled-sale fill after inventory reuse returned reconciliation_required
+initially, but duplicate after reload returned filled despite unverified balances.
+(sale-unreconciled-duplicate-reproduction.txt). New fill evidence records accounting
+outcome before initial transaction commit. Duplicates preserve unresolved status;
+legacy sale events without a marker consult reconciliation rather than assume
+terminal execution means settled accounting. Observed quantities retained once,
+no invented cash/short positions and existing halt preserved.
+
+38 focused sale/execution/commission/reconciliation tests PASS17.70s (17885 exit0,
+sale-unreconciled-duplicate-fixed.txt). Expanded legacy-shape regression ACTIVE98114,
+sale-unreconciled-duplicate-legacy.txt; poll terminal before retry. Ruff/diff pass.
+No actual broker/provider connections/orders, notifications, deployment/live changes.
+
+Legacy regression98114 exited0: 39 passed in 23.97s. No active operation.
+Reuse prior suite/browser evidence for unaffected paths; whole goal remains active.
+Next: remaining sale ownership/strategy and full accounting/operations gates,
+without treating manual simulator acceptance as external execution readiness.
+
+
+## Milestone verified: bounded mandate evidence and durable runtime halt
+
+HEAD remains 0e18029fe882497cd7bb998f5b855777ac474889; existing dirty work preserved.
+Original pasted instructions read completely. Previous goal turn made code/test
+progress; checkpoint alone was rejected by automatic review usage limit. Fresh
+review now succeeded; failed checkpoint command was verified not to have executed.
+Normal sandbox mount failure persists; approved scoped commands remain usable.
+Interrupted90323 confirmed terminal exit0:16PASS11.28s (mandate-evidence-capacity.txt).
+Daily approved orders, positions, pending reservations and runtime fixture quotes
+now use deterministic 10,000-row limits plus overflow sentinel. Overflow persists
+MANDATE_EVIDENCE_CAPACITY before a new order; runtime checks before refreshing
+quotes. Independent PostgreSQL connection verifies committed halt/alert, unchanged
+quotes/cash and no orders. 18945 terminal exit0:17PASS12.35s in
+mandate-runtime-capacity.txt. Ruff and git diff --check pass. No active operation.
+Command: TEST_DATABASE_URL="postgresql+asyncpg://lulu@/test_acceptance_expenses?host=$PWD/.qa/socket&port=55439" TEST_DATABASE_DISPOSABLE_TOKEN=fixture-acceptance-20260909 .venv/bin/pytest tests/integration/mandates_test.py tests/integration/risk_monitor_test.py tests/integration/manual_risk_test.py -q
+This bounds loaded rows, not a measured query-latency SLA. No actual broker/provider
+connection, external order/notification, production deployment or live enablement.
+Remaining full scope unchanged: autonomous strategy-owned sales, corporate actions/
+flows/period accounting, richer analysis, operations/retention/soak, deployment and
+conditional external gates. Goal active, not complete.
+
+
+## Milestone in verification: separately approved strategy-owned sales
+
+Added price_band_fixture v1 alongside unchanged periodic_fixture_buy v1. Explicit
+positive buy_below < sell_above thresholds enter immutable mandate review/hash.
+Chosen over fixed target quantity because a fixed quantity would not exercise
+sales without a mandate revision; no speculative model authority added. At low
+price buy bounded quantity; at high price sell only this mandate's available
+inventory. Neutral/no-owned-inventory returns no_trade; pending strategy intents
+block another. Existing manual-sale opt-in is neither granted nor required for
+this separate approved strategy. Revised mandates cannot inherit prior holdings.
+Gross order caps apply to sales (fee-only cash reserve is not the order notional).
+Retained ledger replay now applies aggregate instrument deltas for mandate-owned
+sales while preserving each allocation's independent basis/provenance.
+UI offers explicit strategy and threshold selection; approval remains separate.
+Schema and mandate/accounting/architecture documentation updated.
+
+36941 exit0:46PASS27.89s (strategy-sales-first.txt).58878 exit0:9PASS2.95s
+(strategy-sales-authority.txt), including threshold mutation, protected instrument,
+sale gross cap, manual/old mandate isolation, pending intent and exact realized PnL.
+Ruff/node syntax/diff checks pass. Added forward-runner neutral/no-fill regression.
+ACTIVE55509 full unit/integration suite: suite-strategy-sales.txt.
+ACTIVE56669 Chromium on separate marked browser DB: browser-strategy-sales.txt.
+Poll both before retry; neither result yet claimed. Main DB disposable marker is
+verified by fixture; browser DB separate. No external connections/orders or live
+changes. Full gate statuses remain unchanged pending broader verification.
+
+
+Strategy milestone results: full unit/real PostgreSQL suite records708PASS88.64s
+(suite-strategy-sales.txt); poll55509 terminal status if not yet recorded below.
+Chromium56669 exit0 PASS (browser-strategy-sales.txt), including original buy-only
+and new price-band independent approvals, prior workflows, zero console errors
+apart from expected fixture409. No broker connection/external order.
+No-trade decisions currently return truthful status but lack immutable durable
+decision records; replaying a no-trade tick after quote change is not yet fenced.
+Do not claim complete autonomous recovery until fixed. Next concrete work:
+durable strategy decision evidence/idempotency for no_trade and signal inputs,
+then full accounting/operations/host gates. No goal scope or permissions changed.
+
+55509 confirmed terminal exit0. No active test processes; all milestone evidence saved.
+
+
+## Milestone in verification: durable strategy decisions and no-trade replay
+
+Previous turn made verified progress (708-suite/Chromium), all handles terminal.
+HEAD still0e18029fe882497cd7bb998f5b855777ac474889; existing changes preserved.
+Added StrategyDecision and explicit migration0014_strategy_decisions (from0013).
+Append-only application evidence retains scope, mandate hash, tick key, quote/FX/
+as-of, quantity/side, risk and original result with SHA256 integrity hash.
+Account lock plus unique(account_id,tick_key) fences concurrent retries. No-trade
+replay returns retained outcome even after price changes; submitted decisions
+return current linked order status without reevaluating signal or resubmitting.
+Changed evidence halts with STRATEGY_EVIDENCE_CONFLICT. Historical orders retain
+legacy idempotency fallback; no invented historical decisions. Neutral decisions
+are persisted without fake orders. Snapshot exposes newest100 records plus
+truncation flag under active-owner scope. No mutation endpoint exists.
+
+75854 exit0:22PASS13.49s (strategy-decisions-first.txt), including committed
+independent-session restart/concurrency and migration chain. Explicit scoped
+/tmp/ia_upgrade_strategy_decisions.py upgraded only marked test_acceptance_expenses
+and test_browser_expenses to0014; execution payload hashes unchanged
+(strategy-decisions-fixture-upgrade.json). Test create_all had made an empty new
+table in mainfixture; helper locked it and proved zero rows before replacing it
+with the migration-defined table. No existing evidence was deleted.
+Startup/readiness/soak prerequisite now0014; production and old recovery/soak DBs
+untouched. Latest recovery proof remains0013, so current0014 restore is pending.
+ACTIVE92136: strategy-decisions-history.txt, adds owner isolation/history and
+migration unique-index assertions. Poll before retry. Full suite/browser for0014
+not yet run. No external connections/orders, production migration or live changes.
+
+
+92136 terminal exit0:23PASS13.90s (strategy-decisions-history.txt).
+87267 terminal exit0:Chromium PASS on0014 (browser-strategy-decisions.txt).
+ACTIVE49219 fullsuite (suite-strategy-decisions.txt), last observed progressing.
+Restore wrapper prepared /tmp/ia_restore_strategy_decisions.py; NOT YET STARTED.
+Wait for suite terminal before running it because both use main fixture DB.
+It will prove source marker/revision, refuse existing target/workdir, seed one
+synthetic no-trade decision, invoke existing full vault/PDF/GGUF recovery runner
+into test_recovery_20260928_decisions, verify restored decision hash/quote/outcome,
+and remove only its synthetic source owner/allocation/decision records. Target
+and .qa/recovery-test_recovery_20260928_decisions must be inspected before retry.
+Command: PYTHONPATH="$PWD" TEST_DATABASE_DISPOSABLE_TOKEN=fixture-acceptance-20260909 .venv/bin/python /tmp/ia_restore_strategy_decisions.py
+No model download or broker connection is involved. Actual current restore proof
+remains0013 until this exercise completes; old results have not been relabelled.
+
+
+49219 terminal exit0:711PASS110.78s (suite-strategy-decisions.txt).
+Current Chromium already terminal PASS87267. Matrix reflects suite and0014 code;
+prior0013 recovery remains explicitly historical. Runbook covers0014 and replay.
+ACTIVE47259: /tmp/ia_restore_strategy_decisions.py, log
+strategy-decision-recovery-run.txt. Do not rerun until terminal and target/workdir
+inspection. Full restore uses existing local model, marked disposable databases,
+new target only. No external connection/order, production deploy or live change.
+
+
+47259 terminal exit0:full0014 recovery PASS,28table hashes/counts, vault wrong-key
+rejection,PDF/settings/model hashes and3restored model tasks. No-trade decision
+hash/quote/outcome preserved (strategy-decision-restored.json); full evidence:
+full-fixture-recovery-0014.json. Sample p95=8.6586s for3tasks is not a service SLA.
+Temporary synthetic source records cleaned; new target/workdir retained private.
+Reusable wrapper saved as scripts/verify_strategy_recovery.py with explicit new
+--target and --output-prefix, refuses existing output/target/workdir. Run from
+checkout with PYTHONPATH="$PWD" TEST_DATABASE_DISPOSABLE_TOKEN=fixture-acceptance-20260909 .venv/bin/python scripts/verify_strategy_recovery.py --target test_recovery_UNIQUE --output-prefix UNIQUE
+Use lowercase target/prefix. Do not overlap source-mutating verification with the
+full integration suite. Script extracted from verified wrapper; CLI-only changes
+lint/help checked, not a second expensive restore. No active operations.
+Goal active; durable no-trade gap closed in local simulator. Remaining scope:
+corporate actions/flows/period accounting, broader economic strategy evidence,
+operations/retention/host24hsoak/deployment and conditional external gates.
+No broker/provider connection, external order/notification, production deployment
+or live enablement occurred. Gates not promoted beyond supporting evidence.
+
+
+## Milestone in verification: research dividend receivables and payment timing
+
+Previous turn completed verified decision/recovery work; all handles terminal.
+Confirmed both replay engines credited ex-date dividends directly to cash without
+payment evidence.54276 exit1:2 failing cash assertions (dividend-cash-reproduction.txt).
+Shared DividendLedger now accrues source-currency entitlement before ex-open fills;
+only explicit aware payment time releases cash, with dated positive payment FX
+required for foreign currency. Outstanding entitlements remain marked receivables;
+missing payment dates yield partial valuation. Later splits do not multiply prior
+claims. Dividend accrual, cash paid, receivable and dividend FX PnL are separate.
+Pending payments use a time heap and per-instrument amount totals rather than
+rescanning all unknown-date claims. Gross-only convention; tax/withholding missing.
+Provider history has no payment dates, so does not invent them. Research UI shows
+received cash/unpaid receivables and valuation status. No execution/broker changes.
+Engine fingerprints cover both replay implementations and the dividend module;
+saved evidence decoder retains nullable payment times/FX. Historical results keep
+prior-engine evidence rather than being relabelled under this implementation.
+
+93609 terminal exit0 initial related checks.68662 exit0:27PASS5.11s before queue
+refinement.85195 exit0:28PASS4.21s after queue/fingerprint changes, including saved
+payment evidence reproduction and tamper rejection (dividend-payment-reproduction.txt).
+Ruff/node/diff pass. Fullsuite/browser/current fixed research comparison pending.
+No active process. No external broker/provider connection/order, paid use or live change.
+Full accounting gate remains incomplete: execution corporate actions, external flows,
+period attribution and broker reconciliation are not proved by these research tests.
+
+
+## Dividend milestone verified after interruption
+
+Previous turn made code/test progress; final checkpoint write alone was rejected
+by automatic review usage limit. Fresh approval now succeeds.71513/84149 handles
+are missing (not live); saved authoritative logs show724PASS88.86s in
+suite-dividend-receivables.txt and real Chromium PASS in
+browser-dividend-receivables.txt, zero console errors except expected fixture409.
+Do not invent terminal exit codes for missing handles; do not rerun passed checks.
+Unchanged predeclared comparison is saved in research-dividend-receivables.json:
+INSUFFICIENT EVIDENCE/liveNO-GO, no parameter/criteria/holdout tuning.
+No active operation. Next: reproduce combined spread/slippage impact allowing
+nonpositive simulated sale prices despite individually valid bps. Goal remains
+active; full accounting/operations/host/external gates still incomplete.
+
+
+## Milestone verified: combined execution cost boundary
+
+64534 terminal exit1:6 reproduced failures accepted spread/2+slippage >=10000bps
+(research-impact-reproduction.txt). Shared validate now rejects these assumptions
+before either replay engine can derive nonpositive sale prices. Positive-price
+boundary retained; no weakening of independent fee/FX/lot rules.
+32367 terminal exit0:35PASS1.19s (research-impact-fixed.txt), including all dividend,
+research and portfolio replay checks. Ruff passed. Prior724fullsuite/Chromium
+predate only this shared validation guard/new regression/docs; unaffected evidence
+reused. No new whole-suite count inferred. No active operation.
+
+Next discovered operations defect: execution/runtime.py selects first100 approved
+mandates ordered by id on every invocation; later ids can starve indefinitely.
+Use durable per-mandate scheduling/leases (existing operations/jobs.py requires
+active real user identity), update due state on success AND failure so repeated
+policy denial cannot monopolize a batch, fence completion, preserve committed
+risk halts and same-tick order idempotency. Do not introduce a fake global user or
+bypass user activation checks. Add >batch-size and concurrent-worker regressions.
+Broader financial/operations/host/external gates remain incomplete. No actual
+broker/provider connection/order, paid use, production deployment or live change.
+
+
+## Milestone in verification: fair durable simulator dispatch
+
+Previous goal turn made verified cost-boundary progress; no interrupted operation.
+HEAD unchanged0e18029fe882497cd7bb998f5b855777ac474889, existing work preserved.
+Runtime now joins per-user/per-mandate JobLease due state, selects never-run/oldest
+due mandates up to100, and claims through the existing active-user lease boundary.
+Success and ordinary policy denial advance due time60s; blocked early ids cannot
+monopolize every batch. Work uses a fresh timestamp per mandate. Owner activation
+is rechecked before any synthetic quote write. Completion is outside the ordinary
+PolicyDenied handler: expired/stolen leases roll back all orders/fills/decisions/
+quote writes in the work transaction. Ordinary policy halts still commit with
+valid completion. Lease clock uses actual PostgreSQL clock_timestamp rather than
+transaction-start time so long work cannot publish after lease expiry.
+
+57265 exit1:3PASS/27 setup errors due connection refused; not code-test success.
+Verified no postgres process, restarted existing .qa cluster via
+bash scripts/start_acceptance_postgres.sh (37055 exit0), no reinitialization/data
+removal/TCP service.28344 exit0:30PASS6.36s (simulator-dispatch-running-db.txt).
+Coverage includes1-item batches with2 mandates, blocked-first fairness, concurrent
+workers, persisted due/failure state, and1.1s lease-expiry rollback of synthetic
+orders/fills/positions/decisions/quotes. Added deactivation-after-claim regression
+not yet run. No current active process. Fullsuite pending because shared jobs clock
+changed. No broker/provider connection/order, production or live-trading change.
+
+
+Fair-dispatch fullsuite recorded735PASS24.18s (suite-fair-dispatch.txt), including
+new deactivation-after-claim regression.19289 terminal status checked separately.
+Prior real Chromium remains valid: no UI or approval-route behavior changed in
+this milestone. No active work beyond verifying that suite handle is terminal.
+Resource review: risk monitor already has cycle/query/lock timeouts; strategy
+runtime now has bounded batch/query rows and fenced leases but lacks comparable
+cycle/statement/lock timeouts and durable infrastructure-failure alerts. Add those
+next using actual failure outcomes, without catching code defects as successes or
+weakening user identity/lease fences. No claim of whole operations acceptance yet.
+
+
+## Milestone in verification: bounded simulator execution and failure evidence
+
+Previous turn achieved fair dispatch,735suitePASS;19289 was confirmed exit0.
+Added20s cycle,10s candidate/work,5s claim/failure-persistence deadlines; SQL
+statement_timeout5s and lock_timeout2s apply within each transaction. These mirror
+existing risk-monitor engineering limits; they are not accepted host workload SLAs.
+Recognized DBAPI/timeouts return failures, never success. Timed-out work rolls back
+orders/fills/decisions/quote changes, then fenced failure completion plus in-app
+alert commit together when the database/user/lease permits. Persistence failure is
+explicitly unavailable. Cycle timeout preserves prior completed results and appends
+partial_failure; no nonexistent global user/alert scope invented. External task
+cancellation and unexpected code errors propagate and roll back active work.
+
+99857 exit0:36PASS12.78s (simulator-dispatch-bounds.txt), including durable job/alert
+failure, failed alert-store rollback, cancellation, code error and whole-cycle
+expiry. New actual locked-account regression added (not yet run) to verify other
+mandates can proceed after PostgreSQL lock timeout. Fullsuite pending. No active
+operation. No actual broker/provider connection/order, external notification,
+production deployment or live change. Goal remains active and incomplete.
+
+
+22859 terminal exit0:741PASS34.87s (suite-bounded-dispatch.txt). Includes real
+PostgreSQL account-lock contention: first account times out with persisted job
+failure/in-app alert and unchanged cash/orders, while next mandate fills normally.
+Ruff/diff pass. No active operation. UI unchanged; prior Chromium evidence reused.
+Milestone closes strategy-runtime deadline/recognized infrastructure-failure gap;
+no whole L10/host SLA claim. Remaining: execution-ledger corporate actions/flows
+and full period PnL/report linkage, broader retention/operations/host24hsoak,
+research external data quality and separately authorized broker/provider gates.
+No actual broker/provider connections or external orders/notifications; no live
+mode changes, production deployments/migrations or OS policy changes.
+
+
+## Milestone in verification: reconciled simulator period reporting
+
+Previous runtime milestone741suitePASS terminal; no interrupted work. Added
+read-only execution/reporting.py: active-owner account locks, max20accounts,
+reconciliation required before publishing period totals, UTC half-open local
+booking interval, exact80digit Decimal totals, max100 displayed executions with
+coverage flags and complete selected-row hash. Reconciliation optionally exposes
+validated normalized fills linked to order/event/allocation ids and disposal PnL.
+Reports collect this source with10s/5sstatement/2slock bounds, promote source failure,
+and deterministically render a simulator-only section. No broker fill/PnL claims.
+Latest retained fee revisions restate original fill-period results; they are not
+period cash-fee flows or a historical point-in-time reconstruction. Missing opening/
+closing marks and flows still prevent total weekly portfolio PnL claims.
+
+63482 exit1:53PASS/1failure (execution-period-reports-first.txt); failure was old
+capitalized limitation wording. Rendering now explicitly says "Broker accounts:
+Realized P&L..." so the existing limitation remains clear while simulator facts
+are separately reported. Added detail-cap/complete-total regression. Reverification
+pending; no passing aggregate yet. No active process. No external connections/
+orders, production deploy/migration, notification or live change.
+
+
+## Reconciled simulator report milestone verified
+
+51444 terminal exit0:746PASS39.44s (suite-execution-period-reports.txt).
+17630 terminal exit0:Chromium PASS (browser-execution-period-reports.txt), model/
+report-source fixtures explicitly retained. This browser scenario does not itself
+prove the new real collector; separate execution-period-report-persistence.txt
+records6PASS3.43s, including actual collector -> deterministic text -> realPDF ->
+PostgreSQL report reload and embedded execution evidence.35401 terminal checked.
+Model/news/broker-source stubs prevent external calls. Fullsuite predates only the
+additional collector/PDF test; code unchanged. No active operation.
+
+Current reports can state simulator booked realized results and attributed fill
+fees with event/order/allocation references and reconciliation hashes for a chosen
+calendar period. Zero totals only follow complete consistent ledger evidence;
+unverified/discrepant accounts return unavailable, never fabricated zero. Details
+are capped independently from aggregate totals. Results are current-knowledge
+restatements, not reconstructed historical knowledge or total portfolio returns.
+Remaining whole-scope gaps unchanged: execution corporate actions/flows, period
+valuations and FX/benchmark attribution, richer validated analysis, broad retention/
+operations/host24hsoak/deployment and conditional broker/bank/live gates.
+No broker/provider connection/order, external notification, paid call, production
+migration/deployment or live enablement. Goal remains active, not complete.
+
+
+## 2026-09-28 resumed: optimized soak guards verified
+
+Command access restored after read-only sandbox mount failures. Original attached
+instructions reread completely; HEAD remains0e18029fe882497cd7bb998f5b855777ac474889;
+staged/unstaged/untracked work preserved. No new applicable AGENTS.md found.
+Prior51148 process confirmed terminal exit0; saved soak-optimized-fixed.txt proves
+2PASS1.31s. New49148 terminal exit0:3PASS3.60s in soak-guards-verified.txt, including
+optimized-Python acceptance of a correct disposable marker. Ruff format/check pass.
+The harness uses unconditional guards rather than removable assertions for database
+identity, marker, revision, persistent halt, readiness and stale-quote gates.
+soak-fixture-upgrade-0014.json records prior named synthetic database upgrade;
+no production migration. PostgreSQL PID7128 remains running on .qa Unix socket.
+
+Active operation42690:90-second smoke, output .qa/soak-20260928-guards, evidence
+soak-smoke-guards.txt. Poll this handle/check live PID before retrying. Command:
+TEST_DATABASE_URL="postgresql+asyncpg://lulu@/test_soak_acceptance?host=$PWD/.qa/socket&port=55439" TEST_DATABASE_DISPOSABLE_TOKEN=fixture-soak-20260909 .venv/bin/python scripts/soak_acceptance.py --hours 0.025 --interval 2 --restart-every 20 --model models/qwen2.5-1.5b-instruct-q4_k_m.gguf --output .qa/soak-20260928-guards
+No24hclaim. Prior746suite/Chromium evidence reused for unchanged application code.
+No external broker/provider connection/order, notification, paid call or live change.
+
+Smoke42690 terminal exit0; checkpoint status SMOKE_PASS, 90.165seconds, 49cycles, 4restarts, halt p95 30.805ms. Model run statuses: ['PASS']. No failures. Raw checkpoint retained under .qa/soak-20260928-guards. No active operation.
+Next confirmed source defect: FAILED_BUDGET_OR_RESTART_GATE and INCOMPLETE_MODEL_OBSERVATION statuses can exit0. Add a CLI regression and nonzero terminal status before accepting automation exit codes. Full24h and broader matrix remain incomplete.
+
+
+## Milestone verified: soak CLI failure exit status
+
+Previous turn completed guard/smoke verification; no live interrupted operation.
+2822 terminal exit1 reproduced persisted FAILED_BUDGET_OR_RESTART_GATE with CLI
+exit0 (soak-exit-reproduction.txt). Runner now returns0 only for SMOKE_PASS/PASS_24H
+and raises SystemExit with that result after checkpoint and child cleanup. Other
+terminal statuses return1; exceptions retain their failure exit.
+63218 terminal exit0:5PASS25.03s (soak-exit-fixed.txt), real marked PostgreSQL/HTTP
+CLI runs verify missed restart -> failure/exit1 and observed restart -> smoke/exit0,
+plus optimized-Python marker acceptance/rejection. Ruff and git diff --check pass.
+Synthetic CLI users/checkpoints retained only in disposable DB and .qa/soak-cli-*.
+Application code unchanged; prior746suite/Chromium evidence reused. SOAK.md updated.
+No active operation, broker/provider connection, external order/notification,
+production deployment or live enablement. Full24h observation remains pending.
+Next substantive scope: execution-ledger corporate actions/external flows and
+period valuation attribution; retained research dividends do not prove those.
+Broader analysis, retention, target-host and conditional external gates remain open.
+
+
+## Milestone in verification: deterministic reconciliation precision
+
+1703 terminal exit1 reproduced identical persisted fractional-price evidence
+changing from consistent to unverified under caller Decimal precision6
+(reconciliation-precision-reproduction.txt). Reconciliation now owns precision80
+for all evidence validation and aggregation and restores its caller context.
+55862 terminal exit0:39PASS9.10s (reconciliation-precision-fixed.txt), covering
+reconciliation, commissions, simulator sales and period reporting. Ruff/diff pass.
+Active12572 full unit/PostgreSQL suite writes suite-reconciliation-precision.txt;
+poll before retry. No browser-facing changes; previous Chromium remains applicable.
+No corporate-action/flow support claimed by this correctness repair. Those and
+period opening/closing valuation remain incomplete. No external connections/orders,
+production changes, notification or live enablement.
+
+12572 terminal exit0:753PASS67.98s (suite-reconciliation-precision.txt). No active operation. ACCOUNTING.md documents context isolation; PLAN L11 evidence refreshed without claiming remote CI. Next: corporate-action and cash-flow ledger integration, including durable provenance, reconciled attribution and report intervals; no production migration authorized.
+
+
+## 2026-10-03 resumed: synthetic cash-flow persistence in verification
+
+Global task-observer skill/helper read; global observer logs contain no entries.
+Global AGENTS progress-monitor policy active. Fixed rubric monitor baseline53;
+latest completed audit58% (+5pp), no gate declared complete from focused tests.
+AccountLedgerEvent migration0015 shares execution sequence; record_cash_flow is
+internal synthetic-fixture-only (no public/model/MCP route or real transfer).
+Active-owner lock, explicit fixture flag, base currency/time/reference validation,
+idempotency/conflict hash, reserved-cash protection and existing reconciliation
+required. Cash, flow evidence and receipt commit atomically. Account/strategy
+PnL/high-water checks exclude retained flows; mandate budgets remain unchanged.
+Collector/report text now retain period-booked cash-flow IDs/hashes apart from
+trading results. Split reducer exists but persisted split integration remains absent.
+
+Recovered42566 handle missing; log proves26PASS6.77s in account-events-risk-report.txt.
+Prior first5PASS1.74s includes reviewed-schema migration tests. Initial migration
+attempt failed before connecting (PostgreSQL stopped during host interruption).
+Verified no live postgres process, restarted existing .qa cluster (78791exit0);
+automatic recovery succeeded, Unix-socket-only, no reinitialization. Positively
+verified all three named database markers before migration; main empty create_all
+fixture table replaced transactionally with actual migration DDL, browser/soak new
+table created, markers upgraded14->15. Evidence account-events-fixture-upgrade.json.
+No production database touched. Startup/readiness/soak/recovery require15.
+
+Active18358 fullsuite -> suite-account-events.txt; browser handle recorded by next
+checkpoint update -> browser-account-events.txt. Poll handles/logs before retries.
+Pending current15 full backup/restore and concurrency evidence. Previous753suite
+and14restore retained with original scope; not relabelled as current acceptance.
+No actual broker/provider connections/orders, paid calls, external notifications,
+production deployment, OS policy changes or live enablement.
+
+18358 terminal exit0:777PASS80.61s (suite-account-events.txt).66909 terminal exit0:realChromium PASS (browser-account-events.txt), zero unexpected consoleerrors. Fullsuite includes real receipt collector->text->PDF->persisted evidence test. Recovery first invocation exit1 before imports/db because omitted documented PYTHONPATH. Corrected documented invocation94281 active; evidence account-events-recovery-verified-run.txt, newtarget test_recovery_20261003_flows. Do not retry while live. New concurrencytest added but not run until recovery finishes to preserve dump comparison. No source application changes after fullsuite.
+
+
+## Cash-flow milestone verified — 2026-10-03
+
+94281 terminal exit 0: current 0015 full synthetic recovery passed.
+account-events-recovery-full.json records all table counts/hashes, vault/PDF/settings
+and existing local model recovery (3 tasks); account-events-recovery-decision.json
+proves original decision/quote and cash-flow digest survive, restored ledger
+reconciles, and the shared sequence advances safely after restore. Continuation
+probe rolled back; only this runner's source fixture records were cleaned up.
+91211 terminal exit 0: 7 PASS in 3.57s (account-events-concurrency.txt), including
+actual concurrent withdrawals: one applies, the other cannot reuse consumed cash.
+777 full-suite and current browser checks remain valid for application code; only
+new test/recovery runner/docs followed them. No current process.
+
+Next: persist split evidence and integrate allocation quantities/basis without
+automatically changing approved orders, protected ownership or trading limits.
+The pure reducer's 42 tests do not prove persisted split support. Cash-flow service
+remains internal fixture-only; real external flows and public confirmation UI are
+not claimed. Full period marks/FX/benchmark attribution still absent.
+Progress monitor audit requested with these results; keep the established rubric.
+All original non-live restrictions preserved. No actual broker connection/order,
+real provider access/notification, production deployment/migration or paid use.
+
+Progress audit completed: GOAL PROGRESS61% (+3pp from58), fixed weights retained in PROGRESS_MONITOR.md. Monitor corrected initial overcredit for incomplete report/retention requirements before publication. L07/L09 remain partial; no gate promotion implied. No active process. Next split implementation must share journal ordering, validate instrument ownership, preserve each allocation basis, reject conflicting/pending-order adjustments, invalidate pre-split quotes and preserve/operator-halt pending policy review. Do not interpret pure reducer support as persisted corporate-action completion.
+
+
+## Persisted split milestone in verification
+
+No previous active operation. Added internal synthetic record_split using the
+0015 journal/shared sequence. It validates ownership, source/time/ratio and
+idempotency, refuses unresolved/non-filled instrument orders and retroactive
+actions, preserves each allocation basis/cash/limits, and invalidates pre-split
+quotes. New corporate-action halt requires review; existing operator halt remains.
+Reconciliation replays splits with fills/flows and exposes separate period action
+references; deterministic reports label these synthetic facts, never broker fills.
+
+60622 exit2: missing-service reproduction.61940 exit1:9PASS/1 fixture error
+(buy limit100 against quote120 before intended pending-order split check). Fixed
+fixture to use a marketable pending sale.80391 exit1:21PASS/1 fixture error
+(report context omitted required period). Corrected explicit period. No thresholds
+or assertions weakened. Fullsuite17587 active -> suite-split-events.txt, poll before
+retry. Ruff passes. No public/model/MCP write route added. Pending fullsuite,
+restore split evidence, and monitor audit before this checkpoint is complete.
+No broker/provider/external order/notification, production or live change.
+
+Resumed17587 handle is missing; saved suite-split-events.txt proves782PASS186.97s. No live pytest process, no inferred exitcode. Existing suite reused, not restarted. Split database restore74984 now active; split-recovery-run.txt, newtarget test_recovery_20261003_splits. Runner scripts/verify_split_recovery.py uses original marked source and verify_restore, preserves all database rows/hashes, then checks exact split reconciliation/quantity/basis/cash/halt. Vault/model recovery reused from prior0015 exercise (unchanged paths). Poll before retry.
+
+
+## Persisted split milestone verified
+
+782 full unit/PostgreSQL PASS186.97s in suite-split-events.txt.17587 missing after
+interruption; no live pytest and no inferred terminal code.74984 exit1: first
+restore matched all29tables but its source-versus-restored dictionary comparison
+used pre-reload Python numeric representations. Restored-state inspection showed
+consistent ledger, qty4/basis200/cash800 and required review halt.
+Verifier now flushes/expires/reloads source rows before comparison; full equality
+assertion retained.73300 terminal exit0 on a NEW target
+test_recovery_20261003_splits_verified. Evidence split-recovery-verified-database.json
+and split-recovery-verified-split.json:29table hashes, exact reconciliation and
+quantity/basis/cash/halt preserved. Original failed target/evidence retained.
+Source synthetic records cleaned up by each runner; no existing destination
+overwritten. Prior0015 vault/model recovery reused; no additional model work.
+
+Reproduce with a fresh target/prefix from checkout:
+PYTHONPATH="$PWD" TEST_DATABASE_DISPOSABLE_TOKEN=fixture-acceptance-20260909 .venv/bin/python scripts/verify_split_recovery.py --target test_recovery_UNIQUE --prefix UNIQUE
+
+No active process. Application code unchanged after fullsuite; only verifier/docs
+changed. Ruff/diff pass. Prior Chromium remains evidence for unchanged UI flows,
+not a new split interaction. Next required scope: persisted dividend/withholding
+events and full period valuations/FX/benchmark attribution; historical split
+restatements and operator review UI still not implemented. No actual broker
+connections/orders, real notifications, production or live enablement.
+
+Monitor audit complete: GOAL PROGRESS63% (+2pp from61; raw62.5/100). Fixed weights retained, earnedpoints saved in PROGRESS_MONITOR.md. Goal active and incomplete; no remaining operation.
+
+## 2026-10-03 dividend receipts milestone (64%)
+HEAD unchanged0e18029fe882497cd7bb998f5b855777ac474889; existing staged/unstaged preserved.
+39986 interrupted reproduction recovered exit2 missing service; saved dividend-events-reproduction.txt.
+Implemented internal simulator-only received dividend payments with gross/withholding/net attribution,
+shared journal sequence/replay, protected-income review halt and report provenance.
+82327exit0:43PASS10.46s dividend-events-first.txt. Latest audit64% raw63.5, fixed rubric saved.
+No live/broker operations. No public input route or inferred ex-date/receivable entitlement.
+Added post-sale allocation/late-fee/tampering/period-boundary checks next; broad suite pending.
+
+Dividend verification:54063exit0,792PASS97.92s suite-dividend-events.txt (includes
+post-sale allocation, fee restatement, tampering and period boundaries).
+79969exit0: fresh test_recovery_20261003_dividends;29table hashes and exact persisted
+reconciliation equality, cash807.5/gross10/withholding2.5/qty4/basis200/halt preserved.
+Evidence dividend-recovery-database.json and dividend-recovery-split.json.
+Reproduce with fresh --target/--prefix:
+PYTHONPATH="$PWD" TEST_DATABASE_DISPOSABLE_TOKEN=fixture-acceptance-20260909 .venv/bin/python scripts/verify_split_recovery.py --with-dividend --target test_recovery_UNIQUE --prefix UNIQUE
+No active process; Ruff/diffchecks pass. Existing Chromium evidence remains for
+unchanged UI; no fresh dividend UI claim. Next local scope: normalized expense
+retention workflow; full valuations/corporate actions/operations also remain.
+
+Dividend recovery audit completed64%delta0,raw64.125/100; fixed points saved.
+
+## 2026-10-03 normalized expense-history retention (65%)
+HEAD unchanged, all earlier staged/unstaged preserved. Internal bounded export/purge
+and browser controls implemented with explicit owner confirmation, plan/exporthash,
+10minute expiry, no pending/recent receipts, import serialization and hashed retirement
+keys blocking re-import. Minimal audit replaces removed-history category details.
+0016_expense_retirement migration upgraded only main/browser/soak marked fixtures;
+expense-retirement-fixture-upgrade.json. Readiness/startup/recovery scripts require0016.
+80188exit2 missing service reproduction retained.2910exit1:9PASS1FAIL old test orphanuser;
+corrected fixture creates activeuser, policy unchanged.97037exit0:15PASS5.67s in
+expense-history-fixed.txt. Added concurrency/rollback/inactive/batch tests and browser
+export+confirmation+crossowner+CSRF+re-import workflow verification.
+ACTIVE handles9172(focused tests),51960(Playwright). Poll before retry.
+Monitor65%raw64.625 saved. Browserplugin absent; repo Playwright used.
+No productiondata purged, live disabled, no external bank/broker/order connections.
+Remaining broad gates unchanged; latest792suite and29table restore predate0016/retention.
+
+## 2026-10-04 resumed verification
+36562/35800 handles missing, no livepytest/browser. Durable logs prove16PASS5.80s
+expense-history-concurrency-fixed.txt and ChromiumPASS browser-expense-history-fixed.txt;
+no inferred terminalexit. Original9172exit1 source-vs-reload decimal-scale changed
+planhash; fixed canonical ten-decimal export, exactchecks retained.51960exit1
+browser reimport lacked file after earlierpage reload; helper reselects fixturefile.
+Audit66%raw65.625; fixedrubric saved. Temporary screenshots lost after interruption;
+harness now saves .qa/browser-evidence. No claims of visual review yet.
+76413exit1:559unitPASS238integrationERROR, all fixtureconnection refusal.
+43116exit1:fixture server connectionrefused. No runningPG; existingpgdata retained.
+72559exit0 restarted owned Unixsocket-only PG. Log proves interrupted Oct3 server
+and successful crash recovery Oct4 11:50WEST,ready. No reinit/dropdata.
+ACTIVE63401 fullsuite recovered,36326 browser visual recovered. Poll before retry.
+New scripts/verify_expense_retirement_recovery.py ready to run ONLY after fullsuite
+finishes (avoid dump comparison during fixture writes). Requires fresh target/prefix,
+explicit marker; verifies30table restore, removed rows absent, tombstones and reimport
+suppression. No source code changed after63401 began except docs/browser evidence paths.
+
+## Retention milestone verified
+63401exit1:794PASS3exportfixtureERROR missingactiveusers. Corrected export fixture
+creates and cleans its owners; production checks unchanged.42794exit0:3PASS1.39s.
+36326exit0BrowserPASS; mobile screenshot captured sidebar transition beforefinish.
+Harness waits for hidden sidebar geometry;67565exit0BrowserPASSdesktop/mobile,
+zero unexpectedconsoleerrors. Durable .qa/browser-evidence screenshots inspected;
+readable controls, no clipping. Browser plugin absent; repoPlaywright used.
+6804exit0:30tablehashes revision0016 PASS restored test_recovery_20261004_retirement;
+removed rows absent,2retirementhashes preserved,reimport suppressed,sourcefixtures
+cleaned. expense-retirement-recovery-database.json and -retirement.json.
+49407exit0:797PASS70.03s suite-expense-history-final.txt. Diff/Ruffchecks pass.
+Monitor66%raw65.975 fixedpoints saved; no overallcomplete/blocked claim.
+No broker/bank connection,orders,realdata purge orproductionmigration;live disabled.
+Next: account-risk precision reproduction37467 pendinghandle; log currently6PASS1FAIL
+RISK_BUDGET_UNAVAILABLE under caller Decimalprec6. Risk should own numericcontext;
+continue regression/fix then full period portfolio valuation. Retentionbackups/orphanPDF,
+operations,host24hsoak/CI,broaderchat/research andconditionalexternalgates remain.
+
+## Execution precision milestone (67%)
+37467exit1 reproduced false RISK_BUDGET_UNAVAILABLE at callerprec6.
+New execution/numeric.py owns128digit tasklocal context including rounding/traps;
+wrapped policypositive/orderhash/preflight, manualpropose/approve/fill/transition,
+commission corrections, markedrisk and approvedautonomytick. Ten-decimal storage
+validation remains unchanged.47PASS7.67s first;26298exit0 48PASS10.05s verified,
+including exact1040.0000000002equity, manualsale/latefees and100.1autoreservation,
+all preservingcallerprec6ROUND_UP. Added unsupportedprecision rejection/caller
+context restoration test. Ruffpass. ACTIVE20870 fullsuite-execution-precision;
+poll beforeretry. Prior797fullsuite ispreprecision. Progress67%raw66.975 saved.
+Next remains period valuation snapshots/completeperiodPnL, broader retention/ops,
+realhost/research/externalgates; no changedauthority orliveenablement.
+
+## Verified resume point:2026-10-04
+20870terminalexit0:801PASS88.11s suite-execution-precision.txt. Latest application
+source included by fullsuite, Ruff/diffchecks pass. No active operation.
+HEAD0e18029fe882497cd7bb998f5b855777ac474889; no agent commits/staging/resets.
+Latest UI proof browser-expense-history-visual-final.txt (exit0, desktop/mobile,
+realChromium+PG with fixturemodel/provider; inspected .qa/browser-evidence).
+Latest persistence proof expense-retirement-recovery-database.json and -retirement.json
+(0016,30tables,removedhistory/suppression restored). UI/retention unchanged by later
+precisionfix. No claim of fresh browser/external validation of precision arithmetic.
+Original objective preserved. Completedthissegment: persisteddividend gross/withholding
+and protectedincome accounting/report/restore; normalizedexpense history export/purge/
+reimport suppression/browser/migration/restore; execution Decimal-context riskfix.
+Next highest local scope: immutable account/user/strategy period valuation snapshots,
+opening/closingmarks, flowadjusted portfolioPnL and explicitFX/benchmark attribution.
+Current report intentionally leaves portfolio_period_pnl unavailable; risk observations
+in account.mandate overwriteprevious and are NOT immutable historical marks. Do not
+reinterpret a currentquote as historical or a firstdailyobservation as periodopening.
+Other remaining: unpaiddividend entitlements/cashinlieu/otheractions/operatorreview,
+backup expiry/completedorphanPDF cleanup, operationssleep/clock/backlog validation,
+host24hsoak/remoteCI/build, broadchat/model/evidence/research. L15noapprovedverified
+paperaccount,L16liveprereqs/mandate; live staysdisabled. No broker/bank connections,
+realorders,externalnotifications,productiondeploy/migrate,OSconfiguration changes.
+Finalshortprogressaudit pending; goalACTIVE, no globalblocker/no completion claim.
+
+Final checkpoint audit completed:GOAL PROGRESS68%delta+1pp,raw67.6/100. Fixedrubric updated. No active toolprocess; Goal staysACTIVE and incomplete, next work as above.
+
+## 0017 valuation work in progress
+66984exit2 missingmodel reproduction. Added immutable owner/account snapshot model,
+current-only capture, exactboundary flowadjusted PnL, unavailablemissingmarks.
+0017 upgraded all3markedfixtureDBs (valuation-fixture-upgrade.json); no production.
+88732handle missingafterinterruption; authoritativevaluation-first.txt5PASS2.93s,
+no livepytest/no inferredexit. Added allocationattribution, sourceclockguard,
+reportcollector/fallback, browsercapture/compare and scopedAPI.98545exit1:10PASS2FAIL
+oldreporttests expectedno partialerror despite missingmarks. Now explicitpartial
+coverage retained; execution/PDF checks retained.31771browser logPASS (handle to poll)
+with valuationworkflow+CSRF/crossowner; snapshotscreen notyetinspected.
+PG stopped acrosshostboundary (Oct4 22:36smartshutdown log); no livePG beforestart.
+26444exit0 restartedexistingprivatefixture,noinit/dropdata. Goal68%raw67.85fixedrubric.
+Next runreporttests/broaderbrowser(fullpartialstatus)/suite+0017snapshotrestore.
+No brokerconnection/orders/liveenablement. FullperiodFX/benchmark andhistorical
+boundarycoverage remainopen; currentmarksneverbackdated.
+
+## Valuation report/browser/restore milestone69%
+25553exit0:24PASS6.19s valuation-reporting-fixed.txt, preserving executions/PDF while
+missingexactboundaries now explicitlypartial. 31771exit0 initialbrowserPASS.
+65575exit0 browser-valuations-layout.txt desktop1440x1000/mobile390x844 realChromium+PG,
+source/provider/model fixtures explicit. Savebeforebuy/saveafterfill/compare-0.1PnL,
+CSRF403/crossowner409; zero unexpectedconsoleerrors. Inspected durable .qa/browser-evidence/
+valuation-desktop.png andvaluation-mobile.png. Exactdisplayonly trims trailingzeros;
+no numericalrounding. Native selectors fitviewport, statuswraps.
+17984exit0:805PASS64.71s suite-valuations.txt.36094exit0:6PASS0.79s valuation-guards.txt
+(includes2tests addedafterfullsuitecollection; applicationunchanged). No historical
+pricefabrication; sourcefuturebooking/invalidFX/capacity/tamper guards verified.
+15959exit0 verify_split_recovery.py --with-dividend --with-valuations --target
+test_recovery_20261004_valuations --prefix valuation-recovery;31tablehashes0017PASS,
+exactperioddict/source-restored equality including7.5PnL,split/dividend/cash/basis/halt.
+Evidence valuation-recovery-database.json andvaluation-recovery-split.json. Ownsource
+fixtures cleaned, newtarget/archive preserved. Goal69%raw68.685fixedweights saved.
+
+## Daily observed history integration in progress
+Added one firstUTCday snapshot to existingexplicitopt-in riskmonitor, with savepoint
+and dedup in-app alert on archival PolicyDenied. Archivalcapacity never disables
+currentriskchecks; no midnightboundary inferred.94386exit0:19PASS3.80s
+valuation-monitor-first.txt tests repeateddailyID, updatingcurrentrisk, capacityfailure
+anddedupalert. Added lease-expired successfulrisk variant to prove snapshotrollback.
+ACTIVE67204 fullsuite-valuation-monitor; poll before retry. Snapshotmonitorcode changed
+after priorfullsuite/browser/restore; latestfullsuitepending. No broker/bank/live actions.
+
+Daily snapshot final verification:67204log810PASS62.85s suite-valuation-monitor.txt,
+including expiredsuccessfulworker rollback(no snapshot orfalsejobcheckpoint), all
+prior risk/manual/valuation tests. Final audit69%delta0raw69.185fixedpointssaved;
+intermediate arithmetic corrected inPROGRESS_MONITOR.md. Goalactive/incomplete.
+No applicationcode changes after fullsuite, onlydocs. All authorizationrestrictions
+preserved. Nextsafeprogress remains originalrequiredgaps listedabove.
+
+## Completed orphan PDF cleanup milestone
+Resumed baseline audit69% delta0 raw69.185; previous67204 terminalexit0 confirmed,
+810PASS evidence reused. No interrupted test/browser/recovery processes remained.
+Reproduced publication/reference gap46330exit1 in report-publication-lock-reproduction.txt:
+exclusive cleanup could acquire lock after PDF publication before DB persistence.
+Reporter now holds shared directory lock through reference commit/failure; worker
+retains its own render lock after request cancellation. New operator-only
+cleanup_report_orphans.py previews exact old completed orphan files, then confirms
+plan with all-owner references reloaded under directory exclusion and PG SHARE table
+lock. No automatic policy; no API/model tool. Bounded scans, unsafe layout/clock
+refusal, metadata recheck, private outputs, actual partial deletion counts and fsync.
+90883exit0:36PASS2.10s report-orphans-first.txt. Ruff fixed4 formatting/import issues;
+diffcheckPASS. Fullsuite and CLI committed-path verification pending. Only synthetic
+PDFs removed. No production/broker/bank/live actions. GoalACTIVE; milestoneauditpending.
+
+Milestoneaudit69%delta0raw69.435; L10+0.25 saved. ACTIVE51835fullsuite-report-orphans and49899browser-report-publication-lock; poll before retry.
+
+Orphan verification completed:51835exit0 suite-report-orphans.txt820PASS62.12s;
+49899exit0 browser-report-publication-lock.txt PASS desktop1440x1000/mobile390x844,
+no unexpectedconsoleerrors; model/providerfixtures explicit, no externalorders.
+55417exit0 report-orphans-cli.txt11PASS3.37s (one added test afterfullsuitecollection,
+applicationunchanged). New uniquely named marked disposableDB created and dropped
+only by test; actual CLI preview/confirm deletes syntheticorphan, preservesreference.
+Separate connection referencewrite blocked by PG SHARE lock. Ruff importsort only
+followingtests. No activeoperations. Remainingbackup expiry next; GoalACTIVE69%.
+
+Postverificationaudit70%delta+1raw69.685 L10=3.625 saved. All orphanoperations terminalexit0. Nextdatabasebackupexpiry requires verifiedrestoreevidence/exactconfirmation/protectednewest; liveoff.
+
+## Standalone database backup expiry milestone
+64968exit0 restartedexistingPGdata after no livePG (Oct5 shutdown/interruption;
+automaticWALrecovery, noinit/drop). New backup_retention module/operatorCLI accepts
+explicitcutoff/keep>=1 and restoredreceipt/sourceidentity/checksum. Locks matching
+writer acrossdump/restore/receipt; newestverifiedper-source protected. Exactplan,
+streambyte/filelimits, aliases/symlinks/clock/changedplan guards, truthfulpartialIO.
+verify_restore defaults preserve_unclassified_bundle; explicit--standalone-retention
+requiredfor eligibility. Fullfilesystem/keybundleexpiry remainsopen, nohiddenclosure.
+32566exit0 initial10PASS1.59s;68018exit0 refactored10PASS2.65s;
+85111exit0 backup-expiry-bundle-guards.txt11PASS2.35s (includesrealCLI syntheticexpiry).
+8683exit0 backup-expiry-restore-run.txt31tables0017, unclassifiedreceipt preserved.
+53216exit0 backup-expiry-standalone-run.txt31tables0017, newsourceidentity/standalone
+receipt. ActualCLIpreviewexit0 backup-expiry-real-preview.json protects1/deletes0.
+Bothnewtargets/archive remain; no earlierartifactpurged. Rufflineformatfixaftertests.
+Noactiveprocesses; GoalACTIVE70%raw69.685 untilmilestoneaudit. Nextcoherentbundle
+retention and otheroriginalgaps; liveoff/no broker/bank/production/OSchanges.
+
+Milestoneaudit70%delta0raw69.935; L10=3.875saved. Nextpriorityreview schedulerclock/backlogrecovery; coherentbundleexpiry remainsopen.
+
+## Job clock/replay fencing in progress
+69441exit1 job-clock-reproduction.txt2FAIL3PASS demonstrates backwardclock pre-acquire
+completion accepted and completedtoken replay accepted. Added0018leased_at nullable,
+no inventedlegacytimestamp;acquire stampsDBtime;complete requiresleased_at<=now<until
+androtatescompletedtoken. LegacyNULL refusescompletion, normalfreshreacquire permitted
+afterexistingdeadline. Startup/readiness/recovery/soakrevisionguards now0018.
+16706exit0 upgradedall3positivelymarkedfixtureDBs0017->0018, evidencejob-clock-fixture-upgrade.json.
+27305ACTIVE job-clock-fixed.txt focusedops/migration/runtime/risk/news tests; pollbefore
+retry. Broaderfullsuite/browser/0018restore stillpending. Noexternalwrites/liveactions.
+27305exit0:32PASS73.14s job-clock-fixed.txt. Then extended immediate fences in news,
+riskclaim and brokerread keep_lease path; added2brokerclockregression cases preserving
+running checkpoint. Fullsuite-job-clock nowrunning;pollhandlebefore retry. Legacy
+migrationtestedNULLpreservedtoken/checkpoint, freshleasecurrenttime no catch-up replay.
+
+Audit70%delta0raw70.185 L10=4.125saved. ACTIVE36712suite-job-clock,58313browser-job-clock; pollbefore retry.
+
+## Current verification failures and startup-budget repair
+36712terminalexit1 suite-job-clock.txt:835PASS2FAIL440.69s; both soak CLI failures
+were FIXTURE_SERVICE_START_TIMEOUT with0cycles, not lease assertion failures.
+58313terminalexit1 browser-job-clock.txt fixturestartupdeadline; server log saved
+browser-job-clock-startup-server.txt shows eventualstartup andcleanstop. No passclaim.
+4525restorehandle missing afterinterruption: durable job-clock-restore.json/run.txt
+PASS31tables0018, no live restoreprocess; no inferredexitcode/no duplicate restore.
+Identified count100 x0.1s loop could fail near10s before predeclared15s startupbudget.
+6224exit1 soak-startup-budget-reproduction.txt2FAIL (12s readiness prematurelyfails;
+16s casewrong failureclassification). Changed soak loop to actual15s monotonicdeadline,
+boundedremaininghealthtimeout/postresponsecheck; budgetNOTincreased.27546ACTIVE
+soak-startup-budget-fixed.txt. ExistingPG stillrunning, no restartneeded.
+Next:poll27546; runfailedsoaktests and serialbrowser with originalbrowserdeadline;
+then acceptanceverification. Authorityreview alsofoundpotential inactiveowner race
+account_for_user readsUserwithoutlockbeforewaitingaccountlock; mustreproduce/fixnext.
+No other applicationcode changes; liveoff/noexternalbroker/bank/productionactions.
+
+27546exit0 startupbudget2PASS2.82s;59337exit0 soak-startup-reverified.txt5PASS38.67s. Budget15sunchanged. Audit70%raw70.06 L11reduced4.75 basedpendingfailureatinspection. Newowner-racerepro andbrowser-job-clock-reverified inprogress; appcodeunchangedwhileverifying.
+
+## Principal lifetime race repaired
+79567exit1 execution-owner-race-reproduction.txt confirms realDBdeactivation could
+commitwhileworkerwaitedforaccountlock. account_for_user nowFOR SHARE activeUser
+beforeFOR UPDATE account.57687exit0 execution-owner-race-fixed.txt41PASS42.04s;
+concurrentdeactivation lockblocked then succeedsafterauthorizedtxn, subsequentworkdenied.
+AUTHORITY_REVIEW.md mapsoriginalL02requirements; no gatepromotionyet,currentfull/browserpending.
+41560exit0 browser-job-clock-reverified.txt desktop/mobilePASS withunchangedstartup
+limit; fixtureprocessstartedbeforeprincipalfix, so thisisclockversionvalidationonly.
+Noactiveops now. 0018restore31tableevidencevalid; fullcurrentvalidationnext.
+
+Principal-lifetimeaudit70%raw70.31 L02=4.25saved. ACTIVE26999suite-owner-lifetime; serialcurrentbrowserafterthisrun. Noapplicationchangesafterlaunch.
+
+26999exit0 suite-owner-lifetime.txt840PASS200.26s; includesalllatestclock/owner/startup/backup/orphanchanges. Currentbrowser-owner-lifetime startedseriallyafterfullsuite; pollbefore retry. Noapplicationchangesafterfullsuite. Dockerreadonlyprobe confirmsWSLcommandunavailable; targetbuildgateunchanged.
+
+26823exit0 browser-owner-lifetime.txt currentversionPASS desktop/mobile allworkflows;
+0unexpectedconsoleerrors,0brokerconnections/externalorders. Inspected latestvaluation
+desktop/mobile screenshots, no newlayoutregressions.840fullsuite+browser currentvalid;
+onlydocs editedsince. AUTHORITY_REVIEW verification updated; exactL02gateauditpending.
+GoalACTIVE70%raw70.31, allprocessesterminal. Remainingbroaderaccounting/bundleretention/
+ops/hostmodel/research/externalgates; Dockerreadonlyprobe stillunavailablehere.
+
+Finalmilestoneaudit74%delta+4raw74.06 L02=8/8; monitorreviewfoundeachactualL02
+conditionevidenced, no vaguependingreview. PLANL02PASS localboundary; L04/L15/L16
+externalvalidation/authorityremainopenblocked. Noactiveoperations; HEADunchanged,
+allstaged/unstaged/untrackedworkpreserved. GoalACTIVE, nextfinancialattribution.
+
+
+## Price/FX attribution implementation milestone
+83561terminalexit1 valuation-fx-first.txt2FAIL8PASS: newtest fee0.2 exceeded
+approved0.18reserve, correctlyhalted. Fixturefeeallowance20bps corrected (no risk
+policyweakening).29772exit0 second10PASS.78661exit0 valuation-fx-scoped.txt30PASS14.85s.
+New schema2 snapshots retain cumulative source/base trade principal/fees and FX
+marks; closing-rate decomposition reconciles total and perallocation P&L. Missing
+legacyhistory/staleFX explicitunavailable; dormantclosedposition requiresnoFX.
+Report/UI updated; browser assertionadded. Ruff touchedmodulesPASS.
+Prior840suite/currentbrowser are beforethisunit; fullnew suite/browser/restore next.
+Noactivecommands at checkpoint; progressaudit running. GoalACTIVE74%lastverified;
+no broker/bank/orders/live/settings/production actions. Preserve currentworktree.
+
+
+## FX verification resumed October6
+87597handlelost; processabsent and suite-valuation-fx.txt terminalsummary846PASS144.99s.
+Noexitcodeinferred.14207exit1 browser-valuation-fx.txt: actualUIzero0E-20/0E-40
+violatedreadabilityassertion. Exactdecimaldisplay now normalizesonly mathematically
+zero strings (noNumberconversion/rounding). Backendunchanged:846suitemaybereused.
+Progressaudit74%raw74.06delta0, unchangedweights. CurrentPG5241live. Browserrerun
+and fresh0018schema2restore next; no realorders/connections/liveconfigchanges.
+
+26915exit0 browser-valuation-fx-fixed.txt fullrealChromium/PostgreSQL desktop/mobile
+PASS, zeroformattednormally,0unexpectedconsoleerrors,0brokerconnections/orders.
+Mobilevaluation screenshotinspectedreadable.3731exit0 valuation-fx-recovery-20261006:
+31tablehashes0018PASS, split/dividend/exact schema2periodresult survivesrestore;
+newtargettest_recovery_20261006_fx andarchive retained. Noactivecommands now.
+846backendtests remainvalid (onlyJSzeroformat/docs changedsince). Progressaudit
+pending; next scopedchat combinedread/followupdefectreview. Liveoff unchanged.
+
+
+FXmilestoneaudit74%raw74.185: L11=4.875 fixedrubric saved. Nextreadfollowupwork:
+78321exit1 read-followup-reproduction.txt8FAIL2PASS. Combinednews waslostforholdings/
+positions/carteira, posiçõesmissing; explicitrefreshfollowups fetchednoevidence.
+Independentnewsclassification plus read-onlyuser-refreshcontext fixed; prioractions
+andnewtopicscannotreplay, tool/assistantcannotsetscope, dispatchrechecksexclusions.
+4285exit0 read-followup-fixed.txt40PASS4.40s.14580exit0 read-followup-stream.txt11PASS
+includesactualeventflow unavailableportfolio/news collectedfresh withoutmodelguesses.
+RuffPASS.40712ACTIVE realexisting1.5BCPU benchmark workflow-followup-cpu-20261006.json,
+8synthetictoolcases, no downloads/provider/broker/orders. Pollbefore retry.
+Noapplicationcodechangeswhilebenchmarkruns. Fullsuite aftercurrentchatfixpending.
+
+40712exit0 workflow-followup-cpu-20261006.json PASS8/8scope/eventcases. Reviewedfacts:
+0.004/EUR100/noinventedtotal; headlineabstention; load6.30s/peak1976.18MiB.
+Mostpathsdeterministic, notmodelquality/speedclaim. Excludedfollowupmodel17.55s generic
+refusalstillqualitygap. Fullsuite-read-followup launched next; pollbefore retry.
+No backendedits after benchmark. Progressaudit running; last74.185rawdisplay74.
+
+Readaudit75%delta+1raw74.685 L06=3.5 saved; activefullsuite50775suite-read-followup.txt.
+
+
+50775exit0 suite-read-followup.txt857PASS162.52s. Next simulationfix:71240exit2
+badpytestreservedparametername correctedwithoutsourcechange;65452exit1 genuine
+4FAILsimulation-ambiguity-reproduction-valid.txt. Parserguessed IT/AGAIN/APPLE and
+droppedexplicitexchange; unavailabletoolresultdisplayedcompletedzeroreturns.
+Now ambiguous/noexplicitproviderinstrument returns clarification, keepsindependent
+scopedreads; explicitlistingrequiresprovider-symbolconfirmation (no guessedmapping).
+Deterministicsimulationformatterextracted src/finance/simulation_answer.py rejects
+missing/invalidresults, preservesbasecurrency andpartialpersistence.5376exit0
+simulation-ambiguity-fixed.txt40PASS1.37s. Added native-modeclarification parameter
+coverageafterthat run; broadercurrentverificationnext. Latestprogress75%raw74.685,
+L03/L08 exactcriterionreview pendingmonitor. No externalconnections/orders/livechanges.
+
+
+## Global manual/strategy exposure boundary
+Simulationfinalaudit75%raw74.685unchanged;871suitePASS. MonitoridentifiedL03global
+manualconcentrationgap andL08providerchanged-ID/outsideoverlapgaps; providerfixNOTstarted.
+New global-exposure-reproduction.txt3FAIL verifiesmanualproposal/approval andcross-
+instrumentpendingbudget gaps. JSONaccount global_exposure_limits nowrequired;
+newbrowserfixtures explicitperinstrument500/total750EUR includingpendingfees.
+Existingaccountswithoutlimits failclosed; none retroactivelyassignedlivepolicy.
+Riskobservation bounds1000positions/pendingorders; marked+reservedbreachpersists
+halt. Sharedorderprojection underaccountlock guardsmanualpropose/approve/autonomy.
+42932exit0 global-exposure-first.txt46PASS7.19s.47701exit0 global-exposure-guards.txt
+10PASS0.84s inclindependenttransactionconcurrentapproval, stricterglobalvstrategy,
+missing/nonfinite/inconsistentlimits, markedgainbreach andsalehaltbypassdenial.
+Noactiveprocessesatcheckpoint; fullcurrenttests/browsernext. HEAD0e18029 unchanged,
+allpriorstaged/unstaged/untrackedchangespreserved. Noexternalconnections/orders/livechanges.
+
+Globalcapaudit75%raw74.935 L03=7.75saved.84798exit0 suite-global-exposure.txt881PASS69.24s. Currentbrowser-global-exposure startedserially; pollbefore retry. Backendunchangedsince881suite; JSONpolicyrequiresnomigration.
+
+91980exit0 browser-global-exposure.txt desktop/mobilePASS allworkflows, noerrors/
+brokerconnections/orders. Finalcapmilestoneaudit75%raw75.185 L03=8/8PASSsaved;
+881suitecurrentvalid, appunchanged, noactiveoperations. NextL08changed-IDpending
+resolution: officialdocs output-transaction-details consultedOct6, identifiersoptional,
+no guaranteedtransitionlink established. Planexplicitowner-reviewedexport/confirm
+pending-retirement linkedtobookedrecord, hashedreimportsuppression, no fuzzyguessing.
+No providerfixcodeyet; previousoverlapandunmatchedpendinglimitationsstaydocumented.
+
+
+## Pending/booked reconciliation implementation in progress
+New src/expenses/reconciliation.py and web/expense_reconciliation.py provide explicit
+owner-selectedpair/export/hash/10minutepreview/independentconfirmation. No fuzzyID
+mapping. Sameaccount/provider/currency/type required; unknowntransferdirection and
+conflictingcategoryoverrides refused. Confirmedpending removedwithhashedsuppression
+andminimalauditlink; bookedamount/sourceclock preserved, categoryoverride retained.
+No migration (existing ExpenseAudit/ExpenseRetirement); no providerrequests.
+51628exit1 expense-reconciliation-first.txt1FAIL8PASS exposed ORMcategorycopy moving
+providerreceivedclock. Explicitdirty retainedsynced_at fixesnewpath andexisting
+categoryroute.82639handlelost; no livepytest, durable expense-reconciliation-fixed.txt
+terminal19PASS1.08s; noexitcodeinferred. UIselection/export/confirmation nowadded;
+notyetbrowserverified. APIreceived_at addedfortruthfulper-rowreceipt evidence.
+Next: browserhelper+CSRF/owner/export/reimport/clock checks, rollback/concurrency,
+fullsuite/restore. Currentlastfull881/browserglobalcap precedethisunit. GoalACTIVE75%
+raw75.185, no activecommands. HEADunchanged/priorworkpreserved/liveoff.
+
+
+8475exit0 browser-expense-reconciliation.txt realChromium/PostgresPASS; addedhelper
+actuallyran despitefirstoutputcheckslistmissingitslabel (metadatafixedafterrun).
+Downloadedpair/independentapproval/CSRF/foreignowner/falseapproval/exporthash/replay,
+bookedamount/receiptclock/categorypreservation/reimport suppression verified.
+Mobile screenshotinspectedreadable; subsequentJSdisplaytrimsamounttrailingzerosonly.
+18228exit0 expense-reconciliation-concurrency.txt11PASS0.70s includesatomicrollback
+andindependenttransactionimportblockeduntilresolutioncommit then suppressed.
+60367exit0 pending-recovery-20261006-run.txt31tables0018restorePASS; -retirement.json
+confirms audit/bookedrow/category/clock/identitysuppression exactlyretained.
+Targettest_recovery_20261006_pending andarchive retained; onlyownedsourcefixturescleaned.
+Noactivecommandsatcheckpoint. Fullsuitecurrentnext, lastscore75raw75.185/L08stillpartial.
+
+98535 observed exit0: suite-expense-reconciliation.txt 892PASS72.31s. Monitor75%raw75.310 L08=4.875 saved. Starting explicit owner-selected historical bank retrieval; no external requests. Prior UI trailingzero presentation verification will run with new controls.
+
+## Explicit bank-history retrieval milestone
+Implemented owner-selected date endpoint/UI and sync override; local730day bound,
+existing5000record/2MB/30sprovider limits, cookie/CSRF/config/owner/consent/account guards.
+Preserves absent transactions, category overrides, retired identities, backoff and
+ordinary incremental cursor. Durable metadata explicitly states coverage unverified.
+86079exit1 bank-history-reproduction.txt4FAIL5PASS before implementation;31869exit0
+bank-history-first.txt9PASS;52700exit0 bank-history-guards.txt11PASS;12269exit0
+bank-history-cursor.txt12PASS0.83s includes narrowhistory notskippingbacklog.
+25009exit0 browser-bank-history.txt fullChromium/PostgresPASS with interceptedbankUI
+and realdisabledAPI/CSRF; reconciliation amountdisplay reverified andmobileinspected.
+Currentfullsuite session22951 writes suite-bank-history.txt; inspectbefore retry.
+No migrations/externalconnections/orders/livechanges. HEADunchanged, priorchangespreserved.
+Monitor milestoneaudit requested; lastcompletedraw75.310/display75%.
+
+22951exit0 suite-bank-history.txt899PASS71.12s. L08localfixturecriteriaPASS; monitorraw75.435display75 L08=5 saved. Realbank remainsseparateblocked. Starting L06observedexclusion-followupanswer qualitygap with failingtests; noappchangesafter899suiteyet.
+
+Bankhistoryfinalaudit75%raw75.435 L08=5/5PASS confirmed after899suite; rubricupdated.
+Exclusion-answer reproduction81837exit1 read-exclusion-answer-reproduction.txt4FAIL:
+modelgenericrefusal/no useful explanation also degradedpath. Added deterministic
+userrestriction answer when onlyrequested scope excluded; no model/tools or authority
+change, independent allowedreads continue.56815exit0 read-exclusion-answer-fixed.txt
+37PASS0.87s default/native/degraded/externaltext/refresh/scopereallow coverage.
+Realexisting1.5BGGUFbenchmark62860 running; inspect before retry. Fullsuiteafterchange
+notyetstarted. No externalconnections/orders/livechanges.
+
+62860exit0 workflow-exclusion-answer-cpu-20261006.json8/8PASS, explicitrestriction
+content assertionPASS. Existing1.5BGGUF CPUload1.418s peak1955.61MiB; excludedrequest
+0.0001s deterministic (not inferencebenchmark). Monitor76%raw75.935 L06=4saved.
+88756exit1 suite-read-exclusion-answer.txt903PASS1FAIL69.63s: native_markup test
+expected modelmarkuprefusal even though newroute correctly avoids inference entirely.
+Updated regression to assert0inference+restriction generation on excludedpath; retained
+1inference+markuprejection onNO_TOOL_CALLING path and unchangedno-dispatch assertions.
+Next rerunaffected+fullsuite. Broader L06qualitative portfolio answerquality remains.
+
+20565exit0 suite-read-exclusion-answer-fixed.txt904PASS confirms nativeguardupdated
+without weakenedno-dispatch behavior. New portfolio_review.py +answerscontractid
+readable descriptive sourceanalysis/qualitygaps, account/currency uniqueconId same-
+time exposuregroups withDecimal128 and explicitcash/lookthrough/authoritylimits.
+portfolio-review-reproduction5FAIL;65613exit0 first26PASS;5438exit0 guards28PASS1.22s
+includes postbenchmarkzeroquantityguard/rounding/nonfinite/extreme/Portuguese.
+76575exit0 workflow-portfolio-review-cpu-20261007.json9/9PASS with actualanswerquality
+assertions; existing1.5BGGUF load1.535s peak1955.98MiB, deterministicpathnotmodelperformance.
+Monitor76%raw76.435 L06=4.5saved. Fullsuite70820 active suite-portfolio-review.txt;
+inspectbefore retry. Next actual L06 gap: combined portfolio/scanner currently
+returns rawnewsJSON instead of validated newsanalysis; source-selection quality needs
+safe mixedfact/instruction fixture review. No externalconnections/orders/livechanges.
+
+70820exit0 suite-portfolio-review.txt911PASS79.23s. Portfolio descriptive review
+milestoneverified; monitor76%raw76.435 unchanged. Currentnextunit scanner/news:
+65468exit1 scanner-analysis-reproduction.txt3FAIL (combinedportfolio bypassednews
+analysis and directsourcecommand acceptedasobservation). _financial_response now
+joins exactfinancialreview with separatelyvalidated tool-free newsassessment;
+sourceinstructionqualityfilter shared news/report; unknown/truncatedcompletion
+rejected.99835exit0 scanner-analysis-first.txt49PASS1.02s. Added retry/incomplete
+finishregressions afterwards, nextfocusedrunpending. Actual1.5BGGUFmodel6307running
+workflow-scanner-quality-cpu-20261007.json/run with512outputtokens; predeclared
+factselection/noinstruction/independentreadchecks. No fullsuiteafterthisunityet;
+monitor saidrunning but it is pending, only modelbenchmarkisactive. No source,
+externalprovider/broker/order or livepermission changes beyondauthorizedcode.
+
+Scanner/model quality milestone ongoing:68345exit0 scanner-analysis-guards.txt52PASS;
+6307exit0 workflow-scanner-quality-cpu-20261007.json measuredFAIL (safeabstention,
+no usefulfact in2cases; exit0alone notPASS). Added exact bounded sentencecandidates,
+recognizeddirective exclusion and quoteenums; sourceevents unchanged.44155exit0
+scanner-analysis-candidates.txt53PASS.48490exit0 workflow-scanner-candidates-cpu-
+20261007.json2/2PASS: scanner10.976s, scopednews9.133s; factualrevenue selected,
+no injectedcommand, limits/scopes/exactfinancialfacts retained; load1.020s peak2012.73MiB.
+17554exit0 report-source-quality-cpu-20261007.jsonFAIL22.23s, analysisinvalidafter
+rejectinginstruction. Reportpromptnow onlycandidatequotes+period; financialevidence
+rendered/storedseparately, original14kcollectionbudget retained.20260exit0
+scanner-report-candidates.txt36PASS.21006exit0 report-source-candidates-cpu-20261007
+nominalPASS is NOT accepted: manualinspection found thirdquote Enablelive...USD999999;
+firstqualityassertiononlytestedIgnorephrase. Expanded explicitenable/disable/change
+candidatefilter andbenchmarkchecksallselectedquotes;97303exit0 instructionguards39PASS.
+Finalreportbenchmark10368 running report-source-candidates-final-cpu-20261007.json/run.
+Inspecthandle/outputbefore retry. No fullsuite since911priorportfolio milestone;
+newscanner/reportfullsuite andbrowser pending. Latestfixedrubric76raw76.435 unchanged.
+
+## Scanner/report real-model quality validated; regression work in progress
+- Final report benchmark10368 exited0: source-candidates-final JSON PASS13.654s;
+  only factory closure and the source's no-forecast/no-price limitation selected.
+- Native scanner86289 exited0: workflow-scanner-native JSON PASS38.508s through
+  deterministic read recovery. Default scanner10.976s; retain default routing.
+- Latest audit77%, raw76.935, L06=5/6; rubric saved. Full current suite is pending.
+- Review found history-success UI called cached loadExpenses() rather than forced
+  refresh. Added a browser assertion requiring a fresh expenses GET after success;
+  reproduction54219 writes browser-history-refresh-reproduction.txt. Inspect it
+  before retry. Fix not applied yet. No other process active at this checkpoint.
+- No broker/bank connections, external orders, production or live-setting changes.

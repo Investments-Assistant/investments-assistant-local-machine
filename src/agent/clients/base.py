@@ -21,9 +21,14 @@ class BaseLLMClient(ABC):
         messages: list[dict[str, Any]],
         system: str,
         max_tokens: int | None = None,
+        response_schema: dict | None = None,
     ) -> AsyncGenerator[dict, None]:
         """
         Async generator that yields typed events until the turn is complete.
+
+        response_schema selects tool-free structured inference. The caller must
+        validate domain semantics; valid JSON/schema shape is not factual proof.
+        Structured inference never routes requests to tools or prose repair.
 
         Events
         ------

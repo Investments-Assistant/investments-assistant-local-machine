@@ -1,0 +1,4 @@
+2026-10-07 09:37:47,471 | INFO | src.agent.clients.llama_cpp_client | Loading GGUF model: models/qwen2.5-1.5b-instruct-q4_k_m.gguf  (n_ctx=4096, n_gpu_layers=0, n_threads=4, n_batch=128)
+llama_context: n_ctx_seq (4096) < n_ctx_train (32768) -- the full capacity of the model will not be utilized
+2026-10-07 09:37:48,393 | INFO | src.agent.clients.llama_cpp_client | GGUF model loaded
+{"status": "PASS", "evidence": "docs/acceptance/evidence/workflow-scanner-native-cpu-20261007.json"}

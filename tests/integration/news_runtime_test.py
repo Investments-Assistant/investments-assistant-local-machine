@@ -14,6 +14,7 @@ from src.news import runtime
 from src.db.models import User, NewsArticle, NewsRevision
 from src.news.http import PublicResponse, PublicFetchError
 from src.operations.models import JobLease, OperationalAlert
+from tests.news_policy_fixture import news_policy_fixture
 
 pytestmark = pytest.mark.integration
 
@@ -27,7 +28,12 @@ async def source_fixture(integration_engine, monkeypatch):
     from src.config import Settings
 
     monkeypatch.setattr(
-        runtime.config, "settings", Settings(_env_file=None, environment="production")
+        runtime.config, "settings", Settings(
+            _env_file=None, environment="production",
+            news_source_policies={
+                identity: news_policy_fixture() for identity in [url, "rss:" + url, "rss:" + url + "/bad"]
+            },
+        )
     )
     async with factory.begin() as session:
         session.add(
@@ -194,3 +200,51 @@ async def test_scheduled_sources_isolate_failures_and_reuse_due_state(source_fix
         second["status"] == "partial_failure"
         and second["source_failures"][0]["status"] == "retry_wait"
     )
+
+
+async def test_missing_or_invalid_policy_blocks_before_fetch_and_lease(source_fixture, monkeypatch):
+    factory, owner, url = source_fixture
+    fetch = AsyncMock()
+    for registry, code in [({}, "SOURCE_PERMISSION_REQUIRED"), ({url: {}}, "SOURCE_POLICY_INVALID")]:
+        monkeypatch.setattr(runtime.config.settings, "news_source_policies", registry)
+        result = await runtime.run_source(owner, url, fetch)
+        assert result == {"status": "blocked", "error_code": code, "fetched": 0, "inserted": 0}
+    fetch.assert_not_awaited()
+    async with factory() as session:
+        assert await session.scalar(select(JobLease.id).where(JobLease.user_id == owner)) is None
+
+
+async def test_policy_change_refetches_and_records_permitted_scope(source_fixture, monkeypatch):
+    factory, owner, url = source_fixture
+    policy = runtime.config.settings.news_source_policies[url]
+    initial = AsyncMock(return_value=(
+        [dict(article(url), content="Unapproved full text")], PublicResponse(200, b"", {"etag": "v1"}, url),
+    ))
+    await runtime.run_source(owner, url, initial)
+    async with factory() as session:
+        row = await session.scalar(select(NewsArticle).where(NewsArticle.url == url))
+        assert row.content is None and row.summary == "Fixture"
+        assert row.provenance["source_policy"]["policy"]["content_scope"] == "summary"
+    await make_due(factory, owner)
+    monkeypatch.setattr(runtime.config.settings, "news_source_policies", {
+        url: dict(policy, policy_id="fixture-headline-only", content_scope="headline"),
+    })
+    await runtime.run_source(owner, url, initial)
+    assert initial.await_args.args == ({},)
+    async with factory() as session:
+        row = await session.scalar(select(NewsArticle).where(NewsArticle.url == url))
+        assert row.summary == "" and row.content is None
+        assert row.provenance["source_policy"]["policy"]["content_scope"] == "headline"
+
+
+async def test_policy_revoked_while_fetching_cannot_publish(source_fixture, monkeypatch):
+    factory, owner, url = source_fixture
+
+    async def fetch(headers):
+        monkeypatch.setattr(runtime.config.settings, "news_source_policies", {})
+        return [article(url)], PublicResponse(200, b"", {}, url)
+
+    result = await runtime.run_source(owner, url, fetch)
+    assert result["status"] == "failed" and result["error_code"] == "SOURCE_PERMISSION_REQUIRED"
+    async with factory() as session:
+        assert await session.scalar(select(NewsArticle.id).where(NewsArticle.url == url)) is None

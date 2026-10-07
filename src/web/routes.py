@@ -250,7 +250,7 @@ async def ready() -> dict:
     try:
         async with async_session() as session:
             revision = await session.scalar(text("SELECT version_num FROM alembic_version"))
-        checks["database"] = revision == "0012_broker_observations"
+        checks["database"] = revision == "0018_job_lease_clock"
     except Exception as exc:
         logger.warning("Readiness database check failed: %s", exc)
     from src.agent.clients.llama_cpp_client import model_status
@@ -967,6 +967,8 @@ async def portfolio_snapshot(request: Request) -> dict:
         "positions": positions,
         "errors": errors,
         "total_market_value_usd": market_value,
+        "total_market_value_usd_exact": summary.get("total_market_value_usd_exact"),
+        "total_unrealized_pnl_usd_exact": summary.get("total_unrealized_pnl_usd_exact"),
         "total_equity_usd": equity,
         "cash_usd": cash,
         "total_unrealized_pnl_usd": _portfolio_number(summary.get("total_unrealized_pnl_usd")),
@@ -1591,6 +1593,7 @@ def _expense_payload(row: ExpenseTransaction) -> dict:
         "subcategory": row.subcategory,
         "occurred_at": row.occurred_at.isoformat(),
         "pending": bool(row.pending),
+        "received_at": row.synced_at.isoformat(),
     }
 
 
@@ -1869,13 +1872,17 @@ async def import_expenses(request: Request) -> dict:
     synced_at = datetime.now(UTC)
     imported = 0
     updated = 0
+    suppressed = 0
     try:
         async with async_session() as session:
             from src.expenses.persistence import upsert_transaction
             for item in normalised:
-                if await upsert_transaction(
+                outcome = await upsert_transaction(
                     session, user_id=principal.user_id, item=item, received_at=synced_at
-                ):
+                )
+                if outcome is None:
+                    suppressed += 1
+                elif outcome:
                     imported += 1
                 else:
                     updated += 1
@@ -1889,6 +1896,7 @@ async def import_expenses(request: Request) -> dict:
         "provider": provider,
         "imported": imported,
         "updated": updated,
+        "suppressed_retired": suppressed,
     }
     await _publish_expense_event(principal.user_id, event)
     return {"success": True, **event}
@@ -2400,3 +2408,7 @@ router.include_router(report_retention_router, dependencies=[Depends(require_all
 from src.web.chat_retention import router as chat_retention_router  # noqa: E402
 
 router.include_router(chat_retention_router, dependencies=[Depends(require_allowed_ip)])
+
+from src.web.expense_reconciliation import router as expense_reconciliation_router  # noqa: E402
+
+router.include_router(expense_reconciliation_router, dependencies=[Depends(require_allowed_ip)])

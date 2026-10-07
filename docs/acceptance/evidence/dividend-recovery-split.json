@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "revision": "0015_account_events",
+  "reconciliation_hash": "ee5777d9ab0f79d3dfe9bd2e5114441626792bdd387780c106a898bed4f9eb8d",
+  "split_receipt": "6f44d3fa-d3a5-4838-91de-31ac2a6950dc",
+  "dividend_receipt": "22c0e523-d9af-4d85-8bcd-113fa077b4b7",
+  "dividend_income_verified": true,
+  "split_quantity_basis_cash_and_halt_preserved": true,
+  "production_data": false,
+  "broker_connections": 0
+}

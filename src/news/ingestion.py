@@ -19,7 +19,10 @@ from sqlalchemy.dialects.postgresql import (
 
 from src.db.models import NewsArticle, NewsRevision
 from src.db.database import async_session
+from src.news.policy import permitted_articles
+from src.news.quality import entity_observations, language_observation
 from src.news.visibility import visible_to
+from src.news.syndication import fingerprint
 from src.security.sessions import assert_active
 from src.agent.utils.logger import get_logger
 
@@ -35,13 +38,22 @@ async def _article_session(existing):
             yield session
 
 
-async def ingest_articles(articles: list[dict[str, Any]], *, owner_user_id: str | None = None, db_session=None) -> int:
+async def ingest_articles(
+    articles: list[dict[str, Any]], *, owner_user_id: str | None = None, db_session=None,
+    source_policy=None, source_identity=None,
+) -> int:
     """Persist *articles* to the DB. Returns the count of newly inserted rows.
 
     Returns newly inserted or corrected articles; exact repeated content is skipped.
     """
     if not articles:
         return 0
+    if source_policy is not None:
+        from src.execution.policy import PolicyDenied
+
+        if (source_policy.transport == "private_newsletter") != bool(owner_user_id):
+            raise PolicyDenied("SOURCE_POLICY_SCOPE_MISMATCH")
+        articles = permitted_articles(articles, source_policy, identity=source_identity)
 
     rows = [
         {
@@ -55,10 +67,14 @@ async def ingest_articles(articles: list[dict[str, Any]], *, owner_user_id: str 
             ).hexdigest(),
             "available_at": func.clock_timestamp(),
             "provenance": {
-                "language": a.get("language", "unknown"),
+                "language": language_observation(a.get("language"))["tag"],
+                "language_observation": language_observation(a.get("language")),
+                "entity_mentions": entity_observations(a.get("tags")),
+                "entity_mapping_status": "unresolved",
                 "license": a.get("license", "unverified"),
                 "retention": a.get("retention", "operator_review_required"),
-                "entities": a.get("tags", []),
+                "source_tags": a.get("tags", []),
+                **({"source_policy": a["source_policy"]} if source_policy is not None else {}),
             },
             "title": a["title"],
             "summary": a.get("summary", ""),
@@ -80,6 +96,10 @@ async def ingest_articles(articles: list[dict[str, Any]], *, owner_user_id: str 
 
     if not rows:
         return 0
+    for row in rows:
+        # Fallback identities must use the final owner-bound URL and stored hash,
+        # exactly as retrieval does; source-supplied metadata cannot override it.
+        row["provenance"]["syndication"] = fingerprint(row)
 
     async with _article_session(db_session) as session:
         if owner_user_id:
@@ -112,7 +132,8 @@ async def ingest_articles(articles: list[dict[str, Any]], *, owner_user_id: str 
                     NewsArticle.sentiment_score.is_distinct_from(insert.excluded.sentiment_score),
                 )
                 & (NewsArticle.visibility == insert.excluded.visibility)
-                & (NewsArticle.user_id.is_not_distinct_from(insert.excluded.user_id)),
+                & (NewsArticle.user_id.is_not_distinct_from(insert.excluded.user_id))
+                & NewsArticle.provenance["retention_state"].as_string().is_distinct_from("retired"),
             )
             .returning(NewsArticle)
             .execution_options(populate_existing=True)

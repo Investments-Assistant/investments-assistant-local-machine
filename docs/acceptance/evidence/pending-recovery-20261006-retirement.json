@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "revision": "0018_job_lease_clock",
+  "removed_rows_absent": true,
+  "retirement_hashes_preserved": 1,
+  "pending_resolution_verified": true,
+  "reimport_suppressed": true,
+  "production_data": false,
+  "bank_connections": 0
+}

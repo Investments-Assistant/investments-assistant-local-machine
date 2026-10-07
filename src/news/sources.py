@@ -1,12 +1,9 @@
 """News source adapters: RSS feeds, optional APIs, and web scraping.
 
-Sources are deliberately layered:
-1. RSS    — structured, always available, no API key needed
-2. Web scraping — open-access sites with no RSS feed
-3. Guardian API — optional full article text, disabled by default
-
-Financial Times and Bloomberg are paywalled; only their RSS headlines
-are fetched (no scraping — would violate their ToS).
+The catalog is not proof of availability or permission. Persistent ingestion
+requires an explicit current source policy before invoking these adapters.
+RSS, bounded HTML retrieval and optional API adapters remain distinct paths;
+no publisher license or right to full-text storage is inferred from access.
 """
 
 from __future__ import annotations
@@ -198,6 +195,7 @@ def _article(
     url: str,
     published_raw: str = "",
     content: str | None = None,
+    language: str | None = None,
 ) -> dict[str, Any]:
     full_text = f"{title} {summary} {content or ''}"
     label, score = _sentiment(full_text)
@@ -211,6 +209,7 @@ def _article(
         "sentiment_label": label,
         "sentiment_score": score,
         "tags": _extract_tags(full_text),
+        "language": language,
     }
 
 
@@ -238,6 +237,7 @@ def fetch_rss_source(source, url, *, max_per_feed=20, headers=None):
                     source,
                     link,
                     getattr(entry, "published", "") or "",
+                    language=getattr(entry, "language", None) or getattr(getattr(feed, "feed", None), "language", None),
                 )
             )
     return articles, response

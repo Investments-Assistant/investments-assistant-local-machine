@@ -102,7 +102,7 @@ def main():
     output = {
         "experiment": plan["experiment"],
         "plan_sha256": hashlib.sha256(plan_bytes).hexdigest(),
-        "engine_sha256": hashlib.sha256(Path("src/research/replay.py").read_bytes()).hexdigest(),
+        "engine_sha256": next(iter(holdout.values()))["engine_sha256"],
         "data_sha256": canonical_hash([asdict(bar) for bar in bars]),
         "plan": plan,
         "results": results,

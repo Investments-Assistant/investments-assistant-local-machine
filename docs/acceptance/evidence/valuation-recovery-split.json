@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "revision": "0017_valuation_snapshots",
+  "reconciliation_hash": "34ae458426ebf3dc1ea1f13e46a940365dfa0a889ee763a22b57db77a282f93c",
+  "split_receipt": "4a267051-3c55-43db-82af-18b54bcb78ed",
+  "dividend_receipt": "96c82f92-c26f-42b2-9957-323391c6e3fe",
+  "dividend_income_verified": true,
+  "exact_period_valuation_verified": true,
+  "split_quantity_basis_cash_and_halt_preserved": true,
+  "production_data": false,
+  "broker_connections": 0
+}

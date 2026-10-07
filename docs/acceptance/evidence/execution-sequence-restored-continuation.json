@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "database": "test_recovery_20260927_sequence",
+  "revision": "0013_execution_sequence",
+  "restored_max_sequence": 156,
+  "first_new_sequence": 228,
+  "clock_regressed_new_sequence": 229,
+  "fixture_rows_rolled_back": true,
+  "existing_rows_unchanged": true
+}

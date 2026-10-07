@@ -48,7 +48,7 @@ async def create_all_tables() -> None:
     """Compatibility name: verify the explicit migration, without schema mutation."""
     async with engine.connect() as conn:
         revision = await conn.scalar(text("SELECT version_num FROM alembic_version"))
-        if revision != "0012_broker_observations":
+        if revision != "0018_job_lease_clock":
             raise RuntimeError("Database migration required: run alembic upgrade head explicitly")
 
 

@@ -26,7 +26,7 @@ def main():
         sock.bind(("127.0.0.1", 0))
         port = sock.getsockname()[1]
     base = f"http://127.0.0.1:{port}"
-    screenshots = Path("/tmp/ia-browser-evidence")
+    screenshots = Path(".qa/browser-evidence").resolve()
     screenshots.mkdir(exist_ok=True)
     with (screenshots / "server.log").open("w") as log:
         server = subprocess.Popen(
@@ -46,7 +46,7 @@ def main():
         try:
             for _ in range(100):
                 if server.poll() is not None:
-                    raise RuntimeError("Fixture server exited; inspect /tmp/ia-browser-evidence/server.log")
+                    raise RuntimeError("Fixture server exited; inspect .qa/browser-evidence/server.log")
                 try:
                     with urlopen(base + "/api/health", timeout=1) as response:
                         if response.status == 200:
@@ -103,9 +103,14 @@ def main():
                     assert reproduce(evidence)["status"] == "PASS"
                     assert float(evidence["result"]["fees"]) > 0
                     replay_id = context.request.get(base + "/api/simulations").json()[0]["id"]
+                    expect(page.locator("#fixture-allow-sales")).not_to_be_checked()
+                    page.locator("#fixture-allow-sales").check()
                     page.locator("#fixture-create").click()
                     expect(page.locator("#fixture-details")).to_contain_text("Synthetic fixture only")
                     fixture = json.loads(page.locator("#fixture-details").inner_text())
+                    page.locator("#fixture-valuation-capture").click()
+                    expect(page.locator("#fixture-valuation-status")).to_contain_text("1 observations shown")
+                    expect(page.locator("#fixture-valuation-compare")).to_be_disabled()
                     page.locator("#fixture-propose").click()
                     expect(page.locator("#fixture-details")).to_contain_text('"status": "proposed"')
                     proposal = json.loads(page.locator("#fixture-details").inner_text())
@@ -120,11 +125,50 @@ def main():
                     assert account["reconciliation"]["status"] == "consistent"
                     assert account["reconciliation"]["scope"] == "simulator_internal"
                     assert len(account["reconciliation"]["inputs_sha256"]) == 64
+                    page.locator("#fixture-valuation-capture").click()
+                    expect(page.locator("#fixture-valuation-status")).to_contain_text("2 observations shown")
+                    page.locator("#fixture-valuation-compare").click()
+                    expect(page.locator("#fixture-valuation-status")).to_contain_text("Observed portfolio P&L: -0.1")
+                    expect(page.locator("#fixture-valuation-status")).to_contain_text(
+                        "Price contribution 0; FX contribution 0"
+                    )
+                    page.locator("#fixture-valuation-status").scroll_into_view_if_needed()
+                    page.screenshot(path=str(screenshots / "valuation-desktop.png"))
+                    page.set_viewport_size({"width": 390, "height": 844})
+                    page.wait_for_function("document.getElementById('sidebar').getBoundingClientRect().right <= 1")
+                    page.locator(".valuation-controls").scroll_into_view_if_needed()
+                    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+                    page.screenshot(path=str(screenshots / "valuation-mobile.png"))
+                    page.set_viewport_size({"width": 1440, "height": 1000})
+                    # Explicitly opted-in manual sale still requires a separate approval.
+                    page.locator("#fixture-side").select_option("sell")
+                    page.locator("#fixture-propose").click()
+                    expect(page.locator("#fixture-details")).to_contain_text('"status": "proposed"')
+                    sale_proposal = json.loads(page.locator("#fixture-details").inner_text())
+                    assert sale_proposal["details"]["side"] == "sell"
+                    page.locator("#fixture-approve").click()
+                    expect(page.locator("#fixture-details")).to_contain_text('"status": "submitted"')
+                    page.locator("#fixture-tick").click()
+                    expect(page.locator("#fixture-details")).to_contain_text('"status": "filled"')
+                    account = context.request.get(base + "/api/simulator/accounts/" + fixture["account_id"]).json()
+                    assert float(account["cash"]) == 999.8 and float(account["realized_pnl"]) == -0.2
+                    assert account["reconciliation"]["status"] == "consistent"
+                    inventory = account["reconciliation"]["allocation_inventory"][0]
+                    assert float(inventory["quantity"]) == float(inventory["cost_basis"]) == 0
                     page.locator("#fixture-mandate-review").click()
                     expect(page.locator("#fixture-details")).to_contain_text('"status": "proposed"')
                     mandate = json.loads(page.locator("#fixture-details").inner_text())
                     assert mandate["details"]["specification"]["environment"] == "simulator"
                     expect(page.locator("#fixture-approve")).to_be_disabled()
+                    page.locator("#fixture-mandate-approve").click()
+                    expect(page.locator("#fixture-details")).to_contain_text('"status": "approved"')
+                    page.locator("#fixture-mandate-strategy").select_option("price_band_fixture")
+                    expect(page.locator("#fixture-mandate-approve")).to_be_disabled()
+                    page.locator("#fixture-mandate-review").click()
+                    expect(page.locator("#fixture-details")).to_contain_text('"status": "proposed"')
+                    band = json.loads(page.locator("#fixture-details").inner_text())["details"]["specification"]
+                    assert band["strategy"] == "price_band_fixture"
+                    assert band["buy_below"] == "100" and band["sell_above"] == "110"
                     page.locator("#fixture-mandate-approve").click()
                     expect(page.locator("#fixture-details")).to_contain_text('"status": "approved"')
                     page.locator("#fixture-halt").click()
@@ -261,15 +305,19 @@ def main():
                     assert any(item["type"] == "tool_result" for item in chat_evidence["evidence"])
                     reports = context.request.get(base + "/api/reports").json()
                     assert reports and reports[0]["pdf_available"]
-                    assert reports[0]["generation_status"] == "complete"
-                    assert reports[0]["generation_errors"] == []
+                    assert reports[0]["generation_status"] == "partial_failure"
+                    assert reports[0]["generation_errors"] == [
+                        {"stage": "collection", "source": "portfolio", "code": "SOURCE_INCOMPLETE"}
+                    ]
                     report_id = reports[0]["id"]
                     pdf = context.request.get(base + f"/api/reports/{report_id}/pdf")
                     assert pdf.status == 200 and pdf.body().startswith(b"%PDF")
                     page.reload()
                     expect(page.locator(".chat-evidence-note")).to_contain_text("Saved answer")
                     expect(page.locator("#reports-list")).to_contain_text("2026-09-01")
-                    expect(page.locator("#reports-list .report-status").first).to_have_text("Generation complete")
+                    expect(page.locator("#reports-list .report-status").first).to_have_text(
+                        "Partial report — review data gaps"
+                    )
                     page.get_by_role("button", name="Simulation", exact=True).click()
                     other = browser.new_context()
                     other_page = other.new_page()
@@ -290,6 +338,19 @@ def main():
                     )
                     assert denied_category.status == 404
                     assert other.request.get(base + "/api/expenses?period=year").json()["transactions"] == []
+                    assert (
+                        other.request.get(
+                            base + "/api/simulator/accounts/" + fixture["account_id"] + "/valuations"
+                        ).status
+                        == 409
+                    )
+                    assert (
+                        context.request.post(
+                            base + "/api/simulator/accounts/" + fixture["account_id"] + "/valuations",
+                            data={"snapshot_key": "csrf-denied"},
+                        ).status
+                        == 403
+                    )
                     assert other.request.get(base + f"/api/simulations/{replay_id}/evidence").status == 404
                     from tests.e2e.broker_observations import verify_broker_observations
 
@@ -300,6 +361,13 @@ def main():
                     from tests.e2e.chat_retention import verify_chat_retention
 
                     verify_chat_retention(page, context, other, base, csrf, user_a, chat_evidence_url)
+                    from tests.e2e.expense_retention import verify_history_retention
+
+                    page.get_by_role("button", name="Expenses", exact=True).click()
+                    verify_history_retention(page, context, other, base, csrf, user_a, transactions, screenshots)
+                    from tests.e2e.expense_reconciliation import verify_reconciliation
+
+                    verify_reconciliation(page, context, other, base, csrf, screenshots)
                     other.close()
                     page.set_viewport_size({"width": 390, "height": 844})
                     expect(page.locator("#sidebar")).to_have_class("hidden")
@@ -342,13 +410,16 @@ def main():
                                     "portfolio view",
                                     "proposal",
                                     "independent approval",
-                                    "independent simulator mandate approval",
+                                    "independent buy-only and price-band simulator mandate approvals",
                                     "expense import, currencies, pages, category, full-period export "
-                                    "and raw-payload retention",
-                                    "bank disabled status; intercepted UI consent/selection/retry/disconnect",
+                                    "and raw-payload/history retention with re-import suppression",
+                                    "bank disabled status; intercepted consent/selection/retry/history retrieval with fresh expense fetch/disconnect",
+                                    "owner-reviewed pending/booked reconciliation, receipt clocks, export, "
+                                    "CSRF/replay denial",
                                     "cost-aware replay, evidence download/reproduction/isolation",
-                                    "fill and fees",
+                                    "buy/sell opt-in, separate approvals, fills, fees and realized PnL",
                                     "broker journal, confirmed read and isolation (synthetic source)",
+                                    "immutable valuation capture and flow-adjusted observation comparison",
                                     "halt",
                                     "model self-approval denial",
                                     "CSRF denial",

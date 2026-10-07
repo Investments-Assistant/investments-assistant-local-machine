@@ -68,7 +68,8 @@ async def test_malformed_opt_in_is_not_coerced_or_allowed_to_break_monitoring(ac
     assert await monitor.monitor_simulator_risk(user_id=ids[0]) == []
 
 
-async def test_expired_worker_cannot_publish_halt_or_success_checkpoint(account_fixture, monkeypatch):
+@pytest.mark.parametrize("price", [40, 100])
+async def test_expired_worker_cannot_publish_halt_or_success_checkpoint(account_fixture, monkeypatch, price):
     factory, ids, _, _ = account_fixture
     monkeypatch.setattr(monitor, "async_session", factory)
     original_acquire, original_check = monitor.acquire, monitor.enforce_account_risk
@@ -92,7 +93,7 @@ async def test_expired_worker_cannot_publish_halt_or_success_checkpoint(account_
         account = await session.get(SimulatorAccount, ids[1])
         account.mandate = dict(account.mandate, fixture=True)
         quote = await session.get(SimulatorInstrument, ids[2])
-        quote.price, quote.as_of = 40, datetime.now(UTC)
+        quote.price, quote.as_of = price, datetime.now(UTC)
     try:
         result = await monitor.monitor_simulator_risk(user_id=ids[0])
         assert reached_check.is_set()
@@ -101,7 +102,63 @@ async def test_expired_worker_cannot_publish_halt_or_success_checkpoint(account_
             account = await session.get(SimulatorAccount, ids[1])
             job = await session.scalar(select(JobLease).where(JobLease.user_id == ids[0]))
             assert not account.halted and job.last_success is None and job.checkpoint == {}
+            from src.execution.models import ValuationSnapshot
+
+            assert not (
+                await session.scalars(select(ValuationSnapshot).where(ValuationSnapshot.account_id == ids[1]))
+            ).all()
             assert not (await session.scalars(select(OperationalAlert).where(OperationalAlert.user_id == ids[0]))).all()
+    finally:
+        async with factory.begin() as session:
+            await session.execute(delete(JobLease).where(JobLease.user_id == ids[0]))
+
+
+@pytest.mark.parametrize("full", [False, True])
+async def test_daily_observation_is_bounded_and_capacity_does_not_disable_risk(account_fixture, monkeypatch, full):
+    from datetime import timedelta
+
+    from src.execution import valuation
+    from src.execution.models import ValuationSnapshot
+
+    factory, ids, _, _ = account_fixture
+    monkeypatch.setattr(monitor, "async_session", factory)
+    if full:
+        monkeypatch.setattr(valuation, "MAX_SNAPSHOTS", 0)
+    async with factory.begin() as session:
+        (await session.get(User, ids[0])).preferences = {"monitoring_enabled": True}
+        account = await session.get(SimulatorAccount, ids[1])
+        account.mandate = dict(account.mandate, fixture=True)
+    try:
+        first = (await monitor.monitor_simulator_risk(user_id=ids[0]))[0]
+        assert first["status"] == "observed"
+        assert first["valuation_status"] == ("unavailable" if full else "recorded")
+        async with factory.begin() as session:
+            job = await session.scalar(select(JobLease).where(JobLease.user_id == ids[0]))
+            job.next_due = job.lease_until = datetime.now(UTC) - timedelta(seconds=1)
+            quote = await session.get(SimulatorInstrument, ids[2])
+            quote.price, quote.as_of = 101, datetime.now(UTC)
+        second = (await monitor.monitor_simulator_risk(user_id=ids[0]))[0]
+        assert second["status"] == "observed"
+        async with factory() as session:
+            account = await session.get(SimulatorAccount, ids[1])
+            assert not account.halted and account.mandate["account_risk"]["equity"].startswith("1001")
+            snapshots = (
+                await session.scalars(select(ValuationSnapshot).where(ValuationSnapshot.account_id == ids[1]))
+            ).all()
+            assert len(snapshots) == (0 if full else 1)
+            if not full:
+                assert first["valuation"]["snapshot_id"] == second["valuation"]["snapshot_id"]
+                assert snapshots[0].payload["equity"].startswith("1000")
+            else:
+                alerts = (
+                    await session.scalars(
+                        select(OperationalAlert).where(
+                            OperationalAlert.user_id == ids[0],
+                            OperationalAlert.rule == "valuation_observation_unavailable",
+                        )
+                    )
+                ).all()
+                assert len(alerts) == 1 and alerts[0].occurrences == 2
     finally:
         async with factory.begin() as session:
             await session.execute(delete(JobLease).where(JobLease.user_id == ids[0]))

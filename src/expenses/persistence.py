@@ -7,21 +7,39 @@ from a preceding SELECT that can race a provider update.
 
 import uuid
 
-from sqlalchemy import case
+from sqlalchemy import case, text, select
 from sqlalchemy.dialects.postgresql import insert
 
-from src.db.models import ExpenseTransaction
+from src.db.models import User, ExpenseTransaction
+from src.expenses.models import ExpenseRetirement
+from src.execution.policy import PolicyDenied, digest
+
+
+def retirement_identity(user_id, item):
+    return digest([user_id, item["provider"], item["account_key"], item["external_id"]])
+
+
+async def expense_write_lock(session, user_id):
+    # A transaction-scoped owner lock serializes import with purge. Hash collisions
+    # only serialize unrelated owners; they cannot grant access or mix data.
+    await session.execute(
+        text("SELECT pg_advisory_xact_lock(hashtextextended(:key, 0))"), {"key": "expense-history:" + str(user_id)}
+    )
+    if not user_id or not await session.scalar(
+        select(User.id).where(User.id == user_id, User.is_active.is_(True)).with_for_update(read=True)
+    ):
+        raise PolicyDenied("PRINCIPAL_INACTIVE")
 
 
 async def upsert_transaction(session, *, user_id, item, received_at):
+    """True inserted, False updated, None suppressed by explicit retirement."""
+    await expense_write_lock(session, user_id)
+    if await session.get(ExpenseRetirement, (user_id, retirement_identity(user_id, item))):
+        return None
     row_id = str(uuid.uuid4())
-    statement = insert(ExpenseTransaction).values(
-        id=row_id, user_id=user_id, **item, synced_at=received_at
-    )
+    statement = insert(ExpenseTransaction).values(id=row_id, user_id=user_id, **item, synced_at=received_at)
     updates = {
-        key: getattr(statement.excluded, key)
-        for key in item
-        if key not in {"provider", "external_id", "account_key"}
+        key: getattr(statement.excluded, key) for key in item if key not in {"provider", "external_id", "account_key"}
     }
     for key in ("category", "subcategory"):
         updates[key] = case(

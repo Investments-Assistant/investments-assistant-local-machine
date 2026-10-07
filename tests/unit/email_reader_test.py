@@ -9,6 +9,7 @@ from email.mime.multipart import MIMEMultipart
 
 import pytest
 
+from src.news.policy import newsletter_identity
 from src.news.email_reader import (
     _strip_html,
     _extract_body,
@@ -16,6 +17,14 @@ from src.news.email_reader import (
     _build_search_criteria,
     read_and_ingest_newsletters,
 )
+from tests.news_policy_fixture import news_policy_fixture
+
+
+def permit_fixture(settings):
+    settings.news_source_policies = {
+        newsletter_identity(settings): news_policy_fixture(transport="private_newsletter", article_hosts=[]),
+    }
+
 
 # ---------------------------------------------------------------------------
 # _strip_html
@@ -178,6 +187,7 @@ class TestReadAndIngestNewsletters:
         # Arrange — no credentials configured
         force_development_env.newsletter_email_user = ""
         force_development_env.newsletter_email_password = ""
+        permit_fixture(force_development_env)
         # Act
         result = await read_and_ingest_newsletters()
         # Assert
@@ -186,6 +196,7 @@ class TestReadAndIngestNewsletters:
     async def test_imap_login_failure_returns_zero(self, force_development_env):
         force_development_env.newsletter_email_user = "user@gmail.com"
         force_development_env.newsletter_email_password = "wrong"
+        permit_fixture(force_development_env)
 
         with patch("src.news.email_reader.imaplib.IMAP4_SSL") as mock_imap:
             mock_imap.side_effect = Exception("auth failed")
@@ -197,6 +208,7 @@ class TestReadAndIngestNewsletters:
         force_development_env.newsletter_email_user = "user@gmail.com"
         force_development_env.newsletter_email_password = "secret"
         force_development_env.newsletter_sender_filter = "news@letter.com"
+        permit_fixture(force_development_env)
 
         # Build a real email message
         msg = MIMEMultipart("alternative")
@@ -220,6 +232,37 @@ class TestReadAndIngestNewsletters:
 
         assert result["fetched"] == 1
         assert result["inserted"] == 1
+
+    async def test_missing_policy_never_connects(self, force_development_env):
+        force_development_env.news_source_policies = {}
+        with patch("src.news.email_reader._imap_connect") as connect:
+            result = await read_and_ingest_newsletters()
+        connect.assert_not_called()
+        assert result["status"] == "blocked" and result["reason"] == "SOURCE_PERMISSION_REQUIRED"
+
+    async def test_mailbox_change_does_not_reuse_permission(self, force_development_env):
+        force_development_env.newsletter_email_user = "first@fixture.invalid"
+        permit_fixture(force_development_env)
+        force_development_env.newsletter_email_user = "second@fixture.invalid"
+        with patch("src.news.email_reader._imap_connect") as connect:
+            result = await read_and_ingest_newsletters()
+        connect.assert_not_called()
+        assert result["reason"] == "SOURCE_PERMISSION_REQUIRED"
+
+    async def test_revocation_during_read_cannot_persist(self, force_development_env):
+        permit_fixture(force_development_env)
+
+        def fetch(_days):
+            force_development_env.news_source_policies = {}
+            return [{"title": "Private fixture", "url": "newsletter://" + "a" * 64}]
+
+        with (
+            patch("src.news.email_reader._fetch_newsletters", side_effect=fetch),
+            patch("src.news.email_reader.ingest_articles", new=AsyncMock()) as ingest,
+        ):
+            result = await read_and_ingest_newsletters()
+        ingest.assert_not_awaited()
+        assert result["status"] == "blocked" and result["reason"] == "SOURCE_PERMISSION_REQUIRED"
 
 
 @pytest.mark.unit

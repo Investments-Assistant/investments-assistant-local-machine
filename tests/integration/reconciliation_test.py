@@ -49,22 +49,24 @@ async def test_partial_fills_late_commissions_and_database_round_trip(db_session
     db_session.expire_all()
     account = await db_session.get(SimulatorAccount, ids[1])
     result = await reconcile_account(db_session, account)
-    assert result["status"] == "consistent" and result["events_checked"] == 4
+    assert result["status"] == "consistent" and result["events_checked"] == 5
     assert (await reconcile_account(db_session, account))["evidence_sha256"] == result["evidence_sha256"]
 
 
-@pytest.mark.parametrize("field", ["cash", "reserved", "position_quantity", "position_cost_basis"])
+@pytest.mark.parametrize("field", ["cash", "reserved", "realized_pnl", "position_quantity", "position_cost_basis"])
 async def test_discrepancy_detected_without_overwriting_balances(db_session, field):
     ids, order, account = await setup_order(db_session)
     await execution(db_session, ids, order)
     position = await db_session.scalar(select(SimulatorPosition).where(SimulatorPosition.account_id == ids[1]))
     target, attr = (position, field.removeprefix("position_")) if field.startswith("position_") else (account, field)
+    before = await reconcile_account(db_session, account)
     original = getattr(target, attr)
     setattr(target, attr, original + Decimal(1))
     await db_session.flush()
     result = await reconcile_account(db_session, account)
     assert result["status"] == "discrepant"
     assert field in {item["field"] for item in result["discrepancies"]}
+    assert before["inputs_sha256"] != result["inputs_sha256"]
     assert getattr(target, attr) == original + 1
     other = await seed(db_session)
     assert (await reconcile_account(db_session, await db_session.get(SimulatorAccount, other[1])))[
@@ -84,7 +86,7 @@ async def test_incomplete_evidence_is_unverified_not_fabricated_cash(db_session)
     await db_session.flush()
     result = await reconcile_account(db_session, account)
     assert result["status"] == "unverified"
-    assert "cash" not in {item["field"] for item in result["discrepancies"]}
+    assert not {"cash", "realized_pnl"} & {item["field"] for item in result["discrepancies"]}
     assert account.cash == Decimal("899.95")
 
 
@@ -128,3 +130,54 @@ async def test_partial_release_retains_subscale_dust_until_final_fill(db_session
     await db_session.refresh(account)
     assert account.reserved == 0 and account.cash == 700
     assert (await reconcile_account(db_session, account))["status"] == "consistent"
+
+
+@pytest.mark.parametrize("change", ["mandate_id", "actor", "details_hash"])
+async def test_changed_allocation_cannot_reassign_retained_fill_ownership(db_session, change):
+    from src.execution.models import SimulatorOrder
+
+    ids, order_id, account = await setup_order(db_session)
+    await execution(db_session, ids, order_id)
+    before = await reconcile_account(db_session, account)
+    assert before["status"] == "consistent"
+    order = await db_session.get(SimulatorOrder, order_id)
+    order.approval = dict(order.approval, **{change: "unapproved-allocation"})
+    await db_session.flush()
+    after = await reconcile_account(db_session, account)
+    assert after["status"] == "unverified"
+    assert "ALLOCATION_PROVENANCE_UNAVAILABLE" in after["unknown_reasons"]
+    assert before["inputs_sha256"] != after["inputs_sha256"]
+    assert order.approval[change] == "unapproved-allocation"
+
+
+async def test_verified_inventory_exposes_exact_owned_basis_and_hides_discrepant_balances(db_session):
+    ids, order, account = await setup_order(db_session, "0.004")
+    await execution(db_session, ids, order, quantity="0.004")
+    result = await reconcile_account(db_session, account)
+    assert result["status"] == "consistent"
+    assert len(result["allocation_inventory"]) == 1
+    inventory = result["allocation_inventory"][0]
+    assert inventory["allocation_id"] == "manual" and inventory["instrument_id"] == ids[2]
+    assert Decimal(inventory["quantity"]) == Decimal("0.004")
+    assert Decimal(inventory["cost_basis"]) == Decimal("0.4")
+    assert Decimal(inventory["reserved_quantity"]) == 0
+    assert Decimal(inventory["available_quantity"]) == Decimal("0.004")
+    account.cash += 1
+    await db_session.flush()
+    discrepancy = await reconcile_account(db_session, account)
+    assert discrepancy["status"] == "discrepant" and discrepancy["allocation_inventory"] is None
+
+
+async def test_reconciliation_preserves_exact_evidence_under_caller_decimal_context(db_session):
+    from decimal import getcontext, localcontext
+
+    ids, order, account = await setup_order(db_session)
+    await execution(db_session, ids, order, price="99.1234567891")
+    await db_session.flush()
+    expected = await reconcile_account(db_session, account, _include_execution_evidence=True)
+    assert expected["status"] == "consistent"
+    with localcontext() as context:
+        context.prec = 6
+        actual = await reconcile_account(db_session, account, _include_execution_evidence=True)
+        assert getcontext().prec == 6
+    assert actual == expected, "Caller precision changed reconciliation of identical persisted evidence"

@@ -1533,7 +1533,11 @@ function renderExpenseTransactions(transactions, currency) {
       ${Array.from(document.getElementById('expenses-category').options).filter(option => option.value).map(option => `<option value="${escapeHtml(option.value)}" ${option.value === transaction.category ? 'selected' : ''}>${escapeHtml(option.textContent)}</option>`).join('')}
       </select><span class="asset-meta">${escapeHtml(transaction.subcategory || '')}</span></td>
       <td>${escapeHtml(transaction.account_name || 'Bank account')}</td>
-      <td>${escapeHtml(dateLabel)}${transaction.pending ? ' · pending' : ''}</td>
+      <td>${escapeHtml(dateLabel)}${transaction.pending ? ' · pending' : ''}
+        ${transaction.pending ? `<button class="dashboard-btn" data-transaction="${escapeHtml(transaction.id)}" onclick="selectPendingReconciliation(this.dataset.transaction)">Resolve pending</button>`
+          : expensePendingId && ['booked', 'revised'].includes(transaction.lifecycle)
+            ? `<button class="dashboard-btn" data-transaction="${escapeHtml(transaction.id)}" onclick="previewPendingReconciliation(this.dataset.transaction)">Review as booked match</button>` : ''}
+      </td>
       <td class="${amountClass}">${amountPrefix}${formatExpenseMoney(transaction.amount_exact ?? transaction.amount, transaction.currency)}</td>
     </tr>`;
   }).join('');
@@ -1661,7 +1665,7 @@ function renderSimulationResult(result) {
   document.getElementById('sim-final-value').textContent = formatExpenseMoney(result.final_value, currency);
   const research = result.research_summary;
   document.getElementById('simulation-research-note').textContent = research
-    ? `Research evidence is insufficient for live use. Fees: ${formatExpenseMoney(research.fees, currency)}. Open positions are marked, not recorded as sales. ${(research.source?.limitations || []).join('. ')}`
+    ? `Research evidence is insufficient for live use. Fees: ${formatExpenseMoney(research.fees, currency)}. Dividend cash received: ${research.dividends_paid == null ? 'unavailable' : formatExpenseMoney(research.dividends_paid, currency)}; unpaid receivables: ${research.dividend_receivable == null ? 'unavailable' : formatExpenseMoney(research.dividend_receivable, currency)}. Valuation: ${research.valuation_status || 'unverified'}. Open positions are marked, not recorded as sales. ${(research.source?.limitations || []).join('. ')}`
     : 'Legacy result: source currency and cost-aware evidence are unavailable.';
   const evidenceLink = document.getElementById('simulation-evidence-link');
   evidenceLink.hidden = !result.evidence_available;
@@ -1955,9 +1959,16 @@ function fixtureDisplay(value) {
 }
 async function createExecutionFixture() {
   try {
-    executionFixture = await fixtureRequest('/fixtures');
+    executionFixture = await fixtureRequest('/fixtures', {manual_sales: document.getElementById('fixture-allow-sales').checked});
+    document.querySelector('#fixture-side option[value="sell"]').disabled = !executionFixture.manual_sales;
+    document.getElementById('fixture-side').value = 'buy';
     executionProposal = null;
     executionMandate = null;
+    document.getElementById('fixture-valuation-capture').disabled = false;
+    document.getElementById('fixture-valuation-compare').disabled = true;
+    document.getElementById('fixture-valuation-start').replaceChildren();
+    document.getElementById('fixture-valuation-end').replaceChildren();
+    document.getElementById('fixture-valuation-status').textContent = 'No saved observations for this practice account.';
     document.getElementById('fixture-mandate-review').disabled = false;
     fixtureDisplay(executionFixture);
     document.getElementById('fixture-propose').disabled = false;
@@ -1969,7 +1980,8 @@ async function createExecutionFixture() {
 async function proposeFixtureOrder() {
   try {
     executionProposal = await fixtureRequest(`/accounts/${executionFixture.account_id}/proposals`, {
-      instrument_id: executionFixture.instrument_id, quantity: '1', limit_price: '100', idempotency_key: crypto.randomUUID()});
+      instrument_id: executionFixture.instrument_id, side: document.getElementById('fixture-side').value,
+      quantity: '1', limit_price: '100', idempotency_key: crypto.randomUUID()});
     // Nonce is kept in memory, not rendered or stored in browser persistence.
     const {nonce, ...display} = executionProposal;
     fixtureDisplay(display);
@@ -2032,9 +2044,15 @@ async function loadOperationalAlerts() {
 
 let executionMandate = null;
 async function reviewFixtureMandate() {
+  document.getElementById('fixture-mandate-approve').disabled = true;
   try {
+    const strategy = document.getElementById('fixture-mandate-strategy').value;
+    const thresholds = strategy === 'price_band_fixture' ? {
+      buy_below: document.getElementById('fixture-buy-below').value,
+      sell_above: document.getElementById('fixture-sell-above').value
+    } : {};
     executionMandate = await fixtureRequest(`/accounts/${executionFixture.account_id}/mandates`, {
-      environment: 'simulator', strategy: 'periodic_fixture_buy', strategy_version: '1',
+      environment: 'simulator', strategy, strategy_version: '1', ...thresholds,
       instrument_ids: [executionFixture.instrument_id], capital_limit: '500', max_position: '300',
       max_order: '150', daily_loss_limit: '25', drawdown_limit: '40', max_orders_per_day: 3,
       min_interval_seconds: 60, max_quote_age_seconds: 30, max_fee_bps: '10', max_spread_bps: '5',
@@ -2070,7 +2088,7 @@ async function importExpenseFile() {
       body: JSON.stringify(body)});
     const result = await response.json();
     if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : 'Import unavailable.');
-    status.textContent = `Imported ${result.imported}; updated ${result.updated}. Bank connectivity is unchanged.`;
+    status.textContent = `Imported ${result.imported}; updated ${result.updated}; skipped retired ${result.suppressed_retired || 0}. Bank connectivity is unchanged.`;
     await loadExpenses(true);
   } catch (error) {
     status.textContent = error instanceof SyntaxError ? 'The file is not valid JSON.' : error.message;
@@ -2138,6 +2156,31 @@ async function loadBankConnections() {
         });
         row.append(control);
       };
+      const historyLabel = document.createElement('label');
+      historyLabel.textContent = 'Retrieve bank history from ';
+      const historyDate = document.createElement('input');
+      historyDate.type = 'date'; historyDate.setAttribute('aria-label', 'Bank history start date');
+      const today = new Date();
+      historyDate.max = today.toISOString().slice(0, 10);
+      historyDate.min = new Date(today.getTime() - 730 * 86400000).toISOString().slice(0, 10);
+      const historyDisabled = !data.external_access_enabled || !['connected', 'retry_wait'].includes(connection.status);
+      historyDate.disabled = historyDisabled;
+      historyLabel.append(historyDate); row.append(historyLabel);
+      action('Retrieve older history', async () => {
+        if (!historyDate.value || !historyDate.checkValidity()) throw new Error('Choose a valid start date within the last 730 days.');
+        const result = await bankRequest(`/${encodeURIComponent(connection.id)}/history`, 'POST', {date_from: historyDate.value});
+        document.getElementById('bank-action-status').textContent = result.status === 'complete'
+          ? 'History retrieval finished. Provider coverage may be limited; missing transactions were not deleted.'
+          : (result.error_code || 'History retrieval is waiting for provider retry.');
+        await loadBankConnections();
+        if (result.status === 'complete') await loadExpenses(true);
+      }, historyDisabled);
+      const historyNote = document.createElement('p');
+      const history = connection.last_history_retrieval;
+      historyNote.textContent = history
+        ? `Last history request: from ${history.requested_from}, received ${formatMessageTime(history.completed_at)} (${history.records} records). Complete coverage is not verified.`
+        : 'Older corrections require a history request. Available history depends on bank consent and provider coverage; missing records are kept.';
+      row.append(historyNote);
       action('Choose consented account', () => chooseBankAccount(connection.id, row), !data.external_access_enabled);
       action('Renew bank consent', () => beginBankConsent(connection.id), !data.consent_setup_available);
       action('Stop local synchronization', async () => {
@@ -2278,4 +2321,200 @@ async function applyExpenseRetention() {
     const result = await response.json();
     status.textContent = `Removed ${result.removed_raw_payloads} raw copies. Transaction history remains.`;
   } catch (error) { status.textContent = error.message; }
+}
+
+let expenseHistoryPlan = null;
+let expenseHistoryGeneration = 0;
+function resetExpenseHistory() {
+  expenseHistoryPlan = null;
+  expenseHistoryGeneration += 1;
+  const approval = document.getElementById('expense-history-confirm');
+  approval.checked = false; approval.disabled = true;
+  document.getElementById('expense-history-apply').disabled = true;
+  document.getElementById('expense-history-status').textContent = 'Choose an age, then export and review before removal.';
+}
+function updateExpenseHistoryApproval() {
+  document.getElementById('expense-history-apply').disabled =
+    !expenseHistoryPlan || !document.getElementById('expense-history-confirm').checked;
+}
+async function previewExpenseHistory() {
+  resetExpenseHistory();
+  const generation = expenseHistoryGeneration;
+  const days = Number(document.getElementById('expense-history-days').value);
+  const status = document.getElementById('expense-history-status');
+  if (!Number.isInteger(days) || days < 1 || days > 36525) {
+    status.textContent = 'Enter a whole number of days between 1 and 36525.'; return;
+  }
+  const button = document.getElementById('expense-history-preview'); button.disabled = true;
+  try {
+    const response = await fetch('/api/expenses/retention/history/preview', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({retain_days: days}),
+    });
+    if (!response.ok) throw new Error('History preview unavailable.');
+    const result = await response.json();
+    if (generation !== expenseHistoryGeneration) return;
+    if (!result.plan.count) { status.textContent = 'No settled history matches this age.'; return; }
+    const url = URL.createObjectURL(new Blob([JSON.stringify(result.export, null, 2)], {type: 'application/json'}));
+    const link = document.createElement('a'); link.href = url; link.download = 'expense-history-retention.json';
+    link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    expenseHistoryPlan = result.plan;
+    status.textContent = `${result.plan.count} transactions in this batch. Verify the downloaded export before approving. ` +
+      'Preview expires after 10 minutes. ' + (result.plan.may_have_more ? 'More history may require another batch.' : '');
+    document.getElementById('expense-history-confirm').disabled = false;
+  } catch (error) { if (generation === expenseHistoryGeneration) status.textContent = error.message; }
+  finally { button.disabled = false; }
+}
+async function applyExpenseHistory() {
+  if (!expenseHistoryPlan || !document.getElementById('expense-history-confirm').checked) return;
+  const plan = expenseHistoryPlan;
+  resetExpenseHistory();
+  const status = document.getElementById('expense-history-status');
+  try {
+    const response = await fetch('/api/expenses/retention/history/apply', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({policy: plan.policy, plan_sha256: plan.plan_sha256, export_sha256: plan.export_sha256,
+        confirm_history_removal: true, confirm_export_saved: true}),
+    });
+    if (!response.ok) throw new Error('History removal did not complete. Preview again; data or authorization may have changed.');
+    const result = await response.json();
+    status.textContent = `Removed ${result.removed_transactions} transactions. Matching re-imports remain blocked. Reports, chats and backups are separate.`;
+  } catch (error) { status.textContent = error.message; }
+}
+
+
+function readableExactDecimal(value) {
+  const text = String(value);
+  if (/^-?0+(?:\.0+)?(?:e[+-]?\d+)?$/i.test(text)) return '0';
+  return /^-?\d+\.\d+$/.test(text) ? text.replace(/0+$/, '').replace(/\.$/, '') : text;
+}
+async function captureFixtureValuation() {
+  if (!executionFixture) return;
+  const accountId = executionFixture.account_id;
+  const button = document.getElementById('fixture-valuation-capture');
+  const status = document.getElementById('fixture-valuation-status');
+  button.disabled = true;
+  try {
+    await fixtureRequest(`/accounts/${accountId}/valuations`, {snapshot_key: crypto.randomUUID()});
+    const response = await fetch(`/api/simulator/accounts/${accountId}/valuations`, {cache: 'no-store'});
+    if (!response.ok) throw new Error('Saved valuations unavailable.');
+    const result = await response.json();
+    if (executionFixture?.account_id !== accountId) return;
+    const snapshots = result.snapshots.slice().reverse();
+    for (const id of ['fixture-valuation-start', 'fixture-valuation-end']) {
+      const select = document.getElementById(id); select.replaceChildren();
+      for (const row of snapshots) {
+        const option = document.createElement('option'); option.value = row.as_of;
+        option.textContent = `${row.as_of} · ${readableExactDecimal(row.equity)} ${row.currency}`;
+        select.append(option);
+      }
+    }
+    document.getElementById('fixture-valuation-end').selectedIndex = snapshots.length - 1;
+    document.getElementById('fixture-valuation-compare').disabled = snapshots.length < 2;
+    status.textContent = `Valuation saved. ${snapshots.length} observations shown.` +
+      (result.truncated ? ' Only the newest 100 observations are listed.' : '');
+  } catch (error) { if (executionFixture?.account_id === accountId) status.textContent = error.message; }
+  finally { button.disabled = !executionFixture; }
+}
+async function compareFixtureValuations() {
+  if (!executionFixture) return;
+  const accountId = executionFixture.account_id;
+  const start = document.getElementById('fixture-valuation-start').value;
+  const end = document.getElementById('fixture-valuation-end').value;
+  const status = document.getElementById('fixture-valuation-status');
+  if (!start || !end || start >= end) { status.textContent = 'Choose an opening observation before the closing observation.'; return; }
+  try {
+    const query = new URLSearchParams({start, end});
+    const response = await fetch(`/api/simulator/accounts/${accountId}/performance?${query}`, {cache: 'no-store'});
+    const result = await response.json();
+    if (executionFixture?.account_id !== accountId) return;
+    if (!response.ok || result.status !== 'complete') throw new Error('Period valuation unavailable; retained evidence may be missing or invalid.');
+    status.textContent = `Observed portfolio P&L: ${readableExactDecimal(result.portfolio_pnl)} ${result.currency}. ` +
+      `Realized change ${readableExactDecimal(result.realized_change)}; unrealized change ${readableExactDecimal(result.unrealized_change)}; dividend income ${readableExactDecimal(result.dividend_net)}. ` +
+      `External flows excluded: ${readableExactDecimal(result.net_external_flows)}. Fees included. ` +
+      (result.fx_attribution_status === 'complete'
+        ? `Price contribution ${readableExactDecimal(result.price_effect)}; FX contribution ${readableExactDecimal(result.fx_effect)}. Price changes use closing FX. `
+        : 'Separate FX attribution unavailable. ') +
+      `Benchmark attribution unavailable. ` +
+      `Period: ${result.start} to ${result.end_exclusive}.`;
+  } catch (error) { if (executionFixture?.account_id === accountId) status.textContent = error.message; }
+}
+
+
+let expensePendingId = null;
+let expenseReconciliationPlan = null;
+let expenseReconciliationGeneration = 0;
+function resetPendingReconciliation() {
+  expensePendingId = null;
+  expenseReconciliationPlan = null;
+  expenseReconciliationGeneration += 1;
+  const approval = document.getElementById('expense-reconciliation-confirm');
+  approval.checked = false; approval.disabled = true;
+  document.getElementById('expense-reconciliation-apply').disabled = true;
+  document.getElementById('expense-reconciliation-status').textContent = 'Select a pending transaction below, then its booked entry. No match is inferred.';
+  if (expenseSnapshot) renderExpenseTransactions(expenseSnapshot.transactions, expenseSnapshot.currency);
+}
+function selectPendingReconciliation(id) {
+  resetPendingReconciliation();
+  expensePendingId = id;
+  document.getElementById('expense-reconciliation-controls').open = true;
+  const row = expenseSnapshot?.transactions.find(item => item.id === id);
+  document.getElementById('expense-reconciliation-status').textContent =
+    `Pending selected: ${row?.merchant || 'transaction'}. Select “Review as booked match” on its settled entry. You can change pages.`;
+  if (expenseSnapshot) renderExpenseTransactions(expenseSnapshot.transactions, expenseSnapshot.currency);
+}
+function updatePendingReconciliationApproval() {
+  document.getElementById('expense-reconciliation-apply').disabled =
+    !expenseReconciliationPlan || !document.getElementById('expense-reconciliation-confirm').checked;
+}
+async function previewPendingReconciliation(bookedId) {
+  if (!expensePendingId) return;
+  const pendingId = expensePendingId;
+  expenseReconciliationPlan = null;
+  const generation = ++expenseReconciliationGeneration;
+  const approval = document.getElementById('expense-reconciliation-confirm');
+  approval.checked = false; approval.disabled = true;
+  updatePendingReconciliationApproval();
+  const status = document.getElementById('expense-reconciliation-status');
+  status.textContent = 'Checking the selected pair…';
+  try {
+    const response = await fetch('/api/expenses/reconciliation/preview', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({pending_id: pendingId, booked_id: bookedId}),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.detail?.reason_code === 'CATEGORY_OVERRIDE_CONFLICT'
+      ? 'The entries have different category overrides. Review their categories before linking them.'
+      : 'Pair unavailable. Select your pending and booked entries from the same account, currency and transaction type.');
+    if (generation !== expenseReconciliationGeneration) return;
+    const url = URL.createObjectURL(new Blob([JSON.stringify(result.export, null, 2)], {type: 'application/json'}));
+    const link = document.createElement('a'); link.href = url; link.download = 'pending-reconciliation.json';
+    link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    expenseReconciliationPlan = result.plan;
+    const describe = row => `${row.merchant}, ${row.occurred_at}, ${readableExactDecimal(row.amount)} ${row.currency}`;
+    status.textContent = `Review pending: ${describe(result.export.pending)}. Booked: ${describe(result.export.booked)}. ` +
+      `The booked amount stays unchanged. ${result.plan.copy_pending_category ? 'Your pending category override will carry over. ' : ''}` +
+      'Verify the downloaded pair before confirming. This preview expires after 10 minutes.';
+    approval.disabled = false;
+    document.getElementById('expense-reconciliation-controls').scrollIntoView({block: 'center'});
+  } catch (error) { if (generation === expenseReconciliationGeneration) status.textContent = error.message; }
+}
+async function applyPendingReconciliation() {
+  if (!expenseReconciliationPlan || !document.getElementById('expense-reconciliation-confirm').checked) return;
+  const plan = expenseReconciliationPlan;
+  resetPendingReconciliation();
+  const generation = expenseReconciliationGeneration;
+  const status = document.getElementById('expense-reconciliation-status');
+  try {
+    const response = await fetch('/api/expenses/reconciliation/apply', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken()},
+      body: JSON.stringify({pending_id: plan.pending_id, booked_id: plan.booked_id, as_of: plan.as_of,
+        plan_sha256: plan.plan_sha256, export_sha256: plan.export_sha256,
+        confirm_same_transaction: true, confirm_export_saved: true}),
+    });
+    if (!response.ok) throw new Error('Resolution did not complete. Preview again; the records or your authorization may have changed.');
+    if (generation === expenseReconciliationGeneration) status.textContent =
+      'Removed the reviewed pending entry; the booked amount is unchanged. Imports of the removed identity stay blocked.';
+    await loadExpenses(true);
+  } catch (error) { if (generation === expenseReconciliationGeneration) status.textContent = error.message; }
 }

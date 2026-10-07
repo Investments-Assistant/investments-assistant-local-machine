@@ -125,5 +125,6 @@ def load_history(symbols: list[str], start: str, end: str, base_currency: str):
             "Historical provider availability latency not observed",
             "FX daily closes conservatively available at next UTC midnight",
             "Vendor corporate-action adjustments require independent reconciliation",
+            "Dividend payment dates unavailable: earned distributions remain receivables, not spendable cash",
         ],
     )

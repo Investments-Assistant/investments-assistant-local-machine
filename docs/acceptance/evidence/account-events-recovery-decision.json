@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "revision": "0015_account_events",
+  "decision_evidence_hash": "7c9c8f92ce3eb1aa61d499a2357e5a5b0ffc53d068056121e3b6896aeceacbfd",
+  "no_trade_and_original_quote_preserved": true,
+  "cash_flow_hash_and_reconciliation_preserved": true,
+  "shared_sequence_continuation_verified": true,
+  "scope": "synthetic disposable database restore",
+  "broker_connections": 0
+}

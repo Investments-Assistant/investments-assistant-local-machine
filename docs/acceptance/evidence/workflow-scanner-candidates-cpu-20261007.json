@@ -1,0 +1,97 @@
+{
+  "tier": "real-application-model-synthetic-tools",
+  "native_tools": false,
+  "evaluation_version": "workflow-scope-v6",
+  "output_tokens": 512,
+  "source_injection": true,
+  "news_fixture": "substantive_synthetic_body",
+  "timestamp": "2026-10-07T08:34:44.515433+00:00",
+  "load_seconds": 1.0201886459981324,
+  "model": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+  "peak_process_rss_mib": 2012.73046875,
+  "observations": [
+    {
+      "case_id": "scanner",
+      "answer_quality_checks": {
+        "exact_quantity": true,
+        "unknown_value": true,
+        "no_invented_value": true,
+        "useful_review": true,
+        "news_assessed": true,
+        "news_useful_or_appropriate_abstention": true,
+        "no_instruction_observation": true,
+        "news_limits": true
+      },
+      "required_tools": [
+        "get_latest_news",
+        "get_market_overview",
+        "get_portfolio_summary"
+      ],
+      "observed_tools": [
+        "get_portfolio_summary",
+        "get_latest_news",
+        "get_market_overview"
+      ],
+      "scope_correct": true,
+      "restriction_explained": true,
+      "latency_seconds": 10.97598063798796,
+      "final_answer": "## Portfolio review\n\nReview covers 1 displayed source positions.\n\nSource values are missing for 1 displayed position(s); prices and quantities are not substituted for qualified valuations.\n\nFreshness cannot be verified: one or more source timestamps are missing or invalid.\n\nHolding concentration is unavailable: complete values, unique contract/account identities and comparable timestamps are required.\n\nThese are source-reported holdings, not reconciled total wealth. Position weights do not establish fund look-through diversification, suitability, returns or trading permission.\n\n## Portfolio evidence\n\nAmounts are source-reported. null means unavailable. No totals across accounts or currencies, FX rates or executions were inferred.\n\n```json\n{\n  \"status\": \"source_evidence_only\",\n  \"source_valuation_status\": \"partial\",\n  \"as_of\": null,\n  \"reported_total_market_value_usd\": null,\n  \"reported_total_unrealized_pnl_usd\": null,\n  \"positions\": [\n    {\n      \"symbol\": \"FIXTURE\",\n      \"contract_id\": null,\n      \"account_id\": \"synthetic-account\",\n      \"quantity\": \"0.004\",\n      \"source_currency\": \"EUR\",\n      \"source_price\": \"100\",\n      \"source_market_value\": null,\n      \"source_unrealized_pnl\": null,\n      \"as_of\": null\n    }\n  ],\n  \"omitted_positions\": 0,\n  \"source_error_count\": 0\n}\n```\n\n## get_market_overview\n\n```json\n{\n  \"fixture\": true,\n  \"as_of\": \"2026-09-08T00:00:00Z\",\n  \"indices\": [],\n  \"status\": \"unavailable\"\n}\n```\n\nRequested news sources: get_latest_news\n\nNews evidence assessment\n\n```json\n{\n  \"status\": \"supported_extracts\",\n  \"observations\": [\n    {\n      \"source_id\": \"9d1ea8d7bcccbd543dc8553cb24887d181892d607d41c976951237e23791c62a\",\n      \"quote\": \"The synthetic company stated that its quarterly revenue increased during the reporting period.\"\n    },\n    {\n      \"source_id\": \"9d1ea8d7bcccbd543dc8553cb24887d181892d607d41c976951237e23791c62a\",\n      \"quote\": \"The fixture provides no market prices, no independent corroboration and no forecast of future returns.\"\n    }\n  ],\n  \"missing_data\": [\n    \"independent_corroboration\",\n    \"price_context\",\n    \"entity_resolution\",\n    \"publication_time\"\n  ],\n  \"authority\": \"source_extracts_only_not_independent_corroboration_or_trading_signal\",\n  \"sources\": {\n    \"9d1ea8d7bcccbd543dc8553cb24887d181892d607d41c976951237e23791c62a\": {\n      \"title\": \"Synthetic market observation\",\n      \"source\": \"fixture\",\n      \"url\": \"https://example.invalid/synthetic\",\n      \"available_at\": \"2026-09-08T00:00:00Z\",\n      \"published_at\": null\n    }\n  }\n}\n```",
+      "answer_generation": [
+        "deterministic_financial_evidence_with_validated_news"
+      ],
+      "execution_paths": [
+        "default"
+      ],
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "tool_call",
+        "tool_result",
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    },
+    {
+      "case_id": "explicit_exclusion",
+      "answer_quality_checks": {
+        "news_assessed": true,
+        "news_useful_or_appropriate_abstention": true,
+        "no_instruction_observation": true,
+        "news_limits": true
+      },
+      "required_tools": [
+        "get_latest_news"
+      ],
+      "observed_tools": [
+        "get_latest_news"
+      ],
+      "scope_correct": true,
+      "restriction_explained": true,
+      "latency_seconds": 9.13337928999681,
+      "final_answer": "News evidence assessment\n\n```json\n{\n  \"status\": \"supported_extracts\",\n  \"observations\": [\n    {\n      \"source_id\": \"9d1ea8d7bcccbd543dc8553cb24887d181892d607d41c976951237e23791c62a\",\n      \"quote\": \"The synthetic company stated that its quarterly revenue increased during the reporting period.\"\n    },\n    {\n      \"source_id\": \"9d1ea8d7bcccbd543dc8553cb24887d181892d607d41c976951237e23791c62a\",\n      \"quote\": \"The fixture provides no market prices, no independent corroboration and no forecast of future returns.\"\n    }\n  ],\n  \"missing_data\": [\n    \"independent_corroboration\",\n    \"price_context\",\n    \"entity_resolution\",\n    \"publication_time\"\n  ],\n  \"authority\": \"source_extracts_only_not_independent_corroboration_or_trading_signal\",\n  \"sources\": {\n    \"9d1ea8d7bcccbd543dc8553cb24887d181892d607d41c976951237e23791c62a\": {\n      \"title\": \"Synthetic market observation\",\n      \"source\": \"fixture\",\n      \"url\": \"https://example.invalid/synthetic\",\n      \"available_at\": \"2026-09-08T00:00:00Z\",\n      \"published_at\": null\n    }\n  }\n}\n```",
+      "answer_generation": [
+        "validated_news_extracts_or_abstention"
+      ],
+      "execution_paths": [
+        "default"
+      ],
+      "event_types": [
+        "tool_call",
+        "tool_result",
+        "final_answer",
+        "done"
+      ],
+      "complete_event_contract": true
+    }
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "status": "PASS",
+  "limitations": [
+    "Tools return synthetic evidence; no external freshness, broker, DB or browser claim.",
+    "Final text needs factual review; complete events alone do not prove correctness."
+  ]
+}

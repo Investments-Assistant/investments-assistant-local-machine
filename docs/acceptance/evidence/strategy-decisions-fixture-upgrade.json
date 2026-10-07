@@ -1,0 +1,20 @@
+[
+  {
+    "database": "test_acceptance_expenses",
+    "from_revision": "0013_execution_sequence",
+    "to_revision": "0014_strategy_decisions",
+    "execution_payloads_unchanged": true,
+    "payload_md5": "c32f5e0300c4f48387db28496b4fe72f",
+    "replaced_empty_fixture_table": true,
+    "status": "PASS"
+  },
+  {
+    "database": "test_browser_expenses",
+    "from_revision": "0013_execution_sequence",
+    "to_revision": "0014_strategy_decisions",
+    "execution_payloads_unchanged": true,
+    "payload_md5": "9c64d6bf9423f311374b1b71997b3018",
+    "replaced_empty_fixture_table": false,
+    "status": "PASS"
+  }
+]

@@ -1,0 +1,5 @@
+2026-10-07 09:36:44,229 | INFO | src.agent.clients.llama_cpp_client | Loading GGUF model: models/qwen2.5-1.5b-instruct-q4_k_m.gguf  (n_ctx=4096, n_gpu_layers=0, n_threads=4, n_batch=128)
+llama_context: n_ctx_seq (4096) < n_ctx_train (32768) -- the full capacity of the model will not be utilized
+2026-10-07 09:36:45,175 | INFO | src.agent.clients.llama_cpp_client | GGUF model loaded
+2026-10-07 09:36:58,818 | INFO | src.scheduler.reporter | Report PDF saved: /tmp/report_2026-01-01_2026-01-31_9cb780085f5b.pdf
+{"status": "PASS", "evidence": "docs/acceptance/evidence/report-source-candidates-final-cpu-20261007.json"}

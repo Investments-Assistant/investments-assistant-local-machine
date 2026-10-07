@@ -32,7 +32,7 @@ class InferenceGate:
         self._admitted -= 1
 
 
-def fit_messages(messages, tools, *, tokenize, context_tokens, output_tokens):
+def fit_messages(messages, tools, *, tokenize, context_tokens, output_tokens, preserve_context=False):
     """Tokenize the complete envelope and reserve chat framing plus output.
 
     This conservative envelope estimate includes instructions, schemas, history,
@@ -53,6 +53,9 @@ def fit_messages(messages, tools, *, tokenize, context_tokens, output_tokens):
 
     if count() <= budget:
         return selected
+    # Repair attempts must retain the complete original context or abstain.
+    if preserve_context:
+        raise InferenceUnavailable("MODEL_CONTEXT_BUDGET_EXCEEDED")
     # Replace entire external evidence objects with an explicit omission marker.
     for message in selected:
         content = message.get("content", "")

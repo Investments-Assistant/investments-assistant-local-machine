@@ -1,0 +1,20 @@
+[
+  {
+    "database": "test_acceptance_expenses",
+    "status": "PASS",
+    "from_revision": "0017_valuation_snapshots",
+    "to_revision": "0018_job_lease_clock"
+  },
+  {
+    "database": "test_browser_expenses",
+    "status": "PASS",
+    "from_revision": "0017_valuation_snapshots",
+    "to_revision": "0018_job_lease_clock"
+  },
+  {
+    "database": "test_soak_acceptance",
+    "status": "PASS",
+    "from_revision": "0017_valuation_snapshots",
+    "to_revision": "0018_job_lease_clock"
+  }
+]

@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 452, in <module>
+    main()
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 203, in main
+    verify_bank_controls(page)
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/tests/e2e/bank_controls.py", line 97, in verify_bank_controls
+    with page.expect_response(lambda response: "/api/expenses?" in response.url
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 85, in __exit__
+    self._event.value
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 59, in value
+    raise exception
+playwright._impl._errors.TimeoutError: Timeout 10000ms exceeded while waiting for event "response"

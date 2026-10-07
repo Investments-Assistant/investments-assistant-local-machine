@@ -1,0 +1,32 @@
+{
+  "source": "workflow-scope-v2-cpu.json",
+  "tier": "manual-review-of-real-model-synthetic-evidence",
+  "tool_scope_and_event_contract": "PASS_5_OF_5",
+  "financial_answer_quality": "FAIL",
+  "findings": [
+    {
+      "case_id": "portfolio",
+      "classification": "deterministic_fallback_not_model_synthesis",
+      "evidence": "Final answer begins Portfolio evidence and reproduces the supplied fixture."
+    },
+    {
+      "case_id": "portuguese_portfolio",
+      "classification": "unsupported_valuation",
+      "quantity": "0.004",
+      "source_price": "100",
+      "source_currency": "EUR",
+      "model_claimed_total_eur": "4.00",
+      "quantity_times_price": "0.400",
+      "evidence": "No supplied multiplier, FX rate, or portfolio total supports the claimed EUR4.00."
+    },
+    {
+      "case_id": "explicit_exclusion",
+      "classification": "unsupported_general_inference",
+      "evidence": "A synthetic observation title alone does not establish ongoing market activity or future developments."
+    }
+  ],
+  "decision": "Do not accept unrestricted financial model prose as authoritative. Preserve exact deterministic financial facts and expose missing valuation inputs.",
+  "broker_connections": 0,
+  "external_orders": 0,
+  "live_eligible": false
+}

@@ -1,0 +1,1 @@
+{"status": "PASS", "tables": 31, "revision": "0018_job_lease_clock", "evidence": "docs/acceptance/evidence/job-clock-restore.json"}

@@ -4,7 +4,18 @@ import uuid
 from decimal import Decimal
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, String, Boolean, Numeric, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy import (
+    JSON,
+    String,
+    Boolean,
+    Numeric,
+    DateTime,
+    Identity,
+    BigInteger,
+    ForeignKey,
+    UniqueConstraint,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.db.database import Base
@@ -87,7 +98,11 @@ class SimulatorPosition(Base):
 
 class ExecutionEvent(Base):
     __tablename__ = "execution_events"
-    __table_args__ = (UniqueConstraint("order_id", "event_key"),)
+    __table_args__ = (
+        UniqueConstraint("order_id", "event_key"),
+        UniqueConstraint("ledger_sequence", name="uq_execution_event_sequence"),
+    )
+    ledger_sequence: Mapped[int] = mapped_column(BigInteger, Identity(always=True), nullable=False)
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
     order_id: Mapped[str] = mapped_column(ForeignKey("simulator_orders.id"), index=True)
     event_key: Mapped[str] = mapped_column(String(128))
@@ -109,3 +124,55 @@ class SimulatorMandate(Base):
     approval_deadline: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     approval: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class StrategyDecision(Base):
+    """Append-only application evidence for both orders and deliberate abstentions."""
+
+    __tablename__ = "strategy_decisions"
+    __table_args__ = (UniqueConstraint("account_id", "tick_key", name="uq_strategy_decision_tick"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    account_id: Mapped[str] = mapped_column(ForeignKey("simulator_accounts.id"), index=True)
+    user_id: Mapped[str] = mapped_column(String(36), index=True)
+    mandate_id: Mapped[str] = mapped_column(ForeignKey("simulator_mandates.id"), index=True)
+    tick_key: Mapped[str] = mapped_column(String(64))
+    evidence: Mapped[dict] = mapped_column(JSON)
+    evidence_hash: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class AccountLedgerEvent(Base):
+    """Append-only synthetic account evidence, separate from order callbacks."""
+
+    __tablename__ = "account_ledger_events"
+    __table_args__ = (
+        UniqueConstraint("account_id", "event_key", name="uq_account_ledger_event_key"),
+        UniqueConstraint("ledger_sequence", name="uq_account_ledger_event_sequence"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    account_id: Mapped[str] = mapped_column(ForeignKey("simulator_accounts.id"), index=True)
+    user_id: Mapped[str] = mapped_column(String(36), index=True)
+    event_key: Mapped[str] = mapped_column(String(128))
+    ledger_sequence: Mapped[int] = mapped_column(
+        BigInteger,
+        nullable=False,
+        server_default=text("nextval('execution_events_ledger_sequence_seq')"),
+    )
+    kind: Mapped[str] = mapped_column(String(32))
+    payload: Mapped[dict] = mapped_column(JSON)
+    evidence_hash: Mapped[str] = mapped_column(String(64))
+    effective_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class ValuationSnapshot(Base):
+    """Immutable observed simulator marks; never inferred historical quotes."""
+    __tablename__ = 'valuation_snapshots'
+    __table_args__ = (UniqueConstraint('account_id', 'snapshot_key', name='uq_valuation_snapshot_key'),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
+    account_id: Mapped[str] = mapped_column(ForeignKey('simulator_accounts.id'), index=True)
+    user_id: Mapped[str] = mapped_column(String(36), index=True)
+    snapshot_key: Mapped[str] = mapped_column(String(128))
+    as_of: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    payload: Mapped[dict] = mapped_column(JSON)
+    evidence_hash: Mapped[str] = mapped_column(String(64))

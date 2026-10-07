@@ -133,3 +133,45 @@ async def test_concurrent_duplicate_commission_after_new_session_charges_once(in
             await session.execute(delete(SimulatorInstrument).where(SimulatorInstrument.account_id == ids[1]))
             await session.execute(delete(SimulatorAccount).where(SimulatorAccount.id == ids[1]))
             await session.execute(delete(User).where(User.id == ids[0]))
+
+
+async def test_fee_revision_preserves_discrepant_balances_and_records_required_review(db_session):
+    ids = await seed(db_session)
+    proposed = await proposal(db_session, ids)
+    await confirmation(db_session, ids, proposed)
+    order_id = proposed["order_id"]
+    await fill(db_session, ids, order_id)
+    account = await db_session.get(SimulatorAccount, ids[1])
+    position = await db_session.scalar(select(SimulatorPosition).where(SimulatorPosition.account_id == ids[1]))
+    account.cash += Decimal(7)
+    original_cash, original_basis = account.cash, position.cost_basis
+    await db_session.flush()
+    result = await record_commission(db_session, **callback(ids, order_id, datetime.now(UTC)))
+    assert result["status"] == "reconciliation_required" and result["halted"]
+    assert account.halt_reason == "COMMISSION_RECONCILIATION_REQUIRED"
+    assert account.cash == original_cash and position.cost_basis == original_basis
+    event = await db_session.scalar(select(ExecutionEvent).where(
+        ExecutionEvent.order_id == order_id, ExecutionEvent.kind == "commission",
+    ))
+    assert event.payload["fee_base"] == "0.05"
+
+
+async def test_fee_correction_updates_only_delta_after_database_reload(db_session):
+    ids = await seed(db_session)
+    proposed = await proposal(db_session, ids)
+    await confirmation(db_session, ids, proposed)
+    order_id = proposed["order_id"]
+    await fill(db_session, ids, order_id)
+    stamp = datetime.now(UTC)
+    await record_commission(db_session, **callback(ids, order_id, stamp, amount="0.08"))
+    await db_session.flush()
+    db_session.expire_all()
+    result = await record_commission(db_session, **callback(ids, order_id, stamp, revision=2, amount="0.02"))
+    account = await db_session.get(SimulatorAccount, ids[1])
+    position = await db_session.scalar(select(SimulatorPosition).where(SimulatorPosition.account_id == ids[1]))
+    assert result["status"] == "applied"
+    assert account.cash == Decimal("899.98") and account.realized_pnl == 0
+    assert position.cost_basis == Decimal("100.02")
+    from src.execution.reconciliation import reconcile_account
+
+    assert (await reconcile_account(db_session, account))["status"] == "consistent"

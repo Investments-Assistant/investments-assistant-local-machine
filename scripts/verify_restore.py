@@ -6,6 +6,7 @@ DB and archive remain for review; repeated runs require a new destination name.
 
 import os
 import re
+import sys
 import json
 import asyncio
 import hashlib
@@ -15,6 +16,9 @@ from datetime import UTC, datetime
 import subprocess
 
 import asyncpg
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from src.operations.report_cleanup import report_directory_lock
 
 
 async def inventory(connection):
@@ -46,6 +50,8 @@ async def main():
     parser.add_argument("--library-path", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--archive-dir", type=Path, default=Path("/tmp"))
+    parser.add_argument("--standalone-retention", action="store_true",
+                        help="Explicitly classify this database archive as independent of any filesystem/key bundle")
     args = parser.parse_args()
     token = os.environ.get("TEST_DATABASE_DISPOSABLE_TOKEN")
     if (
@@ -65,100 +71,108 @@ async def main():
     if not fixture_path(args.archive_dir):
         raise SystemExit("Archive directory must be inside /tmp or checkout .qa")
     args.archive_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
-    source = await asyncpg.connect(database=args.source, host=str(args.socket), port=args.port)
-    target = None
-    try:
-        actual = await source.fetchval("SELECT current_database()")
-        marker = await source.fetchval("SELECT token FROM public.ia_disposable_marker")
-        if actual != args.source or marker != token:
-            raise SystemExit("Disposable source identity verification failed")
-        if await source.fetchval("SELECT 1 FROM pg_database WHERE datname=$1", args.target):
-            raise SystemExit("Destination already exists; inspect previous run, never overwrite")
-        before = await inventory(source)
-        archive = args.archive_dir / (args.target + ".dump")
-        if archive.exists():
-            raise SystemExit("Archive already exists; inspect before retrying")
-        # Create privately before pg_dump writes any content.
-        descriptor = os.open(archive, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-        os.close(descriptor)
-        environment = {
-            "PATH": os.environ.get("PATH", ""),
-            "LD_LIBRARY_PATH": str(args.library_path),
-        }
-        subprocess.run(
-            [
-                str(args.bin / "pg_dump"),
-                "-h",
-                str(args.socket),
-                "-p",
-                str(args.port),
-                "-d",
-                args.source,
-                "-Fc",
-                "-f",
-                str(archive),
-            ],
-            env=environment,
-            check=True,
-            timeout=60,
-        )
-        archive.chmod(0o600)
-        await source.execute(f'CREATE DATABASE "{args.target}"')
-        subprocess.run(
-            [
-                str(args.bin / "pg_restore"),
-                "-h",
-                str(args.socket),
-                "-p",
-                str(args.port),
-                "-d",
-                args.target,
-                "--exit-on-error",
-                "--no-owner",
-                "--no-privileges",
-                str(archive),
-            ],
-            env=environment,
-            check=True,
-            timeout=60,
-        )
-        target = await asyncpg.connect(database=args.target, host=str(args.socket), port=args.port)
-        if await target.fetchval("SELECT token FROM public.ia_disposable_marker") != token:
-            raise RuntimeError("Restored marker does not match")
-        restored = await inventory(target)
-        if before != restored or before != await inventory(source):
-            raise RuntimeError("Restore content differs or source changed during the exercise")
-        revision = await target.fetchval("SELECT version_num FROM alembic_version")
-        result = {
-            "status": "PASS",
-            "tier": "real-postgresql-disposable-backup-restore",
-            "timestamp": datetime.now(UTC).isoformat(),
-            "source": args.source,
-            "target": args.target,
-            "revision": revision,
-            "tables": restored,
-            "archive": str(archive),
-            "archive_sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
-            "production_data": False,
-            "limitations": [
-                "Database only; reports/model/vault-key filesystem recovery is separate."
-            ],
-        }
-        args.output.write_text(json.dumps(result, indent=2) + "\n")
-        print(
-            json.dumps(
-                {
-                    "status": "PASS",
-                    "tables": len(restored),
-                    "revision": revision,
-                    "evidence": str(args.output),
-                }
+    # Serialize archive publication/verification with explicit local expiry.
+    with report_directory_lock(args.archive_dir):
+        source = await asyncpg.connect(database=args.source, host=str(args.socket), port=args.port)
+        target = None
+        try:
+            actual = await source.fetchval("SELECT current_database()")
+            marker = await source.fetchval("SELECT token FROM public.ia_disposable_marker")
+            if actual != args.source or marker != token:
+                raise SystemExit("Disposable source identity verification failed")
+            if await source.fetchval("SELECT 1 FROM pg_database WHERE datname=$1", args.target):
+                raise SystemExit("Destination already exists; inspect previous run, never overwrite")
+            system_id = await source.fetchval("SELECT system_identifier::text FROM pg_control_system()")
+            source_identity = hashlib.sha256(json.dumps([system_id, args.source]).encode()).hexdigest()
+            before = await inventory(source)
+            archive = args.archive_dir / (args.target + ".dump")
+            if archive.exists():
+                raise SystemExit("Archive already exists; inspect before retrying")
+            # Create privately before pg_dump writes any content.
+            descriptor = os.open(archive, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+            os.close(descriptor)
+            environment = {
+                "PATH": os.environ.get("PATH", ""),
+                "LD_LIBRARY_PATH": str(args.library_path),
+            }
+            subprocess.run(
+                [
+                    str(args.bin / "pg_dump"),
+                    "-h",
+                    str(args.socket),
+                    "-p",
+                    str(args.port),
+                    "-d",
+                    args.source,
+                    "-Fc",
+                    "-f",
+                    str(archive),
+                ],
+                env=environment,
+                check=True,
+                timeout=60,
             )
-        )
-    finally:
-        if target:
-            await target.close()
-        await source.close()
+            archive.chmod(0o600)
+            await source.execute(f'CREATE DATABASE "{args.target}"')
+            subprocess.run(
+                [
+                    str(args.bin / "pg_restore"),
+                    "-h",
+                    str(args.socket),
+                    "-p",
+                    str(args.port),
+                    "-d",
+                    args.target,
+                    "--exit-on-error",
+                    "--no-owner",
+                    "--no-privileges",
+                    str(archive),
+                ],
+                env=environment,
+                check=True,
+                timeout=60,
+            )
+            target = await asyncpg.connect(database=args.target, host=str(args.socket), port=args.port)
+            if await target.fetchval("SELECT token FROM public.ia_disposable_marker") != token:
+                raise RuntimeError("Restored marker does not match")
+            restored = await inventory(target)
+            if before != restored or before != await inventory(source):
+                raise RuntimeError("Restore content differs or source changed during the exercise")
+            revision = await target.fetchval("SELECT version_num FROM alembic_version")
+            result = {
+                "status": "PASS",
+                "tier": "real-postgresql-disposable-backup-restore",
+                "timestamp": datetime.now(UTC).isoformat(),
+                "source": args.source,
+                "source_identity_sha256": source_identity,
+                "retention_scope": (
+                    "standalone_database" if args.standalone_retention else "preserve_unclassified_bundle"
+                ),
+                "target": args.target,
+                "revision": revision,
+                "tables": restored,
+                "archive": str(archive),
+                "archive_sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
+                "production_data": False,
+                "limitations": [
+                    "Database only; reports/model/vault-key filesystem recovery is separate."
+                ],
+            }
+            args.output.write_text(json.dumps(result, indent=2) + "\n")
+            print(
+                json.dumps(
+                    {
+                        "status": "PASS",
+                        "tables": len(restored),
+                        "revision": revision,
+                        "evidence": str(args.output),
+                    }
+                )
+            )
+        finally:
+            if target:
+                await target.close()
+            await source.close()
 
 
 if __name__ == "__main__":

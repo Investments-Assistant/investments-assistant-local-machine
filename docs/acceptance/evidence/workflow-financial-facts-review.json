@@ -1,0 +1,15 @@
+{
+  "source": "workflow-financial-facts-cpu.json",
+  "scope_event_checks": "PASS_5_OF_5",
+  "exact_financial_facts": "PASS",
+  "verified_cases": [
+    "portfolio",
+    "scanner",
+    "portuguese_portfolio"
+  ],
+  "generation": "deterministic financial facts; not model-synthesis acceptance",
+  "remaining_model_quality": "FAIL: news-only prose infers ongoing activity/potential market changes from a synthetic title",
+  "external_orders": 0,
+  "broker_connections": 0,
+  "live_eligible": false
+}

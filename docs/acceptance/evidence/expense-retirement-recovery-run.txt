@@ -1,0 +1,1 @@
+{"status": "PASS", "tables": 30, "revision": "0016_expense_retirement", "evidence": "/home/lulu/investments-assistant/investments-assistant-local-machine/docs/acceptance/evidence/expense-retirement-recovery-database.json"}

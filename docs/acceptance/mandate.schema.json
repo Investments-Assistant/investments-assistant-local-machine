@@ -7,7 +7,10 @@
       "type": "string"
     },
     "strategy": {
-      "const": "periodic_fixture_buy",
+      "enum": [
+        "periodic_fixture_buy",
+        "price_band_fixture"
+      ],
       "title": "Strategy",
       "type": "string"
     },
@@ -179,6 +182,40 @@
         }
       ],
       "title": "Quantity Per Order"
+    },
+    "buy_below": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,18}|(?=[\\d.]{1,29}0*$)\\d{0,18}\\.\\d{0,10}0*$)",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Buy Below"
+    },
+    "sell_above": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,18}|(?=[\\d.]{1,29}0*$)\\d{0,18}\\.\\d{0,10}0*$)",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sell Above"
     }
   },
   "required": [

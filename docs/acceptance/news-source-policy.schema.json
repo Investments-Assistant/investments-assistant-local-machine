@@ -1,0 +1,82 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "policy_id": {
+      "maxLength": 64,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Policy Id",
+      "type": "string"
+    },
+    "permission_basis": {
+      "const": "operator_reviewed_permission",
+      "title": "Permission Basis",
+      "type": "string"
+    },
+    "terms_url": {
+      "maxLength": 2048,
+      "title": "Terms Url",
+      "type": "string"
+    },
+    "reviewed_at": {
+      "format": "date-time",
+      "title": "Reviewed At",
+      "type": "string"
+    },
+    "review_due_at": {
+      "format": "date-time",
+      "title": "Review Due At",
+      "type": "string"
+    },
+    "transport": {
+      "default": "public_https",
+      "enum": [
+        "public_https",
+        "private_newsletter"
+      ],
+      "title": "Transport",
+      "type": "string"
+    },
+    "article_hosts": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 30,
+      "title": "Article Hosts",
+      "type": "array"
+    },
+    "content_scope": {
+      "enum": [
+        "headline",
+        "summary",
+        "full_text"
+      ],
+      "title": "Content Scope",
+      "type": "string"
+    },
+    "retention_days": {
+      "maximum": 36525,
+      "minimum": 1,
+      "title": "Retention Days",
+      "type": "integer"
+    },
+    "maximum_content_characters": {
+      "default": 20000,
+      "maximum": 100000,
+      "minimum": 1,
+      "title": "Maximum Content Characters",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "policy_id",
+    "permission_basis",
+    "terms_url",
+    "reviewed_at",
+    "review_due_at",
+    "content_scope",
+    "retention_days"
+  ],
+  "title": "SourcePolicy",
+  "type": "object"
+}

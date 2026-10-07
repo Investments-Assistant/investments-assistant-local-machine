@@ -16,6 +16,14 @@ class ExpenseAudit(Base):
     transaction_id: Mapped[str] = mapped_column(String(36), index=True)
     action: Mapped[str] = mapped_column(String(32))
     changes: Mapped[dict] = mapped_column(JSON)
-    recorded_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.clock_timestamp()
-    )
+    recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.clock_timestamp())
+
+
+class ExpenseRetirement(Base):
+    """Minimal suppression key, without provider IDs, amounts or descriptions."""
+
+    __tablename__ = "expense_retirements"
+    user_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    identity_sha256: Mapped[str] = mapped_column(String(64), primary_key=True)
+    plan_sha256: Mapped[str] = mapped_column(String(64))
+    retired_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

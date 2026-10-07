@@ -1,0 +1,4 @@
+Read-only check: timeout 5 docker version --format '{{.Server.Version}}'
+The WSL Docker shim reported: The command 'docker' could not be found in this WSL 2 distro.
+No server version or usable build daemon was observed. Docker Desktop WSL integration remains unavailable here.
+No Docker/Windows/WSL settings were changed and no deployment/build was attempted.

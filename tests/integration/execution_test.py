@@ -43,6 +43,7 @@ async def seed(session, *, cash=1000, max_order=500):
         halted=False,
         mandate={
             "environment": "simulator",
+            "global_exposure_limits": {"max_position_base": str(cash), "max_exposure_base": str(cash)},
             "fee_bps": "10",
             "expires_at": (now + timedelta(hours=1)).isoformat(),
         },

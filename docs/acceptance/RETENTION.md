@@ -137,3 +137,148 @@ or unfinished conversations are excluded. The real PostgreSQL lock race and
 Chromium flows passed (`chat-retention-concurrency.txt`, `browser-chat-retention.txt`).
 Remaining retention work includes source-specific news license/expiration policies,
 normalized expense-history export-and-purge, completed orphan PDFs and backups.
+
+Declared expired news text and revision cleanup is implemented through the explicit
+operator preview/confirm command documented in [NEWS.md](NEWS.md). IDs, URLs,
+availability clocks and digests remain; ordinary ingestion cannot restore retired
+content. Public and private-owner scopes are explicit, with20article/1000revision
+bounds and changed-plan checks.24 PostgreSQL checks passed, including committed CLI
+execution, in `evidence/news-cleanup-committed.txt`. No real news was purged.
+Legacy unverified-source review, downstream copies and backup expiration remain
+separate; this does not claim application-wide erasure of every derived copy.
+
+## Normalized expense history
+
+The owner can now choose **Export and remove expense history** in Expenses.
+An explicit positive age selects at most100 settled transactions whose occurrence
+and application receipt both predate the cutoff. Pending and recently received
+revisions are excluded. Preview downloads the exact normalized batch as JSON
+(with Decimal strings, currencies, account handles and original identity/clock
+fields; no raw provider payload). The owner must verify that download and separately
+approve removal. No default policy or automatic purge is selected.
+
+The ten-minute plan binds owner, policy, complete exported values and raw-payload
+hashes. Database reloads preserve canonical ten-decimal amounts in the hash.
+Changed content, ownership, expiry or export hash rejects the entire transaction.
+Purge deletes only the selected owner's history/raw copies and replaces category
+change audit details with a minimal removal receipt. SHA256 identity tombstones
+bind owner/provider/account/external identity without retaining those original
+identifiers or amounts. Imports and provider sync use the same transactional
+owner lock: a concurrent import waits, then reports a retired record as suppressed.
+Suppressed records are counted separately from inserts and updates. This does not
+revoke bank consent or erase reports, chat, user downloads, providers or backups.
+A provider changing its identity can appear as a new record; no fuzzy deletion
+rule or automatic restoration is inferred. No public tombstone-reset endpoint exists.
+
+Migration0016 creates expense_retirements; startup/readiness require it. It does
+not migrate or purge existing history automatically. No destructive downgrade:
+restore a reviewed backup, considering that an older backup predating removal can
+restore deleted content. Preview/apply require active browser cookie+CSRF,10second
+request/5second statement/2second lock bounds and explicit export/removal flags.
+Export is private,no-store. Models/MCP cannot invoke these browser-only endpoints.
+
+Evidence:expense-history-concurrency-fixed.txt16PASS, including committed
+import/purge race, rollback and inactive-owner checks; browser-expense-history-fixed.txt
+realChromium/PostgreSQL PASS, export/confirmation/removal/reimport/CSRF/isolation.
+Only synthetic fixtures were removed. Backup-expiry and completed orphan-PDF
+workflows remain separate required scope.
+
+## Completed orphan PDFs
+
+The explicit local operator command below now covers completed PDF files left by
+failed report persistence. There is no scheduled deletion or default cutoff.
+First ensure this private local report directory is used only by the matching
+application writer version; it holds a shared directory lock through PDF publication
+and database commit. Older writers and remote/NFS storage are unsupported.
+
+```sh
+.venv/bin/python scripts/cleanup_report_orphans.py --before <aware-ISO-cutoff>
+```
+
+Use the intended deployment's configured DATABASE_URL and REPORTS_DIR. Cutoff must
+be at least24hours old. Preview emits count/bytes and a plan digest, without names,
+report content or owner identifiers. After review, repeat the exact command with
+`--confirm-sha256 <plan-digest>`. This is operator authority over orphan storage,
+not an owned-browser report removal endpoint; no model/MCP tool can invoke it.
+No production cleanup is authorized or performed by this implementation task.
+
+Each invocation obtains exclusive nonblocking directory exclusion, then a PostgreSQL
+SHARE table lock before reloading every report PDF reference, including unknown
+owners and pending retention. Reference inserts/updates/deletes cannot commit during
+removal. A changed reference set or file identity/size/mtime/ctime changes the plan.
+Only directly contained regular `report_*.pdf` files older than the cutoff and
+absent from the reference set qualify. Recent files, render temporaries and unrelated
+files remain. Symlinks/nonregular entries, out-of-root references, future file clocks
+and exhausted scan limits refuse cleanup with zero removals. Default limits10000;
+SQL deadline5seconds, lock wait2seconds, CLI async deadline15seconds. Local bounded
+filesystem work runs synchronously in this dedicated operator process; slow kernel
+I/O cannot be forcibly timed out and must not be run in a web request.
+
+Unlink is irreversible and cannot be rolled back by PostgreSQL. Per-file metadata
+is rechecked; I/O failure returns partial status and the actual number removed.
+A successful result requires directory fsync. After partial failure, investigate
+and preview again; already removed files are absent from the new plan. An old
+confirmation never authorizes newly discovered files. Backups and downstream copies
+remain separate. Tests removed only synthetic files in temporary directories.
+
+Evidence: report-publication-lock-reproduction.txt reproduces the previous unsafe
+publication/reference gap; report-orphans-first.txt36PASS covers publication fencing,
+changed plans/references, aliases, unsafe storage, scan limits and partial failures.
+
+Follow-up evidence:report-orphans-cli.txt11PASS including a new marked disposable
+PostgreSQL database, real CLI preview/confirmation and competing reference-write
+lock timeout. Only that test-created database was dropped. suite-report-orphans.txt
+820PASS and browser-report-publication-lock.txt real Chromium/report persistence
+PASS. The extra CLI test was added after full-suite collection; application code
+was unchanged. Backup expiration remains open.
+
+## Verified standalone database archive expiry
+
+`scripts/expire_database_backups.py` now provides explicit preview/confirmation for
+standalone PostgreSQL test archives emitted by the restore verifier. No automatic
+age, schedule or minimum-count policy is selected. Operator supplies an aware
+cutoff at least24hours old, `--keep` (at least1 per source), a private archive root
+and every selected successful restore receipt via repeated `--evidence` arguments.
+Each receipt binds the archive checksum and a hashed PostgreSQL system-identifier/
+source-database pair. The actual archive checksum is reverified before every plan
+and apply; the newest existing verified archives per source are protected even
+when older than the cutoff. Unknown/unregistered files are never deleted.
+
+New restore exercises default to `preserve_unclassified_bundle`; only an explicit
+`verify_restore.py --standalone-retention` declaration makes that archive eligible.
+Do not select that flag when the dump belongs to a filesystem/configuration/key
+recovery bundle. Older evidence without source identity or scope is refused. The
+current verifier is fixture-restricted, so this is tested local database-archive
+lifecycle support, not an assertion of production or complete-bundle retention.
+
+```sh
+.venv/bin/python scripts/expire_database_backups.py \
+  --archive-dir /absolute/private/archives \
+  --evidence /absolute/verified-restore-older.json \
+  --evidence /absolute/verified-restore-newer.json \
+  --before <aware-ISO-cutoff> --keep <positive-count>
+```
+
+After reviewing count/bytes and protected_count, repeat with the returned
+`--confirm-sha256`. The shared writer/exclusive cleanup directory lock spans dump,
+restore verification and receipt publication. Matching writers and private local
+storage are required; older writers/NFS are not coordinated. Evidence is bounded
+at2MiB per receipt; default1000 files/receipts and10GiB total archive hashing can be
+lowered. Streaming hashing bounds memory. Scan/byte exhaustion removes nothing.
+Directory ownership and writable permissions are checked; archive/evidence final
+symlinks, malformed/missing verification, future clocks, altered checksums and
+changed plans are refused. Output contains only digests/counts/reasons.
+
+Unlink cannot be rolled back. Partial I/O results report actual removals, and success
+requires directory fsync. Receipts remain after expiry; a fresh preview safely
+ignores already-absent archives and recalculates protected copies. Missing protected
+archives invalidate an earlier plan instead of causing remaining copies to expire.
+Filesystem/key bundle expiry and production encrypted/off-host retention still
+require their separate coherent-set policy and authorized deployment validation.
+
+Evidence:backup-expiry-bundle-guards.txt11PASS2.35s including real CLI on synthetic
+archives. backup-expiry-standalone-restore.json/run.txt31table0017 restore PASS;
+backup-expiry-real-preview.json protects its only verified archive, zero deletions.
+The earlier backup-expiry-restore.json also passed31tables but predates explicit
+standalone classification and is deliberately not eligible. No existing recovery
+archives or databases were removed; new restore targets remain for review.

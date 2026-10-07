@@ -18,6 +18,7 @@ from sqlalchemy import or_, and_, func, select
 from src.db.models import NewsArticle
 from src.db.database import async_session
 from src.news.visibility import visible_to
+from src.news.syndication import fingerprint, group_evidence
 
 
 async def search_news(
@@ -82,8 +83,10 @@ async def search_news(
     async with async_session() as session:
         rows = (await session.execute(stmt)).scalars().all()
 
-    return [
+    return group_evidence([
         {
+            "_syndication": fingerprint({"content": r.content, "summary": r.summary, "url": r.url,
+                                         "content_hash": r.content_hash}),
             "title": r.title,
             "summary": r.summary,
             "source": r.source,
@@ -98,7 +101,7 @@ async def search_news(
             "tags": r.tags,
         }
         for r in rows
-    ]
+    ])
 
 
 async def get_recent_headlines(limit: int = 20, *, user_id: str | None = None) -> list[dict]:
@@ -111,8 +114,10 @@ async def get_recent_headlines(limit: int = 20, *, user_id: str | None = None) -
     )
     async with async_session() as session:
         rows = (await session.execute(stmt)).scalars().all()
-    return [
+    return group_evidence([
         {
+            "_syndication": fingerprint({"content": r.content, "summary": r.summary, "url": r.url,
+                                         "content_hash": r.content_hash}),
             "title": r.title,
             "source": r.source,
             "url": r.url,
@@ -124,7 +129,7 @@ async def get_recent_headlines(limit: int = 20, *, user_id: str | None = None) -
             "provenance": r.provenance,
         }
         for r in rows
-    ]
+    ])
 
 
 async def get_news_evidence_as_of(
@@ -169,7 +174,7 @@ async def get_news_evidence_as_of(
     )
     async with async_session() as session:
         rows = (await session.execute(statement)).scalars().all()
-    return [
+    return group_evidence([
         dict(
             row.evidence,
             revision_id=row.id,
@@ -177,4 +182,4 @@ async def get_news_evidence_as_of(
             available_at=row.available_at.isoformat(),
         )
         for row in rows
-    ]
+    ])

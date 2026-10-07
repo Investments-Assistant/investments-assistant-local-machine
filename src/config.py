@@ -186,9 +186,12 @@ class Settings(BaseSettings):
     newsletter_sender_filter: str = ""  # only ingest emails FROM this address
 
     # NewsAPI/Guardian are retained as optional adapters for compatibility, but
-    # public RSS and HTML sources are the default and require no API keys.
-    # Leave these empty for the strict local/no-news-API deployment.
+    # public RSS and HTML sources do not require API keys but still need explicit
+    # source permission policies. Leave API credentials empty for local-only use.
     news_api_adapters_enabled: bool = False
+    # Exact source identities require an operator-reviewed permission policy.
+    # Catalog entries alone never authorize persistent collection.
+    news_source_policies: dict[str, dict] = Field(default_factory=dict)
 
     # ── Scheduler ─────────────────────────────────────────────────────────────
     market_data_refresh_minutes: int = Field(5, ge=1)
