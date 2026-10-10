@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from decimal import Decimal, localcontext
 
-import yfinance as yf
-
 from src.tools.brokers import (
     ibkr as ibkr_tool,
     alpaca as alpaca_tool,
@@ -21,6 +19,8 @@ logger = get_logger(__name__)
 
 def _enrich_position(pos: dict, symbol_key: str = "symbol") -> dict:
     """Add current market price to a position if not already present."""
+    import yfinance as yf
+
     sym = pos.get(symbol_key)
     if not sym or pos.get("current_price"):
         return pos
@@ -156,33 +156,15 @@ def get_account_info(broker: str, account: BrokerAccountConfig | None = None) ->
     return _call_for_account(fn, account)
 
 
-def get_trade_history(
-    broker: str, days: int = 30, account: BrokerAccountConfig | None = None
-) -> list[dict]:
+def get_trade_history(broker: str, days: int = 30, account: BrokerAccountConfig | None = None) -> list[dict]:
     if account is None or account.broker != broker or not account.user_id or not account.id:
         return [{"error": "AUTHENTICATED_ACCOUNT_REQUIRED"}]
     if broker == "alpaca":
-        return (
-            alpaca_tool.get_alpaca_orders(days, account=account)
-            if account
-            else alpaca_tool.get_alpaca_orders(days)
-        )
+        return alpaca_tool.get_alpaca_orders(days, account=account) if account else alpaca_tool.get_alpaca_orders(days)
     if broker == "ibkr":
-        return (
-            ibkr_tool.get_ibkr_orders(account=account)
-            if account
-            else ibkr_tool.get_ibkr_orders()
-        )
+        return ibkr_tool.get_ibkr_orders(account=account) if account else ibkr_tool.get_ibkr_orders()
     if broker == "coinbase":
-        return (
-            coinbase.get_coinbase_orders(account=account)
-            if account
-            else coinbase.get_coinbase_orders()
-        )
+        return coinbase.get_coinbase_orders(account=account) if account else coinbase.get_coinbase_orders()
     if broker == "binance":
-        return (
-            binance_tool.get_binance_orders(account=account)
-            if account
-            else binance_tool.get_binance_orders()
-        )
+        return binance_tool.get_binance_orders(account=account) if account else binance_tool.get_binance_orders()
     return [{"error": f"Unknown broker: {broker}"}]

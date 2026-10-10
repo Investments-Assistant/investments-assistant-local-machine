@@ -4313,3 +4313,27 @@ User reports engine running; actual Windows and WSL docker version succeed, Linu
 
 Final paused-state audit raw83.125/display83 delta0pp,L11=5/5localchecks/build.
 RemoteCI/runtime remain unverified. Preserve image; no runningoperation to retry.
+
+## Built-image native runtime verified; restart harness running (2026-10-10)
+
+Goal controlACTIVE after resume. Existingimageinspect confirmsamd64/appuser.
+84988terminalexit0: WindowsDockerclient network-none native smoke PASS, UID1000,
+realPDF3460bytes, no copied.env/.qa/models, CPUbackend/GPUoffloadfalse.
+47619terminalexit0 native libraries include ggml-blas; actualldd confirmsOpenBLAS
+linkage. Initialsystem-info beforebackendloading didnotlistBLAS; no defect/fix
+was inferred. Evidence container-native-smoke-windows andopenblas-linkage.
+
+New scripts/verify_container_runtime.py creates onlyownedinternalnetwork/volume/
+PG/app, marks/verifies syntheticDB beforeexplicitmigration, copies existingGGUF,
+checks productionreadiness andapp/DBrestart15sbudget, cleansownedresources.
+86635 CURRENTLYRUNNING; resultcontainer-runtime-20261010.json, logmatching.txt,
+run_idia-runtime-9c9386f98265. Inspect handle/durableexit before retry/cleanup.
+No publishedports, productionstack, broker/providerconnection/order. Ruff/diffPASS.
+
+Native milestone audit raw83.375/display83,L13=3.25.86635terminalFAILexit1,
+PGtemporaryUnixserver race, cleanuptrue. Fixed fixturewait tofinalTCP listener.
+89885 rerunACTIVE container-runtime-20261010-v2, runia-runtime-4d82d685aca7.
+Modelcopy underway, appCreated; no runtimePASS. Read-only dockerlogs query52904
+alsoawaiting completion. Inspect both handles before retry. CONTAINERS.md added.
+
+Runtime milestone 2026-10-10: sessions89885 and52904 terminal (1/0). v2 startup/migration/model load and marker/schema persistence verified; app restart23.143s FAIL fixed15s budget, DB2.177s; cleanup_verified true. Monitor unchanged83% raw83.375. Network-none import profile session53427 terminal exit0; inspect container-import-profile.txt. No broker connections/orders or live changes.

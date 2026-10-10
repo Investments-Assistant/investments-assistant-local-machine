@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import pandas as pd
+
 from typing import Any
 from datetime import UTC, datetime
 import contextlib
-
-import ta
-import pandas as pd
-import yfinance as yf
 
 from src.agent.utils.logger import get_logger
 
@@ -43,6 +44,8 @@ def get_stock_data(
     period: str = "1mo",
     interval: str = "1d",
 ) -> dict:
+    import yfinance as yf
+
     result: dict[str, object] = {}
     for sym in symbols:
         try:
@@ -75,6 +78,8 @@ def get_crypto_data(
 
 def get_market_overview() -> dict:
     """Snapshot of major indices, VIX, bonds, commodities."""
+    import yfinance as yf
+
     tickers = {
         "S&P 500": "^GSPC",
         "NASDAQ 100": "^NDX",
@@ -146,6 +151,9 @@ def _build_signals(
 
 def get_technical_indicators(symbol: str, period: str = "6mo") -> dict:
     """Calculate RSI, MACD, Bollinger Bands, EMA 20/50/200, ATR, OBV."""
+    import ta
+    import yfinance as yf
+
     try:
         df = yf.Ticker(symbol).history(period=period, interval="1d")
         if df.empty or len(df) < 20:
@@ -175,34 +183,20 @@ def get_technical_indicators(symbol: str, period: str = "6mo") -> dict:
         # EMAs
         ema20 = ta.trend.EMAIndicator(close=close, window=20).ema_indicator().iloc[-1]
         ema50 = ta.trend.EMAIndicator(close=close, window=50).ema_indicator().iloc[-1]
-        ema200 = (
-            ta.trend.EMAIndicator(close=close, window=200).ema_indicator().iloc[-1]
-            if len(df) >= 200
-            else None
-        )
+        ema200 = ta.trend.EMAIndicator(close=close, window=200).ema_indicator().iloc[-1] if len(df) >= 200 else None
 
         # Average true range over 14 periods.
-        atr = (
-            ta.volatility.AverageTrueRange(high=high, low=low, close=close, window=14)
-            .average_true_range()
-            .iloc[-1]
-        )
+        atr = ta.volatility.AverageTrueRange(high=high, low=low, close=close, window=14).average_true_range().iloc[-1]
 
         # OBV
-        obv = (
-            ta.volume.OnBalanceVolumeIndicator(close=close, volume=volume)
-            .on_balance_volume()
-            .iloc[-1]
-        )
+        obv = ta.volume.OnBalanceVolumeIndicator(close=close, volume=volume).on_balance_volume().iloc[-1]
 
         current_price = float(close.iloc[-1])
 
         def _r(v: float | None, digits: int = 4) -> float | None:
             return round(float(v), digits) if v is not None and v == v else None
 
-        signals = _build_signals(
-            rsi, macd_val, macd_signal, current_price, ema200, bb_upper, bb_lower
-        )
+        signals = _build_signals(rsi, macd_val, macd_signal, current_price, ema200, bb_upper, bb_lower)
 
         return {
             "symbol": symbol,
@@ -254,6 +248,8 @@ def _option_rows(df: pd.DataFrame) -> list[dict]:
 
 def _clean_option_list(lst: list[dict]) -> list[dict]:
     """Replace NaN values and unwrap numpy scalars in an options row list."""
+    import pandas as pd
+
     for item in lst:
         for k, v in item.items():
             with contextlib.suppress(Exception):
@@ -266,6 +262,8 @@ def _clean_option_list(lst: list[dict]) -> list[dict]:
 
 def get_options_chain(symbol: str, expiry: str | None = None) -> dict:
     """Fetch options chain for a stock symbol."""
+    import yfinance as yf
+
     try:
         ticker = yf.Ticker(symbol)
         exps = ticker.options  # available expiry dates
@@ -293,6 +291,8 @@ def get_options_chain(symbol: str, expiry: str | None = None) -> dict:
 
 def search_ticker(query: str) -> dict:
     """Search Yahoo Finance for matching ticker symbols."""
+    import yfinance as yf
+
     try:
         # yfinance doesn't have a search API; use a simple approach
         results = yf.Search(query, max_results=10)
@@ -318,6 +318,8 @@ def search_ticker(query: str) -> dict:
 
 def get_earnings_calendar(days_ahead: int = 7, symbols: list[str] | None = None) -> dict:
     """Return upcoming earnings via yfinance (best-effort)."""
+    import yfinance as yf
+
     result: dict[str, Any] = {"days_ahead": days_ahead, "earnings": []}
     targets = symbols if symbols else []
     if not targets:

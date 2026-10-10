@@ -268,7 +268,7 @@ class TestGetStockData:
         return mock
 
     def test_returns_data_for_symbol(self):
-        with patch("src.tools.market_data.yf.Ticker", return_value=self._mock_ticker()):
+        with patch("yfinance.Ticker", return_value=self._mock_ticker()):
             result = get_stock_data(["AAPL"])
         assert "AAPL" in result
         assert result["AAPL"]["company_name"] == "Apple Inc."
@@ -277,7 +277,7 @@ class TestGetStockData:
         mock = MagicMock()
         mock.history.side_effect = Exception("network error")
         mock.info = {}
-        with patch("src.tools.market_data.yf.Ticker", return_value=mock):
+        with patch("yfinance.Ticker", return_value=mock):
             result = get_stock_data(["AAPL"])
         assert "error" in result["AAPL"]
 
@@ -309,7 +309,7 @@ class TestGetTechnicalIndicators:
         df = self._make_price_df(60)
         mock = MagicMock()
         mock.history.return_value = df
-        with patch("src.tools.market_data.yf.Ticker", return_value=mock):
+        with patch("yfinance.Ticker", return_value=mock):
             result = get_technical_indicators("AAPL")
         assert "rsi_14" in result
         assert "macd" in result
@@ -319,14 +319,14 @@ class TestGetTechnicalIndicators:
     def test_insufficient_data_returns_error(self):
         mock = MagicMock()
         mock.history.return_value = pd.DataFrame()  # empty
-        with patch("src.tools.market_data.yf.Ticker", return_value=mock):
+        with patch("yfinance.Ticker", return_value=mock):
             result = get_technical_indicators("AAPL")
         assert "error" in result
 
     def test_yfinance_exception_returns_error(self):
         mock = MagicMock()
         mock.history.side_effect = RuntimeError("timeout")
-        with patch("src.tools.market_data.yf.Ticker", return_value=mock):
+        with patch("yfinance.Ticker", return_value=mock):
             result = get_technical_indicators("AAPL")
         assert "error" in result
 
@@ -341,7 +341,7 @@ class TestGetOptionsChain:
     def test_no_options_returns_error(self):
         mock = MagicMock()
         mock.options = []
-        with patch("src.tools.market_data.yf.Ticker", return_value=mock):
+        with patch("yfinance.Ticker", return_value=mock):
             result = get_options_chain("AAPL")
         assert "error" in result
 
@@ -375,7 +375,7 @@ class TestGetOptionsChain:
         )
         mock.option_chain.return_value = chain
 
-        with patch("src.tools.market_data.yf.Ticker", return_value=mock):
+        with patch("yfinance.Ticker", return_value=mock):
             result = get_options_chain("AAPL")
 
         assert "expiries" in result

@@ -1,0 +1,21 @@
+{
+  "status": "FAIL",
+  "run_id": "ia-runtime-9c9386f98265",
+  "image": "investment-assistant:container-build-20261010-ad17fb8e",
+  "checks": [],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "limitations": [
+    "No Nginx/LAN ingress, OS sleep or 24-hour observation",
+    "Readiness/model load, not a model answer-quality benchmark"
+  ],
+  "owned_names": {
+    "app": "ia-runtime-9c9386f98265-app",
+    "database": "ia-runtime-9c9386f98265-db",
+    "network": "ia-runtime-9c9386f98265",
+    "volume": "ia-runtime-9c9386f98265-data"
+  },
+  "image_id": "sha256:35c4be3a4ba5ee26b42f2ee4a055b266b9c2a4c3bfeb98a2efb82eb23ec1e7f1",
+  "cleanup_verified": true,
+  "fixture_logs": ".qa/ia-runtime-9c9386f98265"
+}

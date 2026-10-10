@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_container_runtime.py", line 154, in <module>
+    run(parser.parse_args())
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_container_runtime.py", line 123, in run
+    raise RuntimeError("Restart exceeds predeclared 15-second budget")
+RuntimeError: Restart exceeds predeclared 15-second budget

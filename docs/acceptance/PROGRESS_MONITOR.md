@@ -18,7 +18,7 @@ not gate PASS statuses; PLAN.md remains the acceptance matrix.
 | L10 | 6 | 5.375 |
 | L11 | 5 | 5 |
 | L12 | 6 | 6 |
-| L13 | 7 | 3 |
+| L13 | 7 | 3.25 |
 | L14 | 7 | 2 |
 | L15 | 4 | 0.25 |
 | L16 | 4 | 2 |
@@ -188,3 +188,6 @@ Written plan credited only; noapprovedcampaign/paperaccount/execution claim.
 Actual image build final audit raw83.125/display83 delta0pp,L11=5/5 forlocal
 checks/build. Remote current-worktree CI remains unrun; no containerruntime claim.
 Goal control PAUSED; no completion claimed.
+
+Built-image native smoke audit raw83.375/display83 delta0pp,L13=3.25/7.
+Nonroot/PDF/native/OpenBLAS checks verified; production runtime/restarts pending.

@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import Any
 from datetime import UTC, datetime
 
-import yfinance as yf
-
 from src.agent.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -95,6 +93,8 @@ def get_forex_data(
     interval: str = "1d",
 ) -> dict:
     """Fetch OHLCV history for forex pairs via Yahoo Finance."""
+    import yfinance as yf
+
     result: dict[str, object] = {}
     for pair in pairs:
         sym = _normalize_pair(pair)
@@ -118,6 +118,8 @@ def get_forex_data(
 
 def get_forex_rates(pairs: list[str] | None = None) -> dict:
     """Snapshot of current spot rates, daily change %, and pip size."""
+    import yfinance as yf
+
     targets = [_normalize_pair(p) for p in pairs] if pairs else _DEFAULT_PAIRS
     result: dict[str, Any] = {
         "timestamp": datetime.now(UTC).isoformat(),

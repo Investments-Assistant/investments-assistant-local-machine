@@ -9,12 +9,15 @@ Supported strategies:
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import pandas as pd
+
 import math
 from decimal import Decimal
 from datetime import UTC, datetime
 from dataclasses import asdict
-
-import pandas as pd
 
 from src.agent.utils.logger import get_logger
 
@@ -34,6 +37,8 @@ def _momentum(
     top_n: int = 3,
 ) -> tuple[pd.Series, list[dict]]:
     """Monthly top-momentum rotation using only prices known at rebalance time."""
+    import pandas as pd
+
     if lookback_days < 2 or top_n < 1:
         raise ValueError("lookback_days must be >= 2 and top_n must be >= 1")
     equity = pd.Series(float(capital), index=prices.index)
@@ -49,9 +54,7 @@ def _momentum(
         if i >= lookback_days and not available.empty:
             month = date.to_period("M")
             if month != previous_month and all(symbol in available for symbol in holdings):
-                previous_value = cash + sum(
-                    shares * float(available[symbol]) for symbol, shares in holdings.items()
-                )
+                previous_value = cash + sum(shares * float(available[symbol]) for symbol, shares in holdings.items())
                 lookback = prices.iloc[i - lookback_days]
                 returns = (available / lookback.reindex(available.index) - 1).dropna()
                 selected = returns.nlargest(top_n)
@@ -154,6 +157,8 @@ def _sma_crossover(
     slow: int = 50,
 ) -> tuple[pd.Series, list[dict]]:
     # Trade each symbol independently
+    import pandas as pd
+
     equity = pd.Series(0.0, index=prices.index)
     trades = []
     for sym in prices.columns:
@@ -202,6 +207,7 @@ def _rsi_mean_reversion(
     rsi_buy: float = 30.0,
     rsi_sell: float = 70.0,
 ) -> tuple[pd.Series, list[dict]]:
+    import pandas as pd
     from ta.momentum import RSIIndicator
 
     equity = pd.Series(0.0, index=prices.index)
@@ -255,6 +261,8 @@ def _simulate(
     base_currency: str = "USD",
 ) -> dict:
     """Run cost-aware daily replay; persistable evidence includes exact source bars."""
+    import pandas as pd
+
     from src.research.replay import Costs
     from src.research.portfolio import replay_portfolio
 
@@ -323,9 +331,7 @@ def _simulate(
         period_end=end,
         trades_count=len(result["trades"]),
         trades_sample=result["trades"][:20],
-        equity_curve=[
-            dict(date=str(at.date()), value=float(value)) for at, value in weekly.items()
-        ],
+        equity_curve=[dict(date=str(at.date()), value=float(value)) for at, value in weekly.items()],
         research_status="INSUFFICIENT_EVIDENCE",
         source_limitations=source.get("limitations", []),
         assumptions=result["conventions"],
