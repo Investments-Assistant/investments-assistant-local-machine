@@ -318,6 +318,12 @@ async def record_dividend_payment(
             if old.evidence_hash != event.evidence_hash or digest(event_evidence(old)) != old.evidence_hash:
                 raise PolicyDenied("CONFLICTING_ACCOUNT_EVENT")
             return dict(event_id=old.id, deduplicated=True, environment="simulator")
+        if await session.scalar(select(AccountLedgerEvent.id).where(
+            AccountLedgerEvent.account_id == account_id, AccountLedgerEvent.kind == "dividend_entitlement",
+            AccountLedgerEvent.payload["instrument_id"].as_string() == instrument_id,
+            AccountLedgerEvent.payload["allocation_id"].as_string() == allocation_id,
+        ).limit(1)):
+            raise PolicyDenied("DIVIDEND_ENTITLEMENT_LINK_REQUIRED")
         checked, ledger = await reconcile_account(session, account, _include_ledger=True)
         if checked["status"] != "consistent" or ledger is None:
             raise PolicyDenied("LEDGER_NOT_RECONCILED")

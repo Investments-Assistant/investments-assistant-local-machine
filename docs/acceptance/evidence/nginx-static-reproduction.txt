@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_nginx_ingress.py", line 170, in <module>
+    asyncio.run(run(parser.parse_args()))
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_nginx_ingress.py", line 117, in run
+    raise RuntimeError("STATIC_SECURITY_HEADERS_MISSING")
+RuntimeError: STATIC_SECURITY_HEADERS_MISSING

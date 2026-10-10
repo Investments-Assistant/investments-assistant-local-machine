@@ -19,6 +19,8 @@ from src.execution.accounting import (
     AccountingSplit,
     AccountingCashFlow,
     AccountingDividendPayment,
+    AccountingDividendSettlement,
+    AccountingDividendEntitlement,
     replay_events,
 )
 
@@ -158,18 +160,35 @@ async def _reconcile_account(
     from src.execution.account_events import event_evidence
 
     accounting_actions = []
+    account_events_by_id = {event.id: event for event in account_events}
     for event in account_events:
         try:
             payload = event.payload
             if (
                 event.user_id != account.user_id
-                or event.kind not in {"cash_flow", "split", "dividend_payment"}
+                or event.kind not in {"cash_flow", "split", "dividend_payment",
+                                       "dividend_entitlement", "dividend_settlement"}
                 or digest(event_evidence(event)) != event.evidence_hash
                 or payload["environment"] != "simulator"
                 or payload["currency"] != account.currency
                 or payload["origin"] != "synthetic_fixture_receipt"
             ):
                 raise ValueError("Invalid account evidence")
+            if event.kind == "dividend_entitlement":
+                accounting_actions.append(AccountingDividendEntitlement(
+                    event.id, event.ledger_sequence, payload["action_id"], payload["instrument_id"],
+                    payload["allocation_id"], Decimal(payload["eligible_quantity"]),
+                    Decimal(payload["gross_base"]), Decimal(payload["withholding_base"])))
+                continue
+            if event.kind == "dividend_settlement":
+                earned = account_events_by_id.get(payload["entitlement_id"])
+                if (earned is None or earned.kind != "dividend_entitlement" or event.effective_at < earned.effective_at
+                        or any(payload[key] != earned.payload[key] for key in (
+                            "instrument_id", "allocation_id", "action_id", "eligible_quantity",
+                            "gross_base", "withholding_base", "currency"))):
+                    raise ValueError("Invalid dividend settlement link")
+                accounting_actions.append(AccountingDividendSettlement(event.id, event.ledger_sequence, earned.id))
+                continue
             if event.kind == "dividend_payment":
                 accounting_actions.append(
                     AccountingDividendPayment(
@@ -402,6 +421,7 @@ async def _reconcile_account(
         result[label] = (
             str(sum(getattr(ledger, attribute).values(), Decimal(0))) if result["status"] == "consistent" else None
         )
+    result["dividend_receivable"] = str(ledger.dividend_receivable) if result["status"] == "consistent" else None
     if _include_execution_evidence and result["status"] == "consistent":
         result["reconciled_dividends"] = [
             dict(
@@ -416,9 +436,19 @@ async def _reconcile_account(
                 net_base=str(Decimal(e.payload["gross_base"]) - Decimal(e.payload["withholding_base"])),
                 currency=account.currency,
                 evidence_sha256=e.evidence_hash,
+                entitlement_id=e.payload.get("entitlement_id"),
             )
             for e in account_events
-            if e.kind == "dividend_payment"
+            if e.kind in {"dividend_payment", "dividend_settlement"}
+        ]
+        result["reconciled_dividend_entitlements"] = [
+            dict(event_id=e.id, booked_at=e.observed_at.isoformat(), effective_at=e.effective_at.isoformat(),
+                 instrument_id=e.payload["instrument_id"], allocation_id=e.payload["allocation_id"],
+                 gross_base=e.payload["gross_base"], withholding_base=e.payload["withholding_base"],
+                 net_base=str(Decimal(e.payload["gross_base"]) - Decimal(e.payload["withholding_base"])),
+                 eligible_quantity=e.payload["eligible_quantity"], currency=account.currency,
+                 evidence_sha256=e.evidence_hash)
+            for e in account_events if e.kind == "dividend_entitlement"
         ]
         result["reconciled_cash_flows"] = [
             dict(

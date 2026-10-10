@@ -70,14 +70,16 @@ def attribute(opening, closing, *, pnl):
         totals["fx"] += fx
         totals["fees"] += fees
     income = (Decimal(closing["dividend_gross"]) - Decimal(opening["dividend_gross"])
-              - Decimal(closing["dividend_withholding"]) + Decimal(opening["dividend_withholding"]))
+              - Decimal(closing["dividend_withholding"]) + Decimal(opening["dividend_withholding"])
+              + Decimal(closing.get("dividend_receivable", "0")) - Decimal(opening.get("dividend_receivable", "0")))
     for allocation in sorted(set(by_allocation) | set(opening["allocations"]) | set(closing["allocations"])):
         first = opening["allocations"].get(allocation, {})
         last = closing["allocations"].get(allocation, {})
         delta = {field: Decimal(last.get(field, "0")) - Decimal(first.get(field, "0"))
-                 for field in ("realized", "unrealized", "dividend_gross", "dividend_withholding")}
+                 for field in ("realized", "unrealized", "dividend_gross", "dividend_withholding",
+                               "dividend_receivable")}
         totals = by_allocation.setdefault(allocation, dict(price=Decimal(0), fx=Decimal(0), fees=Decimal(0)))
-        totals["income"] = delta["dividend_gross"] - delta["dividend_withholding"]
+        totals["income"] = delta["dividend_gross"] - delta["dividend_withholding"] + delta["dividend_receivable"]
         totals["pnl"] = totals["price"] + totals["fx"] - totals["fees"] + totals["income"]
         if totals["pnl"] != delta["realized"] + delta["unrealized"] + totals["income"]:
             raise PolicyDenied("VALUATION_ALLOCATION_ATTRIBUTION_MISMATCH")

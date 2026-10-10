@@ -1,0 +1,19 @@
+{
+  "name": "workflow-production-budget-20261009",
+  "repetitions": 3,
+  "cases": "all nine existing workflow-scope-v6 cases, unchanged",
+  "model": "models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+  "threads": 4,
+  "context": 4096,
+  "output_tokens": 768,
+  "native_tools": false,
+  "substantive_news": true,
+  "source_injection": true,
+  "predeclared_interactive_p95_budget_seconds": 30,
+  "percentile": "nearest rank",
+  "limitations": [
+    "Small fixed synthetic sample; not production p95 or economic evidence.",
+    "Deterministic bypass and model-assisted paths must be reported separately."
+  ],
+  "authorization": "Existing local model and synthetic tools only; no downloads/providers/orders."
+}

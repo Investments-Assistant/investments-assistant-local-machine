@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "evidence": "nginx-ingress-20261009-v3.json",
+  "exit_code": 0,
+  "checks": 7,
+  "sha256": {
+    "scripts/verify_nginx_ingress.py": "e66601e1e71e760f2eb23a4561dcb98c2c20662f19b22f83898e88d164cab672",
+    "tests/e2e/ingress_fixture_server.py": "9e7b315cd47ede35070dcb8a327e744a16223ffad2eec8f90da84689078230d3",
+    "config/nginx/local.conf": "ddef46aa299472908fd159c313579ac2a6adaf6716119e820fccad1b769eec59",
+    "config/nginx/rate-limit.conf": "7eb48f74632ebd42d4f0bb71e2c2990b38fccebae62fed552e3be158787dc889",
+    ".qa/nginx-root/usr/sbin/nginx": "a24def283d640db0bcad3c81b0630a3444b3079f6c50c956c9bd39330eaca544",
+    ".qa/nginx-package/nginx_1.24.0-2ubuntu7.18_amd64.deb": "6a169148442f2180cd9676f92e033ec8411d3a82d39c5613d380aaab06226f5b"
+  },
+  "nginx_version": "nginx version: nginx/1.24.0 (Ubuntu)\nbuilt with OpenSSL 3.0.13 30 Jan 2024\nTLS SNI support enabled\nconfigure arguments: --with-cc-opt='-g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/build/nginx-PgwIQM/nginx-1.24.0=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/nginx-PgwIQM/nginx-1.24.0=/usr/src/nginx-1.24.0-2ubuntu7.18 -fPIC -Wdate-time -D_FORTIFY_SOURCE=3' --with-ld-opt='-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -Wl,-z,relro -Wl,-z,now -fPIC' --prefix=/usr/share/nginx --conf-path=/etc/nginx/nginx.conf --http-log-path=/var/log/nginx/access.log --error-log-path=stderr --lock-path=/var/lock/nginx.lock --pid-path=/run/nginx.pid --modules-path=/usr/lib/nginx/modules --http-client-body-temp-path=/var/lib/nginx/body --http-fastcgi-temp-path=/var/lib/nginx/fastcgi --http-proxy-temp-path=/var/lib/nginx/proxy --http-scgi-temp-path=/var/lib/nginx/scgi --http-uwsgi-temp-path=/var/lib/nginx/uwsgi --with-compat --with-debug --with-pcre-jit --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_auth_request_module --with-http_v2_module --with-http_dav_module --with-http_slice_module --with-threads --with-http_addition_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_secure_link_module --with-http_sub_module --with-mail_ssl_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-stream_realip_module --with-http_geoip_module=dynamic --with-http_image_filter_module=dynamic --with-http_perl_module=dynamic --with-http_xslt_module=dynamic --with-mail=dynamic --with-stream=dynamic --with-stream_geoip_module=dynamic\n",
+  "limitations": [
+    "Ubuntu extracted binary, not Compose nginx:alpine image",
+    "Loopback only; no Docker/WSL source-address or LAN firewall proof",
+    "Fixture certificate trusted per client only; no OS trust-store changes"
+  ],
+  "earlier_failures": [
+    "v1: fixture omitted fastcgi temporary path; all temp paths now inside owned .qa directory",
+    "v2: fixture session ID exceeded application 36-character limit; corrected fixture, retained authorization checks"
+  ],
+  "cleanup": "Harness finally terminated owned Nginx/Uvicorn processes"
+}

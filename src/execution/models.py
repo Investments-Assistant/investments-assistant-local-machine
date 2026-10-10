@@ -165,6 +165,12 @@ class AccountLedgerEvent(Base):
     observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
 
 
+# The shared sequence is owned by ExecutionEvent's identity column. SQLAlchemy
+# cannot infer this dependency from the textual nextval default: fresh metadata
+# creation must create that table first (and drop it last).
+AccountLedgerEvent.__table__.add_is_dependent_on(ExecutionEvent.__table__)
+
+
 class ValuationSnapshot(Base):
     """Immutable observed simulator marks; never inferred historical quotes."""
     __tablename__ = 'valuation_snapshots'

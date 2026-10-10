@@ -46,3 +46,7 @@ These engineering fixtures establish accounting and workflow behavior, not econo
 edge. Research remains INSUFFICIENT EVIDENCE and live readiness NO-GO. The original
 fixed train/validation/holdout fixture evaluation remains separately documented;
 real historical/news availability and forward observation are still required.
+
+[Proposed forward observation plan](FORWARD_OBSERVATION.md) specifies the paired
+comparisons, sample limitations, frozen versions, recovery and review rules. It
+is unapproved and grants no provider/account/order or live authority.

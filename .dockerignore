@@ -1,0 +1,23 @@
+# Only inputs explicitly consumed by Dockerfile belong in the build context.
+# In particular, exclude .env, Git history, models, reports and disposable DBs.
+**
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!poetry.lock
+!requirements-poetry.txt
+!.env.example
+!alembic.ini
+!config/
+!config/build/
+!config/build/debian.sources
+!src/
+!src/**
+!migrations/
+!migrations/**
+!scripts/
+!scripts/create_user.py
+!scripts/create_broker_key.py
+**/__pycache__/
+**/*.pyc
+**/*.pyo

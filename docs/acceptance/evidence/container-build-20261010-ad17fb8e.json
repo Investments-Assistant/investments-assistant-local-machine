@@ -1,0 +1,13 @@
+{
+  "tag": "investment-assistant:container-build-20261010-ad17fb8e",
+  "status": "PASS",
+  "log": "docs/acceptance/evidence/container-build-20261010-ad17fb8e.txt",
+  "source_hashes": {
+    "Dockerfile": "ac3c54fff45bf1006c93686fd032b28d6652d5687a13f274784c9c46fa445f50",
+    ".dockerignore": "21b93915cd50dc89ce2139492e25958f347d518fecd0b5c2c74faa6849ac49e0",
+    "requirements-poetry.txt": "f3348925e16ecc562c4834c5df3867ab9da9473d3bd9c32810af804b7a7077d9",
+    "poetry.lock": "f335a4eb2829135eef45d152bca11abf14c3a480dd7d245dac5d70e298600d79",
+    "config/build/debian.sources": "36f8600e4c543f4afdc810983e0005d2174b4ec6141171360fa52f24bbfe28a3"
+  },
+  "exit_code": 0
+}

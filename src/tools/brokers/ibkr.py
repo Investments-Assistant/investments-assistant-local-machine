@@ -94,6 +94,10 @@ def _error(exc):
         "CONTRACT_MISMATCH",
         "AMBIGUOUS_CONTRACT_DETAILS",
         "CONTRACT_PRECISION_UNAVAILABLE",
+        "IBKR_SESSION_CONFIGURATION_CHANGED",
+        "IBKR_SESSION_STOPPING",
+        "IBKR_SESSION_NOT_READY",
+        "IBKR_READ_QUEUE_FULL",
     }
     code = str(exc) if str(exc) in allowed else "IBKR_READ_UNAVAILABLE"
     return {"broker": "ibkr", "available": False, "error": code}
@@ -122,9 +126,26 @@ def summarize_account(values, actual: str) -> dict:
     }
 
 
+def _read(account, operation):
+    _config(account)
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        pass
+    else:
+        raise RuntimeError("IBKR_SYNC_ADAPTER_REQUIRES_WORKER_THREAD")
+    from src.tools.brokers.ibkr_session import route_read
+
+    handled, result = route_read(account, operation)
+    if handled:
+        return result
+    with _connection(account) as (ib, actual):
+        return operation(ib, actual)
+
+
 def get_ibkr_account(account: BrokerAccountConfig | None = None) -> dict:
     try:
-        with _connection(account) as (ib, actual):
+        def operation(ib, actual):
             result = summarize_account(ib.accountSummary(account=actual), actual)
             result.update(
                 declared_environment=account.config["environment"],
@@ -134,13 +155,14 @@ def get_ibkr_account(account: BrokerAccountConfig | None = None) -> dict:
                 execution_permission="read_only_external_writes_disabled",
             )
             return result
+        return _read(account, operation)
     except Exception as exc:
         return _error(exc)
 
 
 def get_ibkr_positions(account: BrokerAccountConfig | None = None) -> list[dict]:
     try:
-        with _connection(account) as (ib, actual):
+        def operation(ib, actual):
             return [
                 {
                     "symbol": item.contract.symbol,
@@ -161,13 +183,14 @@ def get_ibkr_positions(account: BrokerAccountConfig | None = None) -> list[dict]
                 for item in ib.portfolio(account=actual)
                 if item.account == actual
             ]
+        return _read(account, operation)
     except Exception as exc:
         return [_error(exc)]
 
 
 def get_ibkr_orders(account: BrokerAccountConfig | None = None) -> list[dict]:
     try:
-        with _connection(account) as (ib, actual):
+        def operation(ib, actual):
             # Explicit snapshot request; do not present a fresh client's empty cache as history.
             trades = ib.reqAllOpenOrders()
             return [
@@ -191,6 +214,7 @@ def get_ibkr_orders(account: BrokerAccountConfig | None = None) -> list[dict]:
                 for trade in trades
                 if trade.order.account == actual
             ]
+        return _read(account, operation)
     except Exception as exc:
         return [_error(exc)]
 
@@ -232,8 +256,9 @@ def resolve_ibkr_contract(
     symbol: str, exchange: str, currency: str, account: BrokerAccountConfig | None = None
 ) -> dict:
     try:
-        with _connection(account) as (ib, _):
+        def operation(ib, actual):
             return qualify_stock(ib, symbol=symbol, exchange=exchange, currency=currency)
+        return _read(account, operation)
     except Exception as exc:
         return _error(exc)
 

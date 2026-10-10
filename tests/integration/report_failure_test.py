@@ -5,13 +5,15 @@ from contextlib import asynccontextmanager
 from unittest.mock import AsyncMock
 
 import pytest
+from sqlalchemy import select
 
 from src.db import database
 from src.agent import clients
 from src.config import Settings
-from src.db.models import Report
+from src.db.models import User, Report
 from src.scheduler import reporter
 from src.tools.dispatcher import tool_context
+from src.operations.models import OperationalAlert
 from src.operations.storage import StorageUnavailable
 
 pytestmark = pytest.mark.integration
@@ -22,6 +24,8 @@ pytestmark = pytest.mark.integration
 ])
 async def test_report_returns_partial_for_each_failed_stage(db_session, monkeypatch, tmp_path, failure):
     owner = str(uuid.uuid4())
+    db_session.add(User(id=owner, username="report-" + owner, password_hash="fixture", is_active=True))
+    await db_session.flush()
 
     @asynccontextmanager
     async def factory():
@@ -81,6 +85,18 @@ async def test_report_returns_partial_for_each_failed_stage(db_session, monkeypa
     if failure == "disk":
         assert result["pdf_path"] is None
         assert {"stage": "pdf", "code": "DISK_LOW"} in result["errors"]
+        alert = await db_session.scalar(select(OperationalAlert).where(OperationalAlert.user_id == owner))
+        assert alert is not None and alert.rule == "report_storage_pressure"
+        assert alert.observed_value == "DISK_LOW" and alert.delivery_status == "in_app"
+        assert str(tmp_path) not in alert.message
+        with tool_context("report-fixture", owner, "recommend"):
+            retry = await reporter.generate_report("2026-09-01", "2026-09-07")
+        assert retry["status"] == "partial_failure" and retry["report_id"] != result["report_id"]
+        await db_session.refresh(alert)
+        alerts = list(await db_session.scalars(select(OperationalAlert).where(OperationalAlert.user_id == owner)))
+        assert len(alerts) == 1 and alert.occurrences == 2
+
+
 
 
 async def test_real_collector_history_failure_persists_partial_report(db_session, monkeypatch, tmp_path):

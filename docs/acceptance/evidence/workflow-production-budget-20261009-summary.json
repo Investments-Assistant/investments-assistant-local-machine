@@ -1,0 +1,269 @@
+{
+  "plan": "workflow-production-budget-20261009-plan.json",
+  "runs": [
+    "PASS",
+    "PASS",
+    "PASS"
+  ],
+  "cases": {
+    "portfolio": {
+      "samples": 3,
+      "p50_seconds": 0.002549193042796105,
+      "p95_seconds": 0.003216015000361949,
+      "latency_budget_met": true,
+      "execution_paths": [
+        [
+          "default"
+        ],
+        [
+          "default"
+        ],
+        [
+          "default"
+        ]
+      ],
+      "answer_generation": [
+        [
+          "deterministic_financial_evidence"
+        ],
+        [
+          "deterministic_financial_evidence"
+        ],
+        [
+          "deterministic_financial_evidence"
+        ]
+      ]
+    },
+    "scanner": {
+      "samples": 3,
+      "p50_seconds": 10.982542764977552,
+      "p95_seconds": 11.043740949011408,
+      "latency_budget_met": true,
+      "execution_paths": [
+        [
+          "default"
+        ],
+        [
+          "default"
+        ],
+        [
+          "default"
+        ]
+      ],
+      "answer_generation": [
+        [
+          "deterministic_financial_evidence_with_validated_news"
+        ],
+        [
+          "deterministic_financial_evidence_with_validated_news"
+        ],
+        [
+          "deterministic_financial_evidence_with_validated_news"
+        ]
+      ]
+    },
+    "explicit_exclusion": {
+      "samples": 3,
+      "p50_seconds": 8.999228720960673,
+      "p95_seconds": 9.469709894969128,
+      "latency_budget_met": true,
+      "execution_paths": [
+        [
+          "default"
+        ],
+        [
+          "default"
+        ],
+        [
+          "default"
+        ]
+      ],
+      "answer_generation": [
+        [
+          "validated_news_extracts_or_abstention"
+        ],
+        [
+          "validated_news_extracts_or_abstention"
+        ],
+        [
+          "validated_news_extracts_or_abstention"
+        ]
+      ]
+    },
+    "exclusion_followup": {
+      "samples": 3,
+      "p50_seconds": 0.00017309404211118817,
+      "p95_seconds": 0.00019440101459622383,
+      "latency_budget_met": true,
+      "execution_paths": [
+        [
+          "default"
+        ],
+        [
+          "default"
+        ],
+        [
+          "default"
+        ]
+      ],
+      "answer_generation": [
+        [
+          "user_read_restriction"
+        ],
+        [
+          "user_read_restriction"
+        ],
+        [
+          "user_read_restriction"
+        ]
+      ]
+    },
+    "portuguese_portfolio": {
+      "samples": 3,
+      "p50_seconds": 0.00025253702187910676,
+      "p95_seconds": 0.0002904629800468683,
+      "latency_budget_met": true,
+      "execution_paths": [
+        [
+          "default"
+        ],
+        [
+          "default"
+        ],
+        [
+          "default"
+        ]
+      ],
+      "answer_generation": [
+        [
+          "deterministic_financial_evidence"
+        ],
+        [
+          "deterministic_financial_evidence"
+        ],
+        [
+          "deterministic_financial_evidence"
+        ]
+      ]
+    },
+    "refresh_portfolio": {
+      "samples": 3,
+      "p50_seconds": 0.0004028019611723721,
+      "p95_seconds": 0.000481455004774034,
+      "latency_budget_met": true,
+      "execution_paths": [
+        [
+          "default"
+        ],
+        [
+          "default"
+        ],
+        [
+          "default"
+        ]
+      ],
+      "answer_generation": [
+        [
+          "deterministic_financial_evidence"
+        ],
+        [
+          "deterministic_financial_evidence"
+        ],
+        [
+          "deterministic_financial_evidence"
+        ]
+      ]
+    },
+    "holdings_and_news": {
+      "samples": 3,
+      "p50_seconds": 8.977825489011593,
+      "p95_seconds": 9.509765869006515,
+      "latency_budget_met": true,
+      "execution_paths": [
+        [
+          "default"
+        ],
+        [
+          "default"
+        ],
+        [
+          "default"
+        ]
+      ],
+      "answer_generation": [
+        [
+          "deterministic_financial_evidence_with_validated_news"
+        ],
+        [
+          "deterministic_financial_evidence_with_validated_news"
+        ],
+        [
+          "deterministic_financial_evidence_with_validated_news"
+        ]
+      ]
+    },
+    "refresh_excluded_portfolio": {
+      "samples": 3,
+      "p50_seconds": 9.470956396020483,
+      "p95_seconds": 9.741468374966644,
+      "latency_budget_met": true,
+      "execution_paths": [
+        [
+          "default"
+        ],
+        [
+          "default"
+        ],
+        [
+          "default"
+        ]
+      ],
+      "answer_generation": [
+        [
+          "validated_news_extracts_or_abstention"
+        ],
+        [
+          "validated_news_extracts_or_abstention"
+        ],
+        [
+          "validated_news_extracts_or_abstention"
+        ]
+      ]
+    },
+    "qualified_portfolio_review": {
+      "samples": 3,
+      "p50_seconds": 0.0003071159590035677,
+      "p95_seconds": 0.000393534020986408,
+      "latency_budget_met": true,
+      "execution_paths": [
+        [
+          "default"
+        ],
+        [
+          "default"
+        ],
+        [
+          "default"
+        ]
+      ],
+      "answer_generation": [
+        [
+          "deterministic_financial_evidence"
+        ],
+        [
+          "deterministic_financial_evidence"
+        ],
+        [
+          "deterministic_financial_evidence"
+        ]
+      ]
+    }
+  },
+  "peak_process_rss_mib": 2017.1953125,
+  "load_seconds": [
+    1.497703969012946,
+    1.014833883033134,
+    0.9059886470204219
+  ],
+  "limitations": "Three observations per case; nearest-rank p95 is the maximum, not production latency confidence. Inspect answers and distinguish deterministic paths."
+}

@@ -134,7 +134,8 @@ async def capture_valuation(session, *, user_id, account_id, snapshot_key):
     value = sum((Decimal(row["market_value"]) for row in rows), Decimal(0))
     basis = sum((Decimal(row["cost_basis"]) for row in rows), Decimal(0))
     allocations = {}
-    for allocation in sorted(set(ledger.realized_by_allocation) | set(ledger.dividend_gross_by_allocation)):
+    for allocation in sorted(set(ledger.realized_by_allocation) | set(ledger.dividend_gross_by_allocation)
+                              | set(ledger.dividend_receivables_by_allocation)):
         allocations[allocation] = dict(
             realized=str(ledger.realized_by_allocation.get(allocation, Decimal(0))),
             unrealized=str(
@@ -142,6 +143,7 @@ async def capture_valuation(session, *, user_id, account_id, snapshot_key):
             ),
             dividend_gross=str(ledger.dividend_gross_by_allocation.get(allocation, Decimal(0))),
             dividend_withholding=str(ledger.dividend_withholding_by_allocation.get(allocation, Decimal(0))),
+            dividend_receivable=str(ledger.dividend_receivables_by_allocation.get(allocation, Decimal(0))),
         )
     fx_marks = {}
     for instrument_id, quote in quotes.items():
@@ -157,14 +159,14 @@ async def capture_valuation(session, *, user_id, account_id, snapshot_key):
                                        as_of=quote.as_of.isoformat())
     payload = dict(
         allocations=allocations,
-        schema=2,
+        schema=3,
         execution_totals=execution_totals(checked["reconciled_executions"]),
         fx_marks=fx_marks,
         environment="simulator",
         currency=account.currency,
         initial_capital=str(account.initial_capital),
         cash=str(ledger.cash),
-        equity=str(ledger.cash + value),
+        equity=str(ledger.cash + value + ledger.dividend_receivable),
         market_value=str(value),
         cost_basis=str(basis),
         unrealized=str(value - basis),
@@ -172,6 +174,7 @@ async def capture_valuation(session, *, user_id, account_id, snapshot_key):
         net_external_flows=str(ledger.net_external_flows),
         dividend_gross=checked["dividend_gross"],
         dividend_withholding=checked["dividend_withholding"],
+        dividend_receivable=str(ledger.dividend_receivable),
         fees=str(sum((Decimal(row["fee_base"]) for row in checked["reconciled_executions"]), Decimal(0))),
         positions=rows,
         reconciliation_sha256=checked["evidence_sha256"],
@@ -225,7 +228,10 @@ async def period_performance(session, *, user_id, account_id, start, end):
         return Decimal(closing[field]) - Decimal(opening[field])
 
     flows, realized, unrealized = change("net_external_flows"), change("realized"), change("unrealized")
-    income = change("dividend_gross") - change("dividend_withholding")
+    cash_income = change("dividend_gross") - change("dividend_withholding")
+    receivable_change = (Decimal(closing.get("dividend_receivable", "0"))
+                         - Decimal(opening.get("dividend_receivable", "0")))
+    income = cash_income + receivable_change
     pnl = change("equity") - flows
     if pnl != realized + unrealized + income:
         raise PolicyDenied("VALUATION_PNL_NOT_RECONCILED")
@@ -234,7 +240,7 @@ async def period_performance(session, *, user_id, account_id, start, end):
         first, last = opening["allocations"].get(allocation, {}), closing["allocations"].get(allocation, {})
         deltas = {
             field: Decimal(last.get(field, "0")) - Decimal(first.get(field, "0"))
-            for field in ("realized", "unrealized", "dividend_gross", "dividend_withholding")
+            for field in ("realized", "unrealized", "dividend_gross", "dividend_withholding", "dividend_receivable")
         }
         allocation_results.append(
             dict(
@@ -244,6 +250,7 @@ async def period_performance(session, *, user_id, account_id, start, end):
                     + deltas["unrealized"]
                     + deltas["dividend_gross"]
                     - deltas["dividend_withholding"]
+                    + deltas["dividend_receivable"]
                 ),
                 **{key: str(value) for key, value in deltas.items()},
             )
@@ -261,6 +268,8 @@ async def period_performance(session, *, user_id, account_id, start, end):
         realized_change=str(realized),
         unrealized_change=str(unrealized),
         dividend_net=str(income),
+        dividend_cash_net=str(cash_income),
+        dividend_receivable_change=str(receivable_change),
         fees_change=str(change("fees")),
         fee_basis="Included in PnL; never subtract again",
         opening_equity=opening["equity"],

@@ -3458,3 +3458,858 @@ newscanner/reportfullsuite andbrowser pending. Latestfixedrubric76raw76.435 unch
   reproduction54219 writes browser-history-refresh-reproduction.txt. Inspect it
   before retry. Fix not applied yet. No other process active at this checkpoint.
 - No broker/bank connections, external orders, production or live-setting changes.
+
+## Verified local chat/scanner milestone — 78% (2026-10-07)
+- 23723 exited0: suite-scanner-source-quality.txt923PASS69.63s. All relevant Ruff
+  checks passed. Last app change was stricter exact-candidate validation.
+- 54219 reproduced cached history-refresh failure; force-refresh fix verified by
+  27824 exit0 browser-scanner-history-final.txt, including actual fresh expenses GET,
+  retained simulator/report/chat/expense workflows, zero unexpected console errors.
+- 16171 reproduced dropped source qualification. News/report validators now enforce
+  exact eligible full-source sentence selection independently of inference grammar.
+  Existing valid report tests use a complete sentence; all denial tests retained.
+- source-quality-current-validator.json revalidates saved actual default/native/
+  report model outputs against reconstructed original sources and current validator
+  hashes. No unnecessary model reruns; no fabricated synthesis or investment edge.
+- Final progress audit approves local L06PASS6/6. Arithmetic corrected by monitor:
+  raw77.935/display78%, delta+1pp. PLAN and fixed rubric updated. L08local remainsPASS.
+- HEAD0e18029fe882497cd7bb998f5b855777ac474889;505 staged/unstaged/untracked status
+  entries preserved. No active commands. No broker/bank connections, real orders,
+  notifications, deployment, OS changes or live enablement occurred.
+- Next: review coherent filesystem/vault-key recovery bundle expiry under L09/L10;
+  standalone database archive expiry already passes. Other gates remain incomplete.
+
+
+## Coherent fixture bundle recovery verified — 78% (2026-10-07)
+- Recovery16277 exit0: recovery-bundle-20261007.json PASS31tables0018_job_lease_clock,
+  key decryption/wrong-key rejection, PDF/settings/model hashes and3model tasks
+  p95 1.870853s. Source fixtures removed; target/artifacts retained.
+- Bundle CLI/unit55155 exit0:27PASS0.81s. Actual full-bundle preview exit0 protects1,
+  candidates0/deleted0. Never repeat existing target test_recovery_20261007_bundle.
+- Monitor raw77.950/display78 delta0, L09=6/6 local persistence/recovery.
+- HEAD externally advanced to9b0df38c333337aee83d8dcd9874fda7f5945eaf;17dirty entries
+  observed before these docs. Existing changes preserved; agent did not commit.
+- Full suite86123 RUNNING: evidence/suite-recovery-bundle.txt. Inspect handle/output
+  before retry. Prior923-suite and browser evidence remain valid for unchanged paths.
+- No broker/bank connections, external orders, live settings or production changes.
+- Remaining: current bundle fullsuite, operations interruption/recovery coverage,
+  external reconciliation, historical coverage/research, target host/CI/24h/paper gates.
+
+
+## Due-aware monitoring and interruption recovery — 78% (2026-10-07)
+- Bundle fullsuite86123 terminal exit0:939PASS70.51s. Monitor unchanged raw77.950.
+- Found monitor selected first100activeusers before opt-in; fixed eligible due-job
+  SQL filtering/batching independently for report and scan schedules.
+- Opt-out-after-selection reproduction67647 exit1:1FAIL7PASS; recheck now prevents
+  dispatch. Acquisition/completion and discovery SQL/coroutine bounds added.
+- Focused23728 exit0 monitoring-dispatch-guards.txt17PASS1.23s includes network/
+  cancellation recovery and one fresh callback after missed intervals. Ruff passed.
+- Audit raw78.200/display78 delta0, L10=4.375/6. Fullsuite93559 RUNNING at
+  evidence/suite-monitoring-dispatch.txt; inspect before retry. Last app edits are
+  runner consent/timeouts, import-only Ruff adjustment.
+- HEAD9b0df38c333337aee83d8dcd9874fda7f5945eaf; staged and unstaged changes preserved.
+  Agent did not stage/commit. No external broker/bank/orders/live/OS changes.
+- Remaining operations review, current fullsuite; external lifecycle and historical
+  coverage; CI/build/24h/host/research/paper requirements remain unfulfilled.
+
+
+## Heartbeat recovery verified — 78% (2026-10-07)
+- Prior monitoring fullsuite93559 exit0:947PASS69.58s.
+- Heartbeat registration reproduction48258 exit1; new read-only owner observer,
+  atomic gap alert/checkpoint and bounded/coalesced scheduling implemented.
+- Focused11538 exit0 heartbeat-guards.txt17PASS1.36s. Fullsuite60492 terminal exit0:
+  suite-heartbeat.txt955PASS69.74s. Current browser reused; UI unchanged.
+- Monitor raw78.450/display78, L10=4.625. No external watchdog or live actions.
+- Next report resource-pressure alert:25406 exit1 report-resource-alert-reproduction
+  1FAIL (DISK_LOW existed but no in-app alert). Added explicit real active fixture
+  owner and alert assertions. Reporter now emits scoped alert in report transaction;
+  this latest implementation is not yet verified. No active command at checkpoint.
+
+
+## Report resource-pressure alert milestone — 79% (2026-10-07)
+- Reporter now persists DISK_LOW owner-only in-app alert atomically with partial
+  report; repeat failures deduplicate. No external delivery or automatic deletion.
+- Focused48064 terminal exit0:report-resource-alert-guards.txt23PASS1.98s. RuffPASS.
+- Browser64942 terminal exit0:browser-operations-alerts.txtPASS full retained
+  workflows, no unexpected console errors, broker_connections0/external_orders0.
+- Monitor raw78.700/display79 delta+1pp; L10=4.875. Browser completed after audit.
+- Fullsuite5867 RUNNING: evidence/suite-resource-alert.txt. Inspect before retry.
+  Latest production edit report alert/message formatting; no changes after launch.
+- Goal remains active/incomplete. No production writes, broker/bank connections,
+  notifications or live enablement. Other local and external gates remain open.
+
+
+## Resource-alert full validation; workspace browser coverage in progress
+- Fullsuite5867 handle absent on resumed check. Durable suite-resource-alert.txt
+  shows terminal955PASS70.36s and no pytest/browser process remains. Do not invent
+  a recovered exit code; no rerun needed solely for lost handle.
+- Final milestone audit raw78.700/display79 unchanged; browserPASS already saved.
+- Browser preservation gap: added profile/project/disabled encrypted IBKR account
+  create/edit/reload/disable and cross-owner assertions. No real connection allowed
+  by fixture, read_authorized/enabled remainfalse for created account.
+- First browser58315 exit1 due solely to new test's wrong .history-item selector;
+  actual row is .conversation-row. Saved first.txt/.exit. Corrected harness+lint.
+- Browser10746 RUNNING: evidence/browser-workspace-controls-verified.txt/.exit.
+  Inspect handle/output/exit artifact before retry. No application edit for this
+  coverage yet. CurrentHEAD9b0df38c333337aee83d8dcd9874fda7f5945eaf,49dirty entries
+  including externally staged changes. Agent did not stage/commit.
+- Broker journal remains bounded read windows, not continuous history/reconciliation.
+  Local implementation and external prerequisites remain open; goal ACTIVE.
+
+
+## Workspace browser preservation verified — 79% (2026-10-08)
+- Browser10746 terminalexit0 with durable browser-workspace-controls-verified.exit0.
+  PASS full retained workflows plus profile/project/encrypted disabled-account UI,
+  reload/blank-secret preservation and cross-owner denial. No app changes needed.
+- Monitor raw78.700/display79 delta0; existing localgate credit unchanged. Architecture
+  and PLAN updated; current955fullsuite remains valid. No active commands.
+- Full original scope remains: continuous external broker lifecycle/reconciliation
+  fixture implementation/validation, accounting/history boundaries and benchmark
+  coverage, remaining operation/host/build/CI/24h/research gates. Approved external
+  paper/bank/production authority absent; live remainsdisabled.
+
+
+## Verified resume checkpoint — 79% (2026-10-08)
+- Screenshot review found broker buttons clipped in narrow sidebar. Browser22298
+  exited1, saved reproduction.txt/.exit1 proves actual account-card overflow.
+- CSS flex-wrap fix verified by64473 exit0 and durable
+  evidence/browser-account-overflow-fixed.exit0. Full realChromium/PG fixture
+  workflows PASS, new desktop card bounds assertion PASS; screenshot visually
+  inspected. Existing mobile workflows PASS, no mobile card-specific claim.
+- Current backend suite: evidence/suite-resource-alert.txt955PASS70.36s. Handle was
+  lost on priorresume; terminal saved summary and process absence verified, exit
+  not recovered. No rerun needed for later CSS/helper-only changes. Priorheartbeat
+  suite955PASS69.74s had observedexit0.
+- All17touchedPythonfilesRuffPASS. Source/docs staged+unstaged diffcheckPASS.
+  Full diffcheck warns only trailing spaces emitted in raw failure logs; preserved
+  original evidence. No test failure hidden or assertion weakened.
+- Finalmonitor raw78.700/display79 delta0. Fixedweights unchanged, latestL09=6/6,
+  L10=4.875/6. Othergate scores perPROGRESS_MONITOR. Goal ACTIVE and incomplete.
+- No active command handles. HEAD9b0df38c333337aee83d8dcd9874fda7f5945eaf;
+  externally staged and local unstaged changes preserved. No agentstage/commit.
+- Remaining highest-priority local scope: continuous broker callback/history
+  lifecycle/reconciliation prepared and tested without real connections; historical
+  period boundary/benchmark coverage and broader corporate-action handling;
+  operations coverage review. External paper/account approval, bank consent/access,
+  productiondeployment/OS changes not authorized. Target Docker/build/remoteCI and
+  actual24h observation remain unverified; realhistoricalresearch lacks valid inputs.
+- Existing bounded brokerjournal review confirmed it is NOT continuous history.
+  Do not substitute simulator/snapshot success for L04/L15 or turn unknown source
+  history into fabricated values. Research INSUFFICIENT EVIDENCE; live NO-GO/OFF.
+- This work made no real broker/bank/IMAPconnections, externalorders/notifications,
+  production migrations/deployments, modeldownloads or OS/firewall/power changes.
+
+
+## Broker order-review milestone in verification (2026-10-08)
+- Found read review ignored saved order_status facts. Added deterministic scoped
+  lifecycle comparisons, fill/status gaps, conflicting terminal states, partial
+  fill deduplication and correction/identity guards; never inferred currentstate,
+  strategyownership, executionauthority or fullhistory.
+- 32386exit1 red4FAIL. 99404exit0 first17PASS.91852exit1 expanded1FAIL40PASS:
+  new replayfixture incorrectly recreated executed_at; corrected tooriginalevent.
+- 58548exit0 +durable .exit0 broker-order-review-verified.txt41PASS3.66s. RuffPASS.
+- Fullsuite running evidence/suite-broker-order-review.txt/.exit; inspect handle
+  and durablestatus before retry. Latestmonitor requested; score pending.
+- No real broker connection/orders, deployment, notifications or livechanges.
+  Continuous lifecycle/history and full externalreconciliation stillrequired.
+
+Order-review audit raw78.950/display79 delta0; L04=4.25. Fullsuite3266active;
+browser-broker-order-review running too, both with durable .exit files. Inspect
+before retry. No further application edits after launching these checks.
+
+
+## Broker order review verified (2026-10-08)
+- Fullsuite3266 terminalexit0 +durable.exit0: suite-broker-order-review.txt
+  964PASS98.70s. Browser43363 terminalexit0 +durable.exit0: fullworkflowPASS,
+  unexpectedconsoleerrors0, brokerconnections0/externalorders0.
+- Finalcomputedoutput renamed to pending_cancel_observed, an observed historical
+  fact rather than impliedcurrentstate. No persisted schema/UI consumer changes.
+  All41affected checks rerun95582 exit0 +durable.exit0:
+  broker-order-review-observed-field.txt41PASS2.99s. RuffPASS. Unaffected fullsuite
+  and browser evidence reused; no duplicateexpensivechecks needed.
+- Finalaudit confirmed raw78.950/display79 delta0, L04=4.25/8.
+- No active commands. HEAD9b0df38c333337aee83d8dcd9874fda7f5945eaf, preserveall
+  staged/unstaged/untrackedwork; no agentcommit/stage/push.
+- Nextsubstantialbrokerpiece: continuousconnection/event-loop ownership with
+  bounded backpressure and durable scoped observation checkpoints, tested entirely
+  withSDKfixtures before any separatelyauthorizedconnection. Existing _connection
+  serializes short-lived synchronous worker sessions with a process lock; simply
+  looping snapshots would not prove continuous subscriptions/history and would
+  block other reads. Do not substitute periodicwindows for this requirement.
+- Otheroriginalgates stayopen: historicalvaluation/benchmark/corporateactions,
+  operations/host/24h/build/CI, actualresearchinputs, explicitpaper/bank/production
+  prerequisites. All externalwriteentrypoints remainclosed; liveOFF/noorders.
+
+
+## SDK session-owner component in verification (2026-10-08)
+- New ReadSessionWorker owns allSDK connection/eventloop/read/subscriptioncleanup
+  operations ononeboundedthread. Queue/lifespan/timeouts/stop semantics explicit;
+  timedoutnative retainsownership/lock untilactualcleanup. Noautomaticreconnect.
+- Existing bounded collect_ibkr_observations now uses owner. Continuousjournal
+  coordinator notimplemented yet; no backgroundenablement/realconnection authorized.
+- Reproduction56461 exit2 missingnewmodule, first56761 exit0 4PASS;47379 exit0
+  guards47PASS1.56s;19916 exit0 +durable.exit0 collector48PASS1.66s. RuffPASS.
+- Fullsuite launched suite-ibkr-session.txt/.exit; inspecthandle/durableoutput before
+  retry. Prior964suite/browser pertainsbeforecomponent, currentaffectedfullsuitepending.
+- Monitor requested. Remainingdurablecontinuousbatching/authorityrechecks/reconnect
+  lifecycle and existingfullgoal scope unchanged. No externalorders/livechanges.
+
+Session-owner audit raw79.200/display79 delta0; L04=4.5. Fullsuite30500active
+with durable suite-ibkr-session.exit on completion. Next unit is bounded callback
+delivery plus scoped lease-renewed durable batches, without starting real streams.
+
+## Callback capture checkpoint (2026-10-08)
+- Recovered interrupted65807 terminalexit0 and ibkr-callback-stream.exit0:
+  51PASS1.21s. Owner-thread subscription stays attached between drains; finaldrain
+  detaches first; overflow remains partial afterdrain; other-account events excluded.
+- Prior fullsuite30500 completed972PASS72.43s, suite-ibkr-session.exit0.
+  These fullsuite results precede callback refactor; affected51 tests current.
+- Monitor raw79.450/display79 delta0, L04=4.75/8. Goalactive/incomplete.
+- Next: scoped durable stream batches with current consent/config and lease checks.
+  No automatic stream, realconnection, order or trading-setting change.
+
+
+## Durable stream journal milestone (2026-10-08)
+- Added bounded scoped stream checkpoints with atomic evidence/batch counters,
+  current principal/account/config/consent checks, token/DB-clock ownership and
+  lease renewal capped by a finite session lifetime. Final requires nativecleanup;
+  gaps terminatepartial, no history-completeness/trading authority implied.
+- Initial91711 exit1: broker-stream-journal-first.txt1FAIL32PASS. Reproduction
+  showed upsert-left stale ORM lease; begin_refresh now refreshes loaded row.
+- 24323 exit0 verified48PASS2.95s;31487 exit0 guards49PASS2.94s, durable.exit0,
+  RuffPASS/source-docdiffcheckPASS. Separate transaction/concurrency/rollback
+  cases verified. Partialcapturecannot releaseownership without finalcleanup.
+- Fullsuite launched suite-broker-stream-journal.txt/.exit; inspect activehandle
+  and savedexit before retry. Latestmonitor pending. No brokerconnections/orders.
+- Continuous SDK-to-journal coordinator/activation/routing remains next, plus
+  original historicalfinancial, ops/host/24h/CI/research/external gates.
+
+Journal audit raw79.700/display80 delta+1pp, L04=5/8. Fullsuite3798active;
+no retry until durable exit inspected. Next bounded coordinator stillunimplemented.
+
+
+## Finite stream coordinator milestone (2026-10-08)
+- Journal fullsuite3798 exit0 +suite-broker-stream-journal.exit0:990PASS70.00s.
+- New internal broker_stream.capture_observations joins one owner subscription
+  to periodic atomic PG batches; defaults60s/5s, maxima480s/10s; boundedSQL/SDK
+  waits, explicitfinaldetach+nativecleanup, cancellation immediatelysignalsstop.
+  Failed/cancelledreads keepadmissionleased and preserve priorbatchcheckpoint;
+  no latercancelledresult persisted. Callbackgaps emit transactionalinappalert.
+- No HTTP/tool/job registration or automaticactivation. Process SDKlock sharing
+  stillneeds routing beforebackgroundenablement; no realaccount authority added.
+-62930 exit0 coordinator-first28PASS6.10s;15340 exit0 guards55PASS8.66s;
+  25512 exit0 verified56PASS (see savedsummary), all durable.exit0. SDKmock+PG
+  covers sustainedlatefee, revoke, disconnect, malformedcallback, cancellation
+  duringreads/nativeconnect, cleanupfailure and rollback. Ruff/source-docdiffPASS.
+- Currentfullsuite launched suite-broker-stream-coordinator.txt/.exit; inspect
+  handle/durableexit before retry. Monitor requested; prior raw79.700/display80.
+- Preserve staged/unstaged/untracked changes. No externalorders/connections,
+  deployment, notifications, productionmigrations or liveconfiguration changes.
+
+Coordinator audit raw80.200/display80 delta0, L04=5.5/8. Fullsuite68335active.
+Focused56PASS9.72s. Nextsharedowner readrouting; noautomaticactivation.
+
+
+## Shared SDK read routing milestone (2026-10-08)
+- Priorfullsuite68335 terminalexit0 +suite-broker-stream-coordinator.exit0:
+  997PASS77.52s. Subsequent routing changes require newfullsuite below.
+- Activefinitecoordinator registers its owner beforestartup. Account/positions/
+  openorders/contract/snapshot reads match owner+appaccount+entireconfig and run
+  onthatthread, boundedqueue; wrongscope/config failswithoutsecondconnection.
+  Timeout retainsregistry untilactualnativecleanup. Neverstarted reservations
+  releaseonstop; registeredreads reject synchronous calls from async eventloop.
+-91527 exit1 first17FAIL42PASS: newtest attemptedmutationoffrozenconfig before
+  cleanup; fixturefixed with dataclass replacement and setupordering.63505 exit1
+  then2FAIL57PASS: oldmockconnection fixtures omitted readconsent/account/client.
+  Addedexplicit syntheticreadconfig withoutweakening environmentproof assertions.
+-79875 exit0 +broker-read-routing-guards.exit0:59PASS8.14s.60472 exit0
+  +broker-read-routing-subscription.exit0:8PASS1.11s (overlaps7previouschecks).
+  Added actualtemporarysnapshot-withincontinuoussubscription test; parenthandlers
+  retained, no secondSDKconnection. Ruff/source-docdiffcheckPASS.
+- Currentfullsuite launched suite-broker-read-routing.txt/.exit; inspecthandle
+  andsavedexitbefore retry. Monitorauditpending. No realbroker/orders/livechanges.
+- Coordinatorstillnotregistered asroute/tool/scheduler, no automaticreconnect.
+  Reauthorization/reconciliation/explicitactivation and otheroriginalgates remain.
+
+Sharedrouting audit raw80.450/display80 delta0, L04=5.75/8. Fullsuite3139active.
+Nextinspect financialhistory/unpaiddividend gap whileawaiting fullsuite.
+
+
+## Verified broker capture/routing checkpoint (2026-10-08)
+- Fullsuite3139 terminalexit0 +suite-broker-read-routing.exit0:
+  1005PASS78.45s. No subsequent behavior edits (one stale docstring corrected).
+  Source/docs Ruff/diffcheckPASS. Existing browser-broker-order-review fixture
+  evidence reused for unchanged UI; browser does not prove SDK integration.
+- HEAD9b0df38c333337aee83d8dcd9874fda7f5945eaf;125statusentries before finaldocs;
+  preserve externally staged/unstaged/untracked work. No agentstage/commit/push.
+- No active commands. Latestmonitorraw80.450/display80 L04=5.75; finalcurrent
+  checkpoint audit requested. Goalactive/incomplete, liveOFF, all externalwrites
+  disabled; no brokerconnections/orders or realbank/notification/deploy actions.
+- NEXT concrete local gap reviewed: unpaiddividend entitlement accounting.
+  account_events.record_dividend_payment currently records receivedcash only;
+  accounting.replay_events supports cashflow/split/payment, not receivables;
+  reconciliation accepts only those three accountevent kinds. risk.py equity is
+  cash+exposure; valuation.py snapshots/period identities use receiveddividends.
+  Any entitlement implementation must carry explicit dated eligibility/evidence,
+  preserve immutable historical snapshots, avoid inferring current ownership as
+  ex-date eligibility, distinguish receivable from spendablecash, avoiddoublecount
+  onpayment, and integrate risk/valuation/report/recovery tests together.
+  Relevant files: account_events.py/accounting.py/reconciliation.py/risk.py/
+  valuation.py/valuation_attribution.py/reporting.py; existing tests
+  tests/integration/dividend_events_test.py and tests/unit/accounting_test.py.
+- Other original requirements remain: brokerexplicitactivation/reauth/reconciliation;
+  historicalboundary/benchmark/broadercorporateactions; operations/24h/physicalhost/
+  buildremoteCI; realhistoricalresearchinputs; separatelyapprovedbank/paper/production
+  prerequisites. Do not narrow Goal or calloverallcomplete.
+
+Finalaudit confirmed raw80.450/display80 delta0; L04 remains5.75.1005suite
+validatesalreadycredited work. GoalACTIVE/incomplete; no commandsrunning.
+
+
+## Dividend receivable arithmetic milestone (2026-10-08)
+- Added pure AccountingDividendEntitlement/Settlement events. Eligibility must
+  match exact allocation/instrument quantity at its ordered evidence point; issuer
+  action/allocation duplicates and missing/already-paid settlement references fail.
+  Accrual creates only fixed netreceivable; settlement transfers it tocash and
+  receivedgross/withholding, nevercostbasis/disposalPnL. Later sales/splits do not
+  resize earnings. Fractionalallocations, hostileDecimalcontext and aggregate
+  capacity tested. No persisted entitlement service or valuation/risk activation yet.
+- Reproduction exit2 dividend-receivable-reproduction.txt (missingeventclasses).
+  first46PASS0.55s; guards47PASS0.53s/exit0; RuffPASS afterlintonlycleanup.
+  Current1005fullsuite predates this arithmetic change; currentaffected47passed.
+- Next implement dated immutable entitlement/settlement receipts, replay parsing,
+  explicit pendingincome/cash distinctions through risk/valuation/report and
+  fixture recovery. No model/API authority to infer eligibility or create cash.
+- Correct earlier checkpoint testpath: tests/unit/execution_accounting_test.py
+  and accounting_actions_test.py (there is no tests/unit/accounting_test.py).
+- Consulted current SEC ex-date/payment/special-distribution distinctions via
+  existing ACCOUNTING.md source; do not infer issuer/exchange rules from symbol.
+  Goalactive/incomplete. No external financial action or trading-setting change.
+
+
+## Persisted dividend receivables in verification (2026-10-08)
+- New internal synthetic dated entitlement/linkedpayment receipts. Accountlock/
+  activeowner/explicitfixture/currentquantity/evidence/date checks; historical
+  eligibility refused if laterfills/splits prevent currentquantity proof. Stable
+  action+allocation identity, idempotency and linkedsettlement prevent duplicatecash.
+  Once allocation/instrument uses entitlementhistory, new legacyunlinkedpayments
+  require anentitlementlink (existingidempotentreplays remainvalid).
+- Reconciliation derives pendingreceivables, risk/manual+autonomy equity includes
+  them without changing spendablecash. Snapshot schema3 addsreceivables; immutable
+  oldschema1/2 unchanged/zero receivable because oldcode couldnotbookentitlements.
+  Period/FX identities include changeinreceivables; reports separate cash from
+  accrual and show attributed receipts. No schemaDDL or automaticproviderreceipt.
+-48546 exit0 integrationfirst45PASS3.03s;28200 exit0 guards53PASS3.61s,
+  durable.exit0. Includes concurrent committedreceipt/payment/restartdedup. RuffPASS.
+- Actual markedfixture restore running: targettest_receivable_20261008, prefix
+  dividend-receivable-recovery-20261008 with --with-entitlement --with-valuations.
+  Inspecthandle/output/exit/target before retry; script refuses existingtargets.
+  Noothercommandsactive. Fullsuite/browser afterruntimeintegration stillpending.
+- Goalactive/incomplete, prioraudit80.450/display80 unchanged. No realbroker/
+  bankconnections/orders/externalnotifications/deployment or livechanges.
+
+
+## Entitlement restore verified; broad validation running (2026-10-08)
+-73598 terminalexit0 +dividend-receivable-recovery-20261008-run.exit0:
+  actualrestore31tables/revision0018PASS. -database.json exact hashes and
+  -split.json proves pending7.5 asset, unchangedcash, halts/splitbasis and identical
+  exactperiodperformance. Targettest_receivable_20261008 retained; neverrecreate.
+- Addedunspendablecash/crossownersettlementguard.91492 exit1 first10PASS1FAIL:
+  helperlimit100 wasunmarketableagainstfixturequote120; correctedfixturequote
+  to100 toexercise intendedcashguard.60655 exit0 cashverified11PASS1.23s;
+  no policythreshold orassertion weakened.
+- Fullsuite17682active suite-dividend-receivables.txt/.exit; browser65128active
+  browser-dividend-receivables.txt/.exit, distinctmarkedfixtureDBs. Inspectboth
+  handles/durableexits before retry. No furtherappchangesduringthesechecks.
+- Recoveryandcashguard milestoneaudit requested; latestscore80.450/display80.
+  OtherhistoricalFX/benchmark/specialcorporateactions and external/host/CI gates
+  remainincomplete. No realfinancial/providerconnections or livechanges.
+
+
+## Dividend entitlement milestone fully verified locally (2026-10-08)
+-17682 terminalexit0 +suite-dividend-receivables.exit0:1031PASS81.79s.
+-65128 terminalexit0 +browser-dividend-receivables.exit0: realChromium/PostgreSQL
+  desktop/mobileworkflowPASS; unexpectedconsoleerrors0, brokerconnections0/orders0.
+  Actual31tablerestore and exactreceivable/valuation evidence alreadyverified.
+- Monitoraudit raw80.475/display80 delta0; L05=10/10 localaccounting credit.
+  OverallGoalACTIVE/incomplete. Broaderhistorical/foreignspecialcorporateactions
+  andbenchmark/externalreconciliation limitations stillapply; noexternalgatespassed.
+- Noactivecommands; no applicationchanges after launching fullsuite/browser.
+  Nextconcrete report gap: valuation.period_performance unconditionally returns
+  benchmark_return=None; needs explicit compatible dated benchmark evidence and
+  deterministic period comparison ratherthan substituting market data or defaults.
+  Preserve originalscope, dirty/stagedfiles, liveOFF and allwriteboundaries.
+
+
+## Report truthfulness follow-up and next work (2026-10-08)
+- Found fallbackreport footer alwaysclaimed PnLunavailable evenwhen exactperiod
+  result above wascomplete. Corrected wording toaccount-specific availability.
+  80969terminalexit0 +dividend-report-truthfulness.exit0:37PASS3.18s including
+  reportsemantic assertion, dividends, valuations, andreportrepair cases. Ruff/
+  source-docdiffPASS. Onlythistextchange follows1031suite/browser; reuseunaffected
+  broaderresults. Noactivecommands. Finalcheckpointprogressaudit requested.
+- Nextbenchmark implementation design (NOT implemented): accept explicitserver-
+  sourced dated compatible series/basecurrency/total-return evidence with immutable
+  valuation snapshots, rejectstale/future/incompatible marks, calculatebenchmark
+  return onlyforcompatibleboundaries. Preservemissingdata asunavailable.
+  To compareportfolio returns, netflows==0 isINSUFFICIENT proof ofnoexternalflows:
+  offsettingdeposit/withdrawalcancelsnet. Captureflowhistoryidentity/count with
+  new snapshots and avoid simple-return/alpha claims ifflowsoccur orhistorymissing.
+  No benchmark choice, prices, historicalmarks, FX orpaidfeed maybeinferred.
+  Relevant: src/execution/valuation.py period_performance currentlyalwaysNone;
+  src/web/simulator_routes.py captureendpoint; src/scheduler/reporter.py benchmark
+  wording; tests/integration/valuation_snapshots_test.py. Existingreport/research
+  baselines mustremain distinct fromactualbrokerperformance.
+- FullGoalstillactive/incomplete; latestraw80.475/display80, L05localPASS.
+  Otherhistorical/corporateaction, brokeractivation/reconciliation, ops/host/24h/
+  build/remoteCI, researchdata, bank/paper/production prerequisites stayopen.
+
+Finalcurrentaudit raw80.500/display81 delta+1pp, L07local6/6 afterfooterfix.
+Original attachment lines242-260 require reports toDISTINGUISHbenchmarkbasis,
+not invent oralwaysproducebenchmarkreturns; unavailablebasis isexplicit. Earlier
+benchmarkimplementationidea is NOT a newly mandatory reports gate. Comparative
+research remainsL14 andmustnotbeclaimedcompletewithoutitsactualevidence.
+Nextresume should review ORIGINAL remaining L04/L10/L11/L13/L14 conditions and
+currentexternalblockers beforeaddingoptionalbenchmarkfeatures. FullGoalunchanged,
+ACTIVE/incomplete; noactivecommands. LatestHEAD9b0df38c333337aee83d8dcd9874fda7f5945eaf.
+
+
+## Fresh-schema CI defect reproduced (2026-10-08)
+- Read-only GitHub run37657249888 at HEAD9b0df38: unitPASS, integrationFAIL,
+  browserSKIPPED. Downloaded JUnit artifact and saved compact counts in
+  evidence/remote-ci-37657249888-summary.json. Docker WSL integration unavailable.
+- New marked isolated DB test_clean_ci_20261008_ledger created, token
+  fixture-clean-ci-20261008. First setup attempt used a relative socket and failed
+  before DB creation; corrected absolute socket. Initial reproduction log therefore
+  records nonexistent DB, not the schema defect. Valid reproduction file
+  clean-ci-sequence-reproduction-valid.txt/.exit records missing shared sequence.
+- ExecutionEvent Identity owns execution_events_ledger_sequence_seq; AccountLedgerEvent
+  references it via textual nextval, which metadata did not see as a dependency.
+  Added explicit table dependency, preserving schema/migrations/financial behavior.
+  New DDL-order regression checks creation and reverse drop order. RuffPASS.
+- Full unit+integration run26427 ACTIVE against the new unmigrated marked DB,
+  evidence/clean-ci-sequence-fixed-suite.txt/.exit. Inspect before retry.
+- Monitor raw80.000/display80 delta-1pp; L11=4.375. No remote push/rerun,
+  OS/Docker changes, provider connections or trading changes. Goal active.
+
+
+## Clean CI follow-up (2026-10-08)
+- Sequence-fixed suite26427 exit1:1029PASS,3FAIL. Fresh metadata succeeds;
+  failures are soak checks requiring migrated schema, which warm localDB hid.
+- Soak tests now create uniquely named disposable DBs from the already verified
+  integration service, assign random marker, run real Alembic upgrades and clean
+  up only their own DB. No schema stamp or startup safety check bypassed.
+- Runner additionally accepts loopback PostgreSQL for CI, retaining database-name,
+  marker, identity and migration checks; remote/ambiguous queryhosts denied.
+ 10DDL/transport unitchecksPASS. RuffPASS.
+-98800 soak run1FAIL4PASS: source edit during observation correctly triggered
+  CODE_CHANGED_OBSERVATION_INVALIDATED. This is not acceptance evidence.
+-33102 fullsuiteACTIVE using another NEW empty marked DB
+  test_clean_ci_20261008_verified; clean-ci-verified-suite.txt/.exit.
+  No further source changes until observation tests complete. Monitorprevious80%.
+
+
+## Fresh-schema CI fixes verified (2026-10-08)
+-33102 terminalexit0 and clean-ci-verified-suite.exit0:1041PASS94.44s.
+  Full suite started on EMPTY markedDBtest_clean_ci_20261008_verified; no
+  pre-existing schema/sequence. Includes real migrations and startup in isolated
+  per-test soakDBs, no revision-stamp substitution. Source frozen during run.
+-16589 terminalexit0 and clean-ci-loopback-soak.exit0:5PASS38.77s via ephemeral
+  127.0.0.1 TCP-to-existing-PG-Unix-socket bridge. All migration/marker/optimized
+  checks and successful/failed observation CLI exit cases exercised. Bridge closed;
+  no OS/PostgreSQL network configuration changed.
+- Existing browser and31table restore results reused: current changes only table
+  metadata creation order and test/soak transport; no rendered/business behavior
+  changes. Ruff/source diffcheckPASS; noactivecommands.
+- RemoteHEAD stillhas oldfailedCI; no push/rerun performed. Docker commandstill
+  unavailablethroughWSL integration. Localfixes do not establish remoteCI/buildPASS.
+- Saved acceptance matrix and SOAK documentation updated. Final milestone audit
+  requested; previousraw80.000/display80 pending verifiedfix credit.
+- Continue original L04/L10/L13/L14 requirements review; don't add optional
+  benchmark/background features as new mandatory gates. Engineering24h observation
+  may explicitly remainpending withrunner when sessioncannotobserve original
+  attachmentline430. Realpaper/live/production permissions unchanged.
+
+Finalmilestoneaudit raw80.500/display81 delta+1pp, L11=4.875/5.
+Remote failed run remains at unchanged HEAD9b0df38; fixes are working-tree changes,
+not a newer commit. No remote rerun/push. GoalACTIVE/incomplete; noactivecommands.
+
+
+## Coherent latest alert evidence (2026-10-08)
+- Previous turn classified PROGRESS: repaired clean-schema CI and verified1041
+  fulltests/5loopbacksoakchecks. No interrupted commands remain from that turn.
+- Reread full original attachment; remaining L10 review found dedup updated value
+  while retaining old threshold/message/severity, and older evidence reopened
+  resolved alerts. alert-evidence-reproduction.txt/.exit1 proves2FAIL.
+- Upsert now atomically updates all observation display fields only for current
+  evidence; delayed older facts cannot reopen/clear acknowledgment/resolution.
+  A genuine reopened delivery resets old failure code alongside in_app status.
+-63062 terminalexit0, alert-evidence-verified.txt/.exit0:10PASS0.52s. Ruff and
+  source diffcheckPASS. Fullsuite80156 ACTIVE: suite-alert-evidence.txt/.exit,
+  markedtest_acceptance_expenses. No source edits during soak observations.
+- No external notification/provider/broker/order or live setting change.
+  Milestone audit pending; previousraw80.500/display81.
+
+
+## Alert evidence full validation (2026-10-09)
+-80156 terminalexit0; suite-alert-evidence.txt/.exit0:1043PASS87.63s.
+  No retry; previous turn classifiedPROGRESS. HEADunchanged9b0df38.
+- Monitor raw80.750/display81 delta0pp,L10=5.125; saved fixedrubricupdate.
+- Next confirmed local concern: deliver_local awaits injected sink without bound,
+  holding row transaction while adapter stalls. New bounded-delivery reproduction
+  65711 underway (alert-delivery-bound-reproduction.txt/.exit); inspectbefore retry.
+  No external notification will be sent; all checks local injected fixtures.
+
+
+## Bounded local notification delivery (2026-10-09)
+-65711 terminalexit1: new stalled-sink reproduction timed out at outer0.5s;
+  two earlier alert testsPASS. Preserved alert-delivery-bound-reproduction.*.
+- Added10s cooperative delivery deadline and typed LOCAL_SINK_TIMEOUT. Caller
+  cancellation propagates, no false delivered state; existing failures remain
+  LOCAL_SINK_FAILED. No outbound adapter or automatic external retry added.
+-37727 exit0:11PASS;19280 exit0:12PASS0.54s final cancellation/local-retry checks,
+  alert-delivery-cancellation-verified.txt/.exit0. RuffPASS. Earlier1043suite
+  reused for unaffected code; final localized change covered by12affected checks.
+- All toolhandles terminal, noactivecommands. Scope excludes real notification
+  delivery; arbitrary cancellation-suppressing/blocking adapters unsupported.
+  Final milestone audit requested; previousraw80.750/display81,L10=5.125.
+
+Finalcurrentmilestoneaudit raw81.000/display81 delta0pp,L10=5.375/6.
+GoalACTIVE/incomplete; noactivecommands, latestHEAD9b0df38 unchanged.
+
+
+## Production output-budget observations running (2026-10-09)
+- Previous turnPROGRESS, no blocked streak; HEAD9b0df38 and completed alert
+  evidence preserved. L13 review found actual768-token output budget not measured
+  on repeated fixed application cases. Existing model/runtime/source unchanged.
+- Predeclared3repetitions ofall9workflow-scope-v6cases, CPU4/context4096/output768,
+  substantive synthetic news+source injection, no native tools, existing1.5BQ4.
+  Plan: evidence/workflow-production-budget-20261009-plan.json. Budget30sp95
+  from original host baseline, not chosen after results.
+-49079ACTIVE wrapper runs three separate benchmarkprocesses sequentially.
+  evidence/workflow-production-budget-20261009-{1,2,3}.{json,txt,exit}; summary
+  emitted afterallthree. Inspecthandle and outputs BEFORE retry; no overwrite.
+  First childPID1163980 verifiedlive at checkpoint; PIDaloneisnotlaterproof.
+- Must review actualanswers, not nominalPASS; separate deterministic vsinference
+  and reportnearest-rank p95asmaxof3, never productionconfidence/24h/economicproof.
+  No modeldownloads/providers/brokers/orders or changes to inference settings.
+
+
+## Production output-budget benchmark verified (2026-10-09)
+-49079 terminalexit0; all3childexitfiles0 andJSONPASS,9cases each27total.
+  workflow-production-budget-20261009-summary.json: model-assisted max11.044s
+  belowpredeclared30s; peakRSS2017.195MiB;load0.906–1.498s.
+- Repeated answers identical. Reviewed source/financial outputs and saved
+  -review.json withmodelSHA256. Explicitly separated5deterministiccases from
+ 4model-assistedcases; no productionp95/24h/edgeclaim. Sourceunchanged.
+- Added BLOCKERS.md with exact external prerequisites and smallestoperatoractions;
+  it explicitly doesNOTdeclarealllocalworkdone. MODEL_HOST updated with evidence.
+- Noactivecommands. Previousraw81.000/display81,L13=2; milestoneauditrequested.
+  No provider/broker/order/download or OS/inferencesettings changes.
+
+Modelmilestoneaudit raw81.500/display82 delta+1pp,L13=2.5/7.
+NextsafeL13work: same-process native inference overlapping actual authenticated
+ASGI/PostgreSQL halt controls; prior soak used separate CPU process.
+
+
+## Same-process control contention benchmark running (2026-10-09)
+- Added scripts/benchmark_control_contention.py: requires verified marked/migrated
+  local fixtureDB andexistingcheckoutGGUF; no networklistener/provider/broker.
+  Reuses actual authenticated ASGI routes/PostgreSQL for fixture halt controls.
+  Three native tool-free arithmetic generations share eventloop/process with
+  repeated CSRF-authenticated halt requests and persistedstate reads.
+- Predeclared originalhaltp95budget250ms and minimum20samples withnativeownerlock
+  heldbeforeANDafter HTTPrequest; avoidclaimingoverlapfromtaskexistencealone.
+  CPU4/context4096/output768; temporaryactive fixtureuser, no realaccount.
+- Ruff/compilePASS.76217ACTIVE commandwrites control-contention-20261009
+  .json/.txt/.exit. Inspectexistinghandle before retry; outputoverwrite refused.
+  Sourcefrozenforthisobservation. No active fullsuite/brokers or externalwrites.
+
+
+## Same-process contention milestone verified (2026-10-09)
+-76217 terminalexit0 and control-contention-20261009.exit0/JSONPASS.
+ 1044overlappingnative-lock halt requests p95=27.921ms max94.336ms vs250msbudget;
+  three inference rounds26.846/22.155/26.024s, final_answer/done,0toolevents.
+  Persistedhalt verifiedaftereachround. Load1.715s peakRSS2018.191MiB.
+- Source/model/runner hashes and limitations saved in-review.json. No TCPnetwork
+  latency/ingress/Docker/sleep/thermal/24hclaim. ActualASGIauth/CSRF/PostgreSQL used.
+- Ruff/compile/diffPASS; no applicationbehaviorchange, onlynewbenchmarks/documents;
+  prior1043suite+12affectedalertchecks reused. Noactivecommands.
+- MODEL_HOST/SOAK/docs checkpoint updated. Auditrequested; previousraw81.500/
+  display82,L13=2.5. GoalACTIVE; noexternals/orders/downloads/settingschanges.
+
+Finalmilestoneaudit raw82.000/display82 delta0pp,L13=3/7.
+Noactivecommands; GoalACTIVE/incomplete. Resumeoriginalremainingcriteria review.
+
+
+## Explicit broker capture activation (2026-10-09)
+- Windowsdocker.exe read-onlyversion alsofails missingdockerDesktopLinuxEngine
+  namedpipe; daemonblockerconfirmedwithoutOSchanges. Previous turnPROGRESS.
+- Monitorremaininggateaudit raw82/display82 identifiedlocalexplicitactivation.
+- Addedexecution/broker_capture_control.py onefiniteprocess-local task, current
+  selected-accountconsent preflight plus existing coordinatorperbatchfencing.
+  BrowserPOST/GET/DELETE observations/capture: cookieidentity/CSRF, exacttrue
+  confirmation, strict1–480sduration; no import/startup/restartautoconnection.
+  Start returns202admission only; durable journal remainsauthoritative. Stop
+  owner-only, cancellationrequest notnative-disconnectclaim. Appfinallyshutdown
+  cancelsacceptedtask andboundedwait15s, no resuming old taskafterprocessrestart.
+-6867exit0 initial33PASS;16073exit0 finalguards35PASS9.14s, includingrealHTTP
+  productionsettings/session/CSRF/crossowner/deactivation andPGconsentchecks,
+  plus existingSDKfixturestream/interruptedjournalcases. No realSDKconnections.
+- Addeddonecallback for cancellationbeforecoroutinestart; fullsuite78953ACTIVE
+  suite-broker-capture-activation.txt/.exit validatesfinalsource. No sourceedits
+  whileactualsoakchecksrun. Existingdirty/stagedchangespreserved.
+
+Activationmilestoneaudit raw82.500/display83 delta+1pp,L04=6.25/8.
+78953fullsuite stillactive at audit; inspect before retry.
+
+
+## Explicit capture full regression verified (2026-10-09)
+-78953 terminalexit0 and suite-broker-capture-activation.exit0:1058PASS99.83s.
+  Includes final cancellation-before-start callback. Noactivecommands.
+- NextconcreteL04gap discovered: CallbackWindow subscribes disconnectedEvent but
+  NOTerrorEvent. TWS-to-IB connectivity loss can arrive through systemmessages
+  whilelocalAPI socket staysconnected; streamcouldmissgap untilphysicaldisconnect.
+  Need SDK-shaped error-event reproduction, stablemaskedfailure reason, sticky
+  partialcapture/journalalert and cleanup tests; no realgateway needed.
+- Officialcurrenterror-codes page consulted (contains326clientIDcollision);
+ 1100/1101/1102 are systemmessages, notfoundonerror-codespage. Locatecurrent
+  officialsystemmessage page before implementingexactmapping. Nochangesyet.
+
+Finalactivationaudit raw82.500/display83 delta0pp,L04=6.25.1058fullsuiteverified.
+Nextresume errorEvent connectivityfixture gap above; noactivecommands.
+
+
+## Upstream connectivity gap reproduction and repair (2026-10-09)
+- Previous turnPROGRESS; no interruptedcommands. Current officialprimary
+  https://www.interactivebrokers.com/docs/tws-api/doc/error-handling/system-message-codes
+  confirms1100loss/1101restored-data-lost/1102restored-data-maintained/1300portreset.
+  Installedib_insyncwrapper emits(reqId,errorCode,errorString,contract)errorEvent.
+-97209 reproductionexit1:4FAIL7PASS forlocal-socket-connected transitions.
+ 39704unitverifiedexit0. AddederrorEventsubscription andstablemasked
+  BROKER_UPSTREAM_CONNECTION_CHANGED stickyfailure for4codes; no providertextstored.
+  Restoration cannot erasecapturegap; informational2104doesnotinventfailure.
+- Expanded PGfinitecoordinatorscenarios: upstreamnotificationwithSDKconnected,
+  restorednotice, finalpartialjournal/owneralert/no lastsuccess, callbackdetachment.
+ 94091focusedcombinedACTIVE:broker-upstream-verified.txt/.exit. RuffPASS.
+- No actualbrokerconnections/orders/reauth or autoapplicationretry. InstalledSDK
+  itself has1102account-summaryrefresh behavior; applicationdoesnotreinterpret
+  it ascompletehistory/reauthproof. Existing readsession authoritybounds apply.
+
+-94091terminalexit0 broker-upstream-verified.exit0:66PASS13.65s.
+  Fullsuite95751ACTIVE suite-broker-upstream.txt/.exit; no sourceedits duringsoak.
+  BROKER_CAPABILITIES updated with currentofficialmapping andSDKlimitations.
+  Milestoneauditrequested; previousraw82.500/display83,L04=6.25.
+
+
+## Connectivity full suite verified and next ingress work (2026-10-09)
+-95751handle no longeravailable, but durable suite-broker-upstream.exit0 and
+  log1067PASS103.20s confirmed; no rerun. PreviousturnPROGRESS. HEADunchanged.
+- Monitorraw82.750/display83 delta0pp,L04=6.5. Noactualbrokeractions.
+- DockerLinuxengine remains unavailable viaWSL andWindowsclient. Safe independent
+  ingressverification planned: actualNginxloopbackfixture, noOSinstall/listenLAN.
+  Downloaded officialUbuntu nginx1.24.0-2ubuntu7.18 package525KB to.qa/nginx-package
+  usingapt-get download (noOSpackageinstallation); extracted.qa/nginx-root.
+  No sourceapplicationchanges yet. This cannotproveDockerWSLforwarding orLANfirewall.
+
+## Actual isolated Nginx ingress verified (2026-10-09)
+
+- Session41362 finished exit0; durable nginx-ingress-20261009-v3.exit0 and JSON
+  confirm all seven checks. See INGRESS.md for command, result and limitations.
+- Real Nginx TLS/WSS, forwarded-header handling, authentication/origin rejection
+  and source allowlist verified with the actual application and isolated PG.
+  Owned proxy/application processes terminated; no active operation to retry.
+- Earlier v1/v2 fixture failures preserved and explained in the review artifact.
+  Ruff and git diff --check pass. Existing1067-test fullsuite remains valid:
+  only a standalone fixture harness and documentation were added afterward.
+- No broker connection/order, production deployment or OS security change.
+  Docker/WSL and real LAN verification still pending. Next progress audit requested
+  from raw82.750/display83; do not treat local ingress as a complete deployment.
+
+## Static ingress security-header regression repaired (2026-10-09)
+
+- Initial ingress audit remains raw82.750/display83, delta0pp.
+- Actual Nginx reproduction3053 exit1: STATIC_SECURITY_HEADERS_MISSING. Static
+  location cache add_header suppressed inherited security headers. Replaced with
+  expires1h, preserving one-hour successful cache and all four server headers.
+- Session31596 exit0: nginx-static-verified.json/.exit confirms eight checks,
+  including existing asset200 and missing asset404. Review artifact retains
+  source/binary hashes. Ruff/diff checks pass. No active child processes.
+- No Python application changes;1067fullsuite evidence reused. This modifies
+  checked-in proxy config only, not a running production service.
+- No external account connection, order, notifications or OS policy changes.
+  LiveOFF. DockerLinuxengine unavailable; real LAN and remaining host/provider
+  gates stay pending. Final milestone audit requested.
+
+Final ingress audit: raw82.750/display83, delta0pp. Goal ACTIVE/incomplete.
+No pending operation. HEAD9b0df38;252 porcelain entries preserved, no staging or
+commit. Final diff whitespace check passes. Resume from remaining L04/L10/L11/
+L13/L14 prerequisites in PLAN/BLOCKERS; do not rerun completed Nginx or1067-suite
+checks unless subsequent changes affect them. Live remains OFF.
+
+## CI browser artifact and ingress coverage repaired (2026-10-09)
+
+- Previous turn PROGRESS. Found fresh-checkout browser mkdir lacked parents=True
+  and workflow uploaded a different nonexistent screenshot directory. Repaired
+  both; upload scope explicitly lists only synthetic PNGs/server.log, includes
+  hidden .qa files. Official upload-artifact README confirms hidden exclusion.
+- Existing browser job now runs the actual eight-check Nginx harness, recording
+  downloaded Ubuntu package hash/version without installing a system service.
+  Ubuntu24.04 job; no remote workflow triggered or changes published.
+- Session25251 terminalexit0: browser-ci-ingress-wiring.txt/.exit real Chromium/
+  PostgreSQL full workflow PASS. Fresh-parent preflight uses actual runner with
+  app process intercepted before any DB work; YAML parse/all shell bash-n PASS.
+  Ruff/diffPASS. Evidence ci-ingress-wiring-review.json. No active commands.
+-1067backend suite reused; no application logic changed. Remote CI/Docker/host/
+  provider/research prerequisites remain pending. LiveOFF; no broker orders.
+
+CI ingress wiring final audit: raw82.750/display83, delta0pp, L11=4.875.
+Local browser/syntax/preflight PASS; remote working-tree CI and Docker/real LAN
+remain unverified. Goal ACTIVE/incomplete; no running validation to retry.
+
+## Build inputs bounded and image manifests pinned (2026-10-09)
+
+- Previous turn PROGRESS. Dockerfile/Compose used floating image tags and there
+  was no .dockerignore. Added explicit build-context allowlist for COPY inputs;
+  excludes .env, models, reports, Git state and isolated DBs from context.
+- Resolved the same official Python3.12-bookworm/Postgres16-alpine/Nginx-alpine
+  tags to SHA256 multi-platform manifests. Public registry bytes match digests;
+  amd64/arm64 presence verified. Evidence container-image-manifests-20261009.json.
+  No image layers pulled; no credentials or private data sent.
+- Pinned those references and aligned Poetry2.3.4 with CI. BUILD.md records update/
+  rollback and limits: apt repositories and bootstrap transitive deps still move,
+  so this is not full reproducibility or runtime/build acceptance.
+- Actual Windows Docker Compose config --quiet exit0 with .env.example:
+  compose-pinned-config.txt/.exit. Manifest/reference and COPY input review PASS;
+  git diff --check PASS. No app code changes, existing tests remain applicable.
+- Docker engine recheck saved separately; no build/deploy/production changes.
+  No broker connection/order. Goal ACTIVE; final milestone audit pending.
+
+Build-input milestone final audit raw82.750/display83 delta0pp,L11=4.875.
+Compose configPASS; Docker engine missingLinuxpipe exit1. Build and remaining
+mutable apt/Poetry bootstrap dependency closure still pending (BUILD.md).
+No active commands; GoalACTIVE/incomplete; liveOFF.
+
+## Poetry bootstrap closure verified (2026-10-10)
+
+- Previous interrupted turn performed inspection only; no install was running.
+  Resolution71148 exit0; compatible wheel hash collection44356 exit0.
+- requirements-poetry.txt pins46packages/67hashes; Docker uses require-hashes and
+  binary-only install; .dockerignore includes the lock. App lock/venv unchanged.
+-14058 terminalexit0: fresh .qa/poetry-bootstrap-20261010 install, pip check,
+  Poetry2.3.4 and application poetry check--lock PASS.73412exit0 ARM64 compatible
+  wheel download/hash resolution PASS (not ARM64 execution). Logs/exit/review
+  hashes under evidence/poetry-bootstrap-*. No active operations.
+- Debian apt closure and actual Docker image build remain pending; no production,
+  broker connection/order or OS changes. LiveOFF. Final milestone audit requested.
+
+Final bootstrap audit raw82.825/display83 delta0pp,L11=4.95. Noactivecommands.
+Next: remaining Debian apt reproducibility and actualimagebuild verification;
+Dockerengine and independent target/provider/research gates remain unresolved.
+
+## Debian build repository inputs fixed (2026-10-10)
+
+- Previous turnPROGRESS; no interruptedoperations. DockerLinuxpipe stillmissing.
+- Added config/build/debian.sources dated20261009T000000Z for3bookworm repositories;
+  Docker installs with only these sources and existing signed-keyring verification.
+  Snapshot expiry override scoped to archive entries; no insecure/trusted bypass.
+  Context allowlist includes sourcefile. No host package/config changes.
+- Reachability/SHA256 probePASS. Raw gpgv exit2 reflected an unknown extra signer
+  in Ubuntu2023keyring (knownbookworm signatures valid); failure retained in.qa.
+  Actual isolatedapt26699exit0 authenticated/fetchedallindexes without bypass.
+  Simulated installation15roots/dependencies exit0. No packages installed.
+- Evidence debian-snapshot-apt/resolution.txt/.exit and review.json. Testedamd64
+  againstemptyisolatedstatus, notpinnedDockerbase/ARM64/runtime. BUILD.md updated.
+  No activeoperations. Application code/tests unaffected; existingresults reused.
+  LiveOFF/no brokerconnection/order/production. Final progressaudit pending.
+
+Final apt milestone audit raw82.850/display83 delta0pp,L11=4.975.
+Noactivecommands. Next build action requires DockerLinuxengine; verifycurrent
+engine before build, then isolated image/migration/ingress/restart validation.
+All remaining target/provider/research gates retain originalscope andpermissions.
+
+## Remaining-gate audit and forward plan (2026-10-10)
+
+- Previous turnPROGRESS. Remaining gate review confirms fullscope stays intact;
+  durable1067suite evidence and external-write failclosed source inspected.
+- Found explicit original deliverable missing: justified proposed forward sample/
+  observation plan. Added FORWARD_OBSERVATION.md, linked REPLAY/PLAN. Proposed
+ 60exchange sessions/20closed trades are illustrative, notpower/livecriteria;
+  pairedbaselines/frozenversions/time-awareevidence/safety/reviewrules explicit.
+  No threshold/holdout changes to existing research-fixture-plan.json.
+- Plan remains UNAPPROVED; no campaign/accountconnection/orders authorized or
+  started. Currentpaperwrite implementation remainsclosed and needs separate
+  authority/implementation/validation, notjust toggling a setting.
+- Asked asynchronously for DockerLinuxengine restoration; no reply received.
+  Do not treat silence as approval. Otherprovider/host/research prerequisites
+  remain in BLOCKERS.md. Noactivecommand or wait. Finalmilestoneaudit pending.
+
+Final forwardplan audit raw83.100/display83 delta0pp,L15=0.25. GoalACTIVE.
+UserDockerrestoration question remains pending; noapproval inferred. Noactiveops.
+
+## Remaining prerequisites revalidated: blocked check1 (2026-10-10)
+
+- Previous turnPROGRESS (forwardobservation deliverable). This turn is NO PROGRESS,
+  not a verified wait: no live test/build/soak handle and no implementation change.
+- Re-read original scope, currentPLAN/BLOCKERS/SOAK and broker capability limits.
+  Docker client still reports missing dockerDesktopLinuxEngine pipe; unchanged
+  HEAD9b0df38. No new authorization/account/source evidence or reply to pending
+  Docker restoration question. Do not infer permission from silence.
+- Known remaining actions require unavailableDocker/actualhost observation,
+  publication/remoteCI or separately authorized external account/data scope.
+  No additional independent local repair identified in this review. This is not
+  a declaration that unknown defects cannot exist, or that every gate passes.
+- Preserve1067suite/browser/Nginx/apt/Poetry evidence; do not repeat unrelated
+  tests to invent progress.24h runner exists; original instructions explicitly
+  allow leaving observation pending rather than inventingelapsedtime.
+- First consecutive no-progress check at these prerequisites. Goal staysACTIVE;
+  do not markblocked untilthree consecutive genuineimpasse checks. LiveOFF, no
+  brokerconnection/order or productionchange. Finalprogressaudit requested.
+
+## Prerequisite check2 (2026-10-10)
+
+Previous turnNO PROGRESS. Docker recheck stillmissingLinuxenginepipe; HEADunchanged.
+No newuserauthorization/source/account evidence or liveoperation. Same remaining
+prerequisites, noindependentlocalrepair identified. SecondconsecutiveNO PROGRESS
+check; checkpoint update is not implementation progress. Goal staysACTIVE.
+Existing tests retained; no source/trading/productionchanges. Audit requested.
+
+## Prerequisite check3 and blocked handoff (2026-10-10)
+
+Third consecutiveNO PROGRESS turn. Docker version exit1/nullServer: missing
+//./pipe/dockerDesktopLinuxEngine. HEAD9b0df38unchanged. No newauthorizations/data
+or liveoperation; same remainingprerequisites, noindependentlocalrepair identified.
+Final monitor audit requested before markingGoalBLOCKED; completion notclaimed.
+
+Resume: operator restoresDockerDesktopLinuxengine, then ResumeGoal. First verify
+docker version returnsServer; build onlytheisolatedvalidationimage and inspect
+currentCHECKPOINT/PLAN/BUILD before running targettests. Do not startproduction
+Compose or connectbroker/bank withoutseparateauthorization. RemoteCI requires
+reviewedpublication; paper/research/hostobservation prerequisites remainexplicit.
+
+LocalPASSscope L01-L03,L05-L09,L12; partialL04,L10-L14; externalL15/L16blocked.
+1067unit/PG tests, currentdesktop/mobilebrowser,8actualNginxchecks, hashlocked
+Poetry andsignedsnapshotaptchecks retained. No brokerconnection/order occurred;
+liveOFF. Onlycheckpoint/ledgerupdated thischeck; no source ortradingchanges.
+
+## Docker restored (2026-10-10)
+User reports engine running; actual Windows and WSL docker version succeed, Linuxamd64 Engine29.8.2. Prior blocker resolved. Unique image build started: investment-assistant:container-build-20261010-ad17fb8e; log docs/acceptance/evidence/container-build-20261010-ad17fb8e.txt. Inspect process/durableexit before retry. No productionstack/broker started.
+
+## Image build passed; Goal control paused (2026-10-10)
+
+- Prior80600handle missing; durable container-build-20261010-ad17fb8e.json/.exit
+  confirms PASS/exit0. Full build log retained. Image tag:
+  investment-assistant:container-build-20261010-ad17fb8e. Do not rebuild blindly.
+- Native WSL Docker then lost integration/socket; container-native-smoke.txt/.exit1
+  records command failure BEFORE any validation container started. Image-inspect
+  text contains CLI error, notimage evidence. No runtimePASS claim.
+- Direct Windows docker.exe version still succeeds Engine29.8.2/Linuxamd64.
+  Next use that client for inspect/network-none nativePDF/llama smoke, followed
+  by isolated container startup/ingress/restart validation. Do not startproduction.
+- get_goal now reports PAUSED (not changed by agent). Stopped before further
+  runtime actions. Noactivebuild/testhandle, no new brokerconnections/orders.
+  Final read-only progressaudit requested; liveOFF. ResumeGoal control needed
+  to continue under the existing original scope andpermissions.
+
+Final paused-state audit raw83.125/display83 delta0pp,L11=5/5localchecks/build.
+RemoteCI/runtime remain unverified. Preserve image; no runningoperation to retry.

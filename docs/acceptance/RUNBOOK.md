@@ -92,7 +92,7 @@ explicit MCP_USER_ID bound to an active account in addition to its separate toke
 
 ## Private newsletters and observed news history
 
-Current migration head is `0007_news_evidence`. Apply explicit migrations only after
+The news-evidence milestone introduced `0007_news_evidence`; current head is `0018_job_lease_clock`. Apply explicit migrations only after
 reviewing the target and backup; startup does not mutate schemas. The disposable
 upgrade and full regression suite are recorded in `evidence/suite-news-evidence.txt`.
 Set `NEWSLETTER_OWNER_USER_ID` only to the deliberately selected active application
@@ -126,7 +126,7 @@ LD_LIBRARY_PATH="$PWD/.qa/postgres-root/usr/lib/x86_64-linux-gnu" \
 .qa/postgres-root/usr/lib/postgresql/16/bin/pg_ctl -D "$PWD/.qa/pgdata" -m fast -w stop
 ```
 
-Current schema head is `0011_retention_index`. Category edits are browser-authenticated
+Current schema head is `0018_job_lease_clock`; `0011_retention_index` introduced the expense retention index. Category edits are browser-authenticated
 and audited without transaction histories. Displayed-page export is explicit JSON; full-period export is bounded NDJSON and
 requires its completion trailer. Neither is a bank connection. Retention decisions
 remain pending.
@@ -203,7 +203,13 @@ inside the existing single PDF worker slot. Output is capped while written to a
 private0600 temporary file on the report filesystem; only complete nonempty output
 is published, without replacing any existing destination. Normal failures remove
 the temporary file. Typed PDF partial failures include DISK_LOW, REPORT_SIZE_LIMIT,
-PDF_EMPTY and STORAGE_WRITE_FAILED. Existing report text/evidence can still persist.
+PDF_EMPTY and STORAGE_WRITE_FAILED. Existing report text/evidence can still persist. A persisted DISK_LOW report also
+creates a deduplicated owner-only `report_storage_pressure` in-app alert, in the
+same transaction. It states the configured free-space budget and requests storage
+review without exposing paths, deleting data or sending an external notification.
+Repeated failed PDF attempts update the same alert; acknowledge/resolve through
+the existing alert UI. This is detection on a render attempt, not continuous host
+or database-volume resource monitoring.
 
 The preflight cannot reserve space against other processes, cap renderer memory,
 or make PostgreSQL writable on a full disk. Native cancellation retains the worker
@@ -463,3 +469,32 @@ code. Do not run mixed writer versions across this migration; old code does not 
 leased_at or consume completed tokens. Existing order, ledger, checkpoint and alert
 records remain. Real-host sleep/network/Docker and external broker recovery remain
 separate gates; these PostgreSQL tests simulate clock observations and stale leases.
+
+
+Current operations regression evidence: `report-resource-alert-guards.txt`23PASS
+includes low-disk partial-report persistence and repeated-alert deduplication.
+`browser-operations-alerts.txt` PASS verifies retained real Chromium/PostgreSQL
+workflows with fixture model/providers, no unexpected console errors and zero
+broker connections/external orders. Heartbeat recovery is documented in SOAK.md;
+no live deployment, OS sleep changes or external watchdog was performed.
+
+
+### Repeated alert evidence
+
+An alert's value, threshold, message and severity follow the same latest evidence
+timestamp. Delayed older observations increase the occurrence count but cannot
+replace displayed evidence or reopen a resolved alert. Current observations may
+reopen a resolved or cooldown-expired alert; the new delivery state clears the
+previous attempt's failure code. A cooldown is still a delivery/deduplication
+policy, not proof that a repeated condition disappeared. Local sink tests send
+no external notification. Regression evidence: `evidence/alert-evidence-verified.txt`.
+
+Local sink delivery has a ten-second cooperative async deadline; timeout records
+`LOCAL_SINK_TIMEOUT`, other exceptions record `LOCAL_SINK_FAILED`. Caller
+cancellation propagates without claiming success. Adapters must honor cancellation
+and use bounded I/O; this is not a mechanism for killing arbitrary blocking code.
+The alert ID is the sink idempotency key. A timeout is not proof that a future
+external destination received nothing: any real outbound adapter must implement
+idempotency/reconciliation before automatic retries. No real channel is configured
+or tested by these checks. `evidence/alert-delivery-cancellation-verified.txt`
+contains12passing checks, including stalled sink, cancellation and local retry.

@@ -500,3 +500,53 @@ are never reconstructed from current quotes. No production/live capability added
 Verification: valuation-fx-scoped.txt, 30PASS including foreign open/partial/full
 sales, stale closed-position FX, dormant positions, opening exposure/interaction,
 legacy history, received dividends, flows, late fees and report rendering.
+
+
+### Explicit unpaid synthetic dividend receipts (2026-10-08)
+
+Entitlements and linked settlement now have distinct immutable account events.
+The supplied eligibility time, action identity, allocation, instrument, exact
+eligible quantity, gross base amount and explicit withholding form fixture
+evidence; no exchange calendar, tax rate, special-distribution rule or foreign FX
+is inferred. Current quantity is accepted only if no later fill/split invalidates
+its use at the supplied eligibility time. Unsupported historical eligibility is
+rejected for separate reconciliation, not reconstructed from current holdings.
+This follows the distinction between entitlement and payment in the linked SEC
+source above; special distributions require their own verified evidence.
+
+Accrual creates a nonspendable fixed net receivable. Payment references the exact
+entitlement, transfers its net asset to cash once, and does not create a second
+income event. Later sales/splits cannot resize an already earned dividend. New
+unlinked legacy payments are refused for allocations/instruments that have entered
+this explicit entitlement path; old idempotent receipt replay is retained. No
+matching between old unlinked receipts and new issuer actions is invented.
+
+Reconciliation, manual/mandate risk equity and immutable schema3 valuation
+snapshots include receivables. Period income is received cash income plus change
+in outstanding receivables; price+FX-fees+income still reconciles to equity less
+external flows. Existing schema1/2 snapshots remain immutable and predate supported
+entitlement booking. Reports show received cash and accrued income separately.
+Protected income preserves operator halts and requires review; no receivable can
+fund a new order because cash/reservation checks still use actualcash only.
+
+`dividend-receivable-integration-guards.txt`53checks PASS includes concurrent
+receipt/payment, duplicate/conflict, unsupportedhistory, tamper, risk, exact
+valuation and report tests. Fullsuite/browser/restore verification pending at
+this checkpoint. These are base-currency simulator fixtures, not verified broker
+corporate-action entitlements or live financial policy.
+
+Recovery follow-up: `dividend-receivable-recovery-20261008-database.json` verifies
+31table hashes after actual isolated restore; the companion `-split.json` verifies
+unpaid income/cash separation and identical exact period accounting. Target
+`test_receivable_20261008` is retained. Concurrent receipts and linked payments
+commit once; `dividend-receivable-cash-verified.txt`11PASS also verifies cross-owner
+denial and that pending income cannot fund an order. Current fullsuite/browser
+checks are in progress.
+
+Final entitlement validation: `suite-dividend-receivables.txt`1031PASS81.79s/exit0
+and `browser-dividend-receivables.txt`desktop/mobile realChromium/PostgreSQL
+workflowPASS/exit0. No unexpected console errors, broker connections or orders.
+The browser proves preserved application workflows, while the explicit entitlement
+accounting/report/risk and restore invariants are covered by the focused PG tests
+and recovery artifacts above. Foreign/special distributions and unavailable
+historical evidence remain explicit unsupported/partial states.

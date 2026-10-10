@@ -1,0 +1,85 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 59 items
+
+tests/unit/ibkr_read_routing_test.py .......                             [ 11%]
+tests/unit/ibkr_session_test.py ........                                 [ 25%]
+tests/unit/ibkr_observations_test.py ......                              [ 35%]
+tests/unit/acceptance_broker_test.py .........................FF....     [ 88%]
+tests/integration/broker_stream_test.py .......                          [100%]
+
+=================================== FAILURES ===================================
+_ test_ibkr_account_match_does_not_turn_environment_configuration_into_proof[4001] _
+
+port = 4001
+
+    @pytest.mark.parametrize("port", [4001, 4002])
+    def test_ibkr_account_match_does_not_turn_environment_configuration_into_proof(port):
+        from contextlib import contextmanager
+    
+        fixture = BrokerAccountConfig(
+            "fixture",
+            "fixture-user",
+            "ibkr",
+            "Fixture",
+            {
+                "environment": "paper",
+                "port": port,
+            },
+        )
+        sdk = MagicMock()
+        sdk.accountSummary.return_value = []
+    
+        @contextmanager
+        def connected(account):
+            assert account is fixture
+            yield sdk, "synthetic-managed-account"
+    
+        with patch.object(ibkr, "_connection", connected):
+            result = ibkr.get_ibkr_account(fixture)
+>       assert result["managed_account_match"] is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'managed_account_match'
+
+tests/unit/acceptance_broker_test.py:168: KeyError
+_ test_ibkr_account_match_does_not_turn_environment_configuration_into_proof[4002] _
+
+port = 4002
+
+    @pytest.mark.parametrize("port", [4001, 4002])
+    def test_ibkr_account_match_does_not_turn_environment_configuration_into_proof(port):
+        from contextlib import contextmanager
+    
+        fixture = BrokerAccountConfig(
+            "fixture",
+            "fixture-user",
+            "ibkr",
+            "Fixture",
+            {
+                "environment": "paper",
+                "port": port,
+            },
+        )
+        sdk = MagicMock()
+        sdk.accountSummary.return_value = []
+    
+        @contextmanager
+        def connected(account):
+            assert account is fixture
+            yield sdk, "synthetic-managed-account"
+    
+        with patch.object(ibkr, "_connection", connected):
+            result = ibkr.get_ibkr_account(fixture)
+>       assert result["managed_account_match"] is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'managed_account_match'
+
+tests/unit/acceptance_broker_test.py:168: KeyError
+=========================== short test summary info ============================
+FAILED tests/unit/acceptance_broker_test.py::test_ibkr_account_match_does_not_turn_environment_configuration_into_proof[4001]
+FAILED tests/unit/acceptance_broker_test.py::test_ibkr_account_match_does_not_turn_environment_configuration_into_proof[4002]
+========================= 2 failed, 57 passed in 7.96s =========================

@@ -220,3 +220,43 @@ context stays in deterministic rendering/persisted evidence. Existing report
 collection/context size limits remain enforced. PDF/storage are sinks in this
 model tier; browser/PostgreSQL verification is separately required. No external
 broker connection/order occurred, and no return or investment-edge claim follows.
+
+
+## Repeated production output-budget checks (2026-10-09)
+
+The unchanged workflow-scope-v6 harness ran all9fixedcases three times with the
+existing1.5BQ4, CPU4/context4096/outputlimit768, default routing, substantive
+synthetic news and source injection. Plan and30s per-task budget were recorded
+before the runs in `evidence/workflow-production-budget-20261009-plan.json`.
+All27scope/event/answer checks passed; final answers are identical across runs.
+Manual source/financial review and model SHA256 are in the corresponding
+`-review.json`; rawanswers/logs/exitcodes are preserved for runs1,2,3.
+
+Model-assisted case nearest-rank p95 (maximum of3): scanner11.044s, explicit
+portfolio exclusion9.470s, holdings+news9.510s, refreshed excluded-portfolio
+news9.741s. The other5cases use deterministic financial/restriction responses;
+their sub4ms times are not model inference performance. Modelload0.906–1.498s;
+peakprocessRSS2017.195MiB. All measured cases meet the existing30s task budget.
+
+This supports retaining the measured CPU/default-routing profile at the normal
+768-token output limit, not a claim each task generated768tokens. Three samples
+per case are not production tail-latency confidence. There was no concurrent
+load, thermal/OS/Docker observation, network/provider data, browser/database
+workflow, external broker connection or order in this model tier. The24h and
+fulltargetstack observation requirements remain pending.
+
+
+## Same-process control responsiveness under native inference (2026-10-09)
+
+`control-contention-20261009.json` and its `-review.json` record three real local
+CPU4/output768 generations in the same process/event loop as authenticated
+ASGI/PostgreSQL halt handlers.1044requests overlap native ownership before/after
+the entire request. Halt p95=27.921ms, maximum94.336ms, against the unchanged250ms
+budget. Persisted halt state survived every inference round. Native tasks took
+26.846/22.155/26.024s and completed final_answer/done with no tool events.
+Load1.715s; peakRSS2018.191MiB. Runner and relevant source/model hashes are saved.
+
+This closes the previous same-process contention evidence gap for this short
+synthetic fixture. It does not establish network admission, Docker/Nginx routing,
+physical cooling/sleep, arbitrary blocking dependencies or24h stability. The
+arithmetic text is only a load fixture; no answer-quality claim follows.

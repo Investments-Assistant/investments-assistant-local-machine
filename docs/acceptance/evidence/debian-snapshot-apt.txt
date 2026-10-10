@@ -1,0 +1,9 @@
+Get:1 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm InRelease [151 kB]
+Get:2 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm-updates InRelease [55.4 kB]
+Get:3 https://snapshot.debian.org/archive/debian-security/20261009T000000Z bookworm-security InRelease [34.8 kB]
+Get:4 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm/main amd64 Packages [8790 kB]
+Get:5 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm/main amd64 Components [4492 kB]
+Get:6 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm-updates/main amd64 Packages [6924 B]
+Get:7 https://snapshot.debian.org/archive/debian-security/20261009T000000Z bookworm-security/main amd64 Packages [349 kB]
+Fetched 13.9 MB in 3s (5064 kB/s)
+Reading package lists...

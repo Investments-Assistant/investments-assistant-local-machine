@@ -450,3 +450,30 @@ async def test_failed_refresh_has_durable_redacted_status_and_blocks_immediate_r
             await session.execute(delete(OperationalAlert).where(OperationalAlert.user_id == user.id))
             await session.execute(delete(BrokerAccount).where(BrokerAccount.id == account.id))
             await session.execute(delete(User).where(User.id == user.id))
+
+
+
+async def test_persisted_order_fill_gap_recovers_after_late_execution_but_not_conflicting_terminal(db_session):
+    user, account = await seed(db_session)
+    args = dict(user_id=user.id, account_id=account.id)
+    stamp = datetime.now(UTC) - timedelta(seconds=1)
+    filled = dict(kind="order_status", actual_account="SYNTHETIC-ACCOUNT-ONLY", event_id="fixture.order",
+                  observed_at=stamp, client_id=77, order_id=1, permanent_id=9,
+                  status="Filled", filled="0.004", remaining="0")
+    await record_observations(db_session, **args, observations=[filled])
+    result = await read_observations(db_session, **args)
+    assert "ORDER_FILL_EXECUTION_GAP" in result["review"]["reason_codes"]
+    fill, fee = execution(), commission()
+    await record_observations(db_session, **args, observations=[fee, fill])
+    result = await read_observations(db_session, **args)
+    assert "ORDER_FILL_EXECUTION_GAP" not in result["review"]["reason_codes"]
+    assert result["review"]["order_lifecycle"]["orders"][0]["execution_quantity"] == "0.004"
+    assert result["review"]["order_lifecycle"]["complete_reconciliation"] is False
+    # A delayed cancelled callback must not overwrite the recorded fill.
+    await record_observations(db_session, **args, observations=[filled | {"status": "Cancelled"}])
+    replay = await record_observations(db_session, **args, observations=[filled, fill, fee])
+    assert replay["inserted"] == 0
+    result = await read_observations(db_session, **args)
+    assert "ORDER_TERMINAL_STATUS_CONFLICT" in result["review"]["reason_codes"]
+    assert result["review"]["order_lifecycle"]["orders"][0]["statuses_observed"] == ["Cancelled", "Filled"]
+    assert "SYNTHETIC-ACCOUNT-ONLY" not in json.dumps(result)

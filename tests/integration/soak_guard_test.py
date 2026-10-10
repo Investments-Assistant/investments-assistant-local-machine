@@ -5,12 +5,54 @@ import sys
 import asyncio
 
 import pytest
+from sqlalchemy import text
+import pytest_asyncio
+from sqlalchemy.ext.asyncio import create_async_engine
 
 pytestmark = pytest.mark.integration
 
 
+@pytest_asyncio.fixture
+async def soak_database(integration_engine, monkeypatch):
+    """The real app requires migrations, not metadata-only integration tables."""
+    import uuid
+
+    name = "test_soak_cli_" + uuid.uuid4().hex
+    token = "soak-cli-" + uuid.uuid4().hex
+    url = integration_engine.url.set(database=name)
+    rendered = url.render_as_string(hide_password=False)
+    async with integration_engine.connect() as admin:
+        await admin.execution_options(isolation_level="AUTOCOMMIT")
+        await admin.execute(text(f'CREATE DATABASE "{name}"'))
+    fixture = create_async_engine(url)
+    try:
+        async with fixture.begin() as conn:
+            await conn.execute(text("CREATE TABLE ia_disposable_marker(token text NOT NULL)"))
+            await conn.execute(text("INSERT INTO ia_disposable_marker VALUES (:token)"), {"token": token})
+        process = await asyncio.create_subprocess_exec(
+            sys.executable, "-m", "alembic", "upgrade", "head",
+            env={**os.environ, "DATABASE_URL": rendered},
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+        )
+        try:
+            _, stderr = await asyncio.wait_for(process.communicate(), 30)
+        finally:
+            if process.returncode is None:
+                process.kill()
+                await process.wait()
+        assert process.returncode == 0, stderr.decode()
+        monkeypatch.setenv("TEST_DATABASE_URL", rendered)
+        monkeypatch.setenv("TEST_DATABASE_DISPOSABLE_TOKEN", token)
+        yield
+    finally:
+        await fixture.dispose()
+        async with integration_engine.connect() as admin:
+            await admin.execution_options(isolation_level="AUTOCOMMIT")
+            await admin.execute(text(f'DROP DATABASE "{name}"'))
+
+
 @pytest.mark.parametrize("optimized", [False, True])
-async def test_soak_rejects_wrong_disposable_marker_even_when_optimized(integration_engine, optimized):
+async def test_soak_rejects_wrong_disposable_marker_even_when_optimized(soak_database, optimized):
     code = """import asyncio, os
 from scripts.soak_acceptance import verify_database
 asyncio.run(verify_database(os.environ["TEST_DATABASE_URL"], "wrong-marker-fixture"))
@@ -29,7 +71,7 @@ asyncio.run(verify_database(os.environ["TEST_DATABASE_URL"], "wrong-marker-fixtu
     assert b"DISPOSABLE_MARKER_MISMATCH" in stderr
 
 
-async def test_optimized_soak_accepts_the_verified_disposable_database(integration_engine):
+async def test_optimized_soak_accepts_the_verified_disposable_database(soak_database):
     code = """import asyncio, os
 from scripts.soak_acceptance import verify_database
 asyncio.run(verify_database(os.environ["TEST_DATABASE_URL"], os.environ["TEST_DATABASE_DISPOSABLE_TOKEN"]))
@@ -55,7 +97,7 @@ asyncio.run(verify_database(os.environ["TEST_DATABASE_URL"], os.environ["TEST_DA
     ],
 )
 async def test_soak_cli_exit_matches_observed_acceptance(
-    integration_engine, restart_seconds, expected_status, expected_exit
+    soak_database, restart_seconds, expected_status, expected_exit
 ):
     import json
     import uuid
@@ -85,6 +127,7 @@ async def test_soak_cli_exit_matches_observed_acceptance(
         if process.returncode is None:
             process.terminate()
             await asyncio.wait_for(process.wait(), timeout=20)
+    assert (output / "checkpoint.json").exists(), (stdout.decode(), stderr.decode())
     state = json.loads((output / "checkpoint.json").read_text())
     assert state["status"] == expected_status, (stdout.decode(), stderr.decode())
     assert state["runner_pid"] is None

@@ -1,7 +1,7 @@
 # Multi-architecture build for a local Docker host (x86_64 or ARM64).
-# Pin the Debian family, not individual package versions, so Pi builds do not
-# break when the base image receives normal security updates.
-FROM python:3.12-slim-bookworm AS base
+# Pin the multi-platform base manifest; update it through reviewed validation.
+# Apt snapshots are fixed too; see docs/acceptance/BUILD.md for validation limits.
+FROM python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258 AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -11,9 +11,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 # System deps
 # hadolint global ignore=DL3008
-# I intentionally do not pin apt package patch versions because this image targets
-# ARM64/Raspberry Pi builds and should receive normal Debian Bookworm security updates.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Dated, signed repositories fix package/dependency resolution across builds.
+COPY config/build/debian.sources /tmp/ia-debian.sources
+RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/* \
+    && cp /tmp/ia-debian.sources /etc/apt/sources.list.d/debian.sources \
+    && rm /tmp/ia-debian.sources \
+    && apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     ca-certificates \
     cmake \
@@ -33,8 +36,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Install poetry
-RUN pip install --no-cache-dir poetry==2.1.1
+# Install the complete, hash-locked Poetry bootstrap dependency set.
+COPY requirements-poetry.txt ./requirements-poetry.txt
+RUN pip install --no-cache-dir --require-hashes --only-binary=:all: -r requirements-poetry.txt
 
 # Copy dependency files
 COPY pyproject.toml poetry.lock ./

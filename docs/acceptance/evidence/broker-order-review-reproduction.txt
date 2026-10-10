@@ -1,0 +1,58 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/unit/broker_order_review_test.py FFFF                              [100%]
+
+=================================== FAILURES ===================================
+_______ test_cancel_fill_conflict_is_visible_regardless_of_arrival_order _______
+
+    def test_cancel_fill_conflict_is_visible_regardless_of_arrival_order():
+        rows = [status("Cancelled"), status("Filled", "1", "0"), execution(), commission()]
+        for values in (rows, list(reversed(rows))):
+            result = review_observations(values)
+>           assert "ORDER_TERMINAL_STATUS_CONFLICT" in result["reason_codes"]
+E           AssertionError: assert 'ORDER_TERMINAL_STATUS_CONFLICT' in []
+
+tests/unit/broker_order_review_test.py:31: AssertionError
+___________ test_reported_fill_without_execution_is_an_evidence_gap ____________
+
+    def test_reported_fill_without_execution_is_an_evidence_gap():
+        result = review_observations([status("Filled", "0.004", "0")])
+>       assert "ORDER_FILL_EXECUTION_GAP" in result["reason_codes"]
+E       AssertionError: assert 'ORDER_FILL_EXECUTION_GAP' in []
+
+tests/unit/broker_order_review_test.py:40: AssertionError
+________ test_partial_fills_and_duplicate_statuses_are_not_added_twice _________
+
+    def test_partial_fills_and_duplicate_statuses_are_not_added_twice():
+        rows = [status("Submitted", "0.004", "0.006"), status("Submitted", "0.0040", "0.0060"),
+                status("Filled", "0.010", "0"), execution("a", "0.004", "a"),
+                execution("b", "0.006", "b"), commission("a"), commission("b")]
+        result = review_observations(rows)
+        assert result["reason_codes"] == []
+>       order = result["order_lifecycle"]["orders"][0]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'order_lifecycle'
+
+tests/unit/broker_order_review_test.py:50: KeyError
+_ test_pending_cancel_is_not_confirmed_cancel_and_same_client_id_can_have_new_permanent_id _
+
+    def test_pending_cancel_is_not_confirmed_cancel_and_same_client_id_can_have_new_permanent_id():
+        result = review_observations([status("PendingCancel"), status("Submitted", permanent_id=10)])
+        assert result["reason_codes"] == []
+>       orders = result["order_lifecycle"]["orders"]
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'order_lifecycle'
+
+tests/unit/broker_order_review_test.py:59: KeyError
+=========================== short test summary info ============================
+FAILED tests/unit/broker_order_review_test.py::test_cancel_fill_conflict_is_visible_regardless_of_arrival_order
+FAILED tests/unit/broker_order_review_test.py::test_reported_fill_without_execution_is_an_evidence_gap
+FAILED tests/unit/broker_order_review_test.py::test_partial_fills_and_duplicate_statuses_are_not_added_twice
+FAILED tests/unit/broker_order_review_test.py::test_pending_cancel_is_not_confirmed_cancel_and_same_client_id_can_have_new_permanent_id
+============================== 4 failed in 0.75s ===============================

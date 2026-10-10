@@ -134,7 +134,7 @@ jobs:
 
   browser-tests:
     name: Chromium + PostgreSQL (synthetic model)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     needs: integration-tests
     services:
@@ -174,11 +174,30 @@ jobs:
           poetry run alembic upgrade head
       - name: Exercise real browser routes and isolation
         run: poetry run python scripts/verify_browser.py > docs/acceptance/evidence/browser-ci.txt 2>&1
+      - name: Extract isolated Nginx executable without installing a service
+        run: |
+          mkdir -p .qa/nginx-package .qa/nginx-root
+          cd .qa/nginx-package
+          apt-get download nginx
+          packages=(nginx_*.deb)
+          test "${#packages[@]}" -eq 1
+          sha256sum "${packages[0]}" > ../../docs/acceptance/evidence/nginx-ci-package.txt
+          dpkg-deb -x "${packages[0]}" ../nginx-root
+          ../nginx-root/usr/sbin/nginx -V >> ../../docs/acceptance/evidence/nginx-ci-package.txt 2>&1
+      - name: Exercise actual isolated TLS and WebSocket ingress
+        run: >-
+          poetry run python scripts/verify_nginx_ingress.py
+          --nginx .qa/nginx-root/usr/sbin/nginx
+          --output docs/acceptance/evidence/nginx-ci.json
+          > docs/acceptance/evidence/nginx-ci.txt 2>&1
       - name: Upload browser evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: browser-synthetic-evidence
+          include-hidden-files: true
           path: |
             docs/acceptance/evidence/browser-ci.txt
-            /tmp/ia-browser-evidence
+            docs/acceptance/evidence/nginx-ci*
+            .qa/browser-evidence/*.png
+            .qa/browser-evidence/server.log

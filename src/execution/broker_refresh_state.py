@@ -16,6 +16,9 @@ async def begin_refresh(session, *, user_id, account_id):
     if lease is None:
         raise PolicyDenied("BROKER_READ_LEASED_OR_NOT_DUE")
     row = await session.get(JobLease, lease[0])
+    # acquire() upserts may leave an already-loaded ORM object with stale values.
+    await session.refresh(row)
+    row.failure_code = None
     row.checkpoint = {
         "status": "running",
         "scope": "broker_read_only",
@@ -48,7 +51,7 @@ async def finish_refresh(session, *, lease, user_id, summary, failure_code=None,
             failure_code=failure_code,
         )
     row.checkpoint = dict(
-        summary,
+        (row.checkpoint if keep_lease else {}) | summary,
         scope="broker_read_only",
         completed_at=now.isoformat(),
         native_completion="unknown" if keep_lease else "returned",

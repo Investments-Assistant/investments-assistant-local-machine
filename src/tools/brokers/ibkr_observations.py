@@ -5,6 +5,8 @@ is not proof of complete execution history or delivery of every late commission.
 """
 
 from datetime import UTC, datetime
+import threading
+from contextlib import contextmanager
 
 from src.execution.policy import PolicyDenied
 from src.execution.broker_observations import OBSERVATION
@@ -18,6 +20,8 @@ class CallbackWindow:
         self.capacity = capacity
         self.observations = []
         self.failures = set()
+        self._owner_thread = None
+        self._attached = []
 
     def append(self, fields):
         if fields["actual_account"] != self.actual_account:
@@ -97,19 +101,61 @@ class CallbackWindow:
     def disconnected(self):
         self.failures.add("BROKER_DISCONNECTED_DURING_SNAPSHOT")
 
-    def collect(self, ib, execution_filter):
+    def connection_message(self, request_id, code, message, contract=None):
+        # TWS-to-server loss/restoration can leave the local API socket open.
+        # Even a "data maintained" restoration cannot erase this capture's gap.
+        # Never persist provider text, account identifiers or contract payloads.
+        if type(code) is int and code in {1100, 1101, 1102, 1300}:
+            self.failures.add("BROKER_UPSTREAM_CONNECTION_CHANGED")
+
+    @contextmanager
+    def subscribed(self, ib):
+        """Keep callbacks attached; all capture/drain work belongs to this SDK thread."""
+        if self._owner_thread is not None:
+            raise RuntimeError("BROKER_CALLBACK_ALREADY_SUBSCRIBED")
+        self._owner_thread = threading.get_ident()
         subscriptions = [
             (ib.execDetailsEvent, self.execution),
             (ib.commissionReportEvent, self.commission),
             (ib.orderStatusEvent, self.order_status),
             (ib.disconnectedEvent, self.disconnected),
+            (ib.errorEvent, self.connection_message),
         ]
-        attached = []
-        request_finished = False
         try:
             for event, handler in subscriptions:
                 event += handler
-                attached.append((event, handler))
+                self._attached.append((event, handler))
+            yield self
+        finally:
+            self.stop_capture()
+            self._owner_thread = None
+
+    def _require_owner(self):
+        if self._owner_thread != threading.get_ident():
+            raise RuntimeError("BROKER_CALLBACK_OWNER_REQUIRED")
+
+    def stop_capture(self):
+        """Detach on the owner before a final drain; cleanup is idempotent."""
+        self._require_owner()
+        while self._attached:
+            event, handler = self._attached.pop()
+            event -= handler
+
+    def drain(self, *, final=False):
+        """Return detached immutable observations; overflow remains a permanent gap."""
+        self._require_owner()
+        if final:
+            self.stop_capture()
+        observations, self.observations = self.observations, []
+        return {"observations": observations, "failures": sorted(self.failures),
+                "status": "partial" if self.failures else "observed",
+                "capture_active": bool(self._attached), "execution_authority": "none"}
+
+    def request_snapshot(self, ib, execution_filter):
+        """Initial requests within an existing callback subscription; never reconnect."""
+        self._require_owner()
+        request_finished = False
+        try:
             # reqAllOpenOrders does not bind or grant ownership of another client's orders.
             for trade in ib.reqAllOpenOrders():
                 self.order_status(trade)
@@ -126,27 +172,38 @@ class CallbackWindow:
         except Exception:
             # Preserve already-delivered facts but never publish snapshot success.
             self.failures.add("BROKER_SNAPSHOT_REQUEST_FAILED")
-        finally:
-            for event, handler in reversed(attached):
-                event -= handler
-        return {
-            "observations": self.observations,
+        return request_finished
+
+    def collect(self, ib, execution_filter):
+        with self.subscribed(ib):
+            request_finished = self.request_snapshot(ib, execution_filter)
+            result = self.drain(final=True)
+        return result | {
             "request_finished": request_finished,
-            "status": "partial" if self.failures else "observed",
-            "failures": sorted(self.failures),
             "coverage": "available_execution_window_and_open_orders_not_complete_history",
             "late_commissions_complete": False,
-            "execution_authority": "none",
         }
 
 
 def collect_ibkr_observations(account):
-    """Internal worker function, callable only with explicit scoped read configuration."""
-    from src.tools.brokers.ibkr import _connection
+    """Explicit bounded snapshot on a worker-owned SDK session; no automatic stream."""
+    from src.tools.brokers.ibkr_session import ReadSessionWorker, route_read
 
-    with _connection(account) as (ib, actual):
+    def collect(ib, actual):
         from ib_insync import ExecutionFilter
 
         if not ib.isConnected():
             raise PolicyDenied("BROKER_NOT_CONNECTED")
         return CallbackWindow(actual).collect(ib, ExecutionFilter(acctCode=actual))
+
+    handled, result = route_read(account, collect)
+    if handled:
+        return result
+    worker = ReadSessionWorker(account)
+    try:
+        worker.start()
+        return worker.call(collect, timeout=30)
+    finally:
+        if not worker.close(timeout=10):
+            # Native work cannot be killed; its connection remains owned/locked.
+            raise RuntimeError("IBKR_SESSION_CLEANUP_PENDING")

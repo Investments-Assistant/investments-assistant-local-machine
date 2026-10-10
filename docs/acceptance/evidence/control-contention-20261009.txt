@@ -1,0 +1,4 @@
+2026-10-09 12:29:06,833 | INFO | src.agent.clients.llama_cpp_client | Loading GGUF model: /home/lulu/investments-assistant/investments-assistant-local-machine/models/qwen2.5-1.5b-instruct-q4_k_m.gguf  (n_ctx=4096, n_gpu_layers=0, n_threads=4, n_batch=128)
+llama_context: n_ctx_seq (4096) < n_ctx_train (32768) -- the full capacity of the model will not be utilized
+2026-10-09 12:29:08,519 | INFO | src.agent.clients.llama_cpp_client | GGUF model loaded
+{"status": "PASS", "overlap_samples": 1044, "halt_p95_ms": 27.92081597726792}

@@ -1,0 +1,43 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 41 items
+
+tests/unit/broker_order_review_test.py ........                          [ 19%]
+tests/unit/broker_review_test.py ...                                     [ 26%]
+tests/unit/broker_attribution_test.py ..........                         [ 51%]
+tests/integration/broker_observations_test.py ...................F       [100%]
+
+=================================== FAILURES ===================================
+_ test_persisted_order_fill_gap_recovers_after_late_execution_but_not_conflicting_terminal _
+
+db_session = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7d234dfe31a0>
+
+    async def test_persisted_order_fill_gap_recovers_after_late_execution_but_not_conflicting_terminal(db_session):
+        user, account = await seed(db_session)
+        args = dict(user_id=user.id, account_id=account.id)
+        stamp = datetime.now(UTC) - timedelta(seconds=1)
+        filled = dict(kind="order_status", actual_account="SYNTHETIC-ACCOUNT-ONLY", event_id="fixture.order",
+                      observed_at=stamp, client_id=77, order_id=1, permanent_id=9,
+                      status="Filled", filled="0.004", remaining="0")
+        await record_observations(db_session, **args, observations=[filled])
+        result = await read_observations(db_session, **args)
+        assert "ORDER_FILL_EXECUTION_GAP" in result["review"]["reason_codes"]
+        await record_observations(db_session, **args, observations=[commission(), execution()])
+        result = await read_observations(db_session, **args)
+        assert "ORDER_FILL_EXECUTION_GAP" not in result["review"]["reason_codes"]
+        assert result["review"]["order_lifecycle"]["orders"][0]["execution_quantity"] == "0.004"
+        assert result["review"]["order_lifecycle"]["complete_reconciliation"] is False
+        # A delayed cancelled callback must not overwrite the recorded fill.
+        await record_observations(db_session, **args, observations=[filled | {"status": "Cancelled"}])
+        replay = await record_observations(db_session, **args, observations=[filled, execution(), commission()])
+>       assert replay["inserted"] == 0
+E       assert 1 == 0
+
+tests/integration/broker_observations_test.py:474: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/broker_observations_test.py::test_persisted_order_fill_gap_recovers_after_late_execution_but_not_conflicting_terminal
+========================= 1 failed, 40 passed in 3.36s =========================

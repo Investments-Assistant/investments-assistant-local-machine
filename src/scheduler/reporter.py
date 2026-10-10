@@ -486,6 +486,20 @@ def _fallback_report(context: dict) -> str:
             "Received synthetic income; separate from deposits, execution fees and sale P&L."
         )
         performance = account.get("period_performance", {})
+        if account.get("dividend_accrual_net") is not None:
+            lines.append(
+                f"- Accrued dividend income: {account['dividend_accrual_net']} {account['base_currency']}; "
+                "new earned receivables plus unlinked cash receipts, excluding transfers of previously earned income. "
+                "Unpaid receivables are not spendable cash."
+            )
+            for earned in account.get("dividend_entitlements", []):
+                lines.append(
+                    f"- Dividend entitlement {earned['event_id']}; allocation {earned['allocation_id']}; "
+                    f"net {earned['net_base']} {earned['currency']}; eligible quantity {earned['eligible_quantity']}; "
+                    f"booked {earned['booked_at']}; evidence {earned['evidence_sha256']}."
+                )
+            if account.get("dividend_entitlements_truncated"):
+                lines.append("- Entitlement details truncated; totals include all validated period evidence.")
         if performance.get("status") == "complete":
             lines.append(
                 f"- Observed period portfolio P&L: {performance['portfolio_pnl']} {account['base_currency']}; "
@@ -540,7 +554,8 @@ def _fallback_report(context: dict) -> str:
             f"- Included saved simulation runs: {len(context.get('simulations', []))}.",
             "",
             "## Limitations and risks",
-            "Weekly portfolio P&L requires reconciled history and period valuation snapshots; it is unavailable here.",
+            "Account P&L is shown only with reconciled exact boundary snapshots; "
+            "missing account periods remain unavailable.",
             "Broker accounts: Realized P&L, external flows, period cash fees, FX attribution "
             "and benchmark-relative returns are unavailable.",
             "Internal audit records are not reconciled fills; "
@@ -717,6 +732,17 @@ async def generate_report(
                     generation_errors=errors,
                 )
                 session.add(report)
+                if any(error.get("code") == "DISK_LOW" for error in errors):
+                    from src.operations.alerts import emit
+
+                    await emit(
+                        session, user_id=user_id, rule="report_storage_pressure",
+                        observed_value="DISK_LOW",
+                        threshold=f"{settings.storage_minimum_free_bytes + settings.report_maximum_bytes} free bytes",
+                        message=("Report storage is below its free-space budget. "
+                                 "Review storage before retrying PDF generation."),
+                        evidence_at=datetime.now(UTC),
+                    )
                 await session.commit()
                 report_id = report.id
         except Exception as exc:

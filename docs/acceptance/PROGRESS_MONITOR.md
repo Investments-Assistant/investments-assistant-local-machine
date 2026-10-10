@@ -9,18 +9,18 @@ not gate PASS statuses; PLAN.md remains the acceptance matrix.
 | L01 | 4 | 4 |
 | L02 | 8 | 8 |
 | L03 | 8 | 8 |
-| L04 | 8 | 4 |
-| L05 | 10 | 9.975 |
-| L06 | 6 | 5 |
-| L07 | 6 | 5.975 |
+| L04 | 8 | 6.5 |
+| L05 | 10 | 10 |
+| L06 | 6 | 6 |
+| L07 | 6 | 6 |
 | L08 | 5 | 5 |
-| L09 | 6 | 5.985 |
-| L10 | 6 | 4.125 |
-| L11 | 5 | 4.875 |
+| L09 | 6 | 6 |
+| L10 | 6 | 5.375 |
+| L11 | 5 | 5 |
 | L12 | 6 | 6 |
-| L13 | 7 | 2 |
+| L13 | 7 | 3 |
 | L14 | 7 | 2 |
-| L15 | 4 | 0 |
+| L15 | 4 | 0.25 |
 | L16 | 4 | 2 |
 
 Total weight 100. Baseline 53%; next audit 58% (+5 pp) credited persisted
@@ -83,3 +83,108 @@ Readrestrictionansweraudit raw75.935/display76 delta+1pp; L06=4/6 from37focusedP
 Portfolioreviewaudit raw76.435/display76 delta0; L06=4.5/6. 28focusedguardsPASS and9/9appworkflow qualitychecks; fullsuitepending. Descriptive sourceanalysis only, qualitative news/scanner quality stillpending.
 
 Scanner/reportqualityaudit raw76.935/display77 delta+1pp; L06=5/6. ActualGGUF factselection/noinstruction checksPASS and39focusedguards; native/fullsuite/browserpendingataudit.
+
+Final localchat/scanneraudit: correctedraw77.935/display78 delta+1pp. L06=6/6PASS; allotherpointsunchanged. Monitor initiallymisaddedraw77.435, thenexplicitlycorrected. 923suite/browser/defaultandnativeactualGGUFqualitychecks plusCHAT_REVIEW maplocalcriteria.
+
+Coherent fixture recovery audit: raw77.950/display78 delta0pp; L09=6/6 local persistence/recovery. 27 focused tests plus full0018 vault/PDF/model recovery and protected preview verified. Current full suite pending; production/off-host validation remains separate.
+
+Monitoring dispatch audit raw78.200/display78 delta0pp; L10+0.25 for due-aware bounded opt-in selection, dispatch consent recheck and real PostgreSQL interruption/recovery tests. Fullsuite pending.
+
+Heartbeat audit raw78.450/display78 delta0; L10+0.25 for owner-scoped missed-run alerts, atomic alert/checkpoint fencing and bounded coalesced observer. Fullsuite afterward955PASS69.74s. No externalwatchdog claimed.
+
+Resource-pressure alert audit raw78.700/display79 delta+1pp; L10+0.25 for transactional owner-only DISK_LOW alert and deduplicated retries with23focusedPASS. Current fullsuite/browser pending at audit.
+
+Workspace browser preservation audit: raw78.700/display79 delta0, no additional credit to already-complete local gates. Profile/project and disabled encrypted account controls verified with cross-owner denial, no application change.
+
+Final current-checkpoint audit raw78.700/display79 delta0. Sidebar button overflow reproduced and fixed; full browser plus desktop account-card bounds PASS. Existing mobile workflow also passes, but no separate mobile account-card bounds claim. Backend955suite reused for CSS-only final change. Goal ACTIVE/incomplete.
+
+Broker order-review audit raw78.950/display79 delta0; L04+0.25 for order-status/unique-execution comparisons, terminal conflict/gap/correction guards and persisted recovery evidence.41focused tests include20realPostgreSQL cases. Currentfullsuite/browser pending.
+
+Brokerorder finalvalidation audit raw78.950/display79 delta0;964fullsuite/realbrowser PASS plus41affected tests after observed-field correction. L04 remains4.25; broadercontinuoushistory/reconciliation open.
+
+Session-owner audit raw79.200/display79 delta0; L04+0.25 for bounded SDK/event-loop owner, queue/timeout/cleanup contracts and existing collector integration with48mockedSDKchecks. Continuousdurable coordinator remainsincomplete; currentfullsuitepending.
+
+Callback capture audit raw79.450/display79 delta0; L04+0.25 for sustained
+subscription, intermediate drains, detach-before-final-drain and sticky overflow.
+51 focused PASS1.21s/exit0. Prior session-owner fullsuite972PASS72.43s/exit0;
+current callback refactor fullsuite pending. Durable stream coordinator still open.
+
+Stream-journal audit raw79.700/display80 delta+1pp; L04=5/8 for atomic scoped
+batches/recovery/clock fencing with49focusedPASS. Currentfullsuitepending;
+SDK-to-journal coordinator and routing remainopen.
+
+Finitecoordinator audit raw80.200/display80 delta0; L04=5.5/8.56focusedPASS
+SDKmock+PG; currentfullsuitepending. Sharedowner routing/activation/external
+reconciliation remainopen, no realconnections or orders.
+
+Sharedread audit raw80.450/display80 delta0; L04=5.75/8.60unique focused
+checks across59+8with7overlap; currentfullsuitepending. Noexternalactivation.
+
+Finalcurrentcheckpoint audit raw80.450/display80 delta0.1005fullsuitePASS
+validates alreadycreditedsharedrouting; noextra gatepoints. Goalactive/incomplete.
+
+Entitlementruntime finalaudit raw80.475/display80 delta0; L05=10/10 for verified
+localaccounting path, +0.025.1031suite/browser/31tablerestorePASS; broaderhistorical
+boundary/foreignspecialactions/benchmark/externaldata limitations remainexplicit.
+
+Final reportaudit raw80.500/display81 delta+1pp, L07=6/6 localreportcriteria.
+Truthful account-specific availability/37affectedPASS closesfootercontradiction.
+Original reports requirement distinguishes benchmark basis; unavailable basis is
+explicit. Actual comparative research remainsL14, not implied byreportPASS.
+
+Fresh remote CI evidence audit: raw80.000/display80 delta-1pp. L11 reduced0.5
+for currentHEAD integration fresh-schema setup failure; browser job skipped.
+Migrated local1031PASS evidence remains valid but did not cover this defect.
+
+Verified fresh-schema audit: raw80.500/display81 delta+1pp. L11 restored4.875/5
+after1041PASS94.44s onnewempty markedPGDB plus5PASS38.77s localTCPsoakchecks.
+Remote failed run is at unchanged currentHEAD9b0df38, predating uncommittedfixes
+(not an older commit); no remotevalidation ofworkingtree orDockerbuild claimed.
+
+Coherent alert evidence audit: raw80.750/display81 delta0pp; L10=5.125/6.
+10focusedPGchecksPASS. Subsequentfullsuite1043PASS87.63s exit0 verified.
+
+Bounded local delivery audit: raw81.000/display81 delta0pp,L10=5.375/6.
+12affectedPGchecksPASS;1043suite reused for unaffected code. Real outbound
+adapter idempotency/reconciliation remains unverified and no messages sent.
+
+Repeated production-budget model audit: raw81.500/display82 delta+1pp,
+L13=2.5/7.27observationsPASS, modelassistedmax11.044s. No sustainedload/24hclaim.
+
+Same-process native contention audit: raw82.000/display82 delta0pp,L13=3/7.
+1044overlappedhaltrequests p95=27.921ms,max94.336ms vs250ms; persistedhaltverified.
+No ingress/thermal/sleep/24hclaim. Goalactiveandincomplete.
+
+Explicitfinitecapture activation audit raw82.500/display83 delta+1pp;L04=6.25/8.
+35focusedPG/HTTP/SDKfixturesPASS,currentfullsuitepending; noexternalgatewayclaim.
+
+Upstreamconnectivity audit raw82.750/display83 delta0pp,L04=6.5/8.
+66focusedchecks and1067fullsuitePASS; no actualgateway/reauthclaim.
+
+Isolated Nginx and static-header regression final audit: raw82.750/display83,
+delta0pp. Eight actual proxy checks PASS; existing gate evidence strengthened,
+no Docker/WSL/LAN or remote working-tree CI credit. Goal active/incomplete.
+
+CI ingress wiring final audit: raw82.750/display83, delta0pp, L11=4.875.
+Local browser/syntax/preflight PASS; remote working-tree CI and Docker/real LAN
+remain unverified. Goal ACTIVE/incomplete; no running validation to retry.
+
+Build-input milestone final audit raw82.750/display83 delta0pp,L11=4.875.
+Compose configPASS; Docker engine missingLinuxpipe exit1. Build and remaining
+mutable apt/Poetry bootstrap dependency closure still pending (BUILD.md).
+No active commands; GoalACTIVE/incomplete; liveOFF.
+
+Poetry bootstrap closure final audit raw82.825/display83 delta0pp,L11=4.95/5.
+Fresh isolated hash-locked install and ARM64 wheel resolution verified; apt,
+Docker runtime and remote working-tree CI remain pending. GoalACTIVE/incomplete.
+
+Dated apt repository audit raw82.850/display83 delta0pp,L11=4.975/5.
+Authenticated isolated update and15-root dependency dryrunPASS; actualimagebuild/
+remoteCI/ARM64runtime not verified. GoalACTIVE/incomplete.
+
+Forwardobservation proposal audit raw83.100/display83 delta0pp,L15=0.25/4.
+Written plan credited only; noapprovedcampaign/paperaccount/execution claim.
+
+Actual image build final audit raw83.125/display83 delta0pp,L11=5/5 forlocal
+checks/build. Remote current-worktree CI remains unrun; no containerruntime claim.
+Goal control PAUSED; no completion claimed.

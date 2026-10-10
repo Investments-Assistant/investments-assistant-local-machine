@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "workflow_yaml": "parsed",
+  "shell_steps": "all browser job scripts pass bash -n",
+  "fresh_directory": "actual runner creates missing .qa parent and reaches subprocess start; subprocess intentionally intercepted before DB/app work",
+  "remote_ci": "not executed",
+  "artifact_paths": "explicit synthetic PNG files and server.log; hidden-file inclusion required for .qa"
+}

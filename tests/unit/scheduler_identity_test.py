@@ -33,3 +33,16 @@ async def test_degraded_scan_persists_stream_then_reports_job_failure():
     ):
         await _autonomous_scan()
     assert create.call_args.args[1] == "fixture-owner"
+
+
+def test_scheduler_registers_bounded_coalesced_heartbeat_observation():
+    from src.scheduler import jobs
+
+    with patch.object(jobs, "scheduler") as scheduler:
+        jobs.setup_scheduler()
+    registered = {call.kwargs["id"]: call for call in scheduler.add_job.call_args_list}
+    call = registered["operations_heartbeat"]
+    assert call.kwargs["coalesce"] is True
+    assert call.kwargs["max_instances"] == 1
+    assert call.kwargs["misfire_grace_time"] == 30
+    assert call.args[0].__name__ == "monitor_heartbeat"

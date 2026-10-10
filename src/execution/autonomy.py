@@ -175,7 +175,8 @@ async def run_tick(session, *, user_id: str, account_id: str, mandate_id: str, t
         await halt(session, user_id=user_id, account_id=account_id, reason="LEDGER_RECONCILIATION_REQUIRED")
         raise PolicyDenied("LEDGER_RECONCILIATION_REQUIRED")
     net_flows = Decimal(checked["net_external_flows"])
-    equity = account.cash + exposure
+    receivable = Decimal(checked["dividend_receivable"])
+    equity = account.cash + exposure + receivable
     previous = account.mandate.get("risk_observation", {})
     if previous and datetime.fromisoformat(previous["at"]) > now:
         await halt(session, user_id=user_id, account_id=account_id, reason="CLOCK_REGRESSION")
@@ -197,6 +198,7 @@ async def run_tick(session, *, user_id: str, account_id: str, mandate_id: str, t
         net_external_flows=str(net_flows),
         high_water=str(high_water),
         equity=str(equity),
+        dividend_receivable=str(receivable),
         realized=str(account.realized_pnl),
         unrealized=str(exposure - basis),
         daily_pnl=str(daily_pnl),

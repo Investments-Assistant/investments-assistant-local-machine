@@ -1,0 +1,20 @@
+[
+  {
+    "url": "https://snapshot.debian.org/archive/debian/20261009T000000Z/dists/bookworm/InRelease",
+    "reachable": true,
+    "bytes": 151075,
+    "sha256": "77737fa4b34f2693e982cc9ee35736816c35a7778fc2d326cc1bbf5b301fe1aa"
+  },
+  {
+    "url": "https://snapshot.debian.org/archive/debian/20261009T000000Z/dists/bookworm-updates/InRelease",
+    "reachable": true,
+    "bytes": 55403,
+    "sha256": "5aff6e6e76c43a3b3f8ed100aa1fdad5bb0dda38dd981ac6b92464947c23b2f6"
+  },
+  {
+    "url": "https://snapshot.debian.org/archive/debian-security/20261009T000000Z/dists/bookworm-security/InRelease",
+    "reachable": true,
+    "bytes": 34770,
+    "sha256": "6192a790ed1d11bf7b14ccadfc4d8de3aacd98ea8c005299ed35bfd29bdf42c8"
+  }
+]

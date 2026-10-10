@@ -1,0 +1,1 @@
+{"status": "PASS", "tables": 31, "revision": "0018_job_lease_clock", "evidence": "/home/lulu/investments-assistant/investments-assistant-local-machine/docs/acceptance/evidence/dividend-receivable-recovery-20261008-database.json"}

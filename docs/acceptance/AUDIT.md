@@ -1,7 +1,7 @@
 # Audit findings and current evidence
 
 Historical reference: `65ea1d769c79bf77df3de1d4a3b6274168d92085`. Current HEAD is
-`0e18029fe882497cd7bb998f5b855777ac474889`; prior completed work was committed
+`9b0df38c333337aee83d8dcd9874fda7f5945eaf`; prior completed work was committed
 externally. Current news-policy/retention and CI changes remain in the working tree.
 The initial checkout was clean. Resumes preserve existing changes; the agent has
 not committed, pushed or deployed to production. Historical logs
@@ -39,7 +39,7 @@ results and limitations), `REPLAY.md` (new engine and offline reproduction).
 | Write policy differs by entrypoint | External SDK writes uniformly closed; ownerless/wrong-account SDK reads closed; browser simulator policy separately enforced. Full broker execution boundary remains pending external lifecycle implementation. |
 | IBKR SMART/USD and account flattening | Explicit account/read consent/environment/qualified stock identity fixtures implemented; external account not connected. Capability limits in BROKER_CAPABILITIES.md. |
 | Daily loss depends on absent adapter fields | Simulator mandates compute persisted marked-equity observations and halt on limits; external daily-loss enforcement remains unavailable, writes disabled. ACCOUNTING.md defines limits. |
-| Default1.5B profile unmeasured | Existing1.5B/3B CPU structured benchmarks now recorded. GPU offload unavailable in installed build. Broader task accuracy and 24h observation pending. |
+| Default1.5B profile unmeasured | Existing1.5B/3B CPU structured benchmarks now recorded. GPU offload unavailable in installed build. Fixed nine-case quality checks,27normal-output observations andsame-process halt contention verified; broader production distribution and24h observation pending. |
 | External text in system context / brittle tool routing | Untrusted evidence separated, privileged catalog filtered, token/inference bounds tested. Multilingual ambiguity/follow-up breadth remains incomplete. |
 | Final-answer contract differs between checkouts | Laptop final_answer event retained through client/orchestrator/UI; actual client and browser report workflows verified. Pi unchanged; no cross-repository event migration. |
 | Monolithic web concerns | Finance normalization, expense persistence/category/provider handling, risk/execution, research and alert routes extracted; web module remains large and further focused extraction is possible. |
@@ -47,10 +47,10 @@ results and limitations), `REPLAY.md` (new engine and offline reproduction).
 | Synchronous simulation/PDF blocks async handlers | Shared bounded workers with timeout/cancellation permit retention; actual browser replay/PDF pass. |
 | Scheduled/MCP global credentials | Explicit active-user binding enforced; SDK fallback removed. Public news uses explicit active principal, durable fenced leases/checkpoints and reviewed source policies; newsletter reads require bound private policy. Real provider access is unverified. |
 | Bank consent/sync incomplete | Fixture-tested adapter/token/consent/account/recovery and explicit browser controls added. Real bank access requires separate consent/configuration. |
-| Startup create_all/raw alterations/owner backfill | Versioned reviewed-schema upgrades through0012, explicit startup schema checks and unknown-owner quarantine. Full fixture filesystem/key/model restore verified at0009 and database restore at0010; full0012 restore not yet exercised. |
+| Startup create_all/raw alterations/owner backfill | Versioned reviewed-schema upgrades through0018, explicit startup schema checks and unknown-owner quarantine. Full0018fixture vault/PDF/model recovery and31table database/valuation/receivable restores verified; see RETENTION.md and ACCOUNTING.md. Production/off-host recovery remains separate. |
 | Nginx all-interface publication | Compose now defaults loopback with explicit LAN bind and exact proxy peer; offline config and origin fixtures pass. Actual Docker/WSL ingress remains unobserved. |
 | CPU image mistaken for GPU path | Build remains CPU; installed native library reports no GPU offload. No GPU acceleration claim. |
-| CI integration loop/transaction/FTS errors | Function-loop NullPool fixtures, positively marked database, outer rollback/savepoints and real PostgreSQL FTS pass locally. Remote historical run has not been rerun. |
+| CI integration loop/transaction/FTS errors | Function-loop NullPool fixtures, positively marked database, outer rollback/savepoints and real PostgreSQL FTS pass locally. Current committedHEAD remote run37657249888 failed fresh-sequence setup; local working-tree fixes pass1041checks from a new empty markedDB and5loopbacksoakchecks. No remote rerun of these fixes. |
 | ARM64 Pi deployment workflow inherited | Replaced with manual x86_64 CPU validation; no automatic deployment. Remote build execution unobserved. |
 
 No listed finding is dismissed as “not reproduced” merely because current tests

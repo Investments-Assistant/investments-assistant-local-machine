@@ -1,0 +1,25 @@
+{
+  "status": "PASS limited fixed synthetic workflow sample",
+  "observations": 27,
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "manual_review": "Reviewed scanner and holdings/news output plus qualified portfolio review; repeated answers identical across all3runs. Source revenue and limitation extracts only, injected instruction absent, exact0.004/EUR100 preserved, missing values null, concentration excludes cash and denies lookthrough.",
+  "latency_budget": "All9case nearest-rank p95(maxof3) belowpredeclared30s. Tiny sample, not productionconfidence.",
+  "model_assisted_cases": [
+    "scanner",
+    "explicit_exclusion",
+    "holdings_and_news",
+    "refresh_excluded_portfolio"
+  ],
+  "deterministic_cases": [
+    "portfolio",
+    "exclusion_followup",
+    "portuguese_portfolio",
+    "refresh_portfolio",
+    "qualified_portfolio_review"
+  ],
+  "limitations": [
+    "No real provider/broker/browser/DB activity in this modeltier.",
+    "Not loadconcurrency/thermal/24h or economic edge proof.",
+    "Output limit768 does not imply every task generates768tokens."
+  ]
+}

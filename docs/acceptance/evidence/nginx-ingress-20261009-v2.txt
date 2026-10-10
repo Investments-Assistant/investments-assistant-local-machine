@@ -1,0 +1,26 @@
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_nginx_ingress.py", line 151, in <module>
+    asyncio.run(run(parser.parse_args()))
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_nginx_ingress.py", line 124, in run
+    async with websockets.connect(target, ssl=context, origin=base, proxy=None,
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/websockets/asyncio/client.py", line 590, in __aenter__
+    return await self
+           ^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/websockets/asyncio/client.py", line 546, in __await_impl__
+    await self.connection.handshake(
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/websockets/asyncio/client.py", line 115, in handshake
+    raise self.protocol.handshake_exc
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/websockets/client.py", line 327, in parse
+    self.process_response(response)
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/websockets/client.py", line 144, in process_response
+    raise InvalidStatus(response)
+websockets.exceptions.InvalidStatus: server rejected WebSocket connection: HTTP 403

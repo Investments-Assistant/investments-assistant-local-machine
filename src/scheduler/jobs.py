@@ -66,7 +66,7 @@ async def _run_weekly_report() -> None:
             if result.get("status") != "complete":
                 raise RuntimeError("REPORT_PARTIAL_FAILURE")
 
-    for user_id in await monitoring_users():
+    for user_id in await monitoring_users("weekly_report"):
         await run_scoped(user_id, "weekly_report", report, interval_seconds=86400)
 
 
@@ -108,7 +108,7 @@ async def _autonomous_scan() -> None:
         if model_failed:
             raise RuntimeError("MONITORING_MODEL_UNAVAILABLE")
 
-    for user_id in await monitoring_users():
+    for user_id in await monitoring_users("market_scan"):
         await run_scoped(
             user_id,
             "market_scan",
@@ -206,6 +206,17 @@ def setup_scheduler() -> None:
         run_simulator_strategies,
         trigger=IntervalTrigger(seconds=60),
         id="approved_simulator_strategies",
+        replace_existing=True,
+        max_instances=1,
+        coalesce=True,
+        misfire_grace_time=30,
+    )
+    from src.operations.heartbeat import monitor_heartbeat
+
+    scheduler.add_job(
+        monitor_heartbeat,
+        trigger=IntervalTrigger(seconds=60),
+        id="operations_heartbeat",
         replace_existing=True,
         max_instances=1,
         coalesce=True,

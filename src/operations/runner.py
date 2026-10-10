@@ -3,33 +3,51 @@
 import asyncio
 from datetime import UTC, datetime
 
-from sqlalchemy import select
+from sqlalchemy import or_, cast, func, text, select
+from sqlalchemy.dialects.postgresql import JSONB
 
 from src.db.models import User
 from src.db.database import async_session
 from src.operations.jobs import acquire, complete
 from src.operations.alerts import emit
+from src.operations.models import JobLease
+
+MAX_MONITORING_BATCH = 100
 
 
-async def monitoring_users() -> list[str]:
-    async with async_session() as session:
-        rows = (
-            await session.execute(
-                select(User.id, User.preferences)
-                .where(User.is_active.is_(True))
-                .order_by(User.id)
-                .limit(100)
+async def monitoring_users(name: str) -> list[str]:
+    """Bound eligible due work, so skipped users and recent jobs cannot starve others."""
+    if not name or len(name) > 64:
+        raise ValueError("Invalid monitoring job name")
+    async with asyncio.timeout(10), async_session() as session:
+        await session.execute(text("SET LOCAL statement_timeout = '5s'"))
+        await session.execute(text("SET LOCAL lock_timeout = '2s'"))
+        rows = await session.scalars(
+            select(User.id)
+            .outerjoin(JobLease, (JobLease.user_id == User.id) & (JobLease.name == name))
+            .where(
+                User.is_active.is_(True),
+                cast(User.preferences, JSONB).contains({"monitoring_enabled": True}),
+                or_(JobLease.id.is_(None),
+                    (JobLease.next_due <= func.clock_timestamp())
+                    & (JobLease.lease_until <= func.clock_timestamp())),
             )
-        ).all()
-    return [
-        user_id
-        for user_id, preferences in rows
-        if isinstance(preferences, dict) and preferences.get("monitoring_enabled") is True
-    ]
+            .order_by(JobLease.next_due.asc().nullsfirst(), User.id)
+            .limit(MAX_MONITORING_BATCH)
+        )
+        return list(rows)
 
 
 async def run_scoped(user_id: str, name: str, callback, *, interval_seconds=3600):
-    async with async_session.begin() as session:
+    async with asyncio.timeout(10), async_session.begin() as session:
+        await session.execute(text("SET LOCAL statement_timeout = '5s'"))
+        await session.execute(text("SET LOCAL lock_timeout = '2s'"))
+        # Selection can precede dispatch by other users' bounded work. Recheck consent.
+        preferences = await session.scalar(
+            select(User.preferences).where(User.id == user_id, User.is_active.is_(True))
+        )
+        if not isinstance(preferences, dict) or preferences.get("monitoring_enabled") is not True:
+            return {"status": "monitoring_disabled"}
         lease = await acquire(session, user_id=user_id, name=name, lease_seconds=180)
     if lease is None:
         return {"status": "leased_or_not_due"}
@@ -42,7 +60,9 @@ async def run_scoped(user_id: str, name: str, callback, *, interval_seconds=3600
         raise
     except Exception:
         failure = "JOB_DEPENDENCY_FAILED"
-    async with async_session.begin() as session:
+    async with asyncio.timeout(10), async_session.begin() as session:
+        await session.execute(text("SET LOCAL statement_timeout = '5s'"))
+        await session.execute(text("SET LOCAL lock_timeout = '2s'"))
         await complete(
             session,
             lease_id=lease[0],

@@ -1,0 +1,4 @@
+2026-10-09 02:54:44,213 | INFO | src.agent.clients.llama_cpp_client | Loading GGUF model: models/qwen2.5-1.5b-instruct-q4_k_m.gguf  (n_ctx=4096, n_gpu_layers=0, n_threads=4, n_batch=128)
+llama_context: n_ctx_seq (4096) < n_ctx_train (32768) -- the full capacity of the model will not be utilized
+2026-10-09 02:54:45,090 | INFO | src.agent.clients.llama_cpp_client | GGUF model loaded
+{"status": "PASS", "evidence": "/home/lulu/investments-assistant/investments-assistant-local-machine/docs/acceptance/evidence/workflow-production-budget-20261009-3.json"}

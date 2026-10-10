@@ -1,0 +1,9 @@
+{
+  "candidate_bytes": 0,
+  "candidate_count": 0,
+  "deleted": 0,
+  "plan_sha256": "f86f210d54ec5c30b0b0b45281bc8662baf7d40045265d8100b7efa930b62004",
+  "protected_count": 1,
+  "scope": "verified_coherent_fixture_bundles",
+  "status": "preview"
+}

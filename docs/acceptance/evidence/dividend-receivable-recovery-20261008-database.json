@@ -1,0 +1,142 @@
+{
+  "status": "PASS",
+  "tier": "real-postgresql-disposable-backup-restore",
+  "timestamp": "2026-10-08T14:23:52.789309+00:00",
+  "source": "test_acceptance_expenses",
+  "source_identity_sha256": "158368b0feb927086d75376dd2c4f34531a6b910140e9eafe31c060aa86167c3",
+  "retention_scope": "preserve_unclassified_bundle",
+  "target": "test_receivable_20261008",
+  "revision": "0018_job_lease_clock",
+  "tables": {
+    "account_ledger_events": {
+      "count": 2,
+      "sha256": "0966d2f24c02d1ab23d215afffeb36a064785fd9fd133093e9a0386751202db7"
+    },
+    "alembic_version": {
+      "count": 1,
+      "sha256": "ed7265fa412ce8207fa6aa6ea0fd4d78729f0f82ac0b5d4b2a3c3253322ff223"
+    },
+    "analyses": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bank_sync_states": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "broker_accounts": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "broker_observations": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "chat_messages": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "conversations": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "daily_pnl": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "execution_events": {
+      "count": 273,
+      "sha256": "ceede84ff7110c0be55f91368d8950950073cad7d7a569a3bcbba46a384b310d"
+    },
+    "expense_audit": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "expense_retirements": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "expense_transactions": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ia_disposable_marker": {
+      "count": 1,
+      "sha256": "f996feb0ac8ac007b2e93d7e1afda4763885f757a79dc7f943e8abd7cc7fd2a4"
+    },
+    "job_leases": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "news_articles": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "news_revisions": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "operational_alerts": {
+      "count": 156,
+      "sha256": "2ba1752b0d5969a563b01e9a980c2b99e07e54b7dfd3405f1b83326d1b5acdcf"
+    },
+    "projects": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reports": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "session_revocations": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "simulation_results": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "simulator_accounts": {
+      "count": 221,
+      "sha256": "01f3cf49868e57a09e7d5f137572b997aee7797b6c40a3012ca66765b929a2ce"
+    },
+    "simulator_instruments": {
+      "count": 221,
+      "sha256": "35868a4964767a3744a8d54cb6aa5efa577a4733aaeab5775410ab0eb2d1169a"
+    },
+    "simulator_mandates": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "simulator_orders": {
+      "count": 181,
+      "sha256": "587f17d01b7fdc73d7f848b88fe0ee45574963c85ca9a049975c4a7e6e2d5f17"
+    },
+    "simulator_positions": {
+      "count": 1,
+      "sha256": "42c8970df00e21ad862e323073765d72ca30378f79a36a749216d4a8f6408884"
+    },
+    "strategy_decisions": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "trades": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "users": {
+      "count": 225,
+      "sha256": "171758efbbaec71f6236b96ef0bcac3258c059b90699d5349d297c9a8c064d76"
+    },
+    "valuation_snapshots": {
+      "count": 2,
+      "sha256": "f1b3dc9ea78592e379393455e5cb5bf259a42bd2718b443404b8809905a44999"
+    }
+  },
+  "archive": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/split-recovery/test_receivable_20261008.dump",
+  "archive_sha256": "f5127647e47098d9d364240dde7c9913c50cc53eda8a5916be9be424ed4ea3c8",
+  "production_data": false,
+  "limitations": [
+    "Database only; reports/model/vault-key filesystem recovery is separate."
+  ]
+}

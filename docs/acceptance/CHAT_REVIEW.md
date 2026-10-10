@@ -18,7 +18,8 @@ universal natural-language understanding, arbitrary investment advice, or econom
 | Native/default comparison | Native scanner38.508s via deterministic recovery versus default10.976s; both keep scopes and source facts. Existing default stays selected. No p95/production workload claim from these small samples |
 | Event/persistence compatibility | Tool-call/result/final/done regression cases, native recovery, durable chat/browser retention/isolation; browser-scanner-history-final.txt passes all retained end-to-end flows with model/provider fixtures explicit |
 
-Full current regression result must be checked separately before promoting the gate.
+Current full regression:923 tests PASS69.63s (suite-scanner-source-quality.txt, exit0).
+The final milestone audit approves local L06PASS.
 Benchmark failure history is retained, including safe-but-unhelpful abstention and
 an earlier nominal report PASS rejected by manual review for selecting a source
 command. Final report and scanner tests require meaningful factual selection.

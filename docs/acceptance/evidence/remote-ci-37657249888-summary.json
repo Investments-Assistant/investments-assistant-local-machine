@@ -1,0 +1,12 @@
+{
+  "run": 37657249888,
+  "head": "9b0df38c333337aee83d8dcd9874fda7f5945eaf",
+  "junit_counts": {
+    "error: missing shared identity sequence": 301,
+    "passed": 3
+  },
+  "unit": "passed",
+  "integration": "failed",
+  "browser": "skipped",
+  "source": "read-only gh downloaded junit-integration artifact"
+}

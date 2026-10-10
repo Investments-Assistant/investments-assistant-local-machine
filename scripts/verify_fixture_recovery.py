@@ -22,6 +22,7 @@ import asyncpg
 from cryptography.fernet import Fernet, InvalidToken
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 
 def digest(path):
@@ -35,7 +36,10 @@ async def main():
     parser.add_argument("--target", required=True)
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--bundle-dir", type=Path, help="Publish the verified fixture recovery as one retained archive")
     args = parser.parse_args()
+    if args.bundle_dir and args.output.exists():
+        raise SystemExit("Bundle receipt exists; inspect interrupted recovery before retrying")
     token = os.environ.get("TEST_DATABASE_DISPOSABLE_TOKEN")
     if (
         not token
@@ -238,7 +242,13 @@ async def main():
                 )
                 await source.execute("DELETE FROM users WHERE id=$1", owner)
         await source.close()
-    args.output.write_text(json.dumps(result, indent=2) + "\n")
+    if args.bundle_dir:
+        from src.operations.recovery_bundle import publish_fixture_bundle
+
+        args.bundle_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+        result = publish_fixture_bundle(args.bundle_dir, result, args.output)
+    else:
+        args.output.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({"status": "PASS", "evidence": str(args.output), "restored_model_tasks": 3}))
 
 

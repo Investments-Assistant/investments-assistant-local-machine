@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "scope": "Poetry bootstrap dependency closure, CPython3.12 Linux",
+  "packages": 46,
+  "wheel_hashes": 67,
+  "requirements_sha256": "f3348925e16ecc562c4834c5df3867ab9da9473d3bd9c32810af804b7a7077d9",
+  "native_validation": [
+    "clean disposable venv require-hashes binary-only install",
+    "pip check",
+    "Poetry2.3.4 version",
+    "poetry check --lock"
+  ],
+  "arm64_validation": "all46 compatible wheels resolved/downloaded with require-hashes for glibc<=2.36; not executed on ARM64",
+  "limitations": [
+    "No Docker image build or runtime verification",
+    "Debian apt repositories remain mutable",
+    "No application dependency update"
+  ],
+  "source": "https://pip.pypa.io/en/stable/topics/secure-installs/"
+}

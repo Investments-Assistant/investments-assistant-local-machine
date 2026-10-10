@@ -282,3 +282,35 @@ backup-expiry-real-preview.json protects its only verified archive, zero deletio
 The earlier backup-expiry-restore.json also passed31tables but predates explicit
 standalone classification and is deliberately not eligible. No existing recovery
 archives or databases were removed; new restore targets remain for review.
+
+
+## Coherent disposable recovery bundles
+
+`verify_fixture_recovery.py --bundle-dir <private-directory>` optionally publishes
+one verified `.bundle` after the marked PostgreSQL, filesystem, vault and model
+recovery succeeds. Its three members are `database.dump`, `filesystem.tar` and a
+hash/size manifest. The filesystem contains the matching synthetic vault key,
+fixture PDF/settings and existing model. Publication streams and checks all bytes,
+uses private permissions, never replaces an existing receipt, and holds the shared
+directory lock through durable publication. Interrupted unregistered artifacts are
+preserved for inspection. This is a synthetic recovery tool, not an encrypted
+production backup: the key is inside the archive. Off-host storage, encryption and
+production backup policy require separate authorized validation.
+
+Use `scripts/expire_recovery_bundles.py` with the same explicit `--archive-dir`,
+repeated `--evidence`, aware `--before`, and positive `--keep` arguments as the
+standalone command above. Preview first; apply only the reviewed returned
+`--confirm-sha256`. It accepts successful complete fixture recovery receipts and
+rehashes the packed artifact. Newest verified sets are protected per source, and
+expiry removes a whole bundle rather than a database dump or matching key alone.
+Original recovery work directories, restored databases, source archives and
+receipts remain: this command is not comprehensive erasure of downstream copies.
+The standalone database command refuses these bundle members.
+
+Evidence: `recovery-bundle-cli-verified.txt` 27 PASS includes actual CLI preview and
+confirmed expiry of only an older small synthetic bundle; newest bundle and
+receipts survive. `recovery-bundle-20261007.json` records full real disposable
+PostgreSQL recovery of 31 tables at `0018_job_lease_clock`, correct-key decryption,
+wrong-key rejection, matching filesystem checks and three restored model tasks
+(p95 1.871s). `recovery-bundle-real-preview.json` protects the only actual full
+bundle: zero candidates/deletions. The restored target and artifacts are retained.

@@ -1,0 +1,123 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 11 items
+
+tests/integration/dividend_receipts_test.py ..........F                  [100%]
+
+=================================== FAILURES ===================================
+________ test_receivable_cannot_fund_order_or_cross_account_settlement _________
+
+db_session = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x73d96ad1c110>
+
+    async def test_receivable_cannot_fund_order_or_cross_account_settlement(db_session):
+        from src.execution.account_events import record_cash_flow
+        from tests.integration.execution_test import proposal, confirmation
+    
+        ids, account, _ = await owned(db_session)
+        other, _, _ = await owned(db_session)
+        earned = await earn(db_session, ids)
+        with pytest.raises(PolicyDenied, match="DIVIDEND_ENTITLEMENT_UNAVAILABLE"):
+            await pay(db_session, other, earned["event_id"])
+        with pytest.raises(PolicyDenied, match="ACCOUNT_NOT_OWNED"):
+            await pay(db_session, ids, earned["event_id"], user_id=other[0])
+        await record_cash_flow(db_session, user_id=ids[0], account_id=ids[1], event_key="withdraw-cash",
+            amount_base="-800", currency="EUR", effective_at=datetime.now(UTC),
+            source_reference="synthetic-withdrawal", fixture_event=True)
+        assert account.cash == 0
+        with pytest.raises(PolicyDenied, match="INSUFFICIENT_UNRESERVED_CASH"):
+>           proposed = await proposal(db_session, ids, quantity="0.004")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/dividend_receipts_test.py:195: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/execution_test.py:75: in proposal
+    return await propose(
+src/execution/numeric.py:20: in asynchronous
+    return await function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/execution/service.py:104: in propose
+    reserve = preflight(account, instrument, quantity, price, side, now)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/execution/numeric.py:27: in synchronous
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+account = <src.execution.models.SimulatorAccount object at 0x73d96ab83170>
+instrument = <src.execution.models.SimulatorInstrument object at 0x73d96ad62540>
+quantity = Decimal('0.004'), price = Decimal('100'), side = 'buy'
+now = datetime.datetime(2026, 10, 8, 14, 25, 19, 815816, tzinfo=datetime.timezone.utc)
+
+    @execution_precision
+    def preflight(account, instrument, quantity, price, side: str, now: datetime, *, mandate_spec=None) -> Decimal:
+        """Trusted simulator feed supplies contract multiplier/FX; client estimates absent."""
+        if account.halted:
+            raise PolicyDenied("OPERATOR_HALTED")
+        if account.mandate.get("environment") != "simulator":
+            raise PolicyDenied("ENVIRONMENT_NOT_AUTHORIZED")
+        if instrument.account_id != account.id:
+            raise PolicyDenied("INSTRUMENT_ACCOUNT_MISMATCH")
+        if instrument.protected:
+            raise PolicyDenied("PROTECTED_ALLOCATION")
+        if instrument.security_type not in {"stock", "etf"} or instrument.multiplier != 1:
+            raise PolicyDenied("UNSUPPORTED_INSTRUMENT")
+        if side not in {"buy", "sell"}:
+            raise PolicyDenied("UNSUPPORTED_SIDE")
+        if side == "sell" and not (
+            account.mandate.get("fixture") is True and (
+                account.mandate.get("manual_sales") is True
+                or (mandate_spec is not None and mandate_spec.strategy == "price_band_fixture"
+                    and mandate_spec.environment == "simulator")
+            )
+        ):
+            raise PolicyDenied("SELL_CAPABILITY_UNAVAILABLE")
+        expiry = datetime.fromisoformat(account.mandate["expires_at"])
+        if now >= expiry:
+            raise PolicyDenied("MANDATE_EXPIRED")
+        if instrument.as_of > now or now - instrument.as_of > timedelta(seconds=60):
+            raise PolicyDenied("STALE_QUOTE")
+        if instrument.currency == account.currency and instrument.fx_to_base != 1:
+            raise PolicyDenied("INVALID_FX")
+        quantity, price = positive(quantity), positive(price)
+        multiplier, fx = positive(instrument.multiplier), positive(instrument.fx_to_base)
+        if quantity % positive(instrument.lot) or price % positive(instrument.tick):
+            raise PolicyDenied("LOT_OR_TICK_PRECISION")
+        quote = positive(instrument.price)
+        if (side == "buy" and price < quote) or (side == "sell" and price > quote):
+>           raise PolicyDenied("LIMIT_NOT_MARKETABLE")
+E           src.execution.policy.PolicyDenied: LIMIT_NOT_MARKETABLE
+
+src/execution/policy.py:92: PolicyDenied
+
+During handling of the above exception, another exception occurred:
+
+db_session = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x73d96ad1c110>
+
+    async def test_receivable_cannot_fund_order_or_cross_account_settlement(db_session):
+        from src.execution.account_events import record_cash_flow
+        from tests.integration.execution_test import proposal, confirmation
+    
+        ids, account, _ = await owned(db_session)
+        other, _, _ = await owned(db_session)
+        earned = await earn(db_session, ids)
+        with pytest.raises(PolicyDenied, match="DIVIDEND_ENTITLEMENT_UNAVAILABLE"):
+            await pay(db_session, other, earned["event_id"])
+        with pytest.raises(PolicyDenied, match="ACCOUNT_NOT_OWNED"):
+            await pay(db_session, ids, earned["event_id"], user_id=other[0])
+        await record_cash_flow(db_session, user_id=ids[0], account_id=ids[1], event_key="withdraw-cash",
+            amount_base="-800", currency="EUR", effective_at=datetime.now(UTC),
+            source_reference="synthetic-withdrawal", fixture_event=True)
+        assert account.cash == 0
+>       with pytest.raises(PolicyDenied, match="INSUFFICIENT_UNRESERVED_CASH"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'INSUFFICIENT_UNRESERVED_CASH'
+E         Actual message: 'LIMIT_NOT_MARKETABLE'
+
+tests/integration/dividend_receipts_test.py:194: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/dividend_receipts_test.py::test_receivable_cannot_fund_order_or_cross_account_settlement
+========================= 1 failed, 10 passed in 1.33s =========================

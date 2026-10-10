@@ -75,6 +75,8 @@ async def collect_execution_period(session, *, user_id, start, end):
                 dividend_withholding=None,
                 dividend_net=None,
                 dividends=[],
+                dividend_entitlements=[],
+                dividend_accrual_net=None,
             )
             result["status"] = "partial_failure"
         else:
@@ -98,6 +100,12 @@ async def collect_execution_period(session, *, user_id, start, end):
                 for row in checked["reconciled_dividends"]
                 if start <= datetime.fromisoformat(row["booked_at"]) < end
             ]
+            entitlements = [row for row in checked["reconciled_dividend_entitlements"]
+                            if start <= datetime.fromisoformat(row["booked_at"]) < end]
+            with localcontext() as context:
+                context.prec = 80
+                accrual = (Decimal(total(entitlements, "net_base")) + Decimal(total(dividends, "net_base"))
+                           - Decimal(total([row for row in dividends if row["entitlement_id"]], "net_base")))
             try:
                 performance = await period_performance(
                     session, user_id=user_id, account_id=account_id, start=start, end=end
@@ -117,6 +125,11 @@ async def collect_execution_period(session, *, user_id, start, end):
                 dividend_gross=total(dividends, "gross_base"),
                 dividend_withholding=total(dividends, "withholding_base"),
                 dividend_net=total(dividends, "net_base"),
+                dividend_accrual_net=str(accrual),
+                dividend_entitlement_count=len(entitlements),
+                dividend_entitlements=entitlements[:MAX_DISPLAY_EXECUTIONS],
+                dividend_entitlements_truncated=len(entitlements) > MAX_DISPLAY_EXECUTIONS,
+                period_dividend_entitlements_sha256=digest(entitlements),
                 corporate_action_count=len(actions),
                 corporate_actions=actions[:MAX_DISPLAY_EXECUTIONS],
                 corporate_action_details_truncated=len(actions) > MAX_DISPLAY_EXECUTIONS,

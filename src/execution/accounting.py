@@ -52,6 +52,25 @@ class AccountingDividendPayment:
 
 
 @dataclass(frozen=True)
+class AccountingDividendEntitlement:
+    event_id: str
+    sequence: int
+    action_id: str
+    instrument_id: str
+    allocation_id: str
+    eligible_quantity: Decimal
+    gross_base: Decimal
+    withholding_base: Decimal
+
+
+@dataclass(frozen=True)
+class AccountingDividendSettlement:
+    event_id: str
+    sequence: int
+    entitlement_id: str
+
+
+@dataclass(frozen=True)
 class PositionBalance:
     quantity: Decimal = Decimal(0)
     cost_basis: Decimal = Decimal(0)
@@ -74,6 +93,23 @@ class LedgerBalance:
 
     dividend_gross_by_allocation: dict[str, Decimal] = field(default_factory=dict)
     dividend_withholding_by_allocation: dict[str, Decimal] = field(default_factory=dict)
+    dividend_receivables: dict[str, AccountingDividendEntitlement] = field(default_factory=dict)
+
+    @property
+    def dividend_receivables_by_allocation(self):
+        with localcontext() as context:
+            context.prec = 80
+            totals = {}
+            for earned in self.dividend_receivables.values():
+                key = earned.allocation_id
+                totals[key] = amount(totals.get(key, Decimal(0)) + earned.gross_base - earned.withholding_base)
+            return totals
+
+    @property
+    def dividend_receivable(self):
+        with localcontext() as context:
+            context.prec = 80
+            return amount(sum(self.dividend_receivables_by_allocation.values(), Decimal(0)))
 
     @property
     def realized_pnl(self):
@@ -98,7 +134,8 @@ def replay_fills(initial_cash: Decimal, fills: list[AccountingFill]) -> LedgerBa
 
 def replay_events(
     initial_cash: Decimal,
-    events: list[AccountingFill | AccountingCashFlow | AccountingSplit | AccountingDividendPayment],
+    events: list[AccountingFill | AccountingCashFlow | AccountingSplit | AccountingDividendPayment
+                 | AccountingDividendEntitlement | AccountingDividendSettlement],
 ) -> LedgerBalance:
     """Replay ordered observed evidence, without authorizing any cash movement.
 
@@ -112,7 +149,8 @@ def replay_events(
         cash = amount(initial_cash)
         sequences, identities = set(), set()
         for fill in events:
-            if not isinstance(fill, (AccountingFill, AccountingCashFlow, AccountingSplit, AccountingDividendPayment)):
+            if not isinstance(fill, (AccountingFill, AccountingCashFlow, AccountingSplit, AccountingDividendPayment,
+                                     AccountingDividendEntitlement, AccountingDividendSettlement)):
                 raise ValueError("ACCOUNTING_UNSUPPORTED_EVENT")
             identity = fill.execution_id if isinstance(fill, AccountingFill) else fill.event_id
             if (
@@ -126,7 +164,15 @@ def replay_events(
                 raise ValueError("ACCOUNTING_AMBIGUOUS_EXECUTION_ORDER")
             sequences.add(fill.sequence)
             identities.add(identity)
-            if isinstance(fill, AccountingDividendPayment):
+            if isinstance(fill, AccountingDividendSettlement):
+                if not isinstance(fill.entitlement_id, str) or not fill.entitlement_id:
+                    raise ValueError("ACCOUNTING_INVALID_DIVIDEND_IDENTITY")
+                continue
+            if isinstance(fill, AccountingDividendEntitlement) and (
+                not isinstance(fill.action_id, str) or not fill.action_id or amount(fill.eligible_quantity) <= 0
+            ):
+                raise ValueError("ACCOUNTING_INVALID_DIVIDEND_ELIGIBILITY")
+            if isinstance(fill, (AccountingDividendPayment, AccountingDividendEntitlement)):
                 if not fill.instrument_id or not fill.allocation_id:
                     raise ValueError("ACCOUNTING_INVALID_DIVIDEND_IDENTITY")
                 if amount(fill.gross_base) <= 0 or amount(fill.withholding_base) > fill.gross_base:
@@ -150,7 +196,26 @@ def replay_events(
         positions, realized, disposals = {}, {}, []
         net_flows = Decimal(0)
         gross, withholding = {}, {}
+        receivables, dividend_actions = {}, set()
         for fill in sorted(events, key=lambda row: row.sequence):
+            if isinstance(fill, AccountingDividendEntitlement):
+                key = fill.allocation_id, fill.instrument_id
+                action = fill.action_id, *key
+                if action in dividend_actions:
+                    raise ValueError("ACCOUNTING_DUPLICATE_DIVIDEND_ACTION")
+                if key not in positions or positions[key].quantity != fill.eligible_quantity:
+                    raise ValueError("DIVIDEND_ELIGIBILITY_UNVERIFIED")
+                dividend_actions.add(action)
+                receivables[fill.event_id] = fill
+                continue
+            if isinstance(fill, AccountingDividendSettlement):
+                earned = receivables.pop(fill.entitlement_id, None)
+                if earned is None:
+                    raise ValueError("DIVIDEND_ENTITLEMENT_NOT_OUTSTANDING")
+                # Receipt transfers the fixed earned amount, even if the position
+                # was sold or split afterwards. No new income is invented here.
+                fill = AccountingDividendPayment(fill.event_id, fill.sequence, earned.instrument_id,
+                    earned.allocation_id, earned.gross_base, earned.withholding_base)
             if isinstance(fill, AccountingDividendPayment):
                 if (fill.allocation_id, fill.instrument_id) not in positions:
                     raise ValueError("DIVIDEND_OWNERSHIP_UNVERIFIED")
@@ -198,4 +263,6 @@ def replay_events(
             amount(position.cost_basis)
             amount(realized[fill.allocation_id], signed=True)
             positions[key] = position
-        return LedgerBalance(cash, positions, realized, tuple(disposals), net_flows, gross, withholding)
+        result = LedgerBalance(cash, positions, realized, tuple(disposals), net_flows, gross, withholding, receivables)
+        _ = result.dividend_receivable  # Validate aggregate capacity before returning any ledger.
+        return result

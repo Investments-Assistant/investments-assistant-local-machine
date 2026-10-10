@@ -27,7 +27,7 @@ def main():
         port = sock.getsockname()[1]
     base = f"http://127.0.0.1:{port}"
     screenshots = Path(".qa/browser-evidence").resolve()
-    screenshots.mkdir(exist_ok=True)
+    screenshots.mkdir(parents=True, exist_ok=True)
     with (screenshots / "server.log").open("w") as log:
         server = subprocess.Popen(
             [
@@ -318,6 +318,9 @@ def main():
                     expect(page.locator("#reports-list .report-status").first).to_have_text(
                         "Partial report — review data gaps"
                     )
+                    from tests.e2e.workspace_controls import verify_workspace_controls
+
+                    project_id, settings_account_id = verify_workspace_controls(page, context, base, screenshots)
                     page.get_by_role("button", name="Simulation", exact=True).click()
                     other = browser.new_context()
                     other_page = other.new_page()
@@ -331,6 +334,19 @@ def main():
                     assert other.request.get(base + f"/api/reports/{report_id}/pdf").status == 404
                     assert other.request.get(base + chat_evidence_url).status == 404
                     other_csrf = next(c["value"] for c in other.cookies() if c["name"] == "ia_csrf")
+                    other_projects = other.request.get(base + "/api/projects").json()["projects"]
+                    assert all(row["id"] != project_id for row in other_projects)
+                    assert other.request.patch(
+                        base + "/api/projects/" + project_id,
+                        headers={"X-CSRF-Token": other_csrf}, data={"name": "Cross-owner denied"},
+                    ).status == 404
+                    assert other.request.put(
+                        base + "/api/broker-accounts/" + settings_account_id,
+                        headers={"X-CSRF-Token": other_csrf},
+                        data={"broker": "ibkr", "display_name": "Cross-owner denied", "config": {}},
+                    ).status == 404
+                    other_profile = other.request.get(base + "/api/profile").json()
+                    assert other_profile["display_name"] != "Synthetic workspace owner"
                     denied_category = other.request.patch(
                         base + f"/api/expenses/{expense_id}/category",
                         headers={"X-CSRF-Token": other_csrf},
@@ -407,13 +423,17 @@ def main():
                                 "checks": [
                                     "login",
                                     "page identity",
+                                    "profile persistence, project assignment/reload and owner isolation",
+                                    "disabled encrypted IBKR settings create/edit, "
+                                    "blank-secret preservation, disable and isolation",
                                     "portfolio view",
                                     "proposal",
                                     "independent approval",
                                     "independent buy-only and price-band simulator mandate approvals",
                                     "expense import, currencies, pages, category, full-period export "
                                     "and raw-payload/history retention with re-import suppression",
-                                    "bank disabled status; intercepted consent/selection/retry/history retrieval with fresh expense fetch/disconnect",
+                                    "bank disabled status; intercepted consent/selection/retry/history retrieval "
+                                    "with fresh expense fetch/disconnect",
                                     "owner-reviewed pending/booked reconciliation, receipt clocks, export, "
                                     "CSRF/replay denial",
                                     "cost-aware replay, evidence download/reproduction/isolation",

@@ -1,6 +1,7 @@
 """Durable in-app alerts; outbound delivery is an injected local test sink only."""
 
 import uuid
+import asyncio
 from datetime import timedelta
 
 from sqlalchemy import case, func, select
@@ -9,6 +10,8 @@ from sqlalchemy.dialects.postgresql import insert
 from src.db.models import User
 from src.execution.policy import PolicyDenied, digest
 from src.operations.models import OperationalAlert
+
+DELIVERY_TIMEOUT_SECONDS = 10
 
 
 async def emit(
@@ -50,22 +53,29 @@ async def emit(
         delivery_status="in_app",
     )
     # Keep repeated evidence in one alert; only a resolved/expired rule reopens it.
-    reopen = (OperationalAlert.cooldown_until <= now) | (OperationalAlert.status == "resolved")
+    current_evidence = OperationalAlert.evidence_at <= evidence_at
+    reopen = current_evidence & (
+        (OperationalAlert.cooldown_until <= now) | (OperationalAlert.status == "resolved")
+    )
     statement = statement.on_conflict_do_update(
         index_elements=["user_id", "deduplication_key"],
         set_={
             "occurrences": OperationalAlert.occurrences + 1,
             "evidence_at": func.greatest(OperationalAlert.evidence_at, evidence_at),
             "observed_value": case(
-                (OperationalAlert.evidence_at <= evidence_at, str(observed_value)),
+                (current_evidence, str(observed_value)),
                 else_=OperationalAlert.observed_value,
             ),
+            "threshold": case((current_evidence, str(threshold)), else_=OperationalAlert.threshold),
+            "message": case((current_evidence, message), else_=OperationalAlert.message),
+            "severity": case((current_evidence, severity), else_=OperationalAlert.severity),
             "status": case((reopen, "open"), else_=OperationalAlert.status),
             "cooldown_until": case(
                 (reopen, now + timedelta(seconds=cooldown_seconds)),
                 else_=OperationalAlert.cooldown_until,
             ),
             "delivery_status": case((reopen, "in_app"), else_=OperationalAlert.delivery_status),
+            "delivery_error": case((reopen, None), else_=OperationalAlert.delivery_error),
             "acknowledged_at": case((reopen, None), else_=OperationalAlert.acknowledged_at),
             "resolved_at": case((reopen, None), else_=OperationalAlert.resolved_at),
         },
@@ -109,11 +119,15 @@ async def deliver_local(session, *, user_id: str, alert_id: str, sink):
     if row.delivery_status == "delivered":
         return "deduplicated"
     try:
-        await sink(
-            {"id": row.id, "rule": row.rule, "severity": row.severity, "message": row.message}
-        )
+        async with asyncio.timeout(DELIVERY_TIMEOUT_SECONDS):
+            await sink(
+                {"id": row.id, "rule": row.rule, "severity": row.severity, "message": row.message}
+            )
         row.delivery_status = "delivered"
         row.delivery_error = None
+    except TimeoutError:
+        row.delivery_status = "failed"
+        row.delivery_error = "LOCAL_SINK_TIMEOUT"
     except Exception:
         row.delivery_status = "failed"
         row.delivery_error = "LOCAL_SINK_FAILED"

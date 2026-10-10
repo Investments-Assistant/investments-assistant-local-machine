@@ -116,7 +116,8 @@ async def enforce_account_risk(session, account, *, now=None):
         reserved_by_instrument[order.instrument_id] = (
             reserved_by_instrument.get(order.instrument_id, Decimal(0)) + order.reserve
         )
-    equity = cash + exposure
+    receivable = Decimal(reconciliation["dividend_receivable"])
+    equity = cash + exposure + receivable
     previous = account.mandate.get("account_risk", {})
     if not isinstance(previous, dict):
         await breach("RISK_BASELINE_UNAVAILABLE")
@@ -148,6 +149,7 @@ async def enforce_account_risk(session, account, *, now=None):
             day_open_net_flows=str(opening_flows),
             net_external_flows=str(net_flows),
             equity=str(equity),
+            dividend_receivable=str(receivable),
             exposure=str(exposure),
             position_exposure={key: str(value) for key, value in sorted(position_exposure.items())},
             reserved_by_instrument={key: str(value) for key, value in sorted(reserved_by_instrument.items())},

@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "runner_sha256": "8a81bf2e340c4a6265a45c53fdda3fe952105444cf742ef9aa5ab7baa0bb2e11",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "application_source_sha256": {
+    "src/agent/clients/llama_cpp_client.py": "3978777f1e2b409fcd69b505dc3e3f3c6a19a0a8604562475275ea5105a6cf4c",
+    "src/web/simulator_routes.py": "385c398f64917d5b5b6c55989a5d20d1f5f83fc035aae5d20165e41e15e6c95a",
+    "src/execution/service.py": "213a1302e9eecc29bfd43de5f975996eeaee08b549ca167ce56e2b6370e675b4",
+    "tests/e2e/fixture_server.py": "91607cb3a5628999e79abd707d432c65ef6eb3678a35b5b445e48b6c722a6d86"
+  },
+  "limits": [
+    "Authenticated ASGI/PostgreSQL request processing only; no TCP/ingress admission latency measured.",
+    "No physical thermal/sleep/restart/24h observation.",
+    "Tool-free arithmetic content is a load fixture, not an answer-quality or financial benchmark."
+  ],
+  "verified": "Native lock held across counted halt requests; each inference ends final_answer/done with0tool events; halt state re-read from persisted account after eachround."
+}

@@ -5,6 +5,7 @@ from collections import defaultdict
 from src.execution.policy import digest
 from src.execution.broker_balances import compare_balance_evidence
 from src.execution.broker_attribution import explain_balance_changes
+from src.execution.broker_order_review import review_order_lifecycle
 
 
 def review_observations(observations, *, truncated=False):
@@ -45,6 +46,8 @@ def review_observations(observations, *, truncated=False):
         reasons.append("BALANCE_CHANGE_RECONCILIATION_REQUIRED")
     if truncated:
         reasons.append("REVIEW_WINDOW_TRUNCATED")
+    order_lifecycle = review_order_lifecycle(observations, truncated=truncated)
+    reasons = sorted(set(reasons) | set(order_lifecycle["reason_codes"]))
     result = {
         "status": "needs_review" if reasons else "unverified" if observations else "unavailable",
         "scope": "retained_callback_evidence_only",
@@ -58,6 +61,7 @@ def review_observations(observations, *, truncated=False):
         "policy": "Conflicting/corrected callbacks are retained, never summed as additional fills.",
         "inputs_sha256": digest(observations),
         "balance_observations": balance_review,
+        "order_lifecycle": order_lifecycle,
         "execution_explanation": explain_balance_changes(observations, truncated=truncated),
     }
     result["evidence_sha256"] = digest(result)

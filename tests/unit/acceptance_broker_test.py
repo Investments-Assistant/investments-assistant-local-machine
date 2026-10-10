@@ -153,6 +153,10 @@ def test_ibkr_account_match_does_not_turn_environment_configuration_into_proof(p
         {
             "environment": "paper",
             "port": port,
+            "enabled": True,
+            "read_authorized": True,
+            "broker_account_id": "synthetic-managed-account",
+            "client_id": 77,
         },
     )
     sdk = MagicMock()

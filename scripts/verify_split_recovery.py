@@ -33,6 +33,7 @@ from src.execution.models import (
 from src.execution.valuation import capture_valuation, period_performance
 from src.execution.account_events import record_split, record_dividend_payment
 from src.execution.reconciliation import reconcile_account
+from src.execution.dividend_receipts import record_dividend_entitlement
 from tests.integration.simulator_sales_test import owned
 
 
@@ -42,7 +43,10 @@ async def main():
     parser.add_argument("--prefix", required=True)
     parser.add_argument("--with-dividend", action="store_true")
     parser.add_argument("--with-valuations", action="store_true")
+    parser.add_argument("--with-entitlement", action="store_true")
     args = parser.parse_args()
+    if args.with_entitlement and (args.with_dividend or not args.with_valuations):
+        raise SystemExit("Entitlement recovery requires valuations and excludes legacy received-payment fixture")
     root = Path(__file__).resolve().parents[1]
     if (
         Path.cwd() != root
@@ -108,6 +112,13 @@ async def main():
                     fixture_event=True,
                 )
             closing, performance_before = None, None
+            entitlement = None
+            if args.with_entitlement:
+                entitlement = await record_dividend_entitlement(session, user_id=ids[0], account_id=ids[1],
+                    instrument_id=ids[2], allocation_id="manual", event_key="restore-entitlement",
+                    action_id="synthetic-restore-action", eligible_quantity="4", gross_base="10",
+                    withholding_base="2.5", currency="EUR", effective_at=datetime.now(UTC),
+                    source_reference="synthetic-restoration", fixture_event=True)
             if args.with_valuations:
                 quote = await session.get(SimulatorInstrument, ids[2])
                 quote.price, quote.as_of = Decimal(60), datetime.now(UTC)
@@ -121,7 +132,7 @@ async def main():
                     end=datetime.fromisoformat(closing["as_of"]),
                 )
                 if performance_before["status"] != "complete" or Decimal(performance_before["portfolio_pnl"]) != (
-                    Decimal("7.5") if args.with_dividend else Decimal(0)
+                    Decimal("7.5") if args.with_dividend or args.with_entitlement else Decimal(0)
                 ):
                     raise RuntimeError("SOURCE_PERIOD_PNL_INVALID")
             # Compare persisted source rows with persisted restored rows, not
@@ -170,6 +181,7 @@ async def main():
                     or account.cash != (Decimal("807.5") if args.with_dividend else 800)
                     or Decimal(after["dividend_gross"]) != (10 if args.with_dividend else 0)
                     or Decimal(after["dividend_withholding"]) != (Decimal("2.5") if args.with_dividend else 0)
+                    or Decimal(after["dividend_receivable"]) != (Decimal("7.5") if args.with_entitlement else 0)
                     or not account.halted
                     or account.halt_reason != "CORPORATE_ACTION_REVIEW_REQUIRED"
                 ):
@@ -193,6 +205,8 @@ async def main():
                             split_receipt=receipt["event_id"],
                             dividend_receipt=dividend["event_id"] if dividend else None,
                             dividend_income_verified=args.with_dividend,
+                            entitlement_receipt=entitlement["event_id"] if entitlement else None,
+                            unpaid_entitlement_and_cash_separation_verified=args.with_entitlement,
                             exact_period_valuation_verified=args.with_valuations,
                             split_quantity_basis_cash_and_halt_preserved=True,
                             production_data=False,

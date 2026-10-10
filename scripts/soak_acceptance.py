@@ -67,9 +67,20 @@ async def verify_database(url, marker):
     parsed = make_url(url)
     if parsed.drivername != "postgresql+asyncpg" or not re.fullmatch(r"test_[a-z0-9_]+", parsed.database or ""):
         raise ValueError("Explicit disposable PostgreSQL database required")
-    host = Path(parsed.query.get("host", "")).resolve()
-    if not host.is_relative_to(ROOT / ".qa"):
-        raise ValueError("Soak accepts only the isolated .qa Unix socket")
+    socket_host = parsed.query.get("host")
+    if socket_host is not None:
+        local_transport = (
+            isinstance(socket_host, str)
+            and Path(socket_host).is_absolute()
+            and Path(socket_host).resolve().is_relative_to(ROOT / ".qa")
+        )
+    else:
+        # CI's disposable PostgreSQL service is bound to loopback TCP. The
+        # database identity, random marker and real migration checks below
+        # remain mandatory; an arbitrary remote host is never accepted.
+        local_transport = parsed.host in {"127.0.0.1", "::1", "localhost"}
+    if not local_transport:
+        raise ValueError("Soak requires the isolated .qa socket or loopback PostgreSQL")
     engine = create_async_engine(url, poolclass=NullPool, connect_args={"timeout": 5, "command_timeout": 5})
     try:
         async with engine.connect() as connection:

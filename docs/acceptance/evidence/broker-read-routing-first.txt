@@ -1,0 +1,1076 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 59 items
+
+tests/unit/ibkr_read_routing_test.py .FFFFFF                             [ 11%]
+tests/unit/ibkr_session_test.py .......F                                 [ 25%]
+tests/unit/ibkr_observations_test.py ......                              [ 35%]
+tests/unit/acceptance_broker_test.py ........F................FF....     [ 88%]
+tests/integration/broker_stream_test.py FFFFFFF                          [100%]
+
+=================================== FAILURES ===================================
+_ test_registry_rejects_wrong_scope_or_changed_config_without_fallback[owner-IBKR_CLIENT_BUSY] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7398406c91c0>
+change = 'owner', reason = 'IBKR_CLIENT_BUSY'
+
+    @pytest.mark.parametrize("change,reason", [
+        ("owner", "IBKR_CLIENT_BUSY"), ("account", "IBKR_CLIENT_BUSY"),
+        ("config", "IBKR_SESSION_CONFIGURATION_CHANGED"), ("consent", "IBKR_READ_CONSENT_REQUIRED"),
+    ])
+    def test_registry_rejects_wrong_scope_or_changed_config_without_fallback(monkeypatch, change, reason):
+        selected, sdk, trace = account(), SDK(), []
+        worker = ReadSessionWorker(selected, connection_factory=lambda _: connection(sdk, trace))
+        worker.register_reads()
+        worker.start()
+        other = deepcopy(selected)
+        if change == "owner":
+>           other.user_id = "other-owner"
+            ^^^^^^^^^^^^^
+
+tests/unit/ibkr_read_routing_test.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = BrokerAccountConfig(id='fixture', user_id='owner', broker='ibkr', display_name='Synthetic', config={'enabled': True, 'read_authorized': True, 'broker_account_id': 'SYNTHETIC-SESSION', 'environment': 'paper', 'client_id': 77})
+name = 'user_id', value = 'other-owner'
+
+>   ???
+E   dataclasses.FrozenInstanceError: cannot assign to field 'user_id'
+
+<string>:4: FrozenInstanceError
+_ test_registry_rejects_wrong_scope_or_changed_config_without_fallback[account-IBKR_CLIENT_BUSY] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x739811a87da0>
+change = 'account', reason = 'IBKR_CLIENT_BUSY'
+
+    @pytest.mark.parametrize("change,reason", [
+        ("owner", "IBKR_CLIENT_BUSY"), ("account", "IBKR_CLIENT_BUSY"),
+        ("config", "IBKR_SESSION_CONFIGURATION_CHANGED"), ("consent", "IBKR_READ_CONSENT_REQUIRED"),
+    ])
+    def test_registry_rejects_wrong_scope_or_changed_config_without_fallback(monkeypatch, change, reason):
+        selected, sdk, trace = account(), SDK(), []
+        worker = ReadSessionWorker(selected, connection_factory=lambda _: connection(sdk, trace))
+>       worker.register_reads()
+
+tests/unit/ibkr_read_routing_test.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <src.tools.brokers.ibkr_session.ReadSessionWorker object at 0x739811ae03b0>
+
+    def register_reads(self):
+        """Reserve shared read routing before startup, until actual native cleanup."""
+        global _registered_worker
+        with self._gate, _registry_lock:
+            if self._thread is not None or self._stop.is_set():
+                raise RuntimeError("IBKR_SESSION_ALREADY_STARTED_OR_CLOSED")
+            if _registered_worker is not None:
+>               raise RuntimeError("IBKR_CLIENT_BUSY")
+E               RuntimeError: IBKR_CLIENT_BUSY
+
+src/tools/brokers/ibkr_session.py:72: RuntimeError
+_ test_registry_rejects_wrong_scope_or_changed_config_without_fallback[config-IBKR_SESSION_CONFIGURATION_CHANGED] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x739811ae27e0>
+change = 'config', reason = 'IBKR_SESSION_CONFIGURATION_CHANGED'
+
+    @pytest.mark.parametrize("change,reason", [
+        ("owner", "IBKR_CLIENT_BUSY"), ("account", "IBKR_CLIENT_BUSY"),
+        ("config", "IBKR_SESSION_CONFIGURATION_CHANGED"), ("consent", "IBKR_READ_CONSENT_REQUIRED"),
+    ])
+    def test_registry_rejects_wrong_scope_or_changed_config_without_fallback(monkeypatch, change, reason):
+        selected, sdk, trace = account(), SDK(), []
+        worker = ReadSessionWorker(selected, connection_factory=lambda _: connection(sdk, trace))
+>       worker.register_reads()
+
+tests/unit/ibkr_read_routing_test.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <src.tools.brokers.ibkr_session.ReadSessionWorker object at 0x739811ae2720>
+
+    def register_reads(self):
+        """Reserve shared read routing before startup, until actual native cleanup."""
+        global _registered_worker
+        with self._gate, _registry_lock:
+            if self._thread is not None or self._stop.is_set():
+                raise RuntimeError("IBKR_SESSION_ALREADY_STARTED_OR_CLOSED")
+            if _registered_worker is not None:
+>               raise RuntimeError("IBKR_CLIENT_BUSY")
+E               RuntimeError: IBKR_CLIENT_BUSY
+
+src/tools/brokers/ibkr_session.py:72: RuntimeError
+_ test_registry_rejects_wrong_scope_or_changed_config_without_fallback[consent-IBKR_READ_CONSENT_REQUIRED] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x739811ae3980>
+change = 'consent', reason = 'IBKR_READ_CONSENT_REQUIRED'
+
+    @pytest.mark.parametrize("change,reason", [
+        ("owner", "IBKR_CLIENT_BUSY"), ("account", "IBKR_CLIENT_BUSY"),
+        ("config", "IBKR_SESSION_CONFIGURATION_CHANGED"), ("consent", "IBKR_READ_CONSENT_REQUIRED"),
+    ])
+    def test_registry_rejects_wrong_scope_or_changed_config_without_fallback(monkeypatch, change, reason):
+        selected, sdk, trace = account(), SDK(), []
+        worker = ReadSessionWorker(selected, connection_factory=lambda _: connection(sdk, trace))
+>       worker.register_reads()
+
+tests/unit/ibkr_read_routing_test.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <src.tools.brokers.ibkr_session.ReadSessionWorker object at 0x739811afd8e0>
+
+    def register_reads(self):
+        """Reserve shared read routing before startup, until actual native cleanup."""
+        global _registered_worker
+        with self._gate, _registry_lock:
+            if self._thread is not None or self._stop.is_set():
+                raise RuntimeError("IBKR_SESSION_ALREADY_STARTED_OR_CLOSED")
+            if _registered_worker is not None:
+>               raise RuntimeError("IBKR_CLIENT_BUSY")
+E               RuntimeError: IBKR_CLIENT_BUSY
+
+src/tools/brokers/ibkr_session.py:72: RuntimeError
+__________ test_registry_retains_timed_out_owner_until_actual_cleanup __________
+
+    def test_registry_retains_timed_out_owner_until_actual_cleanup():
+        selected, sdk, trace = account(), SDK(), []
+        worker = ReadSessionWorker(selected, connection_factory=lambda _: connection(sdk, trace))
+>       worker.register_reads()
+
+tests/unit/ibkr_read_routing_test.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <src.tools.brokers.ibkr_session.ReadSessionWorker object at 0x739811174320>
+
+    def register_reads(self):
+        """Reserve shared read routing before startup, until actual native cleanup."""
+        global _registered_worker
+        with self._gate, _registry_lock:
+            if self._thread is not None or self._stop.is_set():
+                raise RuntimeError("IBKR_SESSION_ALREADY_STARTED_OR_CLOSED")
+            if _registered_worker is not None:
+>               raise RuntimeError("IBKR_CLIENT_BUSY")
+E               RuntimeError: IBKR_CLIENT_BUSY
+
+src/tools/brokers/ibkr_session.py:72: RuntimeError
+____ test_sync_adapter_cannot_block_async_caller_even_with_registered_owner ____
+
+    async def test_sync_adapter_cannot_block_async_caller_even_with_registered_owner():
+        selected, sdk, trace = account(), SDK(), []
+        worker = ReadSessionWorker(selected, connection_factory=lambda _: connection(sdk, trace))
+>       worker.register_reads()
+
+tests/unit/ibkr_read_routing_test.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <src.tools.brokers.ibkr_session.ReadSessionWorker object at 0x7398111772c0>
+
+    def register_reads(self):
+        """Reserve shared read routing before startup, until actual native cleanup."""
+        global _registered_worker
+        with self._gate, _registry_lock:
+            if self._thread is not None or self._stop.is_set():
+                raise RuntimeError("IBKR_SESSION_ALREADY_STARTED_OR_CLOSED")
+            if _registered_worker is not None:
+>               raise RuntimeError("IBKR_CLIENT_BUSY")
+E               RuntimeError: IBKR_CLIENT_BUSY
+
+src/tools/brokers/ibkr_session.py:72: RuntimeError
+_ test_existing_snapshot_collector_runs_on_owned_session_and_removes_handlers __
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x739811ae3aa0>
+
+    def test_existing_snapshot_collector_runs_on_owned_session_and_removes_handlers(monkeypatch):
+        import sys
+        from types import SimpleNamespace
+    
+        from tests.unit.ibkr_observations_test import SDK as CallbackSDK
+        from src.tools.brokers.ibkr_observations import collect_ibkr_observations
+    
+        class ConnectedSDK(CallbackSDK, SDK):
+            def __init__(self):
+                CallbackSDK.__init__(self)
+                SDK.__init__(self)
+                self.trace = []
+    
+            def connect(self, **kwargs):
+                assert kwargs["readonly"] is True and kwargs["account"] == "synthetic"
+                self.trace.append(("connect", threading.get_ident()))
+    
+            def managedAccounts(self):
+                return ["synthetic"]
+    
+            def disconnect(self):
+                self.trace.append(("disconnect", threading.get_ident()))
+    
+        sdk = ConnectedSDK()
+        monkeypatch.setitem(sys.modules, "ib_insync", SimpleNamespace(
+            IB=lambda: sdk, ExecutionFilter=lambda **kwargs: "fixture-account-filter",
+        ))
+        selected = account()
+        selected.config["broker_account_id"] = "synthetic"
+>       result = collect_ibkr_observations(selected)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/ibkr_session_test.py:223: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/tools/brokers/ibkr_observations.py:191: in collect_ibkr_observations
+    handled, result = route_read(account, collect)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+account = BrokerAccountConfig(id='fixture', user_id='owner', broker='ibkr', display_name='Synthetic', config={'enabled': True, 'read_authorized': True, 'broker_account_id': 'synthetic', 'environment': 'paper', 'client_id': 77})
+operation = <function collect_ibkr_observations.<locals>.collect at 0x73981112c180>
+
+    def route_read(account, operation):
+        """Route only an exactly matching scoped configuration; never fall back on error."""
+        _config(account)
+        with _registry_lock:
+            owner = _registered_worker
+            if owner is None:
+                return False, None
+            if (owner.account.id, owner.account.user_id) != (account.id, account.user_id):
+                raise RuntimeError("IBKR_CLIENT_BUSY")
+            if owner.account.config != account.config:
+>               raise RuntimeError("IBKR_SESSION_CONFIGURATION_CHANGED")
+E               RuntimeError: IBKR_SESSION_CONFIGURATION_CHANGED
+
+src/tools/brokers/ibkr_session.py:35: RuntimeError
+_______ test_failed_connection_disconnects_and_releases_worker_resources _______
+
+    def test_failed_connection_disconnects_and_releases_worker_resources():
+        sdk = MagicMock()
+        sdk.connect.side_effect = TimeoutError("sensitive provider details")
+        fixture = BrokerAccountConfig(
+            "fixture",
+            "user",
+            "ibkr",
+            "Synthetic",
+            {
+                "enabled": True,
+                "read_authorized": True,
+                "broker_account_id": "synthetic",
+                "environment": "paper",
+                "client_id": 123,
+            },
+        )
+        with patch.dict("sys.modules", {"ib_insync": SimpleNamespace(IB=lambda: sdk)}):
+>           assert ibkr.get_ibkr_account(fixture)["error"] == "IBKR_READ_UNAVAILABLE"
+E           AssertionError: assert 'IBKR_CLIENT_BUSY' == 'IBKR_READ_UNAVAILABLE'
+E             
+E             - IBKR_READ_UNAVAILABLE
+E             + IBKR_CLIENT_BUSY
+
+tests/unit/acceptance_broker_test.py:95: AssertionError
+_ test_ibkr_account_match_does_not_turn_environment_configuration_into_proof[4001] _
+
+port = 4001
+
+    @pytest.mark.parametrize("port", [4001, 4002])
+    def test_ibkr_account_match_does_not_turn_environment_configuration_into_proof(port):
+        from contextlib import contextmanager
+    
+        fixture = BrokerAccountConfig(
+            "fixture",
+            "fixture-user",
+            "ibkr",
+            "Fixture",
+            {
+                "environment": "paper",
+                "port": port,
+            },
+        )
+        sdk = MagicMock()
+        sdk.accountSummary.return_value = []
+    
+        @contextmanager
+        def connected(account):
+            assert account is fixture
+            yield sdk, "synthetic-managed-account"
+    
+        with patch.object(ibkr, "_connection", connected):
+            result = ibkr.get_ibkr_account(fixture)
+>       assert result["managed_account_match"] is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'managed_account_match'
+
+tests/unit/acceptance_broker_test.py:168: KeyError
+_ test_ibkr_account_match_does_not_turn_environment_configuration_into_proof[4002] _
+
+port = 4002
+
+    @pytest.mark.parametrize("port", [4001, 4002])
+    def test_ibkr_account_match_does_not_turn_environment_configuration_into_proof(port):
+        from contextlib import contextmanager
+    
+        fixture = BrokerAccountConfig(
+            "fixture",
+            "fixture-user",
+            "ibkr",
+            "Fixture",
+            {
+                "environment": "paper",
+                "port": port,
+            },
+        )
+        sdk = MagicMock()
+        sdk.accountSummary.return_value = []
+    
+        @contextmanager
+        def connected(account):
+            assert account is fixture
+            yield sdk, "synthetic-managed-account"
+    
+        with patch.object(ibkr, "_connection", connected):
+            result = ibkr.get_ibkr_account(fixture)
+>       assert result["managed_account_match"] is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'managed_account_match'
+
+tests/unit/acceptance_broker_test.py:168: KeyError
+___ test_stream_preserves_only_authorized_batches_and_cleans_owner[success] ____
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x739811ae4f10>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7398111a46b0>
+scenario = 'success'
+
+    @pytest.mark.parametrize("scenario", [
+        "success", "gap", "revoke", "disconnect", "cancel", "startup_cancel", "cleanup_failure",
+    ])
+    async def test_stream_preserves_only_authorized_batches_and_cleans_owner(integration_engine, monkeypatch, scenario):
+        factory = async_sessionmaker(integration_engine, expire_on_commit=False)
+        monkeypatch.setattr(broker_stream, "async_session", factory)
+        monkeypatch.setattr(broker_monitor, "async_session", factory)
+        sdk = StreamingSDK()
+        sdk.cleanup_failure = scenario == "cleanup_failure"
+        if scenario == "startup_cancel":
+            sdk.startup_hold = threading.Event()
+        monkeypatch.setitem(sys.modules, "ib_insync", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
+        async with factory.begin() as session:
+            user, account = await seed(session)
+            config = vault.decrypt_config(account.config_encrypted)
+            account.config_encrypted = vault.encrypt_config(config | {"broker_account_id": "synthetic"})
+        original = broker_stream.checkpoint_batch
+        batches = []
+    
+        async def checkpoint(session, **kwargs):
+            result = await original(session, **kwargs)
+            batches.append(result)
+            if len(batches) == 1:
+                sdk.late.set()
+                if scenario == "revoke":
+                    row = await session.get(BrokerAccount, account.id)
+                    selected = vault.decrypt_config(row.config_encrypted)
+                    row.config_encrypted = vault.encrypt_config(selected | {"read_authorized": False})
+                elif scenario == "disconnect":
+                    sdk.connected = False
+                elif scenario == "gap":
+                    # Bad provider evidence delivered on the SDK owner, after its
+                    # initial snapshot. It must close partial rather than renew.
+                    sdk.observed.execution.shares = -1
+                    sdk.sleep = bad_callback
+            return result
+    
+        def bad_callback(seconds):
+            sdk.execDetailsEvent.emit(None, sdk.observed)
+            threading.Event().wait(min(seconds, .01))
+    
+        monkeypatch.setattr(broker_stream, "checkpoint_batch", checkpoint)
+        task = asyncio.create_task(broker_stream.capture_observations(
+            user_id=user.id, account_id=account.id, duration_seconds=1, batch_seconds=1))
+        try:
+            if scenario == "startup_cancel":
+                assert await asyncio.to_thread(sdk.entered.wait, 1)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+                assert not sdk.closed.is_set()  # Native connect is still owned.
+                sdk.startup_hold.set()
+                assert await asyncio.to_thread(sdk.closed.wait, 2)
+            elif scenario == "cancel":
+                # Wait for an actual committed first checkpoint, then cancel between
+                # reads; use a bounded test deadline, no elapsed-time success claim.
+                async with asyncio.timeout(3):
+                    while True:
+                        async with factory.begin() as session:
+                            row = await session.scalar(select(JobLease).where(JobLease.user_id == user.id))
+                            if row and row.checkpoint.get("batches", 0) >= 1:
+                                break
+                        await asyncio.sleep(.01)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+            elif scenario == "revoke":
+                with pytest.raises(PolicyDenied, match="IBKR_READ_CONSENT_REQUIRED"):
+                    await task
+            elif scenario in {"disconnect", "cleanup_failure"}:
+                with pytest.raises(RuntimeError):
+                    await task
+            else:
+>               result = await task
+                         ^^^^^^^^^^
+
+tests/integration/broker_stream_test.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/execution/broker_stream.py:51: in capture_observations
+    worker.register_reads()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <src.tools.brokers.ibkr_session.ReadSessionWorker object at 0x7398111911f0>
+
+    def register_reads(self):
+        """Reserve shared read routing before startup, until actual native cleanup."""
+        global _registered_worker
+        with self._gate, _registry_lock:
+            if self._thread is not None or self._stop.is_set():
+                raise RuntimeError("IBKR_SESSION_ALREADY_STARTED_OR_CLOSED")
+            if _registered_worker is not None:
+>               raise RuntimeError("IBKR_CLIENT_BUSY")
+E               RuntimeError: IBKR_CLIENT_BUSY
+
+src/tools/brokers/ibkr_session.py:72: RuntimeError
+_____ test_stream_preserves_only_authorized_batches_and_cleans_owner[gap] ______
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x7398036278d0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x739811193da0>
+scenario = 'gap'
+
+    @pytest.mark.parametrize("scenario", [
+        "success", "gap", "revoke", "disconnect", "cancel", "startup_cancel", "cleanup_failure",
+    ])
+    async def test_stream_preserves_only_authorized_batches_and_cleans_owner(integration_engine, monkeypatch, scenario):
+        factory = async_sessionmaker(integration_engine, expire_on_commit=False)
+        monkeypatch.setattr(broker_stream, "async_session", factory)
+        monkeypatch.setattr(broker_monitor, "async_session", factory)
+        sdk = StreamingSDK()
+        sdk.cleanup_failure = scenario == "cleanup_failure"
+        if scenario == "startup_cancel":
+            sdk.startup_hold = threading.Event()
+        monkeypatch.setitem(sys.modules, "ib_insync", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
+        async with factory.begin() as session:
+            user, account = await seed(session)
+            config = vault.decrypt_config(account.config_encrypted)
+            account.config_encrypted = vault.encrypt_config(config | {"broker_account_id": "synthetic"})
+        original = broker_stream.checkpoint_batch
+        batches = []
+    
+        async def checkpoint(session, **kwargs):
+            result = await original(session, **kwargs)
+            batches.append(result)
+            if len(batches) == 1:
+                sdk.late.set()
+                if scenario == "revoke":
+                    row = await session.get(BrokerAccount, account.id)
+                    selected = vault.decrypt_config(row.config_encrypted)
+                    row.config_encrypted = vault.encrypt_config(selected | {"read_authorized": False})
+                elif scenario == "disconnect":
+                    sdk.connected = False
+                elif scenario == "gap":
+                    # Bad provider evidence delivered on the SDK owner, after its
+                    # initial snapshot. It must close partial rather than renew.
+                    sdk.observed.execution.shares = -1
+                    sdk.sleep = bad_callback
+            return result
+    
+        def bad_callback(seconds):
+            sdk.execDetailsEvent.emit(None, sdk.observed)
+            threading.Event().wait(min(seconds, .01))
+    
+        monkeypatch.setattr(broker_stream, "checkpoint_batch", checkpoint)
+        task = asyncio.create_task(broker_stream.capture_observations(
+            user_id=user.id, account_id=account.id, duration_seconds=1, batch_seconds=1))
+        try:
+            if scenario == "startup_cancel":
+                assert await asyncio.to_thread(sdk.entered.wait, 1)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+                assert not sdk.closed.is_set()  # Native connect is still owned.
+                sdk.startup_hold.set()
+                assert await asyncio.to_thread(sdk.closed.wait, 2)
+            elif scenario == "cancel":
+                # Wait for an actual committed first checkpoint, then cancel between
+                # reads; use a bounded test deadline, no elapsed-time success claim.
+                async with asyncio.timeout(3):
+                    while True:
+                        async with factory.begin() as session:
+                            row = await session.scalar(select(JobLease).where(JobLease.user_id == user.id))
+                            if row and row.checkpoint.get("batches", 0) >= 1:
+                                break
+                        await asyncio.sleep(.01)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+            elif scenario == "revoke":
+                with pytest.raises(PolicyDenied, match="IBKR_READ_CONSENT_REQUIRED"):
+                    await task
+            elif scenario in {"disconnect", "cleanup_failure"}:
+                with pytest.raises(RuntimeError):
+                    await task
+            else:
+>               result = await task
+                         ^^^^^^^^^^
+
+tests/integration/broker_stream_test.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/execution/broker_stream.py:51: in capture_observations
+    worker.register_reads()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <src.tools.brokers.ibkr_session.ReadSessionWorker object at 0x7398111499d0>
+
+    def register_reads(self):
+        """Reserve shared read routing before startup, until actual native cleanup."""
+        global _registered_worker
+        with self._gate, _registry_lock:
+            if self._thread is not None or self._stop.is_set():
+                raise RuntimeError("IBKR_SESSION_ALREADY_STARTED_OR_CLOSED")
+            if _registered_worker is not None:
+>               raise RuntimeError("IBKR_CLIENT_BUSY")
+E               RuntimeError: IBKR_CLIENT_BUSY
+
+src/tools/brokers/ibkr_session.py:72: RuntimeError
+____ test_stream_preserves_only_authorized_batches_and_cleans_owner[revoke] ____
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x739803683190>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x739811149b80>
+scenario = 'revoke'
+
+    @pytest.mark.parametrize("scenario", [
+        "success", "gap", "revoke", "disconnect", "cancel", "startup_cancel", "cleanup_failure",
+    ])
+    async def test_stream_preserves_only_authorized_batches_and_cleans_owner(integration_engine, monkeypatch, scenario):
+        factory = async_sessionmaker(integration_engine, expire_on_commit=False)
+        monkeypatch.setattr(broker_stream, "async_session", factory)
+        monkeypatch.setattr(broker_monitor, "async_session", factory)
+        sdk = StreamingSDK()
+        sdk.cleanup_failure = scenario == "cleanup_failure"
+        if scenario == "startup_cancel":
+            sdk.startup_hold = threading.Event()
+        monkeypatch.setitem(sys.modules, "ib_insync", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
+        async with factory.begin() as session:
+            user, account = await seed(session)
+            config = vault.decrypt_config(account.config_encrypted)
+            account.config_encrypted = vault.encrypt_config(config | {"broker_account_id": "synthetic"})
+        original = broker_stream.checkpoint_batch
+        batches = []
+    
+        async def checkpoint(session, **kwargs):
+            result = await original(session, **kwargs)
+            batches.append(result)
+            if len(batches) == 1:
+                sdk.late.set()
+                if scenario == "revoke":
+                    row = await session.get(BrokerAccount, account.id)
+                    selected = vault.decrypt_config(row.config_encrypted)
+                    row.config_encrypted = vault.encrypt_config(selected | {"read_authorized": False})
+                elif scenario == "disconnect":
+                    sdk.connected = False
+                elif scenario == "gap":
+                    # Bad provider evidence delivered on the SDK owner, after its
+                    # initial snapshot. It must close partial rather than renew.
+                    sdk.observed.execution.shares = -1
+                    sdk.sleep = bad_callback
+            return result
+    
+        def bad_callback(seconds):
+            sdk.execDetailsEvent.emit(None, sdk.observed)
+            threading.Event().wait(min(seconds, .01))
+    
+        monkeypatch.setattr(broker_stream, "checkpoint_batch", checkpoint)
+        task = asyncio.create_task(broker_stream.capture_observations(
+            user_id=user.id, account_id=account.id, duration_seconds=1, batch_seconds=1))
+        try:
+            if scenario == "startup_cancel":
+                assert await asyncio.to_thread(sdk.entered.wait, 1)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+                assert not sdk.closed.is_set()  # Native connect is still owned.
+                sdk.startup_hold.set()
+                assert await asyncio.to_thread(sdk.closed.wait, 2)
+            elif scenario == "cancel":
+                # Wait for an actual committed first checkpoint, then cancel between
+                # reads; use a bounded test deadline, no elapsed-time success claim.
+                async with asyncio.timeout(3):
+                    while True:
+                        async with factory.begin() as session:
+                            row = await session.scalar(select(JobLease).where(JobLease.user_id == user.id))
+                            if row and row.checkpoint.get("batches", 0) >= 1:
+                                break
+                        await asyncio.sleep(.01)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+            elif scenario == "revoke":
+                with pytest.raises(PolicyDenied, match="IBKR_READ_CONSENT_REQUIRED"):
+>                   await task
+
+tests/integration/broker_stream_test.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/execution/broker_stream.py:51: in capture_observations
+    worker.register_reads()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <src.tools.brokers.ibkr_session.ReadSessionWorker object at 0x739812afb200>
+
+    def register_reads(self):
+        """Reserve shared read routing before startup, until actual native cleanup."""
+        global _registered_worker
+        with self._gate, _registry_lock:
+            if self._thread is not None or self._stop.is_set():
+                raise RuntimeError("IBKR_SESSION_ALREADY_STARTED_OR_CLOSED")
+            if _registered_worker is not None:
+>               raise RuntimeError("IBKR_CLIENT_BUSY")
+E               RuntimeError: IBKR_CLIENT_BUSY
+
+src/tools/brokers/ibkr_session.py:72: RuntimeError
+__ test_stream_preserves_only_authorized_batches_and_cleans_owner[disconnect] __
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x739803627390>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7398111cc860>
+scenario = 'disconnect'
+
+    @pytest.mark.parametrize("scenario", [
+        "success", "gap", "revoke", "disconnect", "cancel", "startup_cancel", "cleanup_failure",
+    ])
+    async def test_stream_preserves_only_authorized_batches_and_cleans_owner(integration_engine, monkeypatch, scenario):
+        factory = async_sessionmaker(integration_engine, expire_on_commit=False)
+        monkeypatch.setattr(broker_stream, "async_session", factory)
+        monkeypatch.setattr(broker_monitor, "async_session", factory)
+        sdk = StreamingSDK()
+        sdk.cleanup_failure = scenario == "cleanup_failure"
+        if scenario == "startup_cancel":
+            sdk.startup_hold = threading.Event()
+        monkeypatch.setitem(sys.modules, "ib_insync", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
+        async with factory.begin() as session:
+            user, account = await seed(session)
+            config = vault.decrypt_config(account.config_encrypted)
+            account.config_encrypted = vault.encrypt_config(config | {"broker_account_id": "synthetic"})
+        original = broker_stream.checkpoint_batch
+        batches = []
+    
+        async def checkpoint(session, **kwargs):
+            result = await original(session, **kwargs)
+            batches.append(result)
+            if len(batches) == 1:
+                sdk.late.set()
+                if scenario == "revoke":
+                    row = await session.get(BrokerAccount, account.id)
+                    selected = vault.decrypt_config(row.config_encrypted)
+                    row.config_encrypted = vault.encrypt_config(selected | {"read_authorized": False})
+                elif scenario == "disconnect":
+                    sdk.connected = False
+                elif scenario == "gap":
+                    # Bad provider evidence delivered on the SDK owner, after its
+                    # initial snapshot. It must close partial rather than renew.
+                    sdk.observed.execution.shares = -1
+                    sdk.sleep = bad_callback
+            return result
+    
+        def bad_callback(seconds):
+            sdk.execDetailsEvent.emit(None, sdk.observed)
+            threading.Event().wait(min(seconds, .01))
+    
+        monkeypatch.setattr(broker_stream, "checkpoint_batch", checkpoint)
+        task = asyncio.create_task(broker_stream.capture_observations(
+            user_id=user.id, account_id=account.id, duration_seconds=1, batch_seconds=1))
+        try:
+            if scenario == "startup_cancel":
+                assert await asyncio.to_thread(sdk.entered.wait, 1)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+                assert not sdk.closed.is_set()  # Native connect is still owned.
+                sdk.startup_hold.set()
+                assert await asyncio.to_thread(sdk.closed.wait, 2)
+            elif scenario == "cancel":
+                # Wait for an actual committed first checkpoint, then cancel between
+                # reads; use a bounded test deadline, no elapsed-time success claim.
+                async with asyncio.timeout(3):
+                    while True:
+                        async with factory.begin() as session:
+                            row = await session.scalar(select(JobLease).where(JobLease.user_id == user.id))
+                            if row and row.checkpoint.get("batches", 0) >= 1:
+                                break
+                        await asyncio.sleep(.01)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+            elif scenario == "revoke":
+                with pytest.raises(PolicyDenied, match="IBKR_READ_CONSENT_REQUIRED"):
+                    await task
+            elif scenario in {"disconnect", "cleanup_failure"}:
+                with pytest.raises(RuntimeError):
+                    await task
+            else:
+                result = await task
+                assert result["status"] == ("partial" if scenario == "gap" else "observed")
+                assert result["complete_history"] is False and result["execution_authority"] == "none"
+>           assert [item[0] for item in sdk.trace] == ["connect", "disconnect"]
+E           AssertionError: assert [] == ['connect', 'disconnect']
+E             
+E             Right contains 2 more items, first extra item: 'connect'
+E             Use -v to get more diff
+
+tests/integration/broker_stream_test.py:144: AssertionError
+____ test_stream_preserves_only_authorized_batches_and_cleans_owner[cancel] ____
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x7398037aa650>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7398111a1220>
+scenario = 'cancel'
+
+    @pytest.mark.parametrize("scenario", [
+        "success", "gap", "revoke", "disconnect", "cancel", "startup_cancel", "cleanup_failure",
+    ])
+    async def test_stream_preserves_only_authorized_batches_and_cleans_owner(integration_engine, monkeypatch, scenario):
+        factory = async_sessionmaker(integration_engine, expire_on_commit=False)
+        monkeypatch.setattr(broker_stream, "async_session", factory)
+        monkeypatch.setattr(broker_monitor, "async_session", factory)
+        sdk = StreamingSDK()
+        sdk.cleanup_failure = scenario == "cleanup_failure"
+        if scenario == "startup_cancel":
+            sdk.startup_hold = threading.Event()
+        monkeypatch.setitem(sys.modules, "ib_insync", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
+        async with factory.begin() as session:
+            user, account = await seed(session)
+            config = vault.decrypt_config(account.config_encrypted)
+            account.config_encrypted = vault.encrypt_config(config | {"broker_account_id": "synthetic"})
+        original = broker_stream.checkpoint_batch
+        batches = []
+    
+        async def checkpoint(session, **kwargs):
+            result = await original(session, **kwargs)
+            batches.append(result)
+            if len(batches) == 1:
+                sdk.late.set()
+                if scenario == "revoke":
+                    row = await session.get(BrokerAccount, account.id)
+                    selected = vault.decrypt_config(row.config_encrypted)
+                    row.config_encrypted = vault.encrypt_config(selected | {"read_authorized": False})
+                elif scenario == "disconnect":
+                    sdk.connected = False
+                elif scenario == "gap":
+                    # Bad provider evidence delivered on the SDK owner, after its
+                    # initial snapshot. It must close partial rather than renew.
+                    sdk.observed.execution.shares = -1
+                    sdk.sleep = bad_callback
+            return result
+    
+        def bad_callback(seconds):
+            sdk.execDetailsEvent.emit(None, sdk.observed)
+            threading.Event().wait(min(seconds, .01))
+    
+        monkeypatch.setattr(broker_stream, "checkpoint_batch", checkpoint)
+        task = asyncio.create_task(broker_stream.capture_observations(
+            user_id=user.id, account_id=account.id, duration_seconds=1, batch_seconds=1))
+        try:
+            if scenario == "startup_cancel":
+                assert await asyncio.to_thread(sdk.entered.wait, 1)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+                assert not sdk.closed.is_set()  # Native connect is still owned.
+                sdk.startup_hold.set()
+                assert await asyncio.to_thread(sdk.closed.wait, 2)
+            elif scenario == "cancel":
+                # Wait for an actual committed first checkpoint, then cancel between
+                # reads; use a bounded test deadline, no elapsed-time success claim.
+                async with asyncio.timeout(3):
+                    while True:
+                        async with factory.begin() as session:
+                            row = await session.scalar(select(JobLease).where(JobLease.user_id == user.id))
+                            if row and row.checkpoint.get("batches", 0) >= 1:
+                                break
+>                       await asyncio.sleep(.01)
+
+tests/integration/broker_stream_test.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+delay = 0.01, result = None
+
+    async def sleep(delay, result=None):
+        """Coroutine that completes after a given time (in seconds)."""
+        if delay <= 0:
+            await __sleep0()
+            return result
+    
+        loop = events.get_running_loop()
+        future = loop.create_future()
+        h = loop.call_later(delay,
+                            futures._set_result_unless_cancelled,
+                            future, result)
+        try:
+>           return await future
+                   ^^^^^^^^^^^^
+E           asyncio.exceptions.CancelledError
+
+/usr/lib/python3.12/asyncio/tasks.py:665: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x7398037aa650>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7398111a1220>
+scenario = 'cancel'
+
+    @pytest.mark.parametrize("scenario", [
+        "success", "gap", "revoke", "disconnect", "cancel", "startup_cancel", "cleanup_failure",
+    ])
+    async def test_stream_preserves_only_authorized_batches_and_cleans_owner(integration_engine, monkeypatch, scenario):
+        factory = async_sessionmaker(integration_engine, expire_on_commit=False)
+        monkeypatch.setattr(broker_stream, "async_session", factory)
+        monkeypatch.setattr(broker_monitor, "async_session", factory)
+        sdk = StreamingSDK()
+        sdk.cleanup_failure = scenario == "cleanup_failure"
+        if scenario == "startup_cancel":
+            sdk.startup_hold = threading.Event()
+        monkeypatch.setitem(sys.modules, "ib_insync", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
+        async with factory.begin() as session:
+            user, account = await seed(session)
+            config = vault.decrypt_config(account.config_encrypted)
+            account.config_encrypted = vault.encrypt_config(config | {"broker_account_id": "synthetic"})
+        original = broker_stream.checkpoint_batch
+        batches = []
+    
+        async def checkpoint(session, **kwargs):
+            result = await original(session, **kwargs)
+            batches.append(result)
+            if len(batches) == 1:
+                sdk.late.set()
+                if scenario == "revoke":
+                    row = await session.get(BrokerAccount, account.id)
+                    selected = vault.decrypt_config(row.config_encrypted)
+                    row.config_encrypted = vault.encrypt_config(selected | {"read_authorized": False})
+                elif scenario == "disconnect":
+                    sdk.connected = False
+                elif scenario == "gap":
+                    # Bad provider evidence delivered on the SDK owner, after its
+                    # initial snapshot. It must close partial rather than renew.
+                    sdk.observed.execution.shares = -1
+                    sdk.sleep = bad_callback
+            return result
+    
+        def bad_callback(seconds):
+            sdk.execDetailsEvent.emit(None, sdk.observed)
+            threading.Event().wait(min(seconds, .01))
+    
+        monkeypatch.setattr(broker_stream, "checkpoint_batch", checkpoint)
+        task = asyncio.create_task(broker_stream.capture_observations(
+            user_id=user.id, account_id=account.id, duration_seconds=1, batch_seconds=1))
+        try:
+            if scenario == "startup_cancel":
+                assert await asyncio.to_thread(sdk.entered.wait, 1)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+                assert not sdk.closed.is_set()  # Native connect is still owned.
+                sdk.startup_hold.set()
+                assert await asyncio.to_thread(sdk.closed.wait, 2)
+            elif scenario == "cancel":
+                # Wait for an actual committed first checkpoint, then cancel between
+                # reads; use a bounded test deadline, no elapsed-time success claim.
+>               async with asyncio.timeout(3):
+
+tests/integration/broker_stream_test.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Timeout [expired]>
+exc_type = <class 'asyncio.exceptions.CancelledError'>
+exc_val = CancelledError(), exc_tb = <traceback object at 0x739803691700>
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+    
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+    
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+    
+            if self._task.uncancel() <= self._cancelling and exc_type is exceptions.CancelledError:
+                # Since there are no new cancel requests, we're
+                # handling this.
+>               raise TimeoutError from exc_val
+E               TimeoutError
+
+/usr/lib/python3.12/asyncio/timeouts.py:115: TimeoutError
+_ test_stream_preserves_only_authorized_batches_and_cleans_owner[startup_cancel] _
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x7398036cd250>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7398036ece90>
+scenario = 'startup_cancel'
+
+    @pytest.mark.parametrize("scenario", [
+        "success", "gap", "revoke", "disconnect", "cancel", "startup_cancel", "cleanup_failure",
+    ])
+    async def test_stream_preserves_only_authorized_batches_and_cleans_owner(integration_engine, monkeypatch, scenario):
+        factory = async_sessionmaker(integration_engine, expire_on_commit=False)
+        monkeypatch.setattr(broker_stream, "async_session", factory)
+        monkeypatch.setattr(broker_monitor, "async_session", factory)
+        sdk = StreamingSDK()
+        sdk.cleanup_failure = scenario == "cleanup_failure"
+        if scenario == "startup_cancel":
+            sdk.startup_hold = threading.Event()
+        monkeypatch.setitem(sys.modules, "ib_insync", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
+        async with factory.begin() as session:
+            user, account = await seed(session)
+            config = vault.decrypt_config(account.config_encrypted)
+            account.config_encrypted = vault.encrypt_config(config | {"broker_account_id": "synthetic"})
+        original = broker_stream.checkpoint_batch
+        batches = []
+    
+        async def checkpoint(session, **kwargs):
+            result = await original(session, **kwargs)
+            batches.append(result)
+            if len(batches) == 1:
+                sdk.late.set()
+                if scenario == "revoke":
+                    row = await session.get(BrokerAccount, account.id)
+                    selected = vault.decrypt_config(row.config_encrypted)
+                    row.config_encrypted = vault.encrypt_config(selected | {"read_authorized": False})
+                elif scenario == "disconnect":
+                    sdk.connected = False
+                elif scenario == "gap":
+                    # Bad provider evidence delivered on the SDK owner, after its
+                    # initial snapshot. It must close partial rather than renew.
+                    sdk.observed.execution.shares = -1
+                    sdk.sleep = bad_callback
+            return result
+    
+        def bad_callback(seconds):
+            sdk.execDetailsEvent.emit(None, sdk.observed)
+            threading.Event().wait(min(seconds, .01))
+    
+        monkeypatch.setattr(broker_stream, "checkpoint_batch", checkpoint)
+        task = asyncio.create_task(broker_stream.capture_observations(
+            user_id=user.id, account_id=account.id, duration_seconds=1, batch_seconds=1))
+        try:
+            if scenario == "startup_cancel":
+>               assert await asyncio.to_thread(sdk.entered.wait, 1)
+E               assert False
+
+tests/integration/broker_stream_test.py:114: AssertionError
+_ test_stream_preserves_only_authorized_batches_and_cleans_owner[cleanup_failure] _
+
+integration_engine = <sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x7398037b0810>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7398111ebc50>
+scenario = 'cleanup_failure'
+
+    @pytest.mark.parametrize("scenario", [
+        "success", "gap", "revoke", "disconnect", "cancel", "startup_cancel", "cleanup_failure",
+    ])
+    async def test_stream_preserves_only_authorized_batches_and_cleans_owner(integration_engine, monkeypatch, scenario):
+        factory = async_sessionmaker(integration_engine, expire_on_commit=False)
+        monkeypatch.setattr(broker_stream, "async_session", factory)
+        monkeypatch.setattr(broker_monitor, "async_session", factory)
+        sdk = StreamingSDK()
+        sdk.cleanup_failure = scenario == "cleanup_failure"
+        if scenario == "startup_cancel":
+            sdk.startup_hold = threading.Event()
+        monkeypatch.setitem(sys.modules, "ib_insync", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
+        async with factory.begin() as session:
+            user, account = await seed(session)
+            config = vault.decrypt_config(account.config_encrypted)
+            account.config_encrypted = vault.encrypt_config(config | {"broker_account_id": "synthetic"})
+        original = broker_stream.checkpoint_batch
+        batches = []
+    
+        async def checkpoint(session, **kwargs):
+            result = await original(session, **kwargs)
+            batches.append(result)
+            if len(batches) == 1:
+                sdk.late.set()
+                if scenario == "revoke":
+                    row = await session.get(BrokerAccount, account.id)
+                    selected = vault.decrypt_config(row.config_encrypted)
+                    row.config_encrypted = vault.encrypt_config(selected | {"read_authorized": False})
+                elif scenario == "disconnect":
+                    sdk.connected = False
+                elif scenario == "gap":
+                    # Bad provider evidence delivered on the SDK owner, after its
+                    # initial snapshot. It must close partial rather than renew.
+                    sdk.observed.execution.shares = -1
+                    sdk.sleep = bad_callback
+            return result
+    
+        def bad_callback(seconds):
+            sdk.execDetailsEvent.emit(None, sdk.observed)
+            threading.Event().wait(min(seconds, .01))
+    
+        monkeypatch.setattr(broker_stream, "checkpoint_batch", checkpoint)
+        task = asyncio.create_task(broker_stream.capture_observations(
+            user_id=user.id, account_id=account.id, duration_seconds=1, batch_seconds=1))
+        try:
+            if scenario == "startup_cancel":
+                assert await asyncio.to_thread(sdk.entered.wait, 1)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+                assert not sdk.closed.is_set()  # Native connect is still owned.
+                sdk.startup_hold.set()
+                assert await asyncio.to_thread(sdk.closed.wait, 2)Task exception was never retrieved
+future: <Task finished name='Task-91' coro=<capture_observations() done, defined at /home/lulu/investments-assistant/investments-assistant-local-machine/src/execution/broker_stream.py:32> exception=RuntimeError('IBKR_CLIENT_BUSY')>
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/src/execution/broker_stream.py", line 51, in capture_observations
+    worker.register_reads()
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/src/tools/brokers/ibkr_session.py", line 72, in register_reads
+    raise RuntimeError("IBKR_CLIENT_BUSY")
+RuntimeError: IBKR_CLIENT_BUSY
+
+            elif scenario == "cancel":
+                # Wait for an actual committed first checkpoint, then cancel between
+                # reads; use a bounded test deadline, no elapsed-time success claim.
+                async with asyncio.timeout(3):
+                    while True:
+                        async with factory.begin() as session:
+                            row = await session.scalar(select(JobLease).where(JobLease.user_id == user.id))
+                            if row and row.checkpoint.get("batches", 0) >= 1:
+                                break
+                        await asyncio.sleep(.01)
+                task.cancel()
+                with pytest.raises(asyncio.CancelledError):
+                    await task
+            elif scenario == "revoke":
+                with pytest.raises(PolicyDenied, match="IBKR_READ_CONSENT_REQUIRED"):
+                    await task
+            elif scenario in {"disconnect", "cleanup_failure"}:
+                with pytest.raises(RuntimeError):
+                    await task
+            else:
+                result = await task
+                assert result["status"] == ("partial" if scenario == "gap" else "observed")
+                assert result["complete_history"] is False and result["execution_authority"] == "none"
+>           assert [item[0] for item in sdk.trace] == ["connect", "disconnect"]
+E           AssertionError: assert [] == ['connect', 'disconnect']
+E             
+E             Right contains 2 more items, first extra item: 'connect'
+E             Use -v to get more diff
+
+tests/integration/broker_stream_test.py:144: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/ibkr_read_routing_test.py::test_registry_rejects_wrong_scope_or_changed_config_without_fallback[owner-IBKR_CLIENT_BUSY]
+FAILED tests/unit/ibkr_read_routing_test.py::test_registry_rejects_wrong_scope_or_changed_config_without_fallback[account-IBKR_CLIENT_BUSY]
+FAILED tests/unit/ibkr_read_routing_test.py::test_registry_rejects_wrong_scope_or_changed_config_without_fallback[config-IBKR_SESSION_CONFIGURATION_CHANGED]
+FAILED tests/unit/ibkr_read_routing_test.py::test_registry_rejects_wrong_scope_or_changed_config_without_fallback[consent-IBKR_READ_CONSENT_REQUIRED]
+FAILED tests/unit/ibkr_read_routing_test.py::test_registry_retains_timed_out_owner_until_actual_cleanup
+FAILED tests/unit/ibkr_read_routing_test.py::test_sync_adapter_cannot_block_async_caller_even_with_registered_owner
+FAILED tests/unit/ibkr_session_test.py::test_existing_snapshot_collector_runs_on_owned_session_and_removes_handlers
+FAILED tests/unit/acceptance_broker_test.py::test_failed_connection_disconnects_and_releases_worker_resources
+FAILED tests/unit/acceptance_broker_test.py::test_ibkr_account_match_does_not_turn_environment_configuration_into_proof[4001]
+FAILED tests/unit/acceptance_broker_test.py::test_ibkr_account_match_does_not_turn_environment_configuration_into_proof[4002]
+FAILED tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[success]
+FAILED tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[gap]
+FAILED tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[revoke]
+FAILED tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[disconnect]
+FAILED tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[cancel]
+FAILED tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[startup_cancel]
+FAILED tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[cleanup_failure]
+======================== 17 failed, 42 passed in 5.53s =========================

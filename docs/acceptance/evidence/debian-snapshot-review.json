@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Three dated InRelease documents reachable and hashed",
+    "Isolated apt update authenticates releases and indexes without insecure flags",
+    "All15 Docker build package roots and dependencies resolve in dry-run"
+  ],
+  "sources_sha256": "36f8600e4c543f4afdc810983e0005d2174b4ec6141171360fa52f24bbfe28a3",
+  "installed_packages": 0,
+  "limitations": [
+    "Resolver starts from empty isolated status, not pinned Docker base",
+    "amd64 resolver only; ARM64 build not run",
+    "No Docker build/runtime verification"
+  ],
+  "earlier_gpgv": "Exit2 from unknown additional signature in old Ubuntu keyring; trusted bookworm signatures valid; actual isolated apt authentication subsequently succeeds"
+}

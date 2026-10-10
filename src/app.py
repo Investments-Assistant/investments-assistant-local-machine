@@ -14,6 +14,7 @@ from src.db.database import create_all_tables
 from src.agent.clients import create_llm_client
 from src.scheduler.jobs import setup_scheduler, shutdown_scheduler
 from src.agent.utils.logger import get_logger, setup_logging
+from src.execution.broker_capture_control import capture_control
 
 setup_logging()
 logger = get_logger(__name__)
@@ -33,10 +34,13 @@ async def lifespan(app: FastAPI):
     # worker thread prevents the first WebSocket upgrade from racing model load.
     await asyncio.to_thread(create_llm_client)
     setup_scheduler()
-    yield
-    # ── Shutdown ───────────────────────────────────────────────────────────────
-    shutdown_scheduler()
-    logger.info("Investment Assistant shut down")
+    try:
+        yield
+    finally:
+        # Explicit captures are never resumed automatically after a restart.
+        shutdown_scheduler()
+        await capture_control.shutdown()
+        logger.info("Investment Assistant shut down")
 
 
 app = FastAPI(
