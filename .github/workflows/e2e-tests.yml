@@ -21,7 +21,7 @@ jobs:
     uses: ./.github/workflows/integration-tests.yml
     secrets: inherit
 
-  # ── Step 3: Merge coverage reports and final SonarCloud gate ──────────────
+  # ── Step 3: Combined coverage and the single mandatory SonarCloud gate ──────────────
   sonar-quality-gate:
     name: SonarCloud Quality Gate (combined coverage)
     runs-on: ubuntu-latest
@@ -99,6 +99,18 @@ jobs:
             --junitxml=junit-e2e.xml \
             -v
 
+      - name: Download measured browser-server coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-browser
+          path: .qa/browser-coverage
+
+      - name: Combine all Python test tiers
+        run: |
+          poetry run coverage combine --append --keep .qa/browser-coverage
+          poetry run coverage xml -o coverage-combined.xml
+          poetry run coverage report
+
       - name: Upload combined coverage
         uses: actions/upload-artifact@v4
         if: always()
@@ -113,8 +125,14 @@ jobs:
           name: junit-e2e
           path: junit-e2e.xml
 
+      - name: Require SonarCloud authorization
+        run: |
+          if [ -z "$SONAR_TOKEN" ]; then
+            echo "::error::SONAR_TOKEN is unavailable. Tests completed, but external quality validation remains blocked. Configure an authorized repository secret."
+            exit 1
+          fi
+
       - name: SonarCloud Scan (combined)
-        if: env.SONAR_TOKEN != ''
         uses: SonarSource/sonarqube-scan-action@v6.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -125,7 +143,6 @@ jobs:
             -Dsonar.python.xunit.reportPath=junit-e2e.xml
 
       - name: SonarCloud Quality Gate check
-        if: env.SONAR_TOKEN != ''
         uses: sonarsource/sonarqube-quality-gate-action@master
         timeout-minutes: 5
         env:
@@ -176,7 +193,18 @@ jobs:
           psql -h localhost -U postgres -d test_browser -v ON_ERROR_STOP=1 -c "CREATE TABLE ia_disposable_marker(token text NOT NULL); INSERT INTO ia_disposable_marker VALUES ('ci-browser-isolated');"
           poetry run alembic upgrade head
       - name: Exercise real browser routes and isolation
-        run: poetry run python scripts/verify_browser.py > docs/acceptance/evidence/browser-ci.txt 2>&1
+        env:
+          COVERAGE_FILE: .qa/browser-coverage/.coverage.browser
+        run: |
+          mkdir -p .qa/browser-coverage
+          poetry run coverage run --rcfile=config/coverage-browser.ini scripts/verify_browser.py > docs/acceptance/evidence/browser-ci.txt 2>&1
+      - name: Upload measured browser-server coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-browser
+          include-hidden-files: true
+          path: .qa/browser-coverage/.coverage.browser.*
+          if-no-files-found: error
       - name: Extract isolated Nginx executable without installing a service
         run: |
           mkdir -p .qa/nginx-package .qa/nginx-root

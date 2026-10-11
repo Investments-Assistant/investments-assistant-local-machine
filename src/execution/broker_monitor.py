@@ -119,5 +119,8 @@ async def _record_failure(lease, user_id, account_id, code, *, keep_lease):
                     message="Broker evidence refresh failed. Review read status before an explicit retry.",
                     evidence_at=datetime.now(UTC),
                 )
-    except (Exception, asyncio.CancelledError):
-        logger.warning("Broker read failure checkpoint unavailable; existing lease is not success")
+    except (Exception, asyncio.CancelledError) as exc:
+        logger.warning(
+            "Broker read failure checkpoint unavailable (%s); existing lease is not success",
+            type(exc).__name__,
+        )

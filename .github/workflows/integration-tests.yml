@@ -93,27 +93,4 @@ jobs:
           name: junit-integration
           path: junit-integration.xml
 
-      - name: Require SonarCloud authorization
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          if [ -z "$SONAR_TOKEN" ]; then
-            echo "::error::SONAR_TOKEN is unavailable. Integration tests completed, but external quality validation remains blocked. Configure an authorized repository secret."
-            exit 1
-          fi
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.python.coverage.reportPaths=coverage-integration.xml
-            -Dsonar.python.xunit.reportPath=junit-integration.xml
-
-      - name: SonarCloud Quality Gate check
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        timeout-minutes: 5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # The parent workflow analyzes combined coverage once all test tiers pass.

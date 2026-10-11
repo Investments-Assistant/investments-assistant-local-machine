@@ -29,7 +29,7 @@ repository = "https://github.com/Investments-Assistant/"
 [tool.poetry.dependencies]
 # ── Core ──────────────────────────────────────────────────────────────────────
 python-dotenv = ">=1.0.0"
-cryptography = ">=42.0.4"
+cryptography = ">=49.0.0"
 pydantic = ">=2.0.0"
 pydantic-settings = ">=2.0.0"
 
@@ -39,13 +39,14 @@ llama-cpp-python = ">=0.3.0"
 
 # MCP server — expose tools to Claude Desktop / Claude Code
 #   pip install mcp   (on your laptop, not the Pi)
-mcp = { version = ">=1.0.0", optional = true }
+# Retain the supported v1 API until an explicit v2 adapter migration is tested.
+mcp = { version = ">=1.28.1,<2", optional = true }
 
 # ── Web framework ─────────────────────────────────────────────────────────────
 fastapi = ">=0.115.0"
 uvicorn = { version = ">=0.32.0", extras = ["standard"] }
 websockets = ">=14.0"
-python-multipart = ">=0.0.12"
+python-multipart = ">=0.0.32"
 jinja2 = ">=3.1.0"
 httpx = ">=0.28.0"
 aiofiles = ">=24.1.0"
@@ -75,7 +76,7 @@ coinbase-advanced-py = ">=1.7.0"
 python-binance = ">=1.0.19"
 
 # ── Report generation ─────────────────────────────────────────────────────────
-weasyprint = ">=65.0"
+weasyprint = ">=70.0"
 exchange-calendars = "4.13.2"
 
 [tool.poetry.extras]
@@ -108,6 +109,7 @@ markers = [
 
 [tool.coverage.run]
 source = ["src"]
+relative_files = true
 omit = ["src/web/static/*", "tests/*", "*/__pycache__/*"]
 
 [tool.coverage.report]

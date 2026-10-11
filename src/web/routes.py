@@ -252,7 +252,7 @@ async def ready() -> dict:
             revision = await session.scalar(text("SELECT version_num FROM alembic_version"))
         checks["database"] = revision == "0018_job_lease_clock"
     except Exception as exc:
-        logger.warning("Readiness database check failed: %s", exc)
+        logger.warning("Readiness database check failed: %s", type(exc).__name__)
     from src.agent.clients.llama_cpp_client import model_status
 
     checks["model"] = model_status()["loaded"]
@@ -362,7 +362,7 @@ async def login(request: Request) -> JSONResponse:
                 )
                 user = result.scalar_one_or_none()
         except Exception as exc:
-            logger.error("User lookup failed during login: %s", exc)
+            logger.error("User lookup failed during login: %s", type(exc).__name__)
             raise HTTPException(
                 status_code=503, detail="Authentication service unavailable"
             ) from exc
@@ -434,7 +434,7 @@ async def register(request: Request) -> JSONResponse:
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
-        logger.error("Could not register user: %s", exc)
+        logger.error("Could not register user: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Account could not be created") from exc
 
 
@@ -677,7 +677,7 @@ async def list_broker_accounts(request: Request) -> dict:
     except BrokerVaultUnavailable as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
-        logger.error("Could not list broker accounts: %s", exc)
+        logger.error("Could not list broker accounts: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Broker account service unavailable") from exc
 
 
@@ -726,7 +726,7 @@ async def create_broker_account(request: Request) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error("Could not create broker account: %s", exc)
+        logger.error("Could not create broker account: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Broker account could not be saved") from exc
 
 
@@ -785,7 +785,7 @@ async def update_broker_account(account_id: str, request: Request) -> dict:
     except IntegrityError as exc:
         raise HTTPException(status_code=409, detail="Broker account update conflicted") from exc
     except Exception as exc:
-        logger.error("Could not update broker account %s: %s", account_id, exc)
+        logger.error("Could not update broker account (%s)", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Broker account could not be updated") from exc
 
 
@@ -819,7 +819,7 @@ async def deactivate_broker_account(account_id: str, request: Request) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error("Could not deactivate broker account %s: %s", account_id, exc)
+        logger.error("Could not deactivate broker account (%s)", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Broker account could not be disabled") from exc
 
 
@@ -880,7 +880,7 @@ async def portfolio_snapshot(request: Request) -> dict:
     except BrokerVaultUnavailable as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
-        logger.error("Could not load portfolio snapshot: %s", exc)
+        logger.error("Could not load portfolio snapshot: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Portfolio service unavailable") from exc
 
     positions = [_portfolio_position(position) for position in summary.get("positions", [])]
@@ -1136,7 +1136,7 @@ async def list_projects(request: Request, search: str = "") -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error("Could not list conversation projects: %s", exc)
+        logger.error("Could not list conversation projects: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Conversation history unavailable") from exc
 
 
@@ -1167,7 +1167,7 @@ async def list_conversations(
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error("Could not list conversations: %s", exc)
+        logger.error("Could not list conversations: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Conversation history unavailable") from exc
 
 
@@ -1211,7 +1211,7 @@ async def create_project(request: Request) -> dict:
             detail="A project with that name already exists",
         ) from exc
     except Exception as exc:
-        logger.error("Could not create project: %s", exc)
+        logger.error("Could not create project: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Project could not be created") from exc
 
 
@@ -1264,7 +1264,7 @@ async def update_project(project_id: str, request: Request) -> dict:
             detail="A project with that name already exists",
         ) from exc
     except Exception as exc:
-        logger.error("Could not update project %s: %s", project_id, exc)
+        logger.error("Could not update project (%s)", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Project could not be updated") from exc
 
 
@@ -1310,7 +1310,7 @@ async def create_conversation(request: Request) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error("Could not create conversation: %s", exc)
+        logger.error("Could not create conversation: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Conversation could not be created") from exc
 
 
@@ -1370,7 +1370,7 @@ async def get_conversation(conversation_id: str, request: Request) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error("Could not load conversation %s: %s", conversation_id, exc)
+        logger.error("Could not load conversation (%s)", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Conversation could not be loaded") from exc
 
 
@@ -1430,7 +1430,7 @@ async def update_conversation(conversation_id: str, request: Request) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error("Could not update conversation %s: %s", conversation_id, exc)
+        logger.error("Could not update conversation (%s)", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Conversation could not be updated") from exc
 
 
@@ -1470,7 +1470,7 @@ async def delete_conversation(conversation_id: str, request: Request) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error("Could not delete conversation %s: %s", conversation_id, exc)
+        logger.error("Could not delete conversation (%s)", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Conversation could not be deleted") from exc
 
 
@@ -1698,7 +1698,7 @@ async def list_expenses(
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error("Could not load expenses: %s", exc)
+        logger.error("Could not load expenses: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Expense service unavailable") from exc
 
     has_more = len(rows) > limit
@@ -1951,7 +1951,7 @@ async def safety_status(request: Request) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        logger.warning("Could not read daily halt status: %s", exc)
+        logger.warning("Could not read daily halt status: %s", type(exc).__name__)
     return {
         "trading_mode": trading_mode,
         "auto_max_trade_usd": settings.auto_max_trade_usd,
@@ -2004,7 +2004,7 @@ async def activate_kill_switch(request: Request) -> dict:
             "message": "Future auto orders are blocked for today; check brokers for open orders.",
         }
     except Exception as exc:
-        logger.error("Could not persist auto-trading kill switch: %s", exc)
+        logger.error("Could not persist auto-trading kill switch: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Could not persist kill switch") from exc
 
 
@@ -2170,7 +2170,7 @@ async def create_simulation(request: Request) -> dict:
             payload["trades_sample"] = result.get("trades_sample", [])
             return payload
     except Exception as exc:
-        logger.error("Could not persist simulation: %s", exc)
+        logger.error("Could not persist simulation: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Simulation could not be saved") from exc
 
 
@@ -2238,7 +2238,7 @@ async def download_report_pdf(report_id: str, request: Request) -> FileResponse:
             report_path = Path(report.pdf_path).resolve()
             reports_root = Path(settings.reports_dir).resolve()
             if reports_root not in report_path.parents:
-                logger.error("Refusing report path outside reports directory: %s", report_path)
+                logger.error("Refusing report path outside reports directory")
                 raise HTTPException(status_code=404, detail="PDF not available")
             return FileResponse(
                 report_path,

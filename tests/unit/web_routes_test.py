@@ -474,6 +474,11 @@ class TestListReportsEndpoint:
 
 @pytest.mark.unit
 class TestSimulationEndpoints:
+    @pytest.fixture(autouse=True)
+    def route_settings(self, monkeypatch, force_development_env):
+        # Routes may already have been imported during test collection.
+        monkeypatch.setattr("src.web.routes.settings", force_development_env)
+
     def test_lists_saved_simulations(self):
         simulation = MagicMock()
         simulation.id = "sim-1"
