@@ -72,7 +72,7 @@ jobs:
         with:
           args: >
             -Dsonar.python.coverage.reportPaths=coverage.xml
-            -Dsonar.testExecutionReportPaths=junit-unit.xml
+            -Dsonar.python.xunit.reportPath=junit-unit.xml
 
       - name: SonarCloud Quality Gate check
         if: env.SONAR_TOKEN != ''
