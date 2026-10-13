@@ -54,7 +54,7 @@ async def capture_observations(*, user_id, account_id, duration_seconds=60, batc
 
         def drain(ib, actual, *, initial=False, final=False):
             if initial:
-                from ib_insync import ExecutionFilter
+                from ib_async import ExecutionFilter
                 window.request_snapshot(ib, ExecutionFilter(acctCode=actual))
             # Detach in this same owner operation on any detected gap, before
             # returning its final batch to the async persistence coordinator.

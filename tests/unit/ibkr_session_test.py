@@ -133,7 +133,7 @@ def test_default_connection_owns_its_event_loop_and_disconnects_without_sdk_writ
 
     sdk.connect, sdk.disconnect = connect, disconnect
     sdk.managedAccounts = lambda: ["SYNTHETIC-SESSION"]
-    monkeypatch.setitem(sys.modules, "ib_insync", SimpleNamespace(IB=lambda: sdk))
+    monkeypatch.setitem(sys.modules, "ib_async", SimpleNamespace(IB=lambda: sdk))
     worker = ReadSessionWorker(account())
     worker.start()
     try:
@@ -215,7 +215,7 @@ def test_existing_snapshot_collector_runs_on_owned_session_and_removes_handlers(
             self.trace.append(("disconnect", threading.get_ident()))
 
     sdk = ConnectedSDK()
-    monkeypatch.setitem(sys.modules, "ib_insync", SimpleNamespace(
+    monkeypatch.setitem(sys.modules, "ib_async", SimpleNamespace(
         IB=lambda: sdk, ExecutionFilter=lambda **kwargs: "fixture-account-filter",
     ))
     selected = account()

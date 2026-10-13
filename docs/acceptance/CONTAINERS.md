@@ -6,6 +6,13 @@ The actual amd64 image build passed: `container-build-20261010-ad17fb8e.json`,
 Its source hashes and exported image digest are recorded. This is a local build;
 the remote workflow has not run against the uncommitted checkout.
 
+The current `ib_async==2.1.0` candidate also builds successfully as
+`investment-assistant:local`; a network-disabled, non-root image smoke confirms
+the package and read-only adapter imports. Evidence:
+`evidence/container-build-ibasync-20261013.txt`. This validates dependency
+installation and import only; isolated production startup/restart checks have
+not been rerun against this candidate.
+
 A Windows Docker client network-none smoke ran as UID1000, produced a real PDF,
 loaded llama.cpp, and checked that `.env`, `.qa` and model files were absent from
 the image. GPU offload is unsupported. Library inspection and `ldd` verify the
@@ -50,3 +57,58 @@ PostgreSQL's temporary initialization server shutdown. Its resources were cleane
 The runner now waits for the final TCP listener; the reproduction remains in
 `container-runtime-20261010.json/.txt/.exit`. Do not classify an active retry as
 PASS before its checks and cleanup finish.
+
+## Verified recovery after startup import repair
+
+v2 FAILED: application23.143s exceeded the fixed15s budget; database2.177s,
+marker/schema persistence and cleanup succeeded. Import profiling found
+market-data dependencies eagerly loaded during service startup. Their imports
+now occur in synchronous data/simulation operations. The failing startup import
+regression and47focusedPASS are preserved.
+
+Updatedimage `investment-assistant:container-startup-20261010` builds successfully.
+v3 PASS: application12.986s, database1.777s, realGGUF readiness and persisted
+operatorhalt. The fixture invokes the actual halt service and verifies a new
+proposal is denied OPERATOR_HALTED after each restart, with cash/reserve unchanged.
+Cleanup passed. See `container-runtime-20261010-v3.json/.txt/.exit` and
+`container-startup-review.json` for scope, image/model/source hashes. This short
+run is not24h, thermal, physicalsleep, externalbroker or Dockeringress acceptance.
+
+## Docker Desktop ingress (2026-10-10)
+
+`container-ingress-20261010-v2.json/.txt/.exit` records PASS for the pinned
+Nginx image, real application authentication/routes and a marked disposable
+PostgreSQL database. Inference/providers are explicit fixtures. Verified TLS,
+static success/error security headers, redirects, trusted proxy identity,
+authenticated WSS and origin/authentication denials passed. A separate
+non-allowlisted container received HTTPS403.
+
+Windows curl verified the fixture certificate through a temporary port bound
+only to127.0.0.1. The application observed172.18.0.1 (the Docker bridge gateway),
+not the physical Windows client address. Do not treat this address as proof of
+a LAN boundary. The fixture permits only its exact app/gateway addresses and
+trusts only its exact Nginx peer. No firewall setting changed. All owned
+containers, anonymous volumes and networks were removed.
+
+The first attempt used an internal-only network, on which Docker suppressed
+the published port. It passed five container-level checks but is preserved as
+FAIL. The successful fixture matches Compose's bridge topology; it has no
+production mounts, provider credentials or scheduler and explicitly rejects
+broker connections. The bridge is not an egress-isolation claim.
+
+Reproduce with a new output path:
+
+```sh
+.venv/bin/python scripts/verify_container_ingress.py \
+  --docker '/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe' \
+  --image investment-assistant:container-startup-20261010 \
+  --postgres postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea \
+  --nginx nginx:alpine@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2 \
+  --output docs/acceptance/evidence/container-ingress-new.json
+```
+
+## Security-updated image validation
+
+The approved cd049bf image `investment-assistant:security-cd049bf` built with manifest `5f56ad6fd7a50fb91edd085f55a5ab8d60d25aa8ab2805713128ea710a0eb626`. Native non-root/PDF/CPU-library checks pass. Actual GGUF startup and restart checks pass: app10.954s, database1.615s within the unchanged15s budget, persistent halt denies proposals after both restarts, and owned-resource cleanup is verified. See [runtime evidence](evidence/container-runtime-security.json) and [build provenance](evidence/container-security-review.json).
+
+[Current-image ingress](evidence/container-ingress-security.json) also passes all seven checks with cleanup verified. Windows loopback forwarding still exposes the Docker bridge gateway to the application. This is not LAN/firewall, physical sleep, thermal or24h acceptance. No real broker connection or order occurred.

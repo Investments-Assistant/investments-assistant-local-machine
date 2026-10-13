@@ -1,11 +1,17 @@
 # Quality and dependency review — 2026-10-11
 
+Current status (2026-10-13): the user accepted the four reviewed findings. Sonar
+records RESOLVED/WONTFIX and the quality gate is now OK, including 82.6% coverage.
+These are accepted review decisions, not code fixes. The prior failed CI job is
+rerunning at unchanged commit cd049bf. See [review outcome](SONAR_REVIEW.md).
+Earlier failures and review proposals below are historical evidence.
+
 Remote run38097627974 at5fefb1a authenticates and uploads successfully to Sonar.
 696 unit tests pass; its quality gate fails reliability3/security4/newcoverage56
 against unchanged thresholds1/1/80. Later test jobs are skipped. No remote issue
 has been dismissed and no threshold/exclusion was changed.
 
-## Pipeline correction prepared locally
+## Published pipeline correction
 
 Partial unit and integration scans previously overwrote the same branch analysis.
 Their early gates could prevent the combined coverage run from being reached.
@@ -15,7 +21,9 @@ Standalone unit/integration workflows now report their test tier only. Source:
 [Sonar Python coverage](https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/test-coverage/python-test-coverage).
 Local YAML, bash syntax, required dependencies and missing-token checks are in
 [evidence/ci-combined-gate-review.json](evidence/ci-combined-gate-review.json).
-Further publication requires approval. Combined coverage is not yet a remotePASS.
+The user approved the exact15-file bundle, published as cd049bf. Remote38185591707
+unit, integration and Chromium/ingress jobs pass; combined1086 tests pass; the mandatory quality gate fails on four remaining
+findings documented in SONAR_REVIEW.md.
 
 ## Findings
 
@@ -50,11 +58,11 @@ regression passes. No application uses PyJWT to authenticate browser sessions;
 retained broker/MCP dependencies still warranted the update. Reference:
 [upstream empty-key advisory](https://github.com/jpadilla/pyjwt/security/advisories/GHSA-pxh4-856f-4h89).
 
-Fifteen packages have reviewed lock updates; 78 of 81 recorded alerts meet their
-published patched-version floors. This is a local version comparison, not remote
-alert closure. Backend/browser/build verification remains required for the final
-lock. The updated major security packages passed the23-flow browser/PDF run; the
-subsequent pydantic-settings update requires a final validation pass. MCP remains on
+Fifteen packages have reviewed lock updates. After publication and a successful
+Dependency Graph run, a read-only GitHub query finds1 open medium diskcache alert,
+down from81; no alerts were manually dismissed. The final23-flow local browser run,
+remote710 unit/372 integration tests and updated Docker build/runtime/ingress pass.
+The separate local host-clock failure remains documented below. MCP remains on
 supported1.x (>=1.28.1,<2) to preserve the current bridge API, following
 [upstream support policy](https://github.com/modelcontextprotocol/python-sdk/blob/main/SECURITY.md).
 WeasyPrint70 is required by its
@@ -72,7 +80,8 @@ mutation is covered by the passing expired-token/options-preservation regression
 on2.15.1. WeasyPrint presentational-hints injection requires that feature enabled;
 this application does not enable it and escapes untrusted Markdown/HTML before
 rendering. Diskcache exposure is described above. These are contextual assessments,
-not claims that upstream advisories or remote alerts are closed.
+not claims that every upstream advisory is fixed. The later repository query
+records80 automatic closures and1 remaining diskcache alert.
 
 ## Clock evidence
 
@@ -81,7 +90,7 @@ clock-quality-probe.json captured a backward wall step1.3107s versus forward
 monotonic0.0104s. This supports a clock-related explanation but does not establish
 the exact cause of every earlier failure. The later20.623s probe saw no jumps;
 browser-security-coverage-v2 passes. Production clock/lease safeguards remain
-unchanged. The next backend run records clock movement for its entire duration.
+unchanged. The following full backend run records six backward wall steps during211.4s.
 
 ## Browser coverage
 
@@ -99,7 +108,7 @@ one integration cancellation/recovery case failsSTALE_JOB_LEASE. The concurrent
 clock monitor captured six backward steps~0.54–0.63s. No guard was relaxed.
 The final browser-security-coverage-v3 run passes all23flows on both viewports,
 including real PDF generation and session/CSRF/isolation checks. Localcombined
-linecoverage82.63% includes measured browser routes; no remotequalityPASS claimed.
+linecoverage82.68% includes measured browser routes; no remotequalityPASS claimed.
 A separate60s probe saw no regressions, which does not invalidate the earlier
 under-test clock failures. Reproduce bounded clock observations with:
 
@@ -108,6 +117,27 @@ under-test clock failures. Reproduce bounded clock observations with:
 ```
 
 Use a new output filename. The command only reads time and writes its report; it
-returns1 on backward wall steps. Docker rebuild remains pending because the
-DockerDesktop Linuxengine pipe is unavailable. No trading, production deployment,
+returns1 on backward wall steps. Docker was restored; updated-image build, native
+smoke, real-GGUF startup/restart and ingress checks pass with owned cleanup.
+Remote710 unit tests pass in25.039s and372 integration tests in149.654s; no
+failures/errors/skips in their JUnit artifacts. The23-flow Chromium and8-check
+Nginx jobs pass. The combined suite passes1086 tests in165.877s without failures/errors/skips;
+measured combined linecoverage is82.63%. Sonar analysis/upload succeeds and newcoverage82.6% passes. The mandatory gate
+still fails on four remaining security/reliability findings; see SONAR_REVIEW.md. See
+evidence/remote-ci-38185591707-test-artifacts.json and
+evidence/container-runtime-security.json. No trading, production deployment,
 OS configuration or remote Sonar issue state was changed.
+
+CI verification complete: run38185591707 attempt2 atcd049bf finishedSUCCESS, including the mandatory Sonar quality gate. Fresh combined1086testsPASS167.652s; allfourjobsSUCCESS. L11PASS. Accepted findings remain documented decisions, not code repairs; other physical/external/research gates remainopen.
+
+## Current local candidate — 2026-10-13
+
+After migrating the IBKR adapter to `ib_async==2.1.0`, the local candidate
+passes719 unit tests and374 full PostgreSQL integration tests. The updated
+Docker image builds and passes a network-disabled, non-root package/adapter
+import smoke. See `evidence/ib-async-migration-20261013.txt` and
+`evidence/container-build-ibasync-20261013.txt`. These results do not represent
+remote CI for the dirty candidate; its exact dependency/source change remains
+unpublished pending separate approval. The build's yanked `soupsieve 3.0.1`
+warning is documented in the container evidence; the image runtime is Python
+3.12 and both build and import smoke pass.

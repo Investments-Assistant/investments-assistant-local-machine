@@ -78,7 +78,8 @@ orders, the tool would need a `time_in_force` parameter added.
 
 ## Interactive Brokers (`src/tools/brokers/ibkr.py`)
 
-**SDK**: `ib_insync` (third-party async wrapper around IB's TWS API)
+**SDK**: `ib_async` (maintained third-party async wrapper around IB's TWS API;
+`ib_insync` is no longer updated and follows a legacy API release)
 
 **What it supports**: stocks, options, futures, forex, bonds — the full IB universe
 
@@ -89,7 +90,7 @@ or a similar platform. Alpaca only supports equities.
 **Architecture difference vs other brokers**: IBKR does not have a REST API. Instead:
 - You run **IB Gateway** or **Trader Workstation (TWS)** on a computer (or in a Docker
   container)
-- `ib_insync` connects to it via a TCP socket (`ibkr_host:ibkr_port`)
+- `ib_async` connects to it via a TCP socket (`ibkr_host:ibkr_port`)
 - Each function connects, executes, then disconnects — a new connection per call
 
 This "connect → do → disconnect" pattern avoids keeping a persistent connection alive,

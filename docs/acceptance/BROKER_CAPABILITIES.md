@@ -42,6 +42,13 @@ do not establish a paper/live response field for this adapter's handshake. The
 external-paper gate therefore still needs separately authorized account/environment
 verification; no local fixture result is substituted for that observation.
 
+Rechecked 2026-10-13 against the current connection documentation: `isConnected()`
+reports socket/API connection state, while the initial handshake returns accessible
+account IDs and `nextValidId` is the documented signal that setup is complete before
+other API calls. None of those facts identifies a paper account. A paper-only TWS
+session and separately verified selected account remain prerequisites; the adapter
+still makes no paper/live inference from a port or account-number pattern.
+
 Evidence: ibkr-environment-boundary-final.txt,31targeted tests PASS. Tests use
 otherwise configured IBKR fixtures and assert identity rejection before lock/SDK
 construction; both common port values leave verified_environment unset.
@@ -65,12 +72,32 @@ never claims complete broker history or complete late-commission delivery.
 Current primary references:
 [IBKR Execution fields](https://www.interactivebrokers.com/docs/tws-api/ref/execution)
 define separate execution IDs, correction suffixes, account and client/order
-identity. [ib_insync events](https://ib-insync.readthedocs.io/api.html)
-define execution/commission/disconnection callbacks. No dependency migration or
-real connection was performed. Evidence: broker-journal-recovery.txt (7PASS),
+identity. [ib_async API and event semantics](https://github.com/ib-api-reloaded/ib_async)
+define execution/commission/disconnection callbacks. The checkout now uses the
+maintained `ib_async` successor as described below. Evidence:
+broker-journal-recovery.txt (7PASS),
 broker-refresh-authority.txt (12PASS). Continuous subscriptions, complete external
 reconciliation, execution authority and observed external-paper acceptance are
 still incomplete; this journal alone does not satisfy L04 or L15.
+
+## Maintained IBKR client decision (2026-10-13)
+
+Current [IBKR third-party package guidance](https://www.interactivebrokers.com/docs/tws-api/doc/third-party-api-platforms/non-standard-tws-api-languages-and-packages/ib-insync-and-ib-async)
+says the original `ib_insync` package uses a legacy TWS API release and is no
+longer updated. It points to `ib_async`, maintained by an original contributor,
+as a migration path while advising direct IBKR API use where possible. The
+checkout pins `ib_async==2.1.0`, updates its lazy imports and locks its
+dependencies. A no-socket test checks the installed package's connection,
+qualification, account, disconnect, `Stock`, and `ExecutionFilter` API surface.
+
+This published client requires `tzdata<2026`, so the lock resolves tzdata
+2025.3 instead of 2026.1. Record this dependency tradeoff: the verified host and
+CI runtime is Python 3.12; no support claim is made for Python 3.14 or other
+untested runtimes. The 48 focused broker unit tests and 11 broker-stream tests
+against marked disposable PostgreSQL pass with the new import path. This remains
+package/API and fixture validation only: no Gateway/TWS login, reauthentication,
+market-data entitlement, external account or order was used. External writes
+remain disabled.
 
 Retained evidence review now reports conflicting execution/commission versions,
 correction families, unpaired commissions/executions and mismatched payload hashes.
@@ -97,7 +124,7 @@ EUR/USD without FX. Missing cash is incomplete, not zero. Duplicate contract or
 currency rows are rejected rather than silently overwritten.
 
 [IBKR per-currency prefixes](https://www.interactivebrokers.com/docs/tws-api/doc/tws-settings/per-currency-account-value-prefix)
-explain the optional $LEDGER- namespace. The installed ib_insync0.9.86
+explain the optional $LEDGER- namespace. The installed ib_async2.1.0
 reqAccountSummaryAsync requests $LEDGER:ALL and completes through its summary
 request future; reqPositionsAsync completes its positions request. These local
 contracts were inspected and exercised through SDK-shaped fixtures, not a live
@@ -143,8 +170,9 @@ notes repeated status notifications and that not every transition is reported;
 execution details must also be considered. This is a historical official reference,
 not proof of a current connected broker or verified installed runtime compatibility.
 The current [IBKR introduction](https://www.interactivebrokers.com/docs/tws-api/doc/introduction)
-and [installed-library API reference](https://ib-insync.readthedocs.io/api.html)
-were also consulted. No new SDK, connection or dependency migration was performed.
+and [maintained ib_async API](https://github.com/ib-api-reloaded/ib_async)
+were also consulted. The dependency migration is described above; no broker
+connection or order was made.
 
 Evidence: `broker-order-review-reproduction.txt`4FAIL exposed ignored order evidence;
 `broker-order-review-verified.txt`41PASS3.66s includes marked PostgreSQL late-fill
@@ -315,7 +343,7 @@ The finite coordinator stops on its next bounded drain, detaches callbacks,
 performs native cleanup, persists a partial checkpoint and emits an owner-scoped
 in-app alert. A restoration notice cannot clear the gap or set last_success.
 The application neither reconnects nor retries automatically. The installed
-ib_insync library has its own1102account-summary refresh behavior; this is not
+ib_async library has its own1102account-summary refresh behavior; this is not
 external reconciliation or evidence of completed human reauthentication.
 
 `broker-upstream-reproduction.txt` records4failing regressions before the fix.

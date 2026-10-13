@@ -77,7 +77,7 @@ async def test_stream_preserves_only_authorized_batches_and_cleans_owner(integra
     sdk.cleanup_failure = scenario == "cleanup_failure"
     if scenario == "startup_cancel":
         sdk.startup_hold = threading.Event()
-    monkeypatch.setitem(sys.modules, "ib_insync", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
+    monkeypatch.setitem(sys.modules, "ib_async", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
     async with factory.begin() as session:
         user, account = await seed(session)
         config = vault.decrypt_config(account.config_encrypted)

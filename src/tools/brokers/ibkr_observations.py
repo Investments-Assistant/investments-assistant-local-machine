@@ -190,7 +190,7 @@ def collect_ibkr_observations(account):
     from src.tools.brokers.ibkr_session import ReadSessionWorker, route_read
 
     def collect(ib, actual):
-        from ib_insync import ExecutionFilter
+        from ib_async import ExecutionFilter
 
         if not ib.isConnected():
             raise PolicyDenied("BROKER_NOT_CONNECTED")

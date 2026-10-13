@@ -123,7 +123,7 @@ def test_snapshot_read_keeps_continuous_subscription_attached(monkeypatch):
     def connected(_):
         yield sdk, "synthetic"
 
-    monkeypatch.setitem(sys.modules, "ib_insync", SimpleNamespace(ExecutionFilter=lambda **_: "fixture-account-filter"))
+    monkeypatch.setitem(sys.modules, "ib_async", SimpleNamespace(ExecutionFilter=lambda **_: "fixture-account-filter"))
     worker = ReadSessionWorker(selected, connection_factory=connected,
                                subscription=lambda ib, _: persistent.subscribed(ib))
     worker.register_reads()

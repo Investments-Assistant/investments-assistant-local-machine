@@ -58,7 +58,7 @@ def test_spyl_xetra_eur_contract_fixture_is_only_resolution():
     sdk.qualifyContracts.return_value = [contract]
     sdk.reqContractDetails.return_value = [SimpleNamespace(minTick=0.01, minSize=1)]
     stock = MagicMock()
-    with patch.dict("sys.modules", {"ib_insync": SimpleNamespace(Stock=stock)}):
+    with patch.dict("sys.modules", {"ib_async": SimpleNamespace(Stock=stock)}):
         result = ibkr.qualify_stock(sdk, symbol="SPYL", exchange="IBIS2", currency="EUR")
     stock.assert_called_once_with("SPYL", "IBIS2", "EUR")
     assert result["currency"] == "EUR" and result["con_id"] == 123
@@ -69,7 +69,7 @@ def test_ambiguous_contract_is_rejected():
     sdk = MagicMock()
     sdk.qualifyContracts.return_value = []
     with (
-        patch.dict("sys.modules", {"ib_insync": SimpleNamespace(Stock=MagicMock())}),
+        patch.dict("sys.modules", {"ib_async": SimpleNamespace(Stock=MagicMock())}),
         pytest.raises(ValueError, match="AMBIGUOUS_CONTRACT"),
     ):
         ibkr.qualify_stock(sdk, symbol="SPYL", exchange="IBIS2", currency="EUR")
@@ -91,7 +91,7 @@ def test_failed_connection_disconnects_and_releases_worker_resources():
             "client_id": 123,
         },
     )
-    with patch.dict("sys.modules", {"ib_insync": SimpleNamespace(IB=lambda: sdk)}):
+    with patch.dict("sys.modules", {"ib_async": SimpleNamespace(IB=lambda: sdk)}):
         assert ibkr.get_ibkr_account(fixture)["error"] == "IBKR_READ_UNAVAILABLE"
     sdk.disconnect.assert_called_once()
     assert not ibkr._connection_lock.locked()
@@ -127,7 +127,7 @@ def test_sdk_reads_require_explicit_owned_matching_account(module, invalid, monk
         account = None
     constructor = MagicMock(side_effect=AssertionError("IBKR SDK must not run"))
     with (
-        patch.dict("sys.modules", {"ib_insync": SimpleNamespace(IB=constructor)}),
+        patch.dict("sys.modules", {"ib_async": SimpleNamespace(IB=constructor)}),
         patch.object(module, "_connection_lock" if name == "ibkr" else "_get_client") as client,
     ):
         for suffix in ("account", "positions", "orders"):

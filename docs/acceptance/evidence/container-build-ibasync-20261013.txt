@@ -1,0 +1,12 @@
+Updated IBKR dependency image validation — 2026-10-13
+
+Command: docker compose build app
+Result: PASS; image investment-assistant:local built from the current pyproject.toml and poetry.lock. The build installed ib-async 2.1.0 and tzdata 2025.3. Image manifest digest: a64ce3a90cee80e7a93cd6e8e83828c583d3d70b37ff99de0c31ed8f27babe95.
+
+Isolated image smoke:
+  docker run --rm --network none --entrypoint python investment-assistant:local -c 'import os, ib_async; from ib_async import IB, Stock, ExecutionFilter; import src.tools.brokers.ibkr ...'
+Result: exit 0, uid 1000, ib_async 2.1.0, read-only adapter import PASS, API contract present. The container had no network and opened no broker connection.
+
+Build warning: Poetry reported soupsieve 3.0.1 as yanked because Python versions older than 3.11.5 have a regex compatibility issue. The image uses pinned Python 3.12; build and isolated import passed. Preserve this warning for dependency review.
+
+No Compose services or persistent volumes were started. No production deployment, broker connection, order or live setting change occurred.

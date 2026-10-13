@@ -1,0 +1,40 @@
+IBKR maintained client migration evidence — 2026-10-13
+
+Reason: current IBKR documentation says the original ib_insync package uses a
+legacy TWS API release and is no longer updated. It names ib_async, maintained
+by an original contributor, as a migration path, while advising direct IBKR API
+use where possible:
+https://www.interactivebrokers.com/docs/tws-api/doc/third-party-api-platforms/non-standard-tws-api-languages-and-packages/ib-insync-and-ib-async
+
+Pinned package: ib_async==2.1.0 (Python >=3.10; verified runtime Python 3.12.3).
+PyPI wheel SHA-256:
+f6d8b991bdbd6dd38e700c61b3dced06ebe0f14be4e5263e2ef10ba10b88d434
+The wheel exposes IB.connect with host/port/clientId/timeout/readonly/account/
+raiseSyncErrors, IB.qualifyContracts, IB.managedAccounts, IB.disconnect,
+RequestTimeout, RaiseRequestErrors, Stock and ExecutionFilter. No socket opened.
+
+Dependency resolution: Poetry lock adds aeventkit 2.1.0 and ib-async 2.1.0;
+the published package requires tzdata >=2025.2,<2026, so Poetry resolves tzdata
+2025.3 rather than 2026.1. This is a recorded tradeoff. Current CI targets
+Python 3.12; no claim is made for other untested versions.
+
+Commands/results:
+- poetry lock — PASS
+- poetry sync --no-interaction; poetry sync --all-extras --no-interaction — PASS
+- poetry run pytest -q tests/unit/ib_async_compatibility_test.py
+  tests/unit/acceptance_broker_test.py tests/unit/ibkr_session_test.py
+  tests/unit/ibkr_read_routing_test.py — 48 passed in 1.27s
+- Broker capture/control, observations, stream journal and stream integration
+  tests against a newly created, positively marked disposable PostgreSQL
+  database in the local .qa/pgdata cluster — 59 passed in 15.18s; database
+  dropped after the run
+- Full unit suite — 719 passed, 1 warning in 7.21s
+- Full integration suite against a newly created, positively marked disposable
+  PostgreSQL database — 374 passed, 1 dependency deprecation warning in 96.52s;
+  pytest exit 0 and disposable database cleanup PASS
+- poetry check --lock, Ruff on all touched adapter/test files, compileall on
+  touched runtime files and git diff --check — PASS
+- git diff --check — PASS
+
+No broker connection, paper order, live order, or external data request occurred.
+LIVE_TRADING_ENABLED remains false and the broker write boundary remains closed.

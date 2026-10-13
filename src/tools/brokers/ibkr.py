@@ -1,4 +1,4 @@
-"""Explicit-account read-only IBKR adapter via ib_insync.
+"""Explicit-account read-only IBKR adapter via the maintained ib_async package.
 
 The worker owns its event loop and always disconnects. Live/paper writes remain
 unavailable pending independent external-account and durable broker acceptance.
@@ -51,7 +51,7 @@ def _connection(account: BrokerAccountConfig | None):
     asyncio.set_event_loop(loop)
     ib = None
     try:
-        from ib_insync import IB
+        from ib_async import IB
 
         ib = IB()
         ib.RequestTimeout = 10
@@ -221,7 +221,7 @@ def get_ibkr_orders(account: BrokerAccountConfig | None = None) -> list[dict]:
 
 def qualify_stock(ib, *, symbol: str, exchange: str, currency: str) -> dict:
     """Explicit stock contract resolution; a symbol or port never selects a market."""
-    from ib_insync import Stock
+    from ib_async import Stock
 
     if not symbol or not exchange or len(currency) != 3:
         raise ValueError("INCOMPLETE_CONTRACT")

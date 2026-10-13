@@ -12,7 +12,7 @@ Current checkout: local-machine only; audit baseline 65ea1d7. Updated 2026-10-05
 | Tool permissions and vault | tools/dispatcher.py, broker_accounts.py | Implemented and tested: model self-approval denied; SDK/portfolio helpers reject unscoped reads even with global credentials (scoped-helper-reads.txt) |
 | Browser simulator approvals | web/simulator_routes.py → execution/service.py | Real browser and PostgreSQL tests; cookie/CSRF and immutable nonce/details checked |
 | Simulator risk and lifecycle | execution/policy.py, execution/models.py | Implemented and tested in isolated fixtures: locks/reservations, lifecycle races, approved versioned mandates, bounded buy ticks and marked-loss halts; opted-in manual sales tested; separately approved price-band strategy sales tested; durable no-trade decisions and concurrent replay tested; external reconciliation incomplete (MANDATES.md) |
-| Direct IBKR adapter | tools/brokers/ibkr.py → ib_insync → TWS/Gateway | Explicit-account readonly fixture contracts tested; no external connection evidence |
+| Direct IBKR adapter | tools/brokers/ibkr.py → ib_async 2.1.0 → TWS/Gateway | Explicit-account read-only fixture contracts and installed-package API compatibility tested; no external connection evidence |
 | Other external SDK adapters | tools/brokers/{alpaca,coinbase,binance}.py | Read implementations retained; all write entrypoints disabled through execution/external.py |
 | Application MCP bridge | scripts/mcp_server.py → /api/tools/invoke | Application bearer token is separate from ChatGPT connectors; userless broker reads now denied; MCP_USER_ID explicitly binds an active user |
 | Financial valuation | finance/normalization.py, tools/portfolio.py | Exact fractional quantity/currency/FX totals, synthetic flow/split/earned-and-received-dividend ledger, fee revisions and immutable observed period valuations tested (ACCOUNTING.md); separate observed price/FX attribution verified; historical boundary coverage, benchmark attribution and broader actions remain incomplete |
@@ -21,7 +21,7 @@ Current checkout: local-machine only; audit baseline 65ea1d7. Updated 2026-10-05
 | Database | db/models.py, migrations/ | Implemented and tested: reviewed-schema upgrades through 0018, ownership quarantine and durable sessions/evidence/mandates; 0018 database31-table restore verified (job-clock-restore.json); full0018fixture PDF/vault/model recovery and coherent backup-bundle expiry verified; owned chat/report/news/expense retention tested; production/off-host restore remains unverified |
 | News ingestion | news/ingestion.py, sources.py, search.py | Implemented and tested: public pinned-DNS HTTPS bounds, explicit private newsletter ownership, immutable corrections and availability-aware historical retrieval; durable per-source leases/retry and RSS validators tested (NEWS.md); source-specific policies, syndicated-copy deduplication and expired-text cleanup tested; real configured-provider operation remains unverified |
 | Jobs and notifications | scheduler/jobs.py | Implemented and tested: scoped leases, in-app coherent latest-evidence dedup/ack and bounded local delivery recovery, bounded simulation/PDF workers, short restart/model contention smoke and0018 clock/token fencing tests; 24-hour observation and OS/Docker interruption pending (SOAK.md) |
-| Container/network/CI | Dockerfile, docker-compose.yml, .github/workflows | CPU build path retained; manual x86_64 validation replaces automatic Pi deployment; Docker host build blocked by daemon availability |
+| Container/network/CI | Dockerfile, docker-compose.yml, .github/workflows | CPU build path retained; manual x86_64 validation replaces automatic Pi deployment; updated ib_async image build and isolated non-root import smoke pass (`evidence/container-build-ibasync-20261013.txt`) |
 
 ## Authority and data separation
 
@@ -34,7 +34,7 @@ no simulator order can reach a broker SDK.
 
 The external SDK write boundary is closed in `execution/external.py`. A configuration
 flag, model schema, port 4002, test success, or six-share SPYL example grants no write
-capability. Direct ib_insync and the HTTP MCP bridge are separate layers; ChatGPT
+capability. Direct ib_async and the HTTP MCP bridge are separate layers; ChatGPT
 connector credentials are neither discovered nor reused by this application.
 
 IBKR readonly calls bind an actual managed account and preserve contract/currency
@@ -46,8 +46,8 @@ account evidence remain required before external writes could be considered.
 
 - [IBKR API](https://www.interactivebrokers.com/docs/tws-api/doc/introduction)
 - [IBKR order placement](https://www.interactivebrokers.com/campus/trading-lessons/python-placing-orders/)
-- [ib_insync API and event semantics](https://ib-insync.readthedocs.io/api.html)
-- [IBKR third-party adapter status](https://www.interactivebrokers.com/docs/tws-api/doc/third-party-api-platforms/non-standard-tws-api-languages-and-packages/ib-insync-and-ib-async)
+- [ib_async API and event semantics](https://github.com/ib-api-reloaded/ib_async)
+- [IBKR third-party adapter status and ib_insync deprecation notice](https://www.interactivebrokers.com/docs/tws-api/doc/third-party-api-platforms/non-standard-tws-api-languages-and-packages/ib-insync-and-ib-async)
 - [IBKR reauthentication](https://www.interactivebrokers.com/docs/tws-api/doc/tws-settings/daily-weekly-reauthentication)
 - [GoCardless bank-data quickstart](https://docs.gocardless.com/docs/bank-account-data/quickstart-guide)
 - [SQLAlchemy transaction isolation in tests](https://docs.sqlalchemy.org/en/20/orm/session_transaction.html)

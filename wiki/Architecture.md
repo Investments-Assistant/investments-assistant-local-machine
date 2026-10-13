@@ -37,7 +37,7 @@ control-plane complexity has no benefit at this scale.
 ## Why Python?
 
 - **Ecosystem**: every data science and brokerage library we need (`yfinance`, `ta`,
-  `alpaca-py`, `ib_insync`, `binance`) has a Python SDK. Writing the same integrations in
+  `alpaca-py`, `ib_async`, `binance`) has a Python SDK. Writing the same integrations in
   Go or Rust would require maintaining custom HTTP clients for each broker.
 - **AsyncIO**: Python 3.12's `asyncio` is mature. `asyncpg` and SQLAlchemy's async layer
   give genuinely non-blocking database access, which matters when the LLM is running in a
@@ -79,7 +79,7 @@ control-plane complexity has no benefit at this scale.
 │   ├─ news_memory.py      PostgreSQL FTS                     │
 │   ├─ portfolio.py        cross-broker aggregator            │
 │   ├─ brokers/alpaca.py   alpaca-py SDK                      │
-│   ├─ brokers/ibkr.py     ib_insync                          │
+│   ├─ brokers/ibkr.py     ib_async                           │
 │   ├─ brokers/coinbase.py coinbase-advanced-py               │
 │   ├─ brokers/binance.py  python-binance                     │
 │   └─ simulator.py        pandas + ta                        │
