@@ -61,6 +61,23 @@ def require_gate(condition, code):
         raise RuntimeError(code)
 
 
+def observe_continuity(previous, interval):
+    """Reject gaps, including suspend on clocks that exclude suspended time."""
+    current = (time.monotonic(), time.time())
+    monotonic_delta = current[0] - previous[0]
+    wall_delta = current[1] - previous[1]
+    # Allow the requested cadence plus bounded HTTP/restart work, not an
+    # arbitrarily delayed next sample. Clock corrections invalidate this window;
+    # they do not imply an application defect or authorize changing OS settings.
+    require_gate(monotonic_delta <= interval + 30, "OBSERVATION_GAP")
+    require_gate(
+        monotonic_delta >= 0 and wall_delta >= 0
+        and abs(wall_delta - monotonic_delta) <= 0.25,
+        "CLOCK_DISCONTINUITY",
+    )
+    return current
+
+
 async def verify_database(url, marker):
     if not marker:
         raise ValueError("DISPOSABLE_MARKER_REQUIRED")
@@ -243,11 +260,14 @@ def main():
         current_window_started_at=datetime.now(UTC).isoformat(),
         target_hours=args.hours,
         control_p95_budget_ms=250,
+        observation_gap_budget_seconds=args.interval + 30,
+        clock_divergence_budget_seconds=0.25,
     )
     save(checkpoint, state)
     env = dict(os.environ, BROWSER_FIXTURE_USERS=state["user"] + "," + state["user"] + "-other")
     process = client = model_process = None
     began = last_restart = time.monotonic()
+    last_observation = (began, time.time())
     next_model = began
     model_started = None
     latencies = []
@@ -262,6 +282,7 @@ def main():
                 stale["instrument_id"],
             )
         while time.monotonic() < deadline and not STOP.is_set():
+            last_observation = observe_continuity(last_observation, args.interval)
             cycle = time.monotonic()
             if code_fingerprint() != state["code_sha256"]:
                 raise RuntimeError("CODE_CHANGED_OBSERVATION_INVALIDATED")
@@ -393,10 +414,13 @@ def main():
             )
         if STOP.is_set():
             state["status"] = "INTERRUPTED"
-        elif state["control_p95_ms"] > 250 or not state["restarts"]:
-            state["status"] = "FAILED_BUDGET_OR_RESTART_GATE"
         else:
-            state["status"] = "PASS_24H" if time.monotonic() - began >= 86400 else "SMOKE_PASS"
+            # A pause can cross the deadline and bypass the next loop body.
+            observe_continuity(last_observation, args.interval)
+            if state["control_p95_ms"] > 250 or not state["restarts"]:
+                state["status"] = "FAILED_BUDGET_OR_RESTART_GATE"
+            else:
+                state["status"] = "PASS_24H" if time.monotonic() - began >= 86400 else "SMOKE_PASS"
     except Exception as exc:
         state["status"] = "FAILED"
         state["failures"].append(

@@ -42,7 +42,8 @@ Smoke evidence:
   halt p95 43.69 ms, local structured model tasks 3/3. Raw samples and code
   fingerprint saved in `.qa/soak-smoke-v2`. Status is `SMOKE_PASS`, not `PASS_24H`.
 
-No 24-hour observation has been launched or claimed. Ongoing source changes would
+The first 24-hour attempt was stopped during setup after a continuity-check defect
+was discovered (see below); no 24-hour pass is claimed. Ongoing source changes
 invalidate a window; start the full observation only against a stable candidate.
 
 - `evidence/soak-smoke-v3.txt`:90.165seconds,49samples,four restarts, haltHTTPp95
@@ -136,3 +137,39 @@ It opens no HTTP listening port, but runs actual login, CSRF and halt handlers
 through ASGI. This measures application processing, not network admission or
 Docker/Nginx routing. It does not replace the independent restart, thermal, OS
 sleep or24h observation gates, nor evaluate arithmetic-answer quality.
+
+## Updated candidate preflight — 2026-10-13
+
+After CI passed at cd049bf, a 90.165-second preflight passed with the updated
+dependencies:51 control samples, halt p95 45.695ms against250ms, and three service
+restarts taking1.957/2.005/2.369s against15s. The existing local GGUF benchmark
+passed in a separate process. Owned children terminated and no broker connection
+or order occurred. This is SMOKE_PASS, not PASS_24H.
+
+Evidence: [preflight](evidence/soak-security-preflight-20261013.json). Concurrent
+[clock observation](evidence/clock-soak-preflight-20261013.json) found no backward
+steps in100.005s/9827samples. This does not erase earlier under-suite clock failures
+or prove future stability. The user was asked whether the laptop can remain
+available for a continuous24-hour window. No OS/power setting changed.
+
+## Observation continuity repair
+
+The runner previously could count a long scheduling/suspend gap toward its
+elapsed target and report PASS_24H without observing that period. A real
+PostgreSQL/HTTP regression reproduces this with injected clocks: a service
+restart followed by an unobserved day yielded PASS_24H in9.75s. This test is
+failure evidence, not actual elapsed observation.
+
+The repaired runner checks continuity at each cycle and once after its loop,
+because a gap can cross the deadline. Before starting a fresh window, budgets
+are fixed at requested sample interval plus30s for the maximum observation gap,
+and250ms for divergence between elapsed wall and monotonic clocks. At the normal
+30s cadence, a gap over60s invalidates the run. Clock adjustment or suspend that
+violates these budgets produces FAILED with OBSERVATION_GAP or CLOCK_DISCONTINUITY;
+it does not authorize an OS change. The extra30s permits bounded control/health
+requests and the existing15s service restart budget. This remains minute-scale
+engineering observation, not proof of continuous physical hardware availability.
+
+The initial `.qa/soak-24h-security-20261013` attempt is INTERRUPTED and must not be
+relabelled or continued across the harness change. Use a fresh output directory
+and retain its earlier evidence. No broker/provider or OS setting changed.

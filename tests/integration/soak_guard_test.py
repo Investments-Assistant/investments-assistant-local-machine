@@ -133,3 +133,51 @@ async def test_soak_cli_exit_matches_observed_acceptance(
     assert state["runner_pid"] is None
     assert state["service_pid"] is None
     assert process.returncode == expected_exit, "CLI result contradicts persisted acceptance status"
+
+
+async def test_soak_cannot_count_an_unobserved_day_as_a_pass(soak_database):
+    """A suspended runner can wake after its deadline without another loop body."""
+    import json
+    import uuid
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    output = root / ".qa" / ("soak-gap-" + uuid.uuid4().hex)
+    code = r'''
+import json, sys
+from pathlib import Path
+from scripts import soak_acceptance as soak
+output = Path(sys.argv[1])
+original_mono, original_wall = soak.time.monotonic, soak.time.time
+original_wait = soak.STOP.wait
+offset = [0.0]
+soak.time.monotonic = lambda: original_mono() + offset[0]
+soak.time.time = lambda: original_wall() + offset[0]
+def wait(seconds):
+    checkpoint = output / "checkpoint.json"
+    if seconds >= 0.5 and checkpoint.exists():
+        cycles = json.loads(checkpoint.read_text())["cycles"]
+        # First complete an actual service restart, then miss an entire day.
+        offset[0] += 10 if cycles == 1 else 86401
+    return original_wait(min(seconds, 0.01))
+soak.STOP.wait = wait
+sys.argv = ["soak_acceptance", "--hours", "24", "--interval", "1",
+            "--restart-every", "5", "--output", str(output)]
+raise SystemExit(soak.main())
+'''
+    process = await asyncio.create_subprocess_exec(
+        sys.executable, "-c", code, str(output), cwd=root,
+        env=os.environ.copy(), stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    try:
+        stdout, stderr = await asyncio.wait_for(process.communicate(), 40)
+    finally:
+        if process.returncode is None:
+            process.terminate()
+            await asyncio.wait_for(process.wait(), 20)
+    state = json.loads((output / "checkpoint.json").read_text())
+    assert state["status"] == "FAILED", (stdout.decode(), stderr.decode(), state)
+    assert state["failures"][-1]["code"] == "OBSERVATION_GAP"
+    assert state["runner_pid"] is None and state["service_pid"] is None
+    assert process.returncode != 0
