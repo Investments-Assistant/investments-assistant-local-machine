@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "run_id": "ia-runtime-2001c3b0b268",
+  "independent_cleanup_check": {
+    "container": [],
+    "network": [],
+    "volume": []
+  },
+  "image_id": "sha256:a64ce3a90cee80e7a93cd6e8e83828c583d3d70b37ff99de0c31ed8f27babe95",
+  "checked_result": "container-runtime-ibasync-new.json",
+  "source_match": "container-source-comparison-20261014.json",
+  "scope": "No fixture-labelled resources remain; separate read-only check after runner exit0."
+}

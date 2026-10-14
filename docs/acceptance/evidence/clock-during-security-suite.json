@@ -1,0 +1,29 @@
+{
+  "seconds": 211.43608149200008,
+  "jumps": [
+    {
+      "wall_delta": -0.578214078,
+      "monotonic_delta": 0.010167921
+    },
+    {
+      "wall_delta": -0.632830015,
+      "monotonic_delta": 0.01029971
+    },
+    {
+      "wall_delta": -0.537573514,
+      "monotonic_delta": 0.01030478
+    },
+    {
+      "wall_delta": -0.586477253,
+      "monotonic_delta": 0.010272267
+    },
+    {
+      "wall_delta": -0.543212014,
+      "monotonic_delta": 0.010286889
+    },
+    {
+      "wall_delta": -0.568795149,
+      "monotonic_delta": 0.010178135
+    }
+  ]
+}

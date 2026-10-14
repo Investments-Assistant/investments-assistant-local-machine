@@ -12,6 +12,7 @@ import pandas as pd
 import yfinance as yf
 import exchange_calendars as calendars
 
+from src.config import get_settings
 from src.research.replay import Bar
 
 CALENDARS = {
@@ -27,6 +28,8 @@ CALENDARS = {
 
 
 def load_history(symbols: list[str], start: str, end: str, base_currency: str):
+    if not get_settings().yahoo_historical_data_enabled:
+        raise ValueError("YAHOO_RESEARCH_SOURCE_DISABLED_PENDING_OPERATOR_REVIEW")
     start_at, end_at = datetime.fromisoformat(start), datetime.fromisoformat(end)
     if not start_at < end_at or (end_at - start_at).days > 3653:
         raise ValueError("Research interval must be increasing and at most10 years")

@@ -1,0 +1,16 @@
+{
+  "status": "FAILED",
+  "cycles": 7,
+  "restarts": 0,
+  "current_window_seconds": 8.843452848988818,
+  "failures": [
+    {
+      "at": "2026-10-13T15:12:55.666145+00:00",
+      "code": "CLOCK_DISCONTINUITY"
+    }
+  ],
+  "runner_pid": null,
+  "service_pid": null,
+  "current_window_started_at": "2026-10-13T15:12:45.555346+00:00",
+  "finished_at": "2026-10-13T15:12:55.944286+00:00"
+}

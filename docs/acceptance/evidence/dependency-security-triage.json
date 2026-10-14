@@ -1,0 +1,765 @@
+{
+  "alerts_reviewed": 81,
+  "patched_floor_met": 78,
+  "not_cleared": [
+    {
+      "fixed": null,
+      "manifest": "poetry.lock",
+      "number": 90,
+      "package": "PyJWT",
+      "severity": "medium",
+      "locked": "2.15.1",
+      "patched_floor_met": false
+    },
+    {
+      "fixed": null,
+      "manifest": "poetry.lock",
+      "number": 37,
+      "package": "weasyprint",
+      "severity": "medium",
+      "locked": "70.0",
+      "patched_floor_met": false
+    },
+    {
+      "fixed": null,
+      "manifest": "poetry.lock",
+      "number": 1,
+      "package": "diskcache",
+      "severity": "medium",
+      "locked": "5.6.3",
+      "patched_floor_met": false
+    }
+  ],
+  "remote_alerts_changed": false,
+  "rows": [
+    {
+      "fixed": "70.0",
+      "manifest": "poetry.lock",
+      "number": 94,
+      "package": "WeasyPrint",
+      "severity": "high",
+      "locked": "70.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.15.0",
+      "manifest": "poetry.lock",
+      "number": 93,
+      "package": "PyJWT",
+      "severity": "medium",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "1.4.2",
+      "manifest": "poetry.lock",
+      "number": 92,
+      "package": "Mako",
+      "severity": "medium",
+      "locked": "1.4.3",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "6.9.1",
+      "manifest": "poetry.lock",
+      "number": 91,
+      "package": "multidict",
+      "severity": "medium",
+      "locked": "7.1.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": null,
+      "manifest": "poetry.lock",
+      "number": 90,
+      "package": "PyJWT",
+      "severity": "medium",
+      "locked": "2.15.1",
+      "patched_floor_met": false
+    },
+    {
+      "fixed": "6.5.9",
+      "manifest": "poetry.lock",
+      "number": 89,
+      "package": "tornado",
+      "severity": "medium",
+      "locked": "6.5.10",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "6.5.9",
+      "manifest": "poetry.lock",
+      "number": 88,
+      "package": "tornado",
+      "severity": "high",
+      "locked": "6.5.10",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "6.5.9",
+      "manifest": "poetry.lock",
+      "number": 87,
+      "package": "tornado",
+      "severity": "high",
+      "locked": "6.5.10",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.15.0",
+      "manifest": "poetry.lock",
+      "number": 86,
+      "package": "PyJWT",
+      "severity": "medium",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.14.0",
+      "manifest": "poetry.lock",
+      "number": 82,
+      "package": "pyjwt",
+      "severity": "medium",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.14.0",
+      "manifest": "poetry.lock",
+      "number": 81,
+      "package": "PyJWT",
+      "severity": "high",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.14.0",
+      "manifest": "poetry.lock",
+      "number": 80,
+      "package": "PyJWT",
+      "severity": "medium",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.14.0",
+      "manifest": "poetry.lock",
+      "number": 79,
+      "package": "PyJWT",
+      "severity": "critical",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.14.0",
+      "manifest": "poetry.lock",
+      "number": 78,
+      "package": "pyjwt",
+      "severity": "medium",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.14.0",
+      "manifest": "poetry.lock",
+      "number": 77,
+      "package": "pyjwt",
+      "severity": "high",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.14.0",
+      "manifest": "poetry.lock",
+      "number": 76,
+      "package": "PyJWT",
+      "severity": "medium",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "49.0.0",
+      "manifest": "poetry.lock",
+      "number": 75,
+      "package": "cryptography",
+      "severity": "high",
+      "locked": "50.0.2",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "49.0.0",
+      "manifest": "poetry.lock",
+      "number": 74,
+      "package": "cryptography",
+      "severity": "medium",
+      "locked": "50.0.2",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.9.0",
+      "manifest": "poetry.lock",
+      "number": 71,
+      "package": "soupsieve",
+      "severity": "medium",
+      "locked": "3.0.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.9.0",
+      "manifest": "poetry.lock",
+      "number": 70,
+      "package": "soupsieve",
+      "severity": "medium",
+      "locked": "3.0.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "70.0",
+      "manifest": "poetry.lock",
+      "number": 69,
+      "package": "weasyprint",
+      "severity": "medium",
+      "locked": "70.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "6.5.8",
+      "manifest": "poetry.lock",
+      "number": 67,
+      "package": "tornado",
+      "severity": "high",
+      "locked": "6.5.10",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "6.5.8",
+      "manifest": "poetry.lock",
+      "number": 65,
+      "package": "tornado",
+      "severity": "medium",
+      "locked": "6.5.10",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "6.5.8",
+      "manifest": "poetry.lock",
+      "number": 64,
+      "package": "tornado",
+      "severity": "low",
+      "locked": "6.5.10",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "50.0.0",
+      "manifest": "poetry.lock",
+      "number": 61,
+      "package": "cryptography",
+      "severity": "high",
+      "locked": "50.0.2",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.3",
+      "manifest": "poetry.lock",
+      "number": 60,
+      "package": "aiohttp",
+      "severity": "high",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.2",
+      "manifest": "poetry.lock",
+      "number": 59,
+      "package": "aiohttp",
+      "severity": "medium",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.2",
+      "manifest": "poetry.lock",
+      "number": 58,
+      "package": "aiohttp",
+      "severity": "medium",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.13.0",
+      "manifest": "poetry.lock",
+      "number": 57,
+      "package": "PyJWT",
+      "severity": "medium",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.13.0",
+      "manifest": "poetry.lock",
+      "number": 56,
+      "package": "pyjwt",
+      "severity": "low",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 55,
+      "package": "pillow",
+      "severity": "high",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 54,
+      "package": "pillow",
+      "severity": "high",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 53,
+      "package": "pillow",
+      "severity": "medium",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 52,
+      "package": "Pillow",
+      "severity": "high",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 51,
+      "package": "Pillow",
+      "severity": "high",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 50,
+      "package": "Pillow",
+      "severity": "medium",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 49,
+      "package": "Pillow",
+      "severity": "high",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 48,
+      "package": "Pillow",
+      "severity": "medium",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 47,
+      "package": "pillow",
+      "severity": "high",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 46,
+      "package": "pillow",
+      "severity": "high",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 45,
+      "package": "pillow",
+      "severity": "high",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 44,
+      "package": "pillow",
+      "severity": "high",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "12.3.0",
+      "manifest": "poetry.lock",
+      "number": 43,
+      "package": "pillow",
+      "severity": "high",
+      "locked": "12.3.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "1.28.1",
+      "manifest": "poetry.lock",
+      "number": 42,
+      "package": "mcp",
+      "severity": "high",
+      "locked": "1.30.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "1.27.2",
+      "manifest": "poetry.lock",
+      "number": 41,
+      "package": "mcp",
+      "severity": "high",
+      "locked": "1.30.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "1.27.2",
+      "manifest": "poetry.lock",
+      "number": 40,
+      "package": "mcp",
+      "severity": "high",
+      "locked": "1.30.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.8.4",
+      "manifest": "poetry.lock",
+      "number": 39,
+      "package": "soupsieve",
+      "severity": "high",
+      "locked": "3.0.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.8.4",
+      "manifest": "poetry.lock",
+      "number": 38,
+      "package": "soupsieve",
+      "severity": "high",
+      "locked": "3.0.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": null,
+      "manifest": "poetry.lock",
+      "number": 37,
+      "package": "weasyprint",
+      "severity": "medium",
+      "locked": "70.0",
+      "patched_floor_met": false
+    },
+    {
+      "fixed": "2.14.2",
+      "manifest": "poetry.lock",
+      "number": 36,
+      "package": "pydantic-settings",
+      "severity": "medium",
+      "locked": "2.15.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "1.3.1",
+      "manifest": "poetry.lock",
+      "number": 34,
+      "package": "starlette",
+      "severity": "high",
+      "locked": "1.7.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "1.3.0",
+      "manifest": "poetry.lock",
+      "number": 33,
+      "package": "Starlette",
+      "severity": "low",
+      "locked": "1.7.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "6.5.7",
+      "manifest": "poetry.lock",
+      "number": 32,
+      "package": "tornado",
+      "severity": "medium",
+      "locked": "6.5.10",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "0.0.30",
+      "manifest": "poetry.lock",
+      "number": 31,
+      "package": "python-multipart",
+      "severity": "high",
+      "locked": "0.0.32",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "0.0.31",
+      "manifest": "poetry.lock",
+      "number": 30,
+      "package": "python-multipart",
+      "severity": "low",
+      "locked": "0.0.32",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "0.0.30",
+      "manifest": "poetry.lock",
+      "number": 29,
+      "package": "python-multipart",
+      "severity": "low",
+      "locked": "0.0.32",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "0.0.30",
+      "manifest": "poetry.lock",
+      "number": 28,
+      "package": "python-multipart",
+      "severity": "low",
+      "locked": "0.0.32",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "6.5.6",
+      "manifest": "poetry.lock",
+      "number": 27,
+      "package": "tornado",
+      "severity": "high",
+      "locked": "6.5.10",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "6.5.6",
+      "manifest": "poetry.lock",
+      "number": 26,
+      "package": "tornado",
+      "severity": "high",
+      "locked": "6.5.10",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "1.1.0",
+      "manifest": "poetry.lock",
+      "number": 25,
+      "package": "starlette",
+      "severity": "high",
+      "locked": "1.7.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "1.1.0",
+      "manifest": "poetry.lock",
+      "number": 24,
+      "package": "starlette",
+      "severity": "medium",
+      "locked": "1.7.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "48.0.1",
+      "manifest": "poetry.lock",
+      "number": 23,
+      "package": "cryptography",
+      "severity": "high",
+      "locked": "50.0.2",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.1",
+      "manifest": "poetry.lock",
+      "number": 22,
+      "package": "aiohttp",
+      "severity": "medium",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.1",
+      "manifest": "poetry.lock",
+      "number": 21,
+      "package": "aiohttp",
+      "severity": "low",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.1",
+      "manifest": "poetry.lock",
+      "number": 20,
+      "package": "aiohttp",
+      "severity": "low",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.1",
+      "manifest": "poetry.lock",
+      "number": 19,
+      "package": "aiohttp",
+      "severity": "medium",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.1",
+      "manifest": "poetry.lock",
+      "number": 18,
+      "package": "aiohttp",
+      "severity": "medium",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.1",
+      "manifest": "poetry.lock",
+      "number": 17,
+      "package": "aiohttp",
+      "severity": "medium",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.1",
+      "manifest": "poetry.lock",
+      "number": 16,
+      "package": "aiohttp",
+      "severity": "medium",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.1",
+      "manifest": "poetry.lock",
+      "number": 15,
+      "package": "aiohttp",
+      "severity": "low",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.0",
+      "manifest": "poetry.lock",
+      "number": 14,
+      "package": "aiohttp",
+      "severity": "low",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.13.0",
+      "manifest": "poetry.lock",
+      "number": 13,
+      "package": "pyjwt",
+      "severity": "medium",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.13.0",
+      "manifest": "poetry.lock",
+      "number": 12,
+      "package": "pyjwt",
+      "severity": "high",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "2.13.0",
+      "manifest": "poetry.lock",
+      "number": 11,
+      "package": "pyjwt",
+      "severity": "medium",
+      "locked": "2.15.1",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "6.5.6",
+      "manifest": "poetry.lock",
+      "number": 10,
+      "package": "tornado",
+      "severity": "low",
+      "locked": "6.5.10",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "1.0.1",
+      "manifest": "poetry.lock",
+      "number": 9,
+      "package": "starlette",
+      "severity": "medium",
+      "locked": "1.7.0",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.0",
+      "manifest": "poetry.lock",
+      "number": 8,
+      "package": "aiohttp",
+      "severity": "medium",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "3.14.0",
+      "manifest": "poetry.lock",
+      "number": 7,
+      "package": "aiohttp",
+      "severity": "medium",
+      "locked": "3.14.5",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "0.0.27",
+      "manifest": "poetry.lock",
+      "number": 3,
+      "package": "python-multipart",
+      "severity": "high",
+      "locked": "0.0.32",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": "1.3.12",
+      "manifest": "poetry.lock",
+      "number": 2,
+      "package": "Mako",
+      "severity": "high",
+      "locked": "1.4.3",
+      "patched_floor_met": true
+    },
+    {
+      "fixed": null,
+      "manifest": "poetry.lock",
+      "number": 1,
+      "package": "diskcache",
+      "severity": "medium",
+      "locked": "5.6.3",
+      "patched_floor_met": false
+    }
+  ]
+}

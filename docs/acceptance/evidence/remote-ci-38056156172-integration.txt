@@ -1,0 +1,1336 @@
+﻿2026-10-10T13:34:07.6678163Z Current runner version: '2.337.0'
+2026-10-10T13:34:07.6697644Z ##[group]Runner Image Provisioner
+2026-10-10T13:34:07.6698250Z Hosted Compute Agent
+2026-10-10T13:34:07.6698602Z Version: 20261002.596
+2026-10-10T13:34:07.6699000Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+2026-10-10T13:34:07.6699497Z Build Date: 2026-10-02T22:28:27Z
+2026-10-10T13:34:07.6699899Z Worker ID: {d378f325-b8db-4177-b273-68eebd7b832f}
+2026-10-10T13:34:07.6700348Z Region: centralus
+2026-10-10T13:34:07.6700685Z Cloud: Azure
+2026-10-10T13:34:07.6701027Z ##[endgroup]
+2026-10-10T13:34:07.6701864Z ##[group]Operating System
+2026-10-10T13:34:07.6702224Z Ubuntu
+2026-10-10T13:34:07.6702697Z 24.04.5
+2026-10-10T13:34:07.6703019Z LTS
+2026-10-10T13:34:07.6703413Z ##[endgroup]
+2026-10-10T13:34:07.6703806Z ##[group]Runner Image
+2026-10-10T13:34:07.6704167Z Image: ubuntu-24.04
+2026-10-10T13:34:07.6704525Z Version: 20261004.327.1
+2026-10-10T13:34:07.6705330Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-10T13:34:07.6706233Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+2026-10-10T13:34:07.6706789Z ##[endgroup]
+2026-10-10T13:34:07.6707516Z ##[group]GITHUB_TOKEN Permissions
+2026-10-10T13:34:07.6708752Z Contents: read
+2026-10-10T13:34:07.6709127Z Metadata: read
+2026-10-10T13:34:07.6709477Z Packages: read
+2026-10-10T13:34:07.6709810Z ##[endgroup]
+2026-10-10T13:34:07.6711228Z Secret source: Actions
+2026-10-10T13:34:07.6711800Z Cache mode: write
+2026-10-10T13:34:07.6712452Z Prepare workflow directory
+2026-10-10T13:34:07.7019365Z Prepare all required actions
+2026-10-10T13:34:07.7051466Z Getting action download info
+2026-10-10T13:34:07.9473086Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-10T13:34:08.0338064Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-10T13:34:08.1264155Z Download action repository 'snok/install-poetry@v1' (SHA:a783c322200f0519c7926aa6faa857c4e23e9263)
+2026-10-10T13:34:08.3652911Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+2026-10-10T13:34:08.4856789Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-10T13:34:08.6081709Z Download action repository 'SonarSource/sonarcloud-github-action@master' (SHA:ba3875ecf642b2129de2b589510c81a8b53dbf4e)
+2026-10-10T13:34:08.8081061Z Download action repository 'sonarsource/sonarqube-quality-gate-action@master' (SHA:7a5fffe8e523c40e0c740b6bc2712ab503e52efa)
+2026-10-10T13:34:09.1133145Z Getting action download info
+2026-10-10T13:34:09.2028770Z Download action repository 'SonarSource/sonarqube-scan-action@v5.0.0' (SHA:0303d6b62e310685c0e34d0b9cde218036885c4d)
+2026-10-10T13:34:09.4481106Z Getting action download info
+2026-10-10T13:34:09.5841790Z Uses: Investments-Assistant/investments-assistant-local-machine/.github/workflows/integration-tests.yml@refs/heads/main (0814db3e8717a9b75e7b8b0e706a135f388e1b34)
+2026-10-10T13:34:09.5845768Z Complete job name: Integration Tests / Run Integration Tests
+2026-10-10T13:34:09.6302911Z ##[group]Checking docker version
+2026-10-10T13:34:09.6311909Z ##[command]/usr/bin/docker version --format '{{.Server.APIVersion}}'
+2026-10-10T13:34:09.7095394Z '1.48'
+2026-10-10T13:34:09.7119178Z Docker daemon API version: '1.48'
+2026-10-10T13:34:09.7120118Z ##[command]/usr/bin/docker version --format '{{.Client.APIVersion}}'
+2026-10-10T13:34:09.7263071Z '1.48'
+2026-10-10T13:34:09.7277216Z Docker client API version: '1.48'
+2026-10-10T13:34:09.7281625Z ##[endgroup]
+2026-10-10T13:34:09.7284556Z ##[group]Clean up resources from previous jobs
+2026-10-10T13:34:09.7289243Z ##[command]/usr/bin/docker ps --all --quiet --no-trunc --filter "label=678889"
+2026-10-10T13:34:09.7439673Z ##[command]/usr/bin/docker network prune --force --filter "label=678889"
+2026-10-10T13:34:09.7550327Z ##[endgroup]
+2026-10-10T13:34:09.7550957Z ##[group]Create local container network
+2026-10-10T13:34:09.7559353Z ##[command]/usr/bin/docker network create --label 678889 github_network_a5e94da3df9d46c4b5d686808dd4089c
+2026-10-10T13:34:09.8135650Z e10acc51b31f571d3cd5a9172088cf3993000eb71db7cf53b3652ee0337d79e2
+2026-10-10T13:34:09.8150869Z ##[endgroup]
+2026-10-10T13:34:09.8171804Z ##[group]Starting postgres service container
+2026-10-10T13:34:09.8187336Z ##[command]/usr/bin/docker pull postgres:16
+2026-10-10T13:34:10.3982831Z 16: Pulling from library/postgres
+2026-10-10T13:34:10.5416685Z ecc510c1e359: Pulling fs layer
+2026-10-10T13:34:10.5420029Z 79faf13a8736: Pulling fs layer
+2026-10-10T13:34:10.5420396Z 6456bfbf35e7: Pulling fs layer
+2026-10-10T13:34:10.5420665Z b353db459ed1: Pulling fs layer
+2026-10-10T13:34:10.5420882Z 99f49de4fe2b: Pulling fs layer
+2026-10-10T13:34:10.5421104Z 83d1a2a3917c: Pulling fs layer
+2026-10-10T13:34:10.5421322Z 715ea0948cb1: Pulling fs layer
+2026-10-10T13:34:10.5421546Z 486e8305f56f: Pulling fs layer
+2026-10-10T13:34:10.5421767Z 99f49de4fe2b: Waiting
+2026-10-10T13:34:10.5422014Z 83d1a2a3917c: Waiting
+2026-10-10T13:34:10.5422211Z 715ea0948cb1: Waiting
+2026-10-10T13:34:10.5422536Z b353db459ed1: Waiting
+2026-10-10T13:34:10.5422722Z 486e8305f56f: Waiting
+2026-10-10T13:34:10.5422988Z e7d675f11ded: Pulling fs layer
+2026-10-10T13:34:10.5423216Z c49864c27f35: Pulling fs layer
+2026-10-10T13:34:10.5423387Z 770ef8b308ea: Pulling fs layer
+2026-10-10T13:34:10.5423522Z 50c25daa0302: Pulling fs layer
+2026-10-10T13:34:10.5423655Z 8309db3ae5b6: Pulling fs layer
+2026-10-10T13:34:10.5423786Z 9731e27f2541: Pulling fs layer
+2026-10-10T13:34:10.5423918Z e7d675f11ded: Waiting
+2026-10-10T13:34:10.5424034Z c49864c27f35: Waiting
+2026-10-10T13:34:10.5424149Z 770ef8b308ea: Waiting
+2026-10-10T13:34:10.5424262Z 50c25daa0302: Waiting
+2026-10-10T13:34:10.5424378Z 8309db3ae5b6: Waiting
+2026-10-10T13:34:10.5424492Z 9731e27f2541: Waiting
+2026-10-10T13:34:10.6968545Z 79faf13a8736: Verifying Checksum
+2026-10-10T13:34:10.6969753Z 79faf13a8736: Download complete
+2026-10-10T13:34:10.8374228Z 6456bfbf35e7: Verifying Checksum
+2026-10-10T13:34:10.8374669Z 6456bfbf35e7: Download complete
+2026-10-10T13:34:10.8779076Z ecc510c1e359: Verifying Checksum
+2026-10-10T13:34:10.8779743Z ecc510c1e359: Download complete
+2026-10-10T13:34:10.9231053Z b353db459ed1: Verifying Checksum
+2026-10-10T13:34:10.9231312Z b353db459ed1: Download complete
+2026-10-10T13:34:11.0851271Z 715ea0948cb1: Verifying Checksum
+2026-10-10T13:34:11.0851698Z 715ea0948cb1: Download complete
+2026-10-10T13:34:11.1214157Z 83d1a2a3917c: Verifying Checksum
+2026-10-10T13:34:11.1215050Z 83d1a2a3917c: Download complete
+2026-10-10T13:34:11.1482964Z 99f49de4fe2b: Verifying Checksum
+2026-10-10T13:34:11.1487956Z 99f49de4fe2b: Download complete
+2026-10-10T13:34:11.2115446Z 486e8305f56f: Download complete
+2026-10-10T13:34:11.2653660Z c49864c27f35: Download complete
+2026-10-10T13:34:11.3393745Z 770ef8b308ea: Verifying Checksum
+2026-10-10T13:34:11.3394363Z 770ef8b308ea: Download complete
+2026-10-10T13:34:11.4184792Z 50c25daa0302: Verifying Checksum
+2026-10-10T13:34:11.4185179Z 50c25daa0302: Download complete
+2026-10-10T13:34:11.4879015Z 8309db3ae5b6: Verifying Checksum
+2026-10-10T13:34:11.4879717Z 8309db3ae5b6: Download complete
+2026-10-10T13:34:11.5733675Z ecc510c1e359: Pull complete
+2026-10-10T13:34:11.5768719Z 9731e27f2541: Download complete
+2026-10-10T13:34:11.5929576Z e7d675f11ded: Verifying Checksum
+2026-10-10T13:34:11.5929837Z e7d675f11ded: Download complete
+2026-10-10T13:34:17.9274040Z 79faf13a8736: Pull complete
+2026-10-10T13:34:18.1652256Z 6456bfbf35e7: Pull complete
+2026-10-10T13:34:18.2150336Z b353db459ed1: Pull complete
+2026-10-10T13:34:18.5620848Z 99f49de4fe2b: Pull complete
+2026-10-10T13:34:18.6508987Z 83d1a2a3917c: Pull complete
+2026-10-10T13:34:18.6586810Z 715ea0948cb1: Pull complete
+2026-10-10T13:34:18.6683673Z 486e8305f56f: Pull complete
+2026-10-10T13:34:22.0457545Z e7d675f11ded: Pull complete
+2026-10-10T13:34:22.0583851Z c49864c27f35: Pull complete
+2026-10-10T13:34:22.0654605Z 770ef8b308ea: Pull complete
+2026-10-10T13:34:22.0739467Z 50c25daa0302: Pull complete
+2026-10-10T13:34:22.0808058Z 8309db3ae5b6: Pull complete
+2026-10-10T13:34:22.0884810Z 9731e27f2541: Pull complete
+2026-10-10T13:34:22.0919544Z Digest: sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+2026-10-10T13:34:22.0931869Z Status: Downloaded newer image for postgres:16
+2026-10-10T13:34:22.0951327Z docker.io/library/postgres:16
+2026-10-10T13:34:22.1002838Z ##[command]/usr/bin/docker create --name 872b004dbc7643408edeb55eb617d309_postgres16_7cd4c5 --label 678889 --network github_network_a5e94da3df9d46c4b5d686808dd4089c --network-alias postgres -p 5432:5432 --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 -e "POSTGRES_USER=postgres" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_DB=test_investments" -e GITHUB_ACTIONS=true -e CI=true postgres:16
+2026-10-10T13:34:22.1206614Z 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9
+2026-10-10T13:34:22.1227233Z ##[command]/usr/bin/docker start 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9
+2026-10-10T13:34:22.4104309Z 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9
+2026-10-10T13:34:22.4122585Z ##[command]/usr/bin/docker ps --all --filter id=4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9 --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+2026-10-10T13:34:22.4235843Z 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9 Up Less than a second (health: starting)
+2026-10-10T13:34:22.4243898Z ##[command]/usr/bin/docker port 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9
+2026-10-10T13:34:22.4361584Z 5432/tcp -> 0.0.0.0:5432
+2026-10-10T13:34:22.4362191Z 5432/tcp -> [::]:5432
+2026-10-10T13:34:22.4400416Z ##[endgroup]
+2026-10-10T13:34:22.4406919Z ##[group]Waiting for all services to be ready
+2026-10-10T13:34:22.4416990Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9
+2026-10-10T13:34:22.4536297Z starting
+2026-10-10T13:34:22.4558005Z postgres service is starting, waiting 2 seconds before checking again.
+2026-10-10T13:34:24.4557905Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9
+2026-10-10T13:34:24.4655863Z starting
+2026-10-10T13:34:24.4667542Z postgres service is starting, waiting 3 seconds before checking again.
+2026-10-10T13:34:28.2434958Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9
+2026-10-10T13:34:28.2529046Z starting
+2026-10-10T13:34:28.2542036Z postgres service is starting, waiting 7 seconds before checking again.
+2026-10-10T13:34:35.8729040Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9
+2026-10-10T13:34:35.8827234Z healthy
+2026-10-10T13:34:35.8842848Z postgres service is healthy.
+2026-10-10T13:34:35.8843447Z ##[endgroup]
+2026-10-10T13:34:35.9034783Z ##[group]Run actions/checkout@v4
+2026-10-10T13:34:35.9035048Z with:
+2026-10-10T13:34:35.9035243Z   repository: Investments-Assistant/investments-assistant-local-machine
+2026-10-10T13:34:35.9036662Z   token: ***
+2026-10-10T13:34:35.9036781Z   ssh-strict: true
+2026-10-10T13:34:35.9036905Z   ssh-user: git
+2026-10-10T13:34:35.9037034Z   persist-credentials: true
+2026-10-10T13:34:35.9037173Z   clean: true
+2026-10-10T13:34:35.9037305Z   sparse-checkout-cone-mode: true
+2026-10-10T13:34:35.9037453Z   fetch-depth: 1
+2026-10-10T13:34:35.9037569Z   fetch-tags: false
+2026-10-10T13:34:35.9037685Z   show-progress: true
+2026-10-10T13:34:35.9037804Z   lfs: false
+2026-10-10T13:34:35.9037909Z   submodules: false
+2026-10-10T13:34:35.9038025Z   set-safe-directory: true
+2026-10-10T13:34:35.9038170Z   allow-unsafe-pr-checkout: false
+2026-10-10T13:34:35.9038382Z ##[endgroup]
+2026-10-10T13:34:35.9809839Z Syncing repository: Investments-Assistant/investments-assistant-local-machine
+2026-10-10T13:34:35.9812074Z ##[group]Getting Git version info
+2026-10-10T13:34:35.9812801Z Working directory is '/home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine'
+2026-10-10T13:34:35.9813612Z [command]/usr/bin/git version
+2026-10-10T13:34:35.9827199Z git version 2.55.0
+2026-10-10T13:34:35.9843057Z ##[endgroup]
+2026-10-10T13:34:35.9854310Z Temporarily overriding HOME='/home/runner/work/_temp/95cd80ac-9b77-48fb-9ec4-6f781d239cb6' before making global git config changes
+2026-10-10T13:34:35.9855007Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-10T13:34:35.9858750Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine
+2026-10-10T13:34:35.9911856Z Deleting the contents of '/home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine'
+2026-10-10T13:34:35.9915279Z ##[group]Initializing the repository
+2026-10-10T13:34:35.9918628Z [command]/usr/bin/git init /home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine
+2026-10-10T13:34:36.0023660Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-10T13:34:36.0024442Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-10T13:34:36.0024908Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-10T13:34:36.0025304Z hint: call:
+2026-10-10T13:34:36.0025526Z hint:
+2026-10-10T13:34:36.0025821Z hint: 	git config --global init.defaultBranch <name>
+2026-10-10T13:34:36.0026197Z hint:
+2026-10-10T13:34:36.0026545Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-10T13:34:36.0027001Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-10T13:34:36.0027371Z hint:
+2026-10-10T13:34:36.0027694Z hint: 	git branch -m <name>
+2026-10-10T13:34:36.0027976Z hint:
+2026-10-10T13:34:36.0028299Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-10T13:34:36.0028995Z Initialized empty Git repository in /home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine/.git/
+2026-10-10T13:34:36.0030784Z [command]/usr/bin/git remote add origin https://github.com/Investments-Assistant/investments-assistant-local-machine
+2026-10-10T13:34:36.0092988Z ##[endgroup]
+2026-10-10T13:34:36.0093383Z ##[group]Disabling automatic garbage collection
+2026-10-10T13:34:36.0093789Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-10T13:34:36.0126530Z ##[endgroup]
+2026-10-10T13:34:36.0126824Z ##[group]Setting up auth
+2026-10-10T13:34:36.0133816Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-10T13:34:36.0170759Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-10T13:34:36.0740092Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-10T13:34:36.0832628Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-10T13:34:36.1173914Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-10T13:34:36.1207132Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-10T13:34:36.1693167Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-10T13:34:36.1793197Z ##[endgroup]
+2026-10-10T13:34:36.1793524Z ##[group]Fetching the repository
+2026-10-10T13:34:36.1809137Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +0814db3e8717a9b75e7b8b0e706a135f388e1b34:refs/remotes/origin/main
+2026-10-10T13:34:37.0258252Z From https://github.com/Investments-Assistant/investments-assistant-local-machine
+2026-10-10T13:34:37.0258748Z  * [new ref]         0814db3e8717a9b75e7b8b0e706a135f388e1b34 -> origin/main
+2026-10-10T13:34:37.0275137Z ##[endgroup]
+2026-10-10T13:34:37.0275480Z ##[group]Determining the checkout info
+2026-10-10T13:34:37.0286916Z ##[endgroup]
+2026-10-10T13:34:37.0288808Z [command]/usr/bin/git sparse-checkout disable
+2026-10-10T13:34:37.0343495Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-10T13:34:37.0373857Z ##[group]Checking out the ref
+2026-10-10T13:34:37.0377087Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-10-10T13:34:37.0991506Z Switched to a new branch 'main'
+2026-10-10T13:34:37.0995559Z branch 'main' set up to track 'origin/main'.
+2026-10-10T13:34:37.1006087Z ##[endgroup]
+2026-10-10T13:34:37.1053837Z [command]/usr/bin/git log -1 --format=%H
+2026-10-10T13:34:37.1081784Z 0814db3e8717a9b75e7b8b0e706a135f388e1b34
+2026-10-10T13:34:37.1273011Z ##[group]Run actions/setup-python@v5
+2026-10-10T13:34:37.1273178Z with:
+2026-10-10T13:34:37.1273296Z   python-version: 3.12
+2026-10-10T13:34:37.1273425Z   check-latest: false
+2026-10-10T13:34:37.1274636Z   token: ***
+2026-10-10T13:34:37.1274752Z   update-environment: true
+2026-10-10T13:34:37.1274891Z   allow-prereleases: false
+2026-10-10T13:34:37.1275018Z   freethreaded: false
+2026-10-10T13:34:37.1275141Z ##[endgroup]
+2026-10-10T13:34:37.2216032Z ##[group]Installed versions
+2026-10-10T13:34:37.2284096Z (node:2528) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-10T13:34:37.2284727Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-10T13:34:37.2285134Z Successfully set up CPython (3.12.15)
+2026-10-10T13:34:37.2285622Z ##[endgroup]
+2026-10-10T13:34:37.2489947Z ##[group]Run snok/install-poetry@v1
+2026-10-10T13:34:37.2490199Z with:
+2026-10-10T13:34:37.2490370Z   version: 2.3.4
+2026-10-10T13:34:37.2490566Z   virtualenvs-create: true
+2026-10-10T13:34:37.2490845Z   virtualenvs-in-project: true
+2026-10-10T13:34:37.2491118Z   virtualenvs-path: {cache-dir}/virtualenvs
+2026-10-10T13:34:37.2491397Z   installer-parallel: true
+2026-10-10T13:34:37.2491625Z env:
+2026-10-10T13:34:37.2491894Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:37.2492442Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:34:37.2492934Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:37.2493216Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:37.2493454Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:37.2493689Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:34:37.2493875Z ##[endgroup]
+2026-10-10T13:34:37.2554687Z ##[start-action display=Install and configure Poetry;id=__snok_install-poetry.__run]
+2026-10-10T13:34:37.2583996Z ##[group]Run $GITHUB_ACTION_PATH/main.sh
+2026-10-10T13:34:37.2584220Z [36;1m$GITHUB_ACTION_PATH/main.sh[0m
+2026-10-10T13:34:37.2776549Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-10T13:34:37.2776776Z env:
+2026-10-10T13:34:37.2776946Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:37.2777190Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:34:37.2777428Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:37.2777645Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:37.2777857Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:37.2778085Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:34:37.2778283Z   VERSION: 2.3.4
+2026-10-10T13:34:37.2778410Z   VIRTUALENVS_CREATE: true
+2026-10-10T13:34:37.2778777Z   VIRTUALENVS_IN_PROJECT: true
+2026-10-10T13:34:37.2778930Z   VIRTUALENVS_PATH: {cache-dir}/virtualenvs
+2026-10-10T13:34:37.2779090Z   INSTALLER_PARALLEL: true
+2026-10-10T13:34:37.2779222Z   INSTALLATION_ARGUMENTS: 
+2026-10-10T13:34:37.2779360Z   POETRY_PLUGINS: 
+2026-10-10T13:34:37.2779498Z ##[endgroup]
+2026-10-10T13:34:37.4440409Z 
+2026-10-10T13:34:37.4441315Z [33mSetting Poetry installation path as /home/runner/.local[0m
+2026-10-10T13:34:37.4441661Z 
+2026-10-10T13:34:37.4441805Z [33mInstalling Poetry 👷[0m
+2026-10-10T13:34:37.4441917Z 
+2026-10-10T13:34:47.2078239Z Retrieving Poetry metadata
+2026-10-10T13:34:47.2078468Z 
+2026-10-10T13:34:47.2078567Z # Welcome to Poetry!
+2026-10-10T13:34:47.2078667Z 
+2026-10-10T13:34:47.2078765Z This will download and install the latest version of Poetry,
+2026-10-10T13:34:47.2078982Z a dependency and package manager for Python.
+2026-10-10T13:34:47.2079098Z 
+2026-10-10T13:34:47.2079248Z It will add the `poetry` command to Poetry's bin directory, located at:
+2026-10-10T13:34:47.2079470Z 
+2026-10-10T13:34:47.2079546Z /home/runner/.local/bin
+2026-10-10T13:34:47.2079683Z 
+2026-10-10T13:34:47.2079877Z You can uninstall at any time by executing this script with the --uninstall option,
+2026-10-10T13:34:47.2080274Z and these changes will be reverted.
+2026-10-10T13:34:47.2080419Z 
+2026-10-10T13:34:47.2080501Z Installing Poetry (2.3.4)
+2026-10-10T13:34:47.2080768Z Installing Poetry (2.3.4): Creating environment
+2026-10-10T13:34:47.2080994Z Installing Poetry (2.3.4): Installing Poetry
+2026-10-10T13:34:47.2081179Z Installing Poetry (2.3.4): Creating script
+2026-10-10T13:34:47.2081333Z Installing Poetry (2.3.4): Done
+2026-10-10T13:34:47.2081418Z 
+2026-10-10T13:34:47.2081476Z Poetry (2.3.4) is installed now. Great!
+2026-10-10T13:34:47.2081571Z 
+2026-10-10T13:34:47.2081650Z You can test that everything is set up by executing:
+2026-10-10T13:34:47.2081769Z 
+2026-10-10T13:34:47.2081819Z `poetry --version`
+2026-10-10T13:34:47.2081890Z 
+2026-10-10T13:34:49.3528971Z 
+2026-10-10T13:34:49.3530119Z [33mDone ✅[0m
+2026-10-10T13:34:49.3530301Z 
+2026-10-10T13:34:49.3531138Z [33mIf you are creating a venv in your project, you can activate it by running 'source .venv/bin/activate'. If you're running this in an OS matrix, you can use 'source $VENV' instead, as an OS agnostic option[0m
+2026-10-10T13:34:49.3545888Z ##[end-action id=__snok_install-poetry.__run;outcome=success;conclusion=success;duration_ms=12099]
+2026-10-10T13:34:49.4577843Z ##[group]Run actions/cache@v4
+2026-10-10T13:34:49.4578016Z with:
+2026-10-10T13:34:49.4578130Z   path: .venv
+2026-10-10T13:34:49.4578338Z   key: venv-Linux-b14503823f52fce8531f479a77ad31a80446b9ada7e7433b55568306f2c41830
+2026-10-10T13:34:49.4578581Z   restore-keys: venv-Linux-
+2026-10-10T13:34:49.4578726Z   enableCrossOsArchive: false
+2026-10-10T13:34:49.4578868Z   fail-on-cache-miss: false
+2026-10-10T13:34:49.4578999Z   lookup-only: false
+2026-10-10T13:34:49.4579121Z   save-always: false
+2026-10-10T13:34:49.4579238Z env:
+2026-10-10T13:34:49.4579413Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:49.4579660Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:34:49.4579899Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:49.4580111Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:49.4580323Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:49.4580561Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:34:49.4580744Z   VENV: .venv/bin/activate
+2026-10-10T13:34:49.4580872Z ##[endgroup]
+2026-10-10T13:34:49.5335421Z (node:2657) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-10T13:34:49.5335962Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-10T13:34:49.6775460Z Cache hit for: venv-Linux-b14503823f52fce8531f479a77ad31a80446b9ada7e7433b55568306f2c41830
+2026-10-10T13:34:49.6849930Z (node:2657) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-10T13:34:50.8778964Z Received 125829120 of 188346344 (66.8%), 120.0 MBs/sec
+2026-10-10T13:34:51.2138076Z Received 188346344 of 188346344 (100.0%), 134.4 MBs/sec
+2026-10-10T13:34:51.2139228Z Cache Size: ~180 MB (188346344 B)
+2026-10-10T13:34:51.2190881Z [command]/usr/bin/tar -xf /home/runner/work/_temp/6e7fbb5f-73dd-407c-ba44-6b029484f297/cache.tzst -P -C /home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine --use-compress-program unzstd
+2026-10-10T13:34:52.2212842Z Cache restored successfully
+2026-10-10T13:34:52.2355398Z Cache restored from key: venv-Linux-b14503823f52fce8531f479a77ad31a80446b9ada7e7433b55568306f2c41830
+2026-10-10T13:34:52.2484301Z ##[group]Run poetry install --no-interaction --no-root
+2026-10-10T13:34:52.2484563Z [36;1mpoetry install --no-interaction --no-root[0m
+2026-10-10T13:34:52.2541156Z shell: /usr/bin/bash -e {0}
+2026-10-10T13:34:52.2541314Z env:
+2026-10-10T13:34:52.2541480Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:52.2541731Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:34:52.2541971Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:52.2542189Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:52.2542563Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:52.2542783Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:34:52.2542976Z   VENV: .venv/bin/activate
+2026-10-10T13:34:52.2543113Z ##[endgroup]
+2026-10-10T13:34:52.8089449Z Installing dependencies from lock file
+2026-10-10T13:34:53.0374399Z 
+2026-10-10T13:34:53.0374770Z No dependencies to install or update
+2026-10-10T13:34:53.1610762Z ##[group]Run until pg_isready -h localhost -p 5432 -U postgres; do
+2026-10-10T13:34:53.1611081Z [36;1muntil pg_isready -h localhost -p 5432 -U postgres; do[0m
+2026-10-10T13:34:53.1611297Z [36;1m  echo "Waiting for PostgreSQL..."[0m
+2026-10-10T13:34:53.1611462Z [36;1m  sleep 2[0m
+2026-10-10T13:34:53.1611584Z [36;1mdone[0m
+2026-10-10T13:34:53.1666643Z shell: /usr/bin/bash -e {0}
+2026-10-10T13:34:53.1666806Z env:
+2026-10-10T13:34:53.1666973Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.1667224Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:34:53.1667474Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.1667691Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.1667905Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.1668125Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:34:53.1668350Z   VENV: .venv/bin/activate
+2026-10-10T13:34:53.1668485Z ##[endgroup]
+2026-10-10T13:34:53.2164257Z localhost:5432 - accepting connections
+2026-10-10T13:34:53.2194490Z ##[group]Run psql -h localhost -U postgres -d test_investments -v ON_ERROR_STOP=1 -c "CREATE TABLE ia_disposable_marker(token text NOT NULL); INSERT INTO ia_disposable_marker VALUES ('ci-isolated-service');"
+2026-10-10T13:34:53.2195235Z [36;1mpsql -h localhost -U postgres -d test_investments -v ON_ERROR_STOP=1 -c "CREATE TABLE ia_disposable_marker(token text NOT NULL); INSERT INTO ia_disposable_marker VALUES ('ci-isolated-service');"[0m
+2026-10-10T13:34:53.2249041Z shell: /usr/bin/bash -e {0}
+2026-10-10T13:34:53.2249187Z env:
+2026-10-10T13:34:53.2249343Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.2249591Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:34:53.2249831Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.2250047Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.2250260Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.2250655Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:34:53.2250846Z   VENV: .venv/bin/activate
+2026-10-10T13:34:53.2250980Z   PGPASSWORD: postgres
+2026-10-10T13:34:53.2251110Z ##[endgroup]
+2026-10-10T13:34:53.3217458Z CREATE TABLE
+2026-10-10T13:34:53.3217824Z INSERT 0 1
+2026-10-10T13:34:53.3259895Z ##[group]Run poetry run pytest tests/integration \
+2026-10-10T13:34:53.3260169Z [36;1mpoetry run pytest tests/integration \[0m
+2026-10-10T13:34:53.3260351Z [36;1m  --cov=src \[0m
+2026-10-10T13:34:53.3260524Z [36;1m  --cov-report=xml:coverage-integration.xml \[0m
+2026-10-10T13:34:53.3260746Z [36;1m  --cov-report=term-missing \[0m
+2026-10-10T13:34:53.3260934Z [36;1m  --junitxml=junit-integration.xml \[0m
+2026-10-10T13:34:53.3261110Z [36;1m  -v[0m
+2026-10-10T13:34:53.3314482Z shell: /usr/bin/bash -e {0}
+2026-10-10T13:34:53.3314635Z env:
+2026-10-10T13:34:53.3314796Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.3315058Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:34:53.3315305Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.3315528Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.3315775Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:34:53.3315996Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:34:53.3316188Z   VENV: .venv/bin/activate
+2026-10-10T13:34:53.3316325Z   ENVIRONMENT: development
+2026-10-10T13:34:53.3316491Z   TEST_DATABASE_DISPOSABLE_TOKEN: ci-isolated-service
+2026-10-10T13:34:53.3317470Z   DATABASE_URL: ***localhost:5432/investments
+2026-10-10T13:34:53.3317779Z   TEST_DATABASE_URL: ***localhost:5432/test_investments
+2026-10-10T13:34:53.3317956Z ##[endgroup]
+2026-10-10T13:34:54.7118894Z ============================= test session starts ==============================
+2026-10-10T13:34:54.7119520Z platform linux -- Python 3.12.15, pytest-9.0.3, pluggy-1.6.0 -- /home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine/.venv/bin/python
+2026-10-10T13:34:54.7119954Z cachedir: .pytest_cache
+2026-10-10T13:34:54.7120220Z rootdir: /home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine
+2026-10-10T13:34:54.7120517Z configfile: pyproject.toml
+2026-10-10T13:34:54.7120679Z plugins: asyncio-1.3.0, anyio-4.13.0, cov-7.1.0
+2026-10-10T13:34:54.7120997Z asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+2026-10-10T13:34:58.4148080Z collecting ... collected 372 items
+2026-10-10T13:34:58.4148356Z 
+2026-10-10T13:34:58.7948019Z tests/integration/account_events_test.py::test_flow_persisted_and_reconciled_without_inventing_profit_or_policy PASSED [  0%]
+2026-10-10T13:34:58.9230406Z tests/integration/account_events_test.py::test_cash_flow_rejects_scope_conflict_and_reserved_cash PASSED [  0%]
+2026-10-10T13:34:59.0146051Z tests/integration/account_events_test.py::test_tampered_cash_flow_evidence_is_unverified PASSED [  0%]
+2026-10-10T13:34:59.1593914Z tests/integration/account_events_test.py::test_deposit_cannot_hide_a_marked_loss PASSED [  1%]
+2026-10-10T13:34:59.3175853Z tests/integration/account_events_test.py::test_strategy_withdrawal_is_not_drawdown_and_does_not_expand_limits PASSED [  1%]
+2026-10-10T13:34:59.4316934Z tests/integration/account_events_test.py::test_report_cash_flow_interval_and_owner_evidence PASSED [  1%]
+2026-10-10T13:34:59.6253121Z tests/integration/account_events_test.py::test_concurrent_withdrawals_cannot_consume_same_cash PASSED [  1%]
+2026-10-10T13:34:59.7089555Z tests/integration/alert_evidence_test.py::test_alert_latest_observation_updates_all_display_fields PASSED [  2%]
+2026-10-10T13:34:59.7999156Z tests/integration/alert_evidence_test.py::test_delayed_evidence_cannot_reopen_resolved_alert PASSED [  2%]
+2026-10-10T13:34:59.9004747Z tests/integration/alert_evidence_test.py::test_stalled_local_sink_times_out_and_can_retry PASSED [  2%]
+2026-10-10T13:34:59.9766814Z tests/integration/alert_evidence_test.py::test_delivery_caller_cancellation_is_not_reported_as_success PASSED [  2%]
+2026-10-10T13:35:00.0976956Z tests/integration/bank_sync_test.py::test_refresh_idempotency_revision_and_category_override PASSED [  3%]
+2026-10-10T13:35:00.2127813Z tests/integration/bank_sync_test.py::test_failure_does_not_advance_checkpoint_and_retry_recovers PASSED [  3%]
+2026-10-10T13:35:00.3064716Z tests/integration/bank_sync_test.py::test_invalid_batch_is_atomic_and_revoked_consent_disconnects PASSED [  3%]
+2026-10-10T13:35:00.3947562Z tests/integration/bank_sync_test.py::test_account_and_user_binding PASSED [  4%]
+2026-10-10T13:35:00.5066278Z tests/integration/bank_sync_test.py::test_reconnect_keeps_account_identity_and_checkpoint PASSED [  4%]
+2026-10-10T13:35:00.6231363Z tests/integration/bank_sync_test.py::test_explicit_history_recovers_old_revision_and_keeps_absent_rows PASSED [  4%]
+2026-10-10T13:35:00.7290341Z tests/integration/bank_sync_test.py::test_history_retrieval_failure_preserves_success_and_honors_backoff PASSED [  4%]
+2026-10-10T13:35:00.8079650Z tests/integration/bank_sync_test.py::test_history_date_outside_local_bound_never_calls_provider[-1] PASSED [  5%]
+2026-10-10T13:35:00.8843321Z tests/integration/bank_sync_test.py::test_history_date_outside_local_bound_never_calls_provider[731] PASSED [  5%]
+2026-10-10T13:35:00.9716907Z tests/integration/bank_sync_test.py::test_history_owner_inactive_and_disconnected_guards PASSED [  5%]
+2026-10-10T13:35:01.0675677Z tests/integration/bank_sync_test.py::test_history_invalid_batch_preserves_previous_records_and_metadata PASSED [  5%]
+2026-10-10T13:35:01.3103162Z tests/integration/bank_sync_test.py::test_narrow_history_request_never_skips_incremental_cursor PASSED [  6%]
+2026-10-10T13:35:01.3859499Z tests/integration/broker_capture_control_test.py::test_explicit_activation_is_finite_and_never_auto_restarts[observed] PASSED [  6%]
+2026-10-10T13:35:01.4591873Z tests/integration/broker_capture_control_test.py::test_explicit_activation_is_finite_and_never_auto_restarts[partial] PASSED [  6%]
+2026-10-10T13:35:01.5354588Z tests/integration/broker_capture_control_test.py::test_explicit_activation_is_finite_and_never_auto_restarts[private_failure] PASSED [  6%]
+2026-10-10T13:35:01.6151834Z tests/integration/broker_capture_control_test.py::test_current_account_consent_and_ownership_before_activation PASSED [  7%]
+2026-10-10T13:35:01.7011919Z tests/integration/broker_capture_control_test.py::test_explicit_stop_scope_slot_and_shutdown PASSED [  7%]
+2026-10-10T13:35:01.7031504Z tests/integration/broker_capture_control_test.py::test_capture_requires_explicit_confirmation_and_bounded_duration[payload0] PASSED [  7%]
+2026-10-10T13:35:01.7047295Z tests/integration/broker_capture_control_test.py::test_capture_requires_explicit_confirmation_and_bounded_duration[payload1] PASSED [  8%]
+2026-10-10T13:35:01.7062180Z tests/integration/broker_capture_control_test.py::test_capture_requires_explicit_confirmation_and_bounded_duration[payload2] PASSED [  8%]
+2026-10-10T13:35:01.7078908Z tests/integration/broker_capture_control_test.py::test_capture_requires_explicit_confirmation_and_bounded_duration[payload3] PASSED [  8%]
+2026-10-10T13:35:01.7094320Z tests/integration/broker_capture_control_test.py::test_capture_requires_explicit_confirmation_and_bounded_duration[payload4] PASSED [  8%]
+2026-10-10T13:35:01.7108408Z tests/integration/broker_capture_control_test.py::test_capture_requires_explicit_confirmation_and_bounded_duration[payload5] PASSED [  9%]
+2026-10-10T13:35:01.7123629Z tests/integration/broker_capture_control_test.py::test_capture_requires_explicit_confirmation_and_bounded_duration[payload6] PASSED [  9%]
+2026-10-10T13:35:01.8308406Z tests/integration/broker_capture_control_test.py::test_browser_activation_requires_session_csrf_scope_and_current_principal PASSED [  9%]
+2026-10-10T13:35:01.9299602Z tests/integration/broker_observations_test.py::test_out_of_order_callbacks_retain_conflicts_and_mask_identifiers PASSED [  9%]
+2026-10-10T13:35:02.0320408Z tests/integration/broker_observations_test.py::test_batch_ownership_consent_and_rebinding_are_checked PASSED [ 10%]
+2026-10-10T13:35:02.2183740Z tests/integration/broker_observations_test.py::test_reconnect_replay_concurrent_sessions_deduplicate PASSED [ 10%]
+2026-10-10T13:35:02.4743720Z tests/integration/broker_observations_test.py::test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[success-None] PASSED [ 10%]
+2026-10-10T13:35:02.7366700Z tests/integration/broker_observations_test.py::test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[partial-None] PASSED [ 11%]
+2026-10-10T13:35:03.0015302Z tests/integration/broker_observations_test.py::test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[rebind-BROKER_ACCOUNT_CHANGED_DURING_READ] PASSED [ 11%]
+2026-10-10T13:35:03.3433886Z tests/integration/broker_observations_test.py::test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[revoke-IBKR_READ_CONSENT_REQUIRED] PASSED [ 11%]
+2026-10-10T13:35:03.6433949Z tests/integration/broker_observations_test.py::test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[deactivate-PRINCIPAL_INACTIVE] PASSED [ 11%]
+2026-10-10T13:35:04.0137528Z tests/integration/broker_observations_test.py::test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[disable_account-BROKER_ACCOUNT_INACTIVE] PASSED [ 12%]
+2026-10-10T13:35:04.3576122Z tests/integration/broker_observations_test.py::test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[expired_lease-STALE_JOB_LEASE] PASSED [ 12%]
+2026-10-10T13:35:04.7537387Z tests/integration/broker_observations_test.py::test_refresh_rechecks_authority_after_worker_and_commits_only_owned_evidence[reclaimed_lease-STALE_JOB_LEASE] PASSED [ 12%]
+2026-10-10T13:35:04.8591513Z tests/integration/broker_observations_test.py::test_journal_pages_are_bounded_and_cursor_cannot_cross_account PASSED [ 12%]
+2026-10-10T13:35:04.9361887Z tests/integration/broker_observations_test.py::test_invalid_callback_batch_is_atomic_and_error_does_not_echo_identifiers PASSED [ 13%]
+2026-10-10T13:35:05.0386152Z tests/integration/broker_observations_test.py::test_balance_snapshots_persist_and_read_pages_respect_payload_budget PASSED [ 13%]
+2026-10-10T13:35:05.1250729Z tests/integration/broker_observations_test.py::test_source_decimal_normalization_does_not_round_long_callback_values PASSED [ 13%]
+2026-10-10T13:35:05.2423954Z tests/integration/broker_observations_test.py::test_persisted_snapshot_changes_can_match_evidence_without_granting_authority PASSED [ 13%]
+2026-10-10T13:35:05.5488123Z tests/integration/broker_observations_test.py::test_failed_refresh_has_durable_redacted_status_and_blocks_immediate_retry[RuntimeError-BROKER_READ_FAILED-False] PASSED [ 14%]
+2026-10-10T13:35:06.1183804Z tests/integration/broker_observations_test.py::test_failed_refresh_has_durable_redacted_status_and_blocks_immediate_retry[TimeoutError-BROKER_READ_TIMEOUT-True] PASSED [ 14%]
+2026-10-10T13:35:06.6588197Z tests/integration/broker_observations_test.py::test_failed_refresh_has_durable_redacted_status_and_blocks_immediate_retry[CancelledError-BROKER_READ_CANCELLED-True] PASSED [ 14%]
+2026-10-10T13:35:06.7575528Z tests/integration/broker_observations_test.py::test_persisted_order_fill_gap_recovers_after_late_execution_but_not_conflicting_terminal PASSED [ 15%]
+2026-10-10T13:35:06.8659820Z tests/integration/broker_stream_journal_test.py::test_batches_preserve_late_commission_and_replay_dedup_then_fence_final PASSED [ 15%]
+2026-10-10T13:35:06.9517558Z tests/integration/broker_stream_journal_test.py::test_each_batch_rechecks_current_authority_and_time[revoke-IBKR_READ_CONSENT_REQUIRED] PASSED [ 15%]
+2026-10-10T13:35:07.0402210Z tests/integration/broker_stream_journal_test.py::test_each_batch_rechecks_current_authority_and_time[client_id-BROKER_ACCOUNT_CHANGED_DURING_READ] PASSED [ 15%]
+2026-10-10T13:35:07.2622233Z tests/integration/broker_stream_journal_test.py::test_each_batch_rechecks_current_authority_and_time[host-BROKER_ACCOUNT_CHANGED_DURING_READ] PASSED [ 16%]
+2026-10-10T13:35:07.3500567Z tests/integration/broker_stream_journal_test.py::test_each_batch_rechecks_current_authority_and_time[binding-BROKER_ACCOUNT_CHANGED_DURING_READ] PASSED [ 16%]
+2026-10-10T13:35:07.4388665Z tests/integration/broker_stream_journal_test.py::test_each_batch_rechecks_current_authority_and_time[inactive-PRINCIPAL_INACTIVE] PASSED [ 16%]
+2026-10-10T13:35:07.5283846Z tests/integration/broker_stream_journal_test.py::test_each_batch_rechecks_current_authority_and_time[token-STALE_JOB_LEASE] PASSED [ 16%]
+2026-10-10T13:35:07.6312891Z tests/integration/broker_stream_journal_test.py::test_each_batch_rechecks_current_authority_and_time[expired-STALE_JOB_LEASE] PASSED [ 17%]
+2026-10-10T13:35:07.7218348Z tests/integration/broker_stream_journal_test.py::test_each_batch_rechecks_current_authority_and_time[clock_backwards-STALE_JOB_LEASE] PASSED [ 17%]
+2026-10-10T13:35:07.8090654Z tests/integration/broker_stream_journal_test.py::test_each_batch_rechecks_current_authority_and_time[lifetime-BROKER_STREAM_EXPIRED] PASSED [ 17%]
+2026-10-10T13:35:07.9031027Z tests/integration/broker_stream_journal_test.py::test_partial_capture_is_terminal_and_cannot_be_relabelled_success PASSED [ 18%]
+2026-10-10T13:35:08.0133301Z tests/integration/broker_stream_journal_test.py::test_expired_running_checkpoint_reports_interruption_and_replay_is_safe PASSED [ 18%]
+2026-10-10T13:35:08.0937153Z tests/integration/broker_stream_journal_test.py::test_invalid_inputs_do_not_renew_or_write PASSED [ 18%]
+2026-10-10T13:35:08.3997241Z tests/integration/broker_stream_journal_test.py::test_committed_batches_concurrent_delivery_and_failure_rollback[False] PASSED [ 18%]
+2026-10-10T13:35:08.7318663Z tests/integration/broker_stream_journal_test.py::test_committed_batches_concurrent_delivery_and_failure_rollback[True] PASSED [ 19%]
+2026-10-10T13:35:09.9524646Z tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[success] PASSED [ 19%]
+2026-10-10T13:35:11.1755338Z tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[gap] PASSED [ 19%]
+2026-10-10T13:35:12.4287005Z tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[revoke] PASSED [ 19%]
+2026-10-10T13:35:13.6587868Z tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[disconnect] PASSED [ 20%]
+2026-10-10T13:35:13.9534353Z tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[cancel] PASSED [ 20%]
+2026-10-10T13:35:15.1572419Z tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[startup_cancel] PASSED [ 20%]
+2026-10-10T13:35:16.3770147Z tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[cleanup_failure] PASSED [ 20%]
+2026-10-10T13:35:17.6011287Z tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[upstream1100] PASSED [ 21%]
+2026-10-10T13:35:18.8333594Z tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[upstream1101] PASSED [ 21%]
+2026-10-10T13:35:20.0564293Z tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[upstream1102] PASSED [ 21%]
+2026-10-10T13:35:21.2958118Z tests/integration/broker_stream_test.py::test_stream_preserves_only_authorized_batches_and_cleans_owner[upstream1300] PASSED [ 22%]
+2026-10-10T13:35:21.8294860Z tests/integration/chat_evidence_test.py::test_completed_turn_saved_before_done_and_restored_with_redacted_evidence PASSED [ 22%]
+2026-10-10T13:35:22.0963836Z tests/integration/chat_evidence_test.py::test_cancellation_keeps_received_tool_evidence_and_interrupted_state PASSED [ 22%]
+2026-10-10T13:35:22.4364008Z tests/integration/chat_evidence_test.py::test_final_storage_failure_never_emits_saved_answer_or_done PASSED [ 22%]
+2026-10-10T13:35:22.7210026Z tests/integration/chat_evidence_test.py::test_model_error_is_durable_failed_turn PASSED [ 23%]
+2026-10-10T13:35:23.1930150Z tests/integration/chat_evidence_test.py::test_next_turn_replaces_cached_content_and_omits_retired_evidence PASSED [ 23%]
+2026-10-10T13:35:23.3885384Z tests/integration/chat_evidence_test.py::test_history_read_failure_clears_cache_and_never_invokes_model PASSED [ 23%]
+2026-10-10T13:35:23.4842446Z tests/integration/chat_retention_test.py::test_retention_excludes_active_recent_and_other_owner_and_keeps_evidence_ids PASSED [ 23%]
+2026-10-10T13:35:23.5705770Z tests/integration/chat_retention_test.py::test_changed_or_unauthorized_preview_never_erases_messages[content] PASSED [ 24%]
+2026-10-10T13:35:23.6594091Z tests/integration/chat_retention_test.py::test_changed_or_unauthorized_preview_never_erases_messages[active] PASSED [ 24%]
+2026-10-10T13:35:23.7499482Z tests/integration/chat_retention_test.py::test_changed_or_unauthorized_preview_never_erases_messages[owner] PASSED [ 24%]
+2026-10-10T13:35:23.9860537Z tests/integration/chat_retention_test.py::test_changed_or_unauthorized_preview_never_erases_messages[inactive] PASSED [ 25%]
+2026-10-10T13:35:24.0643886Z tests/integration/chat_retention_test.py::test_changed_or_unauthorized_preview_never_erases_messages[expired] PASSED [ 25%]
+2026-10-10T13:35:24.1695666Z tests/integration/chat_retention_test.py::test_bounded_batches_make_progress_without_changing_activity_clock PASSED [ 25%]
+2026-10-10T13:35:24.4224095Z tests/integration/chat_retention_test.py::test_new_turn_wins_lock_race_without_retention_erasing_its_history PASSED [ 25%]
+2026-10-10T13:35:24.5873794Z tests/integration/commissions_test.py::test_commission_before_fill_revisions_and_immutable_fx_evidence PASSED [ 26%]
+2026-10-10T13:35:24.7478350Z tests/integration/commissions_test.py::test_commission_cost_overrun_is_recorded_and_halts_new_orders PASSED [ 26%]
+2026-10-10T13:35:25.0092222Z tests/integration/commissions_test.py::test_concurrent_duplicate_commission_after_new_session_charges_once PASSED [ 26%]
+2026-10-10T13:35:25.1524835Z tests/integration/commissions_test.py::test_fee_revision_preserves_discrepant_balances_and_records_required_review PASSED [ 26%]
+2026-10-10T13:35:25.3324419Z tests/integration/commissions_test.py::test_fee_correction_updates_only_delta_after_database_reload PASSED [ 27%]
+2026-10-10T13:35:25.4031828Z tests/integration/db_models_test.py::TestChatMessageModel::test_insert_and_retrieve PASSED [ 27%]
+2026-10-10T13:35:25.4715637Z tests/integration/db_models_test.py::TestChatMessageModel::test_id_auto_generated PASSED [ 27%]
+2026-10-10T13:35:25.5389125Z tests/integration/db_models_test.py::TestChatMessageModel::test_tool_calls_json_column PASSED [ 27%]
+2026-10-10T13:35:25.6120695Z tests/integration/db_models_test.py::TestTradeModel::test_insert_and_retrieve PASSED [ 28%]
+2026-10-10T13:35:25.6808670Z tests/integration/db_models_test.py::TestTradeModel::test_optional_fields_nullable PASSED [ 28%]
+2026-10-10T13:35:25.7555562Z tests/integration/db_models_test.py::TestNewsArticleModel::test_insert_and_retrieve PASSED [ 28%]
+2026-10-10T13:35:25.8266935Z tests/integration/db_models_test.py::TestNewsArticleModel::test_url_uniqueness_constraint PASSED [ 29%]
+2026-10-10T13:35:25.8964862Z tests/integration/db_models_test.py::TestNewsArticleModel::test_full_text_search_index_usable PASSED [ 29%]
+2026-10-10T13:35:25.9687643Z tests/integration/db_models_test.py::TestDailyPnLModel::test_unique_date_is_scoped_to_user PASSED [ 29%]
+2026-10-10T13:35:26.0378583Z tests/integration/db_models_test.py::TestDailyPnLModel::test_defaults PASSED [ 29%]
+2026-10-10T13:35:26.2010757Z tests/integration/dividend_events_test.py::test_payment_is_attributed_income_and_net_cash_without_basis_change PASSED [ 30%]
+2026-10-10T13:35:26.3334424Z tests/integration/dividend_events_test.py::test_invalid_or_unowned_payment_does_not_change_cash[change0-INVALID_DIVIDEND_AMOUNT] PASSED [ 30%]
+2026-10-10T13:35:26.4666126Z tests/integration/dividend_events_test.py::test_invalid_or_unowned_payment_does_not_change_cash[change1-INVALID_DIVIDEND_AMOUNT] PASSED [ 30%]
+2026-10-10T13:35:26.5969147Z tests/integration/dividend_events_test.py::test_invalid_or_unowned_payment_does_not_change_cash[change2-INVALID_DIVIDEND_AMOUNT] PASSED [ 30%]
+2026-10-10T13:35:26.7356078Z tests/integration/dividend_events_test.py::test_invalid_or_unowned_payment_does_not_change_cash[change3-DIVIDEND_CURRENCY_MISMATCH] PASSED [ 31%]
+2026-10-10T13:35:27.0451036Z tests/integration/dividend_events_test.py::test_invalid_or_unowned_payment_does_not_change_cash[change4-DIVIDEND_OWNERSHIP_UNVERIFIED] PASSED [ 31%]
+2026-10-10T13:35:27.1702476Z tests/integration/dividend_events_test.py::test_invalid_or_unowned_payment_does_not_change_cash[change5-SIMULATOR_EVENT_REQUIRED] PASSED [ 31%]
+2026-10-10T13:35:27.3134777Z tests/integration/dividend_events_test.py::test_protected_income_halts_consumption_and_conflicting_receipts_fail PASSED [ 31%]
+2026-10-10T13:35:27.4903672Z tests/integration/dividend_events_test.py::test_payment_survives_late_fee_and_report_interval_excludes_other_receipts PASSED [ 32%]
+2026-10-10T13:35:27.7267460Z tests/integration/dividend_receipts_test.py::test_unpaid_income_is_not_cash_and_settlement_is_not_double_income PASSED [ 32%]
+2026-10-10T13:35:27.8710230Z tests/integration/dividend_receipts_test.py::test_eligibility_is_explicit_scoped_and_not_inferred_from_current_holdings[changes0-DIVIDEND_ELIGIBILITY_UNVERIFIED] PASSED [ 32%]
+2026-10-10T13:35:28.0133445Z tests/integration/dividend_receipts_test.py::test_eligibility_is_explicit_scoped_and_not_inferred_from_current_holdings[changes1-DIVIDEND_ELIGIBILITY_UNVERIFIED] PASSED [ 33%]
+2026-10-10T13:35:28.1543702Z tests/integration/dividend_receipts_test.py::test_eligibility_is_explicit_scoped_and_not_inferred_from_current_holdings[changes2-INVALID_DIVIDEND_AMOUNT] PASSED [ 33%]
+2026-10-10T13:35:28.2946582Z tests/integration/dividend_receipts_test.py::test_eligibility_is_explicit_scoped_and_not_inferred_from_current_holdings[changes3-DIVIDEND_CURRENCY_MISMATCH] PASSED [ 33%]
+2026-10-10T13:35:28.4244581Z tests/integration/dividend_receipts_test.py::test_eligibility_is_explicit_scoped_and_not_inferred_from_current_holdings[changes4-SIMULATOR_EVENT_REQUIRED] PASSED [ 33%]
+2026-10-10T13:35:28.5664909Z tests/integration/dividend_receipts_test.py::test_eligibility_is_explicit_scoped_and_not_inferred_from_current_holdings[changes5-HISTORICAL_DIVIDEND_ELIGIBILITY_UNAVAILABLE] PASSED [ 34%]
+2026-10-10T13:35:28.7486402Z tests/integration/dividend_receipts_test.py::test_conflicts_duplicate_actions_and_repeated_settlement_do_not_create_cash PASSED [ 34%]
+2026-10-10T13:35:28.8979327Z tests/integration/dividend_receipts_test.py::test_protected_entitlement_preserves_operator_halt_and_tamper_is_unavailable PASSED [ 34%]
+2026-10-10T13:35:29.4081889Z tests/integration/dividend_receipts_test.py::test_concurrent_receipts_and_payments_commit_only_once PASSED [ 34%]
+2026-10-10T13:35:29.6089607Z tests/integration/dividend_receipts_test.py::test_receivable_cannot_fund_order_or_cross_account_settlement PASSED [ 35%]
+2026-10-10T13:35:30.0443344Z tests/integration/execution_owner_lifetime_test.py::test_deactivation_cannot_overtake_authorized_account_lock_wait PASSED [ 35%]
+2026-10-10T13:35:30.2905718Z tests/integration/execution_reporting_test.py::test_period_evidence_excludes_end_boundary_and_other_users PASSED [ 35%]
+2026-10-10T13:35:30.5457776Z tests/integration/execution_reporting_test.py::test_late_fees_restate_original_period_without_becoming_period_cash_flow PASSED [ 36%]
+2026-10-10T13:35:30.7640043Z tests/integration/execution_reporting_test.py::test_discrepant_account_has_no_reported_execution_totals PASSED [ 36%]
+2026-10-10T13:35:30.9953050Z tests/integration/execution_reporting_test.py::test_deactivated_owner_cannot_collect_period_evidence PASSED [ 36%]
+2026-10-10T13:35:31.2193653Z tests/integration/execution_reporting_test.py::test_truncated_details_keep_exact_totals_and_explicit_coverage PASSED [ 36%]
+2026-10-10T13:35:33.3747136Z tests/integration/execution_reporting_test.py::test_real_collector_persists_linked_execution_evidence_and_pdf PASSED [ 37%]
+2026-10-10T13:35:33.4969208Z tests/integration/execution_test.py::test_approval_is_independent_single_use_and_immutable PASSED [ 37%]
+2026-10-10T13:35:33.5987041Z tests/integration/execution_test.py::test_edited_order_cannot_use_previous_approval PASSED [ 37%]
+2026-10-10T13:35:33.7357511Z tests/integration/execution_test.py::test_partial_duplicate_late_ack_and_commissions PASSED [ 37%]
+2026-10-10T13:35:33.8779690Z tests/integration/execution_test.py::test_uncertain_submission_reserves_and_cancel_fill_race_halts PASSED [ 38%]
+2026-10-10T13:35:33.9859825Z tests/integration/execution_test.py::test_protected_stale_and_deactivated_rejected PASSED [ 38%]
+2026-10-10T13:35:34.0655334Z tests/integration/execution_test.py::test_cross_user_cannot_use_account PASSED [ 38%]
+2026-10-10T13:35:34.3518297Z tests/integration/execution_test.py::test_concurrent_approval_reservations_and_restart_halt PASSED [ 38%]
+2026-10-10T13:35:35.0379988Z tests/integration/expense_export_test.py::test_export_is_complete_exact_owned_and_consistent_during_concurrent_import PASSED [ 39%]
+2026-10-10T13:35:35.2282731Z tests/integration/expense_export_test.py::test_limit_and_revocation_never_claim_complete PASSED [ 39%]
+2026-10-10T13:35:35.4003287Z tests/integration/expense_export_test.py::test_other_owner_exports_only_their_rows PASSED [ 39%]
+2026-10-10T13:35:35.5041934Z tests/integration/expense_history_retention_test.py::test_exact_export_bound_purge_preserves_other_owner_and_blocks_reimport PASSED [ 40%]
+2026-10-10T13:35:35.5981728Z tests/integration/expense_history_retention_test.py::test_stale_changed_wrong_owner_or_missing_export_fails_closed PASSED [ 40%]
+2026-10-10T13:35:35.6907136Z tests/integration/expense_history_retention_test.py::test_purge_failure_rolls_back_suppression_and_all_history PASSED [ 40%]
+2026-10-10T13:35:35.7746692Z tests/integration/expense_history_retention_test.py::test_pending_and_active_owner_checks_and_exact_batch PASSED [ 40%]
+2026-10-10T13:35:36.0620410Z tests/integration/expense_history_retention_test.py::test_concurrent_import_waits_for_purge_then_is_suppressed PASSED [ 41%]
+2026-10-10T13:35:36.2942512Z tests/integration/expense_persistence_test.py::test_concurrent_import_counts_and_override_preservation PASSED [ 41%]
+2026-10-10T13:35:36.3727484Z tests/integration/expense_persistence_test.py::test_category_edit_is_scoped_and_audited_without_bank_payload PASSED [ 41%]
+2026-10-10T13:35:36.4573277Z tests/integration/expense_persistence_test.py::test_sync_clocks_are_owner_scoped_and_independent_of_transaction_page PASSED [ 41%]
+2026-10-10T13:35:36.5549441Z tests/integration/expense_reconciliation_test.py::test_review_export_atomic_resolution_audit_and_reimport_suppression PASSED [ 42%]
+2026-10-10T13:35:36.6545252Z tests/integration/expense_reconciliation_test.py::test_changed_pair_expired_preview_wrong_owner_export_and_replay_denied PASSED [ 42%]
+2026-10-10T13:35:36.7386758Z tests/integration/expense_reconciliation_test.py::test_mismatched_scope_or_settled_state_and_category_conflict_rejected[currency-USD-RECONCILIATION_SCOPE_MISMATCH] PASSED [ 42%]
+2026-10-10T13:35:36.8208893Z tests/integration/expense_reconciliation_test.py::test_mismatched_scope_or_settled_state_and_category_conflict_rejected[account_key-other-RECONCILIATION_SCOPE_MISMATCH] PASSED [ 43%]
+2026-10-10T13:35:36.9081307Z tests/integration/expense_reconciliation_test.py::test_mismatched_scope_or_settled_state_and_category_conflict_rejected[provider-other-RECONCILIATION_SCOPE_MISMATCH] PASSED [ 43%]
+2026-10-10T13:35:36.9879329Z tests/integration/expense_reconciliation_test.py::test_mismatched_scope_or_settled_state_and_category_conflict_rejected[transaction_type-income-RECONCILIATION_SCOPE_MISMATCH] PASSED [ 43%]
+2026-10-10T13:35:37.0706140Z tests/integration/expense_reconciliation_test.py::test_mismatched_scope_or_settled_state_and_category_conflict_rejected[lifecycle-deleted-PENDING_AND_SETTLED_REQUIRED] PASSED [ 43%]
+2026-10-10T13:35:37.1502570Z tests/integration/expense_reconciliation_test.py::test_mismatched_scope_or_settled_state_and_category_conflict_rejected[category_override-True-CATEGORY_OVERRIDE_CONFLICT] PASSED [ 44%]
+2026-10-10T13:35:37.2330199Z tests/integration/expense_reconciliation_test.py::test_unknown_transfer_direction_is_not_guessed PASSED [ 44%]
+2026-10-10T13:35:37.3241735Z tests/integration/expense_reconciliation_test.py::test_resolution_failure_rolls_back_removal_suppression_and_category PASSED [ 44%]
+2026-10-10T13:35:38.0000943Z tests/integration/expense_reconciliation_test.py::test_concurrent_import_waits_then_cannot_resurrect_resolved_pending PASSED [ 44%]
+2026-10-10T13:35:38.0857308Z tests/integration/expense_retention_test.py::test_retention_preserves_financial_history_and_receipt_clocks PASSED [ 45%]
+2026-10-10T13:35:38.1688926Z tests/integration/expense_retention_test.py::test_retention_rejects_changed_data_owner_expiry_and_inactive_principal PASSED [ 45%]
+2026-10-10T13:35:38.2569346Z tests/integration/expense_retention_test.py::test_retention_audit_failure_rolls_back_payload_removal PASSED [ 45%]
+2026-10-10T13:35:38.3534401Z tests/integration/global_exposure_test.py::test_manual_proposal_cannot_exceed_global_concentration PASSED [ 45%]
+2026-10-10T13:35:38.4764606Z tests/integration/global_exposure_test.py::test_manual_approval_rechecks_other_pending_orders PASSED [ 46%]
+2026-10-10T13:35:38.5937302Z tests/integration/global_exposure_test.py::test_other_instrument_reservation_counts_toward_global_exposure PASSED [ 46%]
+2026-10-10T13:35:38.6970486Z tests/integration/global_exposure_test.py::test_missing_or_invalid_global_policy_halts_without_inventing_limits[None] PASSED [ 46%]
+2026-10-10T13:35:38.7960657Z tests/integration/global_exposure_test.py::test_missing_or_invalid_global_policy_halts_without_inventing_limits[policy1] PASSED [ 47%]
+2026-10-10T13:35:38.8957245Z tests/integration/global_exposure_test.py::test_missing_or_invalid_global_policy_halts_without_inventing_limits[policy2] PASSED [ 47%]
+2026-10-10T13:35:38.9936763Z tests/integration/global_exposure_test.py::test_missing_or_invalid_global_policy_halts_without_inventing_limits[policy3] PASSED [ 47%]
+2026-10-10T13:35:39.1286291Z tests/integration/global_exposure_test.py::test_marked_gain_breach_halts_and_sale_is_not_a_halt_bypass PASSED [ 47%]
+2026-10-10T13:35:39.2946714Z tests/integration/global_exposure_test.py::test_strategy_cannot_bypass_global_cap_with_its_larger_mandate PASSED [ 48%]
+2026-10-10T13:35:39.5296498Z tests/integration/global_exposure_test.py::test_concurrent_approvals_share_global_cap_across_transactions PASSED [ 48%]
+2026-10-10T13:35:39.8682995Z tests/integration/heartbeat_test.py::test_resume_records_one_gap_and_no_historical_replay PASSED [ 48%]
+2026-10-10T13:35:40.0464742Z tests/integration/heartbeat_test.py::test_heartbeat_requires_active_explicit_opt_in[optout] PASSED [ 48%]
+2026-10-10T13:35:40.2271027Z tests/integration/heartbeat_test.py::test_heartbeat_requires_active_explicit_opt_in[inactive] PASSED [ 49%]
+2026-10-10T13:35:40.4120865Z tests/integration/heartbeat_test.py::test_heartbeat_requires_active_explicit_opt_in[malformed] PASSED [ 49%]
+2026-10-10T13:35:40.6874002Z tests/integration/heartbeat_test.py::test_expired_worker_rolls_back_gap_and_checkpoint PASSED [ 49%]
+2026-10-10T13:35:40.7834482Z tests/integration/mandates_test.py::test_independent_mandate_approval_cannot_be_replayed_or_self_approved PASSED [ 50%]
+2026-10-10T13:35:40.8727758Z tests/integration/mandates_test.py::test_edited_or_expired_mandate_requires_new_proposal PASSED [ 50%]
+2026-10-10T13:35:41.2957785Z tests/integration/mandates_test.py::test_autonomous_tick_reserves_once_and_preserves_marked_loss_halt PASSED [ 50%]
+2026-10-10T13:35:41.3891214Z tests/integration/mandates_test.py::test_modified_approved_spec_cannot_gain_execution_authority PASSED [ 50%]
+2026-10-10T13:35:41.5601897Z tests/integration/mandates_test.py::test_forward_runner_fills_only_approved_fixture_and_deduplicates PASSED [ 51%]
+2026-10-10T13:35:41.8049938Z tests/integration/mandates_test.py::test_concurrent_workers_reserve_one_tick_once PASSED [ 51%]
+2026-10-10T13:35:41.9867731Z tests/integration/mandates_test.py::test_mandate_evidence_capacity_stops_before_another_order_and_persists_halt PASSED [ 51%]
+2026-10-10T13:35:42.2374735Z tests/integration/mandates_test.py::test_forward_capacity_halt_commits_before_quote_refresh_or_order PASSED [ 51%]
+2026-10-10T13:35:42.3727068Z tests/integration/mandates_test.py::test_tick_risk_and_reservations_do_not_inherit_caller_precision PASSED [ 52%]
+2026-10-10T13:35:42.6558440Z tests/integration/manual_risk_test.py::test_manual_approval_cannot_bypass_marked_risk_and_halt_survives_denial[loss-MARKED_ACCOUNT_LOSS_LIMIT] PASSED [ 52%]
+2026-10-10T13:35:42.9382864Z tests/integration/manual_risk_test.py::test_manual_approval_cannot_bypass_marked_risk_and_halt_survives_denial[stale-VALUATION_STALE] PASSED [ 52%]
+2026-10-10T13:35:43.2012095Z tests/integration/manual_risk_test.py::test_manual_approval_cannot_bypass_marked_risk_and_halt_survives_denial[uncertain-RECONCILIATION_REQUIRED] PASSED [ 52%]
+2026-10-10T13:35:43.4754801Z tests/integration/manual_risk_test.py::test_manual_approval_cannot_bypass_marked_risk_and_halt_survives_denial[cash_discrepancy-LEDGER_RECONCILIATION_DISCREPANT] PASSED [ 53%]
+2026-10-10T13:35:43.7338204Z tests/integration/manual_risk_test.py::test_manual_approval_cannot_bypass_marked_risk_and_halt_survives_denial[realized_discrepancy-LEDGER_RECONCILIATION_DISCREPANT] PASSED [ 53%]
+2026-10-10T13:35:44.0008396Z tests/integration/manual_risk_test.py::test_manual_approval_cannot_bypass_marked_risk_and_halt_survives_denial[allocation_provenance-LEDGER_RECONCILIATION_UNVERIFIED] PASSED [ 53%]
+2026-10-10T13:35:44.3828108Z tests/integration/manual_risk_test.py::test_marked_risk_uses_exact_precision_independent_of_caller PASSED [ 54%]
+2026-10-10T13:35:44.5639117Z tests/integration/manual_risk_test.py::test_manual_lifecycle_and_fee_correction_preserve_callers_decimal_context PASSED [ 54%]
+2026-10-10T13:35:44.8457290Z tests/integration/migrations_test.py::test_reviewed_schema_upgrades_without_assigning_unknown_owner PASSED [ 54%]
+2026-10-10T13:35:44.9204705Z tests/integration/migrations_test.py::test_event_sequence_upgrade_preserves_evidence_and_ignores_future_clock_regression PASSED [ 54%]
+2026-10-10T13:35:45.0209419Z tests/integration/monitoring_dispatch_test.py::test_monitoring_selects_due_opted_in_users_before_bounding PASSED [ 55%]
+2026-10-10T13:35:45.0909740Z tests/integration/monitoring_dispatch_test.py::test_malformed_or_inactive_opt_in_is_not_dispatched[preferences0-True] PASSED [ 55%]
+2026-10-10T13:35:45.1618685Z tests/integration/monitoring_dispatch_test.py::test_malformed_or_inactive_opt_in_is_not_dispatched[preferences1-True] PASSED [ 55%]
+2026-10-10T13:35:45.2318265Z tests/integration/monitoring_dispatch_test.py::test_malformed_or_inactive_opt_in_is_not_dispatched[preferences2-False] PASSED [ 55%]
+2026-10-10T13:35:45.3010327Z tests/integration/monitoring_dispatch_test.py::test_malformed_or_inactive_opt_in_is_not_dispatched[preferences3-True] PASSED [ 56%]
+2026-10-10T13:35:45.3765128Z tests/integration/monitoring_dispatch_test.py::test_opt_out_after_selection_prevents_callback PASSED [ 56%]
+2026-10-10T13:35:45.4839271Z tests/integration/monitoring_dispatch_test.py::test_failed_or_interrupted_read_job_recovers_once_with_fresh_work[network] PASSED [ 56%]
+2026-10-10T13:35:45.5774526Z tests/integration/monitoring_dispatch_test.py::test_failed_or_interrupted_read_job_recovers_once_with_fresh_work[cancellation] PASSED [ 56%]
+2026-10-10T13:35:45.7171925Z tests/integration/news_cleanup_test.py::test_cleanup_removes_all_revision_text_preserves_ids_and_prevents_resurrection PASSED [ 57%]
+2026-10-10T13:35:45.8347355Z tests/integration/news_cleanup_test.py::test_changed_preview_refuses_cleanup[body] PASSED [ 57%]
+2026-10-10T13:35:45.9538789Z tests/integration/news_cleanup_test.py::test_changed_preview_refuses_cleanup[revision] PASSED [ 57%]
+2026-10-10T13:35:46.0758164Z tests/integration/news_cleanup_test.py::test_changed_preview_refuses_cleanup[owner] PASSED [ 58%]
+2026-10-10T13:35:46.1870398Z tests/integration/news_cleanup_test.py::test_changed_preview_refuses_cleanup[expiry] PASSED [ 58%]
+2026-10-10T13:35:46.3039984Z tests/integration/news_cleanup_test.py::test_revision_capacity_refuses_partial_article_erasure PASSED [ 58%]
+2026-10-10T13:35:46.4472522Z tests/integration/news_cleanup_test.py::test_private_cleanup_is_bound_to_one_active_owner PASSED [ 58%]
+2026-10-10T13:35:46.7152680Z tests/integration/news_cleanup_test.py::test_operator_command_previews_then_commits_confirmed_cleanup PASSED [ 59%]
+2026-10-10T13:35:46.7950468Z tests/integration/news_pipeline_test.py::TestIngestArticlesIntegration::test_articles_written_to_db PASSED [ 59%]
+2026-10-10T13:35:46.8722729Z tests/integration/news_pipeline_test.py::TestIngestArticlesIntegration::test_duplicate_url_skipped PASSED [ 59%]
+2026-10-10T13:35:46.9344157Z tests/integration/news_pipeline_test.py::TestIngestArticlesIntegration::test_missing_url_skipped PASSED [ 59%]
+2026-10-10T13:35:47.0102815Z tests/integration/news_pipeline_test.py::TestGetArticleCountIntegration::test_count_matches_db PASSED [ 60%]
+2026-10-10T13:35:47.0886166Z tests/integration/news_pipeline_test.py::TestSearchNewsIntegration::test_full_text_search_finds_article PASSED [ 60%]
+2026-10-10T13:35:47.1650358Z tests/integration/news_pipeline_test.py::TestSearchNewsIntegration::test_sentiment_filter PASSED [ 60%]
+2026-10-10T13:35:47.2394172Z tests/integration/news_pipeline_test.py::TestSearchNewsIntegration::test_empty_query_returns_list PASSED [ 61%]
+2026-10-10T13:35:47.3175400Z tests/integration/news_pipeline_test.py::TestGetRecentHeadlinesIntegration::test_returns_most_recent_first PASSED [ 61%]
+2026-10-10T13:35:47.3966321Z tests/integration/news_pipeline_test.py::TestGetRecentHeadlinesIntegration::test_limit_respected PASSED [ 61%]
+2026-10-10T13:35:47.4838650Z tests/integration/news_pipeline_test.py::test_metadata_correction_retains_prior_evidence_and_first_seen PASSED [ 61%]
+2026-10-10T13:35:47.5597815Z tests/integration/news_policy_expiry_test.py::test_declared_policy_expiration_is_current_and_invalid_metadata_fails_closed[current] PASSED [ 62%]
+2026-10-10T13:35:47.6395355Z tests/integration/news_policy_expiry_test.py::test_declared_policy_expiration_is_current_and_invalid_metadata_fails_closed[expired] PASSED [ 62%]
+2026-10-10T13:35:47.7203255Z tests/integration/news_policy_expiry_test.py::test_declared_policy_expiration_is_current_and_invalid_metadata_fails_closed[review_due] PASSED [ 62%]
+2026-10-10T13:35:47.7985811Z tests/integration/news_policy_expiry_test.py::test_declared_policy_expiration_is_current_and_invalid_metadata_fails_closed[malformed_days] PASSED [ 62%]
+2026-10-10T13:35:47.8774366Z tests/integration/news_policy_expiry_test.py::test_declared_policy_expiration_is_current_and_invalid_metadata_fails_closed[malformed_time] PASSED [ 63%]
+2026-10-10T13:35:47.9589122Z tests/integration/news_policy_expiry_test.py::test_declared_policy_expiration_is_current_and_invalid_metadata_fails_closed[no_offset] PASSED [ 63%]
+2026-10-10T13:35:48.1140009Z tests/integration/news_privacy_test.py::test_private_news_cannot_cross_users_or_become_public PASSED [ 63%]
+2026-10-10T13:35:48.2184279Z tests/integration/news_privacy_test.py::test_corrections_preserve_original_evidence_and_never_backdate_availability PASSED [ 63%]
+2026-10-10T13:35:48.5611375Z tests/integration/news_runtime_test.py::test_conditional_restart_keeps_evidence_and_source_checkpoint PASSED [ 64%]
+2026-10-10T13:35:49.0193911Z tests/integration/news_runtime_test.py::test_failure_backoff_preserves_success_and_recovers PASSED [ 64%]
+2026-10-10T13:35:49.2894773Z tests/integration/news_runtime_test.py::test_concurrent_worker_and_stale_fetch_cannot_publish PASSED [ 64%]
+2026-10-10T13:35:49.5153781Z tests/integration/news_runtime_test.py::test_failed_checkpoint_rolls_back_published_evidence PASSED [ 65%]
+2026-10-10T13:35:49.8310230Z tests/integration/news_runtime_test.py::test_scheduled_sources_isolate_failures_and_reuse_due_state PASSED [ 65%]
+2026-10-10T13:35:49.9607837Z tests/integration/news_runtime_test.py::test_missing_or_invalid_policy_blocks_before_fetch_and_lease PASSED [ 65%]
+2026-10-10T13:35:50.2939316Z tests/integration/news_runtime_test.py::test_policy_change_refetches_and_records_permitted_scope PASSED [ 65%]
+2026-10-10T13:35:50.5293936Z tests/integration/news_runtime_test.py::test_policy_revoked_while_fetching_cannot_publish PASSED [ 66%]
+2026-10-10T13:35:50.6523578Z tests/integration/news_syndication_visibility_test.py::test_syndicated_copies_are_one_evidence_group_without_losing_records PASSED [ 66%]
+2026-10-10T13:35:50.7837017Z tests/integration/news_syndication_visibility_test.py::test_copy_groups_never_reveal_private_or_future_copies PASSED [ 66%]
+2026-10-10T13:35:50.8664927Z tests/integration/operations_test.py::test_leases_deduplicate_and_reject_stale_completion PASSED [ 66%]
+2026-10-10T13:35:50.9511896Z tests/integration/operations_test.py::test_expired_lease_recovery_does_not_accept_previous_worker PASSED [ 67%]
+2026-10-10T13:35:51.0294789Z tests/integration/operations_test.py::test_clock_regression_and_completed_token_cannot_commit_work[backwards] PASSED [ 67%]
+2026-10-10T13:35:51.1097489Z tests/integration/operations_test.py::test_clock_regression_and_completed_token_cannot_commit_work[completed_token_replay] PASSED [ 67%]
+2026-10-10T13:35:51.1982798Z tests/integration/operations_test.py::test_unknown_legacy_acquisition_is_reacquired_without_replaying_missed_intervals PASSED [ 68%]
+2026-10-10T13:35:51.2781073Z tests/integration/operations_test.py::test_broker_read_clock_regression_cannot_overwrite_running_state[False] PASSED [ 68%]
+2026-10-10T13:35:51.3571972Z tests/integration/operations_test.py::test_broker_read_clock_regression_cannot_overwrite_running_state[True] PASSED [ 68%]
+2026-10-10T13:35:51.4586981Z tests/integration/operations_test.py::test_alert_dedup_ack_reopen_and_delivery_failure PASSED [ 68%]
+2026-10-10T13:35:51.6231944Z tests/integration/reconciliation_test.py::test_partial_fills_late_commissions_and_database_round_trip PASSED [ 69%]
+2026-10-10T13:35:51.7640887Z tests/integration/reconciliation_test.py::test_discrepancy_detected_without_overwriting_balances[cash] PASSED [ 69%]
+2026-10-10T13:35:52.1785172Z tests/integration/reconciliation_test.py::test_discrepancy_detected_without_overwriting_balances[reserved] PASSED [ 69%]
+2026-10-10T13:35:52.3187709Z tests/integration/reconciliation_test.py::test_discrepancy_detected_without_overwriting_balances[realized_pnl] PASSED [ 69%]
+2026-10-10T13:35:52.4630307Z tests/integration/reconciliation_test.py::test_discrepancy_detected_without_overwriting_balances[position_quantity] PASSED [ 70%]
+2026-10-10T13:35:52.6015760Z tests/integration/reconciliation_test.py::test_discrepancy_detected_without_overwriting_balances[position_cost_basis] PASSED [ 70%]
+2026-10-10T13:35:52.7462094Z tests/integration/reconciliation_test.py::test_incomplete_evidence_is_unverified_not_fabricated_cash PASSED [ 70%]
+2026-10-10T13:35:52.8781373Z tests/integration/reconciliation_test.py::test_unrepresentable_fill_principal_rejected_before_ledger_changes PASSED [ 70%]
+2026-10-10T13:35:53.0131783Z tests/integration/reconciliation_test.py::test_joint_reservation_tamper_does_not_hide_behind_matching_totals PASSED [ 71%]
+2026-10-10T13:35:53.1552494Z tests/integration/reconciliation_test.py::test_partial_release_retains_subscale_dust_until_final_fill PASSED [ 71%]
+2026-10-10T13:35:53.2912894Z tests/integration/reconciliation_test.py::test_changed_allocation_cannot_reassign_retained_fill_ownership[mandate_id] PASSED [ 71%]
+2026-10-10T13:35:53.4265379Z tests/integration/reconciliation_test.py::test_changed_allocation_cannot_reassign_retained_fill_ownership[actor] PASSED [ 72%]
+2026-10-10T13:35:53.6183677Z tests/integration/reconciliation_test.py::test_changed_allocation_cannot_reassign_retained_fill_ownership[details_hash] PASSED [ 72%]
+2026-10-10T13:35:53.7606355Z tests/integration/reconciliation_test.py::test_verified_inventory_exposes_exact_owned_basis_and_hides_discrepant_balances PASSED [ 72%]
+2026-10-10T13:35:53.8986607Z tests/integration/reconciliation_test.py::test_reconciliation_preserves_exact_evidence_under_caller_decimal_context PASSED [ 72%]
+2026-10-10T13:35:53.9751434Z tests/integration/report_coverage_test.py::test_report_collection_limits_preserve_ownership_and_expose_coverage[0-0] PASSED [ 73%]
+2026-10-10T13:35:54.0556908Z tests/integration/report_coverage_test.py::test_report_collection_limits_preserve_ownership_and_expose_coverage[2-10] PASSED [ 73%]
+2026-10-10T13:35:54.3215886Z tests/integration/report_coverage_test.py::test_report_collection_limits_preserve_ownership_and_expose_coverage[1001-11] PASSED [ 73%]
+2026-10-10T13:35:54.4025550Z tests/integration/report_failure_test.py::test_report_returns_partial_for_each_failed_stage[source] PASSED [ 73%]
+2026-10-10T13:35:54.4829124Z tests/integration/report_failure_test.py::test_report_returns_partial_for_each_failed_stage[model_empty] PASSED [ 74%]
+2026-10-10T13:35:54.5831791Z tests/integration/report_failure_test.py::test_report_returns_partial_for_each_failed_stage[disk] PASSED [ 74%]
+2026-10-10T13:35:54.6557637Z tests/integration/report_failure_test.py::test_report_returns_partial_for_each_failed_stage[persistence] PASSED [ 74%]
+2026-10-10T13:35:54.7324499Z tests/integration/report_failure_test.py::test_report_returns_partial_for_each_failed_stage[missing_portfolio] PASSED [ 75%]
+2026-10-10T13:35:54.8120207Z tests/integration/report_failure_test.py::test_report_returns_partial_for_each_failed_stage[partial_valuation] PASSED [ 75%]
+2026-10-10T13:35:54.8882736Z tests/integration/report_failure_test.py::test_report_returns_partial_for_each_failed_stage[blocked_news] PASSED [ 75%]
+2026-10-10T13:35:54.9737163Z tests/integration/report_failure_test.py::test_real_collector_history_failure_persists_partial_report PASSED [ 75%]
+2026-10-10T13:35:55.0490305Z tests/integration/report_failure_test.py::test_oversized_report_evidence_cannot_trigger_unsupported_model_report PASSED [ 76%]
+2026-10-10T13:35:55.1257352Z tests/integration/report_failure_test.py::test_fitting_evidence_does_not_authorize_model_invented_financial_claims[invalid] PASSED [ 76%]
+2026-10-10T13:35:55.2017979Z tests/integration/report_failure_test.py::test_fitting_evidence_does_not_authorize_model_invented_financial_claims[valid] PASSED [ 76%]
+2026-10-10T13:35:55.2784919Z tests/integration/report_failure_test.py::test_fitting_evidence_does_not_authorize_model_invented_financial_claims[repair] PASSED [ 76%]
+2026-10-10T13:35:55.3530408Z tests/integration/report_orphans_test.py::test_exact_orphan_plan_preserves_all_referenced_recent_and_unmanaged_files PASSED [ 77%]
+2026-10-10T13:35:55.4236624Z tests/integration/report_orphans_test.py::test_changed_or_ambiguous_plan_never_deletes[reference] PASSED [ 77%]
+2026-10-10T13:35:55.4937774Z tests/integration/report_orphans_test.py::test_changed_or_ambiguous_plan_never_deletes[file] PASSED [ 77%]
+2026-10-10T13:35:55.5675007Z tests/integration/report_orphans_test.py::test_changed_or_ambiguous_plan_never_deletes[symlink] PASSED [ 77%]
+2026-10-10T13:35:55.6416632Z tests/integration/report_orphans_test.py::test_changed_or_ambiguous_plan_never_deletes[outside] PASSED [ 78%]
+2026-10-10T13:35:55.7128866Z tests/integration/report_orphans_test.py::test_changed_or_ambiguous_plan_never_deletes[file_limit] PASSED [ 78%]
+2026-10-10T13:35:55.7847614Z tests/integration/report_orphans_test.py::test_changed_or_ambiguous_plan_never_deletes[reference_limit] PASSED [ 78%]
+2026-10-10T13:35:55.8521666Z tests/integration/report_orphans_test.py::test_active_publication_and_unsafe_clock_exclude_cleanup PASSED [ 79%]
+2026-10-10T13:35:55.9258241Z tests/integration/report_orphans_test.py::test_partial_removal_is_truthful_and_retryable[unlink] PASSED [ 79%]
+2026-10-10T13:35:56.0005163Z tests/integration/report_orphans_test.py::test_partial_removal_is_truthful_and_retryable[fsync] PASSED [ 79%]
+2026-10-10T13:35:57.3607173Z tests/integration/report_orphans_test.py::test_committed_operator_cli_and_reference_write_fence PASSED [ 79%]
+2026-10-10T13:35:57.4471371Z tests/integration/report_retention_test.py::test_owned_retention_keeps_tombstone_and_other_reports PASSED [ 80%]
+2026-10-10T13:35:57.7943902Z tests/integration/report_retention_test.py::test_owner_hash_expiry_and_deactivation_reject_erasure PASSED [ 80%]
+2026-10-10T13:35:57.8808309Z tests/integration/report_retention_test.py::test_partial_file_cleanup_is_retryable_and_preserves_shared_files[unlink] PASSED [ 80%]
+2026-10-10T13:35:58.0091181Z tests/integration/report_retention_test.py::test_partial_file_cleanup_is_retryable_and_preserves_shared_files[missing] PASSED [ 80%]
+2026-10-10T13:35:58.0977161Z tests/integration/report_retention_test.py::test_partial_file_cleanup_is_retryable_and_preserves_shared_files[shared] PASSED [ 81%]
+2026-10-10T13:35:58.1881294Z tests/integration/report_retention_test.py::test_partial_file_cleanup_is_retryable_and_preserves_shared_files[alias] PASSED [ 81%]
+2026-10-10T13:35:58.2769440Z tests/integration/report_retention_test.py::test_partial_file_cleanup_is_retryable_and_preserves_shared_files[symlink] PASSED [ 81%]
+2026-10-10T13:35:58.5274838Z tests/integration/report_retention_test.py::test_committed_tombstone_recovers_after_interrupted_file_completion PASSED [ 81%]
+2026-10-10T13:35:59.0147203Z tests/integration/risk_monitor_test.py::test_risk_monitor_requires_opt_in_and_deduplicates_concurrent_workers PASSED [ 82%]
+2026-10-10T13:35:59.2418631Z tests/integration/risk_monitor_test.py::test_malformed_opt_in_is_not_coerced_or_allowed_to_break_monitoring PASSED [ 82%]
+2026-10-10T13:36:00.7334741Z tests/integration/risk_monitor_test.py::test_expired_worker_cannot_publish_halt_or_success_checkpoint[40] PASSED [ 82%]
+2026-10-10T13:36:02.2566353Z tests/integration/risk_monitor_test.py::test_expired_worker_cannot_publish_halt_or_success_checkpoint[100] PASSED [ 83%]
+2026-10-10T13:36:02.7794698Z tests/integration/risk_monitor_test.py::test_daily_observation_is_bounded_and_capacity_does_not_disable_risk[False] PASSED [ 83%]
+2026-10-10T13:36:03.3168368Z tests/integration/risk_monitor_test.py::test_daily_observation_is_bounded_and_capacity_does_not_disable_risk[True] PASSED [ 83%]
+2026-10-10T13:36:03.3929489Z tests/integration/sessions_test.py::test_logout_revocation_survives_new_session_and_does_not_cross_users PASSED [ 83%]
+2026-10-10T13:36:03.4710732Z tests/integration/sessions_test.py::test_deactivation_and_all_session_fence PASSED [ 84%]
+2026-10-10T13:36:03.5617776Z tests/integration/sessions_test.py::test_http_rejects_revoked_and_inactive_account PASSED [ 84%]
+2026-10-10T13:36:03.6420147Z tests/integration/sessions_test.py::test_mcp_requires_binding_and_rechecks_account_activity PASSED [ 84%]
+2026-10-10T13:36:04.1224174Z tests/integration/simulator_dispatch_test.py::test_denied_first_batch_cannot_starve_later_mandates[1] PASSED [ 84%]
+2026-10-10T13:36:04.6756100Z tests/integration/simulator_dispatch_test.py::test_denied_first_batch_cannot_starve_later_mandates[2] PASSED [ 85%]
+2026-10-10T13:36:07.3366748Z tests/integration/simulator_dispatch_test.py::test_expired_dispatch_rolls_back_order_fill_quote_and_decision PASSED [ 85%]
+2026-10-10T13:36:07.7096149Z tests/integration/simulator_dispatch_test.py::test_deactivation_after_claim_prevents_quote_writes_and_orders PASSED [ 85%]
+2026-10-10T13:36:10.0565582Z tests/integration/simulator_dispatch_test.py::test_job_timeout_rolls_back_trading_and_reports_durable_failure[True] PASSED [ 86%]
+2026-10-10T13:36:12.7439498Z tests/integration/simulator_dispatch_test.py::test_job_timeout_rolls_back_trading_and_reports_durable_failure[False] PASSED [ 86%]
+2026-10-10T13:36:13.0617851Z tests/integration/simulator_dispatch_test.py::test_cancellation_and_code_errors_cannot_publish_partial_work[cancel] PASSED [ 86%]
+2026-10-10T13:36:13.3593092Z tests/integration/simulator_dispatch_test.py::test_cancellation_and_code_errors_cannot_publish_partial_work[code_error] PASSED [ 86%]
+2026-10-10T13:36:14.5356200Z tests/integration/simulator_dispatch_test.py::test_cancellation_and_code_errors_cannot_publish_partial_work[cycle_timeout] PASSED [ 87%]
+2026-10-10T13:36:16.9990300Z tests/integration/simulator_dispatch_test.py::test_locked_account_times_out_without_blocking_other_mandates PASSED [ 87%]
+2026-10-10T13:36:17.1940444Z tests/integration/simulator_sales_test.py::test_manual_sale_approval_fill_and_late_purchase_fee[False] PASSED [ 87%]
+2026-10-10T13:36:17.3987563Z tests/integration/simulator_sales_test.py::test_manual_sale_approval_fill_and_late_purchase_fee[True] PASSED [ 87%]
+2026-10-10T13:36:17.6224671Z tests/integration/simulator_sales_test.py::test_sale_reservation_is_checked_again_on_approval_and_cancel_releases PASSED [ 88%]
+2026-10-10T13:36:17.7302253Z tests/integration/simulator_sales_test.py::test_existing_accounts_and_protected_allocations_do_not_gain_sale_authority PASSED [ 88%]
+2026-10-10T13:36:17.9152125Z tests/integration/simulator_sales_test.py::test_partial_sale_keeps_remaining_quantity_reserved_and_duplicate_fill_is_idempotent PASSED [ 88%]
+2026-10-10T13:36:18.1014695Z tests/integration/simulator_sales_test.py::test_cancelled_sale_late_fill_is_recorded_and_halts_new_orders PASSED [ 88%]
+2026-10-10T13:36:18.4026951Z tests/integration/simulator_sales_test.py::test_concurrent_sale_approvals_reserve_owned_quantity_once PASSED [ 89%]
+2026-10-10T13:36:18.5439980Z tests/integration/simulator_sales_test.py::test_sale_fee_reservation_cannot_use_invalid_policy[-1] PASSED [ 89%]
+2026-10-10T13:36:18.6892945Z tests/integration/simulator_sales_test.py::test_sale_fee_reservation_cannot_use_invalid_policy[NaN] PASSED [ 89%]
+2026-10-10T13:36:18.8245189Z tests/integration/simulator_sales_test.py::test_sale_fee_reservation_cannot_use_invalid_policy[Infinity] PASSED [ 90%]
+2026-10-10T13:36:18.9714384Z tests/integration/simulator_sales_test.py::test_sale_fee_reservation_cannot_use_invalid_policy[101] PASSED [ 90%]
+2026-10-10T13:36:19.5224403Z tests/integration/simulator_sales_test.py::test_late_sale_after_inventory_reuse_keeps_duplicate_unreconciled[False] PASSED [ 90%]
+2026-10-10T13:36:19.7666308Z tests/integration/simulator_sales_test.py::test_late_sale_after_inventory_reuse_keeps_duplicate_unreconciled[True] PASSED [ 90%]
+2026-10-10T13:36:21.0906761Z tests/integration/soak_guard_test.py::test_soak_rejects_wrong_disposable_marker_even_when_optimized[False] PASSED [ 91%]
+2026-10-10T13:36:25.4742680Z tests/integration/soak_guard_test.py::test_soak_rejects_wrong_disposable_marker_even_when_optimized[True] PASSED [ 91%]
+2026-10-10T13:36:26.7816563Z tests/integration/soak_guard_test.py::test_optimized_soak_accepts_the_verified_disposable_database PASSED [ 91%]
+2026-10-10T13:36:39.0328393Z tests/integration/soak_guard_test.py::test_soak_cli_exit_matches_observed_acceptance[60-FAILED_BUDGET_OR_RESTART_GATE-1] PASSED [ 91%]
+2026-10-10T13:36:51.2478549Z tests/integration/soak_guard_test.py::test_soak_cli_exit_matches_observed_acceptance[5-SMOKE_PASS-0] PASSED [ 92%]
+2026-10-10T13:36:51.4237810Z tests/integration/split_events_test.py::test_persisted_split_preserves_basis_and_cash_and_requires_review PASSED [ 92%]
+2026-10-10T13:36:51.5785006Z tests/integration/split_events_test.py::test_pending_order_or_retroactive_split_is_rejected_without_changes PASSED [ 92%]
+2026-10-10T13:36:51.7419055Z tests/integration/split_events_test.py::test_unrepresentable_split_scope_and_conflict_fail_closed PASSED [ 93%]
+2026-10-10T13:36:51.8963407Z tests/integration/split_events_test.py::test_split_retains_operator_halt_and_period_report_provenance PASSED [ 93%]
+2026-10-10T13:36:52.1405941Z tests/integration/strategy_sales_test.py::test_price_band_buys_and_sells_only_its_own_inventory PASSED [ 93%]
+2026-10-10T13:36:52.3152139Z tests/integration/strategy_sales_test.py::test_revised_mandate_does_not_inherit_old_inventory PASSED [ 93%]
+2026-10-10T13:36:52.4835239Z tests/integration/strategy_sales_test.py::test_pending_strategy_order_and_neutral_price_do_not_create_more_orders PASSED [ 94%]
+2026-10-10T13:36:52.4853587Z tests/integration/strategy_sales_test.py::test_sale_thresholds_require_separate_explicit_strategy[updates0] PASSED [ 94%]
+2026-10-10T13:36:52.4868348Z tests/integration/strategy_sales_test.py::test_sale_thresholds_require_separate_explicit_strategy[updates1] PASSED [ 94%]
+2026-10-10T13:36:52.4882633Z tests/integration/strategy_sales_test.py::test_sale_thresholds_require_separate_explicit_strategy[updates2] PASSED [ 94%]
+2026-10-10T13:36:52.6578696Z tests/integration/strategy_sales_test.py::test_strategy_sales_preserve_global_caps_protection_and_approved_hash[protected] PASSED [ 95%]
+2026-10-10T13:36:52.8266109Z tests/integration/strategy_sales_test.py::test_strategy_sales_preserve_global_caps_protection_and_approved_hash[sale_cap] PASSED [ 95%]
+2026-10-10T13:36:52.9754473Z tests/integration/strategy_sales_test.py::test_strategy_sales_preserve_global_caps_protection_and_approved_hash[changed_threshold] PASSED [ 95%]
+2026-10-10T13:36:53.1263016Z tests/integration/strategy_sales_test.py::test_forward_runner_handles_no_trade_without_inventing_a_fill PASSED [ 95%]
+2026-10-10T13:36:53.4131613Z tests/integration/strategy_sales_test.py::test_no_trade_replay_keeps_original_quote_and_survives_concurrent_restart PASSED [ 96%]
+2026-10-10T13:36:53.5495586Z tests/integration/strategy_sales_test.py::test_altered_decision_evidence_halts_instead_of_recomputing PASSED [ 96%]
+2026-10-10T13:36:54.0199539Z tests/integration/strategy_sales_test.py::test_decision_history_is_visible_only_to_the_account_owner PASSED [ 96%]
+2026-10-10T13:36:54.1931620Z tests/integration/valuation_snapshots_test.py::test_period_marks_separate_flows_income_and_unrealized_changes PASSED [ 97%]
+2026-10-10T13:36:54.3510140Z tests/integration/valuation_snapshots_test.py::test_unavailable_boundaries_never_use_current_quotes_as_past_marks PASSED [ 97%]
+2026-10-10T13:36:54.5261674Z tests/integration/valuation_snapshots_test.py::test_snapshot_tamper_and_other_owner_are_rejected PASSED [ 97%]
+2026-10-10T13:36:54.7064310Z tests/integration/valuation_snapshots_test.py::test_report_uses_snapshot_boundaries_and_survives_late_fee_restatement PASSED [ 97%]
+2026-10-10T13:36:54.8670508Z tests/integration/valuation_snapshots_test.py::test_foreign_execution_price_fx_and_fees_reconcile_for_open_and_closed_positions[0-False] PASSED [ 98%]
+2026-10-10T13:36:55.0579484Z tests/integration/valuation_snapshots_test.py::test_foreign_execution_price_fx_and_fees_reconcile_for_open_and_closed_positions[1-False] PASSED [ 98%]
+2026-10-10T13:36:55.2585525Z tests/integration/valuation_snapshots_test.py::test_foreign_execution_price_fx_and_fees_reconcile_for_open_and_closed_positions[2-False] PASSED [ 98%]
+2026-10-10T13:36:55.4712229Z tests/integration/valuation_snapshots_test.py::test_foreign_execution_price_fx_and_fees_reconcile_for_open_and_closed_positions[2-True] PASSED [ 98%]
+2026-10-10T13:36:55.6280226Z tests/integration/valuation_snapshots_test.py::test_legacy_snapshot_keeps_period_pnl_but_cannot_invent_fx_history PASSED [ 99%]
+2026-10-10T13:36:55.7840741Z tests/integration/valuation_snapshots_test.py::test_future_bookings_and_invalid_fx_cannot_create_historical_marks PASSED [ 99%]
+2026-10-10T13:36:55.9467926Z tests/integration/valuation_snapshots_test.py::test_capacity_and_corrupt_boundary_do_not_invent_period_pnl PASSED [ 99%]
+2026-10-10T13:36:59.6037714Z tests/integration/valuation_snapshots_test.py::test_opening_foreign_holding_attributes_interaction_to_closing_rate_price PASSED [100%]
+2026-10-10T13:36:59.6038276Z 
+2026-10-10T13:36:59.6038669Z - generated xml file: /home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine/junit-integration.xml -
+2026-10-10T13:36:59.6039259Z ================================ tests coverage ================================
+2026-10-10T13:36:59.6039672Z _______________ coverage: platform linux, python 3.12.15-final-0 _______________
+2026-10-10T13:36:59.6039936Z 
+2026-10-10T13:36:59.6040065Z Name                                      Stmts   Miss   Cover   Missing
+2026-10-10T13:36:59.6040406Z ------------------------------------------------------------------------
+2026-10-10T13:36:59.6040752Z src/__init__.py                               1      0 100.00%
+2026-10-10T13:36:59.6041075Z src/agent/__init__.py                         0      0 100.00%
+2026-10-10T13:36:59.6041435Z src/agent/clients/__init__.py                 6      2  66.67%   15-17
+2026-10-10T13:36:59.6042057Z src/agent/clients/base.py                     7      0 100.00%
+2026-10-10T13:36:59.6042777Z src/agent/clients/llama_cpp_client.py       582    582   0.00%   7-1115
+2026-10-10T13:36:59.6043259Z src/agent/clients/news_analysis.py           86     48  44.19%   19, 40-42, 50, 53-55, 60-61, 63-76, 88-91, 96-110, 114-121
+2026-10-10T13:36:59.6043869Z src/agent/clients/read_scope.py              52     52   0.00%   6-105
+2026-10-10T13:36:59.6044342Z src/agent/orchestrator.py                   143     22  84.62%   31-34, 69, 126, 142, 203-204, 212, 247, 263, 269-272, 286-293
+2026-10-10T13:36:59.6044783Z src/agent/prompts.py                          2      0 100.00%
+2026-10-10T13:36:59.6045117Z src/agent/utils/logger.py                    10      0 100.00%
+2026-10-10T13:36:59.6045430Z src/app.py                                   32     32   0.00%   3-68
+2026-10-10T13:36:59.6045744Z src/chat/__init__.py                          0      0 100.00%
+2026-10-10T13:36:59.6046137Z src/chat/evidence.py                         67     20  70.15%   17, 27, 32, 36-40, 48-52, 61-64, 68-73, 98, 116, 119
+2026-10-10T13:36:59.6046581Z src/chat/persistence.py                      43      4  90.70%   21, 40, 61, 85
+2026-10-10T13:36:59.6046939Z src/chat/retention.py                        47      0 100.00%
+2026-10-10T13:36:59.6047296Z src/config.py                               136     18  86.76%   70-77, 81-85, 132-134, 149, 215
+2026-10-10T13:36:59.6047658Z src/db/__init__.py                            7      4  42.86%   21-25
+2026-10-10T13:36:59.6048020Z src/db/database.py                           56     41  26.79%   36-44, 49-52, 57-82, 87-90, 95-139
+2026-10-10T13:36:59.6048380Z src/db/models.py                            196      0 100.00%
+2026-10-10T13:36:59.6048697Z src/execution/__init__.py                     0      0 100.00%
+2026-10-10T13:36:59.6049150Z src/execution/account_events.py             144     17  88.19%   55, 61-63, 92, 94, 99-100, 134, 145, 210, 212, 230, 276, 283, 329, 331
+2026-10-10T13:36:59.6049756Z src/execution/accounting.py                 198     17  91.41%   125, 132, 146, 154, 164, 169, 174, 177, 179, 183, 189, 192, 194, 205, 207, 214, 221
+2026-10-10T13:36:59.6050389Z src/execution/autonomy.py                   154     20  87.01%   41, 59, 61, 91-92, 99, 107, 140, 143, 145, 165, 175-176, 182-183, 218, 220, 245, 309, 311
+2026-10-10T13:36:59.6051009Z src/execution/broker_attribution.py         106     22  79.25%   43-44, 53, 55, 67-68, 72-73, 76-77, 80-81, 94-95, 105, 110-111, 124-125, 129-131
+2026-10-10T13:36:59.6051602Z src/execution/broker_balances.py             98     17  82.65%   41, 47, 49, 51, 87, 89-92, 95-96, 102-103, 110-111, 125, 136
+2026-10-10T13:36:59.6052053Z src/execution/broker_capture_control.py      55      1  98.18%   27
+2026-10-10T13:36:59.6052510Z src/execution/broker_monitor.py              57      0 100.00%
+2026-10-10T13:36:59.6052940Z src/execution/broker_observations.py        144     11  92.36%   35, 42, 121, 141, 149, 155, 157, 162, 209, 219-220
+2026-10-10T13:36:59.6053488Z src/execution/broker_order_review.py         82     20  75.61%   12, 15-18, 24, 42-43, 53-54, 63, 70, 74-75, 78-79, 86-89
+2026-10-10T13:36:59.6053945Z src/execution/broker_refresh_state.py        35      0 100.00%
+2026-10-10T13:36:59.6054315Z src/execution/broker_review.py               34      3  91.18%   17-18, 44
+2026-10-10T13:36:59.6054735Z src/execution/broker_stream.py               63      2  96.83%   41, 71
+2026-10-10T13:36:59.6055094Z src/execution/broker_stream_journal.py       53      0 100.00%
+2026-10-10T13:36:59.6055512Z src/execution/commissions.py                 92     14  84.78%   31, 33-34, 67, 69, 71, 76, 86, 137-138, 158-160, 167
+2026-10-10T13:36:59.6055943Z src/execution/decisions.py                    8      0 100.00%
+2026-10-10T13:36:59.6056375Z src/execution/dividend_receipts.py           96     12  87.50%   25, 41, 43, 56, 63, 69, 101-102, 104, 115, 136-137
+2026-10-10T13:36:59.6056810Z src/execution/exposure.py                    27      0 100.00%
+2026-10-10T13:36:59.6057162Z src/execution/external.py                     8      2  75.00%   12, 23
+2026-10-10T13:36:59.6057681Z src/execution/inventory.py                   38      6  84.21%   17, 24, 29, 32, 37, 46
+2026-10-10T13:36:59.6058115Z src/execution/mandates.py                    96      9  90.62%   50, 52, 54, 56, 76, 78, 80, 96, 105
+2026-10-10T13:36:59.6058624Z src/execution/models.py                     126      0 100.00%
+2026-10-10T13:36:59.6058997Z src/execution/monitor.py                     76      7  90.79%   28-30, 77, 88, 127, 133
+2026-10-10T13:36:59.6059373Z src/execution/numeric.py                     15      0 100.00%
+2026-10-10T13:36:59.6059782Z src/execution/policy.py                      73     15  79.45%   21-22, 60, 62, 64, 68, 70, 81, 85, 89, 92, 97-98, 104, 108
+2026-10-10T13:36:59.6060475Z src/execution/reconciliation.py             218     32  85.32%   33, 39, 46, 48, 57, 69, 82, 84, 152-158, 189, 217, 228-229, 239, 241, 245, 249-251, 267, 269, 282, 284, 294, 299, 306, 310, 319, 324, 377-378
+2026-10-10T13:36:59.6061082Z src/execution/reporting.py                   49      1  97.96%   27
+2026-10-10T13:36:59.6061536Z src/execution/risk.py                       100     20  80.00%   27, 42-44, 79, 84, 95, 97, 104-105, 113, 123, 129, 131, 134-138, 175
+2026-10-10T13:36:59.6062004Z src/execution/runtime.py                     86      3  96.51%   38-39, 113
+2026-10-10T13:36:59.6062600Z src/execution/service.py                    197     15  92.39%   52, 74, 91, 99, 236, 240, 250, 256, 270, 287, 364, 375, 380-382
+2026-10-10T13:36:59.6063109Z src/execution/valuation.py                  117     12  89.74%   58, 60, 78, 81, 108, 154-155, 157, 196, 225, 237, 259
+2026-10-10T13:36:59.6063572Z src/execution/valuation_attribution.py       68      4  94.12%   18, 45, 85, 87
+2026-10-10T13:36:59.6063954Z src/expenses/__init__.py                      0      0 100.00%
+2026-10-10T13:36:59.6064314Z src/expenses/categories.py                   33      7  78.79%   249-254, 259, 261, 263
+2026-10-10T13:36:59.6064691Z src/expenses/history_retention.py            40      0 100.00%
+2026-10-10T13:36:59.6065032Z src/expenses/models.py                       19      0 100.00%
+2026-10-10T13:36:59.6065359Z src/expenses/persistence.py                  24      0 100.00%
+2026-10-10T13:36:59.6065778Z src/expenses/provider_sync.py               125     11  91.20%   35, 37-38, 70, 73, 108, 113, 116, 153, 156, 162
+2026-10-10T13:36:59.6066358Z src/expenses/providers.py                   121     23  80.99%   41-42, 64, 66, 73, 75, 80, 84, 87, 89, 112, 120, 122, 125, 135, 154, 163, 168, 174, 183, 188, 191, 201
+2026-10-10T13:36:59.6066881Z src/expenses/reconciliation.py               60      3  95.00%   23, 48-49
+2026-10-10T13:36:59.6067279Z src/expenses/retention.py                    39      0 100.00%
+2026-10-10T13:36:59.6067642Z src/expenses/runtime.py                      36     23  36.11%   17-18, 22-28, 32-61
+2026-10-10T13:36:59.6068009Z src/expenses/status.py                        8      0 100.00%
+2026-10-10T13:36:59.6068345Z src/expenses/summary.py                      13     10  23.08%   8-17
+2026-10-10T13:36:59.6068789Z src/expenses/sync.py                         76     18  76.32%   17, 19, 23, 27-28, 37, 44-45, 52, 56, 58, 60, 62, 87-99, 105, 143, 147
+2026-10-10T13:36:59.6069207Z src/finance/__init__.py                       0      0 100.00%
+2026-10-10T13:36:59.6069558Z src/finance/answers.py                       51     22  56.86%   26-27, 29, 31, 73-107
+2026-10-10T13:36:59.6071550Z src/finance/normalization.py                 45     32  28.89%   16-17, 21-25, 29-46, 50-51, 55-59
+2026-10-10T13:36:59.6071999Z src/finance/portfolio_review.py              67     60  10.45%   11-15, 24-72, 76-166
+2026-10-10T13:36:59.6072502Z src/finance/simulation_answer.py             24     24   0.00%   3-30
+2026-10-10T13:36:59.6072851Z src/inference/__init__.py                     0      0 100.00%
+2026-10-10T13:36:59.6073181Z src/inference/budget.py                      47     47   0.00%   3-86
+2026-10-10T13:36:59.6073516Z src/news/__init__.py                          0      0 100.00%
+2026-10-10T13:36:59.6073992Z src/news/cleanup.py                          44      1  97.73%   25
+2026-10-10T13:36:59.6074441Z src/news/email_reader.py                    148    117  20.95%   52-53, 56, 59, 63-65, 74-81, 91-125, 134-145, 149-153, 164-205, 209-260
+2026-10-10T13:36:59.6075046Z src/news/http.py                            133    103  22.56%   29-44, 52-77, 82-83, 86-93, 105, 108-110, 114-181
+2026-10-10T13:36:59.6075457Z src/news/ingestion.py                        54      3  94.44%   55, 172-174
+2026-10-10T13:36:59.6075853Z src/news/policy.py                           93     10  89.25%   28, 39, 49, 51, 58, 60, 77, 88, 101, 114
+2026-10-10T13:36:59.6076221Z src/news/quality.py                           9      0 100.00%
+2026-10-10T13:36:59.6076538Z src/news/retention.py                        21      0 100.00%
+2026-10-10T13:36:59.6076911Z src/news/runtime.py                         105     12  88.57%   49, 82, 90, 100, 131, 136, 176, 183, 209, 218-221
+2026-10-10T13:36:59.6077309Z src/news/search.py                           39      3  92.31%   75-76, 146
+2026-10-10T13:36:59.6077775Z src/news/sources.py                         143    103  27.97%   31-32, 157-162, 173-188, 200-202, 223-243, 248-262, 284-330, 358-393, 406-426
+2026-10-10T13:36:59.6078224Z src/news/syndication.py                      22      0 100.00%
+2026-10-10T13:36:59.6078547Z src/news/visibility.py                        9      0 100.00%
+2026-10-10T13:36:59.6078875Z src/operations/__init__.py                    0      0 100.00%
+2026-10-10T13:36:59.6079223Z src/operations/alerts.py                     55      5  90.91%   31, 35, 90, 111, 118
+2026-10-10T13:36:59.6079615Z src/operations/backup_retention.py          108    108   0.00%   3-185
+2026-10-10T13:36:59.6079994Z src/operations/heartbeat.py                  51     15  70.59%   39, 62-75
+2026-10-10T13:36:59.6080361Z src/operations/jobs.py                       28      2  92.86%   16, 20
+2026-10-10T13:36:59.6080709Z src/operations/models.py                     52      0 100.00%
+2026-10-10T13:36:59.6081060Z src/operations/recovery_bundle.py           133    133   0.00%   3-181
+2026-10-10T13:36:59.6081437Z src/operations/report_cleanup.py             54     38  29.63%   37-85
+2026-10-10T13:36:59.6081810Z src/operations/report_inventory.py           55     55   0.00%   7-81
+2026-10-10T13:36:59.6082186Z src/operations/report_orphans.py             62      2  96.77%   28, 77
+2026-10-10T13:36:59.6082725Z src/operations/report_retention.py           84      5  94.05%   92, 120, 122, 128, 137
+2026-10-10T13:36:59.6083119Z src/operations/runner.py                     43      1  97.67%   21
+2026-10-10T13:36:59.6083513Z src/operations/storage.py                    47      9  80.85%   23, 37, 41, 44-45, 47, 57, 62-63
+2026-10-10T13:36:59.6083927Z src/operations/workloads.py                  34      6  82.35%   20, 29-30, 38-40
+2026-10-10T13:36:59.6084291Z src/research/__init__.py                      0      0 100.00%
+2026-10-10T13:36:59.6084627Z src/research/dividends.py                    68     68   0.00%   3-86
+2026-10-10T13:36:59.6084994Z src/research/history.py                      56     56   0.00%   8-118
+2026-10-10T13:36:59.6085361Z src/research/portfolio.py                   169    169   0.00%   8-253
+2026-10-10T13:36:59.6085718Z src/research/replay.py                      172    172   0.00%   7-351
+2026-10-10T13:36:59.6086061Z src/scheduler/__init__.py                     0      0 100.00%
+2026-10-10T13:36:59.6086474Z src/scheduler/jobs.py                        83     60  27.71%   28, 34-51, 56-70, 75-77, 82-84, 89-112, 124-226, 230-232
+2026-10-10T13:36:59.6086986Z src/scheduler/report_analysis.py             92     25  72.83%   19, 27-28, 46, 51-61, 71-76, 97, 99, 102-103, 106-107, 114
+2026-10-10T13:36:59.6087762Z src/scheduler/reporter.py                   352     53  84.94%   34-37, 46, 50, 52, 60-65, 67, 79, 98-104, 120-121, 141, 165, 167, 172-173, 192-193, 317-318, 331-332, 438, 449, 463-464, 481, 502, 520, 530, 538, 546, 548, 627-629, 723, 806-807, 819
+2026-10-10T13:36:59.6088458Z src/security/__init__.py                      0      0 100.00%
+2026-10-10T13:36:59.6088945Z src/security/sessions.py                     49      5  89.80%   35-39, 116
+2026-10-10T13:36:59.6089294Z src/tools/__init__.py                         3      0 100.00%
+2026-10-10T13:36:59.6089834Z src/tools/broker_accounts.py                110     57  48.18%   62-65, 82, 87-88, 96, 103-104, 112-113, 115, 121-156, 165-176, 190-191
+2026-10-10T13:36:59.6090281Z src/tools/brokers/__init__.py                 0      0 100.00%
+2026-10-10T13:36:59.6090712Z src/tools/brokers/alpaca.py                  87     70  19.54%   15-17, 21-22, 26, 31-34, 42-60, 64-84, 90-117, 130-185, 192-199
+2026-10-10T13:36:59.6091244Z src/tools/brokers/binance.py                 81     64  20.99%   15-17, 21-22, 26, 30-38, 42-66, 71-74, 80-108, 123-170, 179-186
+2026-10-10T13:36:59.6091772Z src/tools/brokers/coinbase.py                90     73  18.89%   15-17, 21-22, 26, 30-33, 37-58, 63-66, 70-91, 107-151, 158-169
+2026-10-10T13:36:59.6092478Z src/tools/brokers/ibkr.py                   133     74  44.36%   24, 27, 29, 31, 36, 47, 49, 70, 108-114, 130-143, 147-160, 164-188, 192-219, 224-242, 258-263, 280, 285
+2026-10-10T13:36:59.6093009Z src/tools/brokers/ibkr_balances.py           25      2  92.00%   18, 37
+2026-10-10T13:36:59.6093554Z src/tools/brokers/ibkr_observations.py      115     41  64.35%   18, 28, 30-31, 60-61, 66-67, 78-79, 82-99, 102, 115, 135, 161, 167, 172-174, 178-181, 190-209
+2026-10-10T13:36:59.6094277Z src/tools/brokers/ibkr_session.py           151     44  70.86%   28-43, 48, 50, 61, 77, 79, 92, 96-97, 99, 105, 111, 114-115, 118-122, 129-130, 136, 152-153, 164-165, 167, 170-171, 183-184
+2026-10-10T13:36:59.6094850Z src/tools/definitions.py                      4      1  75.00%   645
+2026-10-10T13:36:59.6095562Z src/tools/dispatcher.py                     398    327  17.84%   84-95, 124-143, 151-165, 178-206, 210-240, 253-279, 284-316, 324-410, 429-433, 442, 451-465, 469-480, 491-516, 521-537, 545-590, 594-641, 646, 668-721, 725-753, 757-768, 772, 780-782, 793-822
+2026-10-10T13:36:59.6096341Z src/tools/forex.py                           75     61  18.67%   54-57, 62-63, 68-70, 74-78, 96-116, 121-146, 151-180
+2026-10-10T13:36:59.6096883Z src/tools/market_data.py                    153    134  12.42%   23-39, 47-67, 76, 81-117, 132-149, 154-226, 244-246, 251-260, 265-286, 294-313, 321-347
+2026-10-10T13:36:59.6097483Z src/tools/news.py                           111     88  20.72%   84-97, 101-104, 108-113, 118-121, 125-129, 134-140, 152-168, 173-209, 218-244
+2026-10-10T13:36:59.6097955Z src/tools/news_memory.py                     18     12  33.33%   29-41, 58-63, 73-75
+2026-10-10T13:36:59.6098318Z src/tools/nft.py                             47     42  10.64%   15-23, 37-74
+2026-10-10T13:36:59.6098727Z src/tools/portfolio.py                       98     84  14.29%   22-33, 46, 57-107, 115-141, 145-156, 160-170
+2026-10-10T13:36:59.6099270Z src/tools/simulator.py                      159    141  11.32%   28-30, 40-95, 100-110, 120-141, 146-150, 160-201, 210-251, 264-318, 351-365, 369-376
+2026-10-10T13:36:59.6099744Z src/web/__init__.py                           0      0 100.00%
+2026-10-10T13:36:59.6100092Z src/web/alert_routes.py                      26     13  50.00%   18-37, 57-63
+2026-10-10T13:36:59.6100660Z src/web/auth.py                             149     57  61.74%   59-71, 76-91, 122, 125, 128, 135-136, 140-144, 148, 152, 157-161, 166, 172, 178, 187, 199-202, 208, 229-230, 235-243, 248-262
+2026-10-10T13:36:59.6101305Z src/web/bank_routes.py                      118     79  33.05%   50-53, 57, 62-73, 94-124, 129-147, 152-173, 178-183, 188-209, 214-231
+2026-10-10T13:36:59.6101808Z src/web/broker_observations.py               72     34  52.78%   39-41, 47-53, 63-66, 73-82, 87-97
+2026-10-10T13:36:59.6102238Z src/web/chat_retention.py                    49     25  48.98%   34-37, 42-52, 57-68
+2026-10-10T13:36:59.6102714Z src/web/chat_routes.py                       17      1  94.12%   18
+2026-10-10T13:36:59.6103092Z src/web/expense_export.py                    71      9  87.32%   26, 28, 60, 86-89, 115, 118
+2026-10-10T13:36:59.6103644Z src/web/expense_reconciliation.py            51     24  52.94%   36-39, 44-53, 58-71
+2026-10-10T13:36:59.6104093Z src/web/expense_retention.py                 80     45  43.75%   34-37, 42-50, 55-64, 78-91, 96-115
+2026-10-10T13:36:59.6104616Z src/web/expense_routes.py                    36      2  94.44%   27, 30
+2026-10-10T13:36:59.6104969Z src/web/network.py                           13     11  15.38%   7-19
+2026-10-10T13:36:59.6105352Z src/web/report_retention.py                  63     37  41.27%   40-43, 47-48, 53-65, 70-105
+2026-10-10T13:36:59.6105749Z src/web/research_routes.py                   18      9  50.00%   17-29
+2026-10-10T13:36:59.6107315Z src/web/routes.py                          1203   1037  13.80%   107-114, 119-122, 132-229, 237, 249-261, 272-283, 294-305, 310-338, 344-378, 384-438, 446-447, 455, 459, 476-497, 510-552, 565-587, 591, 601-618, 626-644, 653, 670-681, 694-730, 743-789, 802-823, 828-851, 873-960, 988, 1011-1074, 1078-1087, 1096-1140, 1154-1171, 1184-1215, 1228-1268, 1281-1314, 1323-1374, 1387-1434, 1447-1474, 1483-1512, 1524-1538, 1543-1549, 1555-1574, 1601, 1621-1625, 1634, 1653, 1670-1752, 1795-1828, 1849-1902, 1911-1914, 1923-1955, 1978-2008, 2013, 2040-2057, 2061-2095, 2112-2128, 2141-2174, 2184-2209, 2222-2251, 2261-2289, 2302-2344, 2357-2364
+2026-10-10T13:36:59.6109089Z src/web/simulator_routes.py                 173     85  50.87%   46-49, 65-66, 69, 75, 77-89, 110-111, 126-128, 203-204, 226-251, 256-261, 266-273, 278-291, 301-307, 317-343, 348-357
+2026-10-10T13:36:59.6109636Z ------------------------------------------------------------------------
+2026-10-10T13:36:59.6109953Z TOTAL                                     11678   5509  52.83%
+2026-10-10T13:36:59.6110262Z Coverage XML written to file coverage-integration.xml
+2026-10-10T13:37:01.0492234Z ======================= 372 passed in 124.90s (0:02:04) ========================
+2026-10-10T13:37:02.3384140Z ##[group]Run actions/upload-artifact@v4
+2026-10-10T13:37:02.3384325Z with:
+2026-10-10T13:37:02.3384446Z   name: coverage-integration
+2026-10-10T13:37:02.3384589Z   path: coverage-integration.xml
+2026-10-10T13:37:02.3384735Z   if-no-files-found: warn
+2026-10-10T13:37:02.3384865Z   compression-level: 6
+2026-10-10T13:37:02.3384987Z   overwrite: false
+2026-10-10T13:37:02.3385109Z   include-hidden-files: false
+2026-10-10T13:37:02.3385243Z env:
+2026-10-10T13:37:02.3385385Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:02.3385620Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:37:02.3385851Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:02.3386061Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:02.3386267Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:02.3386478Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:37:02.3386679Z   VENV: .venv/bin/activate
+2026-10-10T13:37:02.3386810Z ##[endgroup]
+2026-10-10T13:37:02.4497394Z (node:5177) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-10T13:37:02.4497989Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-10T13:37:02.4529714Z With the provided path, there will be 1 file uploaded
+2026-10-10T13:37:02.4543081Z Artifact name is valid!
+2026-10-10T13:37:02.4543337Z Root directory input is valid!
+2026-10-10T13:37:02.7452990Z Beginning upload of artifact content to blob storage
+2026-10-10T13:37:02.7606287Z (node:5177) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-10T13:37:02.9240906Z Uploaded bytes 25913
+2026-10-10T13:37:02.9649390Z Finished uploading artifact content to blob storage!
+2026-10-10T13:37:02.9649809Z SHA256 digest of uploaded artifact zip is 585f6448ebdbb3471a05317879f90ce653986d42337e498cc4cf6c96933a4b94
+2026-10-10T13:37:02.9651033Z Finalizing artifact upload
+2026-10-10T13:37:03.2153295Z Artifact coverage-integration.zip successfully finalized. Artifact ID 11671596910
+2026-10-10T13:37:03.2153803Z Artifact coverage-integration has been successfully uploaded! Final size is 25913 bytes. Artifact ID is 11671596910
+2026-10-10T13:37:03.2158789Z Artifact download URL: https://github.com/Investments-Assistant/investments-assistant-local-machine/actions/runs/38056156172/artifacts/11671596910
+2026-10-10T13:37:03.2287691Z ##[group]Run actions/upload-artifact@v4
+2026-10-10T13:37:03.2287856Z with:
+2026-10-10T13:37:03.2287977Z   name: junit-integration
+2026-10-10T13:37:03.2288119Z   path: junit-integration.xml
+2026-10-10T13:37:03.2288263Z   if-no-files-found: warn
+2026-10-10T13:37:03.2288397Z   compression-level: 6
+2026-10-10T13:37:03.2288522Z   overwrite: false
+2026-10-10T13:37:03.2288647Z   include-hidden-files: false
+2026-10-10T13:37:03.2288784Z env:
+2026-10-10T13:37:03.2288947Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:03.2289190Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:37:03.2289426Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:03.2289641Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:03.2289855Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:03.2290073Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:37:03.2290274Z   VENV: .venv/bin/activate
+2026-10-10T13:37:03.2290409Z ##[endgroup]
+2026-10-10T13:37:03.3403349Z (node:5210) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-10T13:37:03.3403876Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-10T13:37:03.3454572Z With the provided path, there will be 1 file uploaded
+2026-10-10T13:37:03.3463610Z Artifact name is valid!
+2026-10-10T13:37:03.3463932Z Root directory input is valid!
+2026-10-10T13:37:03.5811238Z Beginning upload of artifact content to blob storage
+2026-10-10T13:37:03.5963885Z (node:5210) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-10T13:37:03.7288721Z Uploaded bytes 9245
+2026-10-10T13:37:03.7664346Z Finished uploading artifact content to blob storage!
+2026-10-10T13:37:03.7664929Z SHA256 digest of uploaded artifact zip is 0af843fc3e82bd1c4fe5585fb4603aea19d7253eca04c369006f68858950e2f3
+2026-10-10T13:37:03.7665791Z Finalizing artifact upload
+2026-10-10T13:37:03.9944020Z Artifact junit-integration.zip successfully finalized. Artifact ID 11672041505
+2026-10-10T13:37:03.9944664Z Artifact junit-integration has been successfully uploaded! Final size is 9245 bytes. Artifact ID is 11672041505
+2026-10-10T13:37:03.9949250Z Artifact download URL: https://github.com/Investments-Assistant/investments-assistant-local-machine/actions/runs/38056156172/artifacts/11672041505
+2026-10-10T13:37:04.0081594Z ##[group]Run SonarSource/sonarcloud-github-action@master
+2026-10-10T13:37:04.0081800Z with:
+2026-10-10T13:37:04.0082095Z   args: -Dsonar.python.coverage.reportPaths=coverage-integration.xml -Dsonar.testExecutionReportPaths=junit-integration.xml
+
+2026-10-10T13:37:04.0082622Z   scannerVersion: 7.0.2.4839
+2026-10-10T13:37:04.0082860Z   scannerBinariesUrl: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli
+2026-10-10T13:37:04.0083094Z env:
+2026-10-10T13:37:04.0083247Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0083492Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:37:04.0083732Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0083953Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0084170Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0084547Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:37:04.0084739Z   VENV: .venv/bin/activate
+2026-10-10T13:37:04.0086054Z   GITHUB_TOKEN: ***
+2026-10-10T13:37:04.0086183Z   SONAR_TOKEN: 
+2026-10-10T13:37:04.0086304Z ##[endgroup]
+2026-10-10T13:37:04.0088866Z ##[start-action display=Deprecation warning;id=__SonarSource_sonarcloud-github-action.__run]
+2026-10-10T13:37:04.0100205Z ##[group]Run echo "::warning title=SonarScanner::This action is deprecated and will be removed in a future release. Please use the sonarqube-scan-action action instead. The sonarqube-scan-action is a drop-in replacement for this action."
+2026-10-10T13:37:04.0101035Z [36;1mecho "::warning title=SonarScanner::This action is deprecated and will be removed in a future release. Please use the sonarqube-scan-action action instead. The sonarqube-scan-action is a drop-in replacement for this action."[0m
+2026-10-10T13:37:04.0154112Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-10T13:37:04.0154309Z env:
+2026-10-10T13:37:04.0154477Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0154716Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:37:04.0154954Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0155171Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0155386Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0155605Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:37:04.0155795Z   VENV: .venv/bin/activate
+2026-10-10T13:37:04.0157090Z   GITHUB_TOKEN: ***
+2026-10-10T13:37:04.0157215Z   SONAR_TOKEN: 
+2026-10-10T13:37:04.0157336Z ##[endgroup]
+2026-10-10T13:37:04.0236301Z ##[warning]This action is deprecated and will be removed in a future release. Please use the sonarqube-scan-action action instead. The sonarqube-scan-action is a drop-in replacement for this action.
+2026-10-10T13:37:04.0240064Z ##[end-action id=__SonarSource_sonarcloud-github-action.__run;outcome=success;conclusion=success;duration_ms=15]
+2026-10-10T13:37:04.0241729Z ##[start-action display=SonarQube Cloud Scan;id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action]
+2026-10-10T13:37:04.0282008Z ##[group]Run SonarSource/sonarqube-scan-action@v5.0.0
+2026-10-10T13:37:04.0282192Z with:
+2026-10-10T13:37:04.0282599Z   args: -Dsonar.python.coverage.reportPaths=coverage-integration.xml -Dsonar.testExecutionReportPaths=junit-integration.xml
+
+2026-10-10T13:37:04.0282929Z   scannerVersion: 7.0.2.4839
+2026-10-10T13:37:04.0283164Z   scannerBinariesUrl: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli
+2026-10-10T13:37:04.0283398Z env:
+2026-10-10T13:37:04.0283553Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0283789Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:37:04.0284028Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0284397Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0284617Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0284837Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:37:04.0285027Z   VENV: .venv/bin/activate
+2026-10-10T13:37:04.0286336Z   GITHUB_TOKEN: ***
+2026-10-10T13:37:04.0286461Z   SONAR_TOKEN: 
+2026-10-10T13:37:04.0286580Z ##[endgroup]
+2026-10-10T13:37:04.0289916Z ##[start-action display=Sanity checks;id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action.__run]
+2026-10-10T13:37:04.0300394Z ##[group]Run ${GITHUB_ACTION_PATH}/scripts/sanity-checks.sh
+2026-10-10T13:37:04.0300642Z [36;1m${GITHUB_ACTION_PATH}/scripts/sanity-checks.sh[0m
+2026-10-10T13:37:04.0351158Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-10T13:37:04.0351343Z env:
+2026-10-10T13:37:04.0351501Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0351884Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:37:04.0352126Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0352427Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0352644Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0352866Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:37:04.0353056Z   VENV: .venv/bin/activate
+2026-10-10T13:37:04.0354333Z   GITHUB_TOKEN: ***
+2026-10-10T13:37:04.0354454Z   SONAR_TOKEN: 
+2026-10-10T13:37:04.0354580Z   INPUT_PROJECTBASEDIR: 
+2026-10-10T13:37:04.0354717Z ##[endgroup]
+2026-10-10T13:37:04.0430915Z ##[warning]Running this GitHub Action without SONAR_TOKEN is not recommended
+2026-10-10T13:37:04.0437682Z ##[end-action id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action.__run;outcome=success;conclusion=success;duration_ms=14]
+2026-10-10T13:37:04.0439627Z ##[start-action display=Load Sonar Scanner CLI from cache;id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action.sonar-scanner-cli]
+2026-10-10T13:37:04.0463730Z ##[group]Run actions/cache@v4
+2026-10-10T13:37:04.0463880Z with:
+2026-10-10T13:37:04.0464059Z   path: /home/runner/work/_temp/sonar-scanner-cli-7.0.2.4839-Linux-X64
+2026-10-10T13:37:04.0464285Z   key: sonar-scanner-cli-7.0.2.4839-Linux-X64
+2026-10-10T13:37:04.0464461Z   enableCrossOsArchive: false
+2026-10-10T13:37:04.0464609Z   fail-on-cache-miss: false
+2026-10-10T13:37:04.0464750Z   lookup-only: false
+2026-10-10T13:37:04.0464878Z   save-always: false
+2026-10-10T13:37:04.0464999Z env:
+2026-10-10T13:37:04.0465151Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0465392Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:37:04.0465625Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0465841Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0466062Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.0466286Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:37:04.0466473Z   VENV: .venv/bin/activate
+2026-10-10T13:37:04.0467738Z   GITHUB_TOKEN: ***
+2026-10-10T13:37:04.0467867Z   SONAR_TOKEN: 
+2026-10-10T13:37:04.0467994Z   SEGMENT_DOWNLOAD_TIMEOUT_MINS: 1
+2026-10-10T13:37:04.0468144Z ##[endgroup]
+2026-10-10T13:37:04.1193960Z (node:5226) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-10T13:37:04.1194497Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-10T13:37:04.2413379Z Cache not found for input keys: sonar-scanner-cli-7.0.2.4839-Linux-X64
+2026-10-10T13:37:04.2488429Z ##[end-action id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action.sonar-scanner-cli;outcome=success;conclusion=success;duration_ms=204]
+2026-10-10T13:37:04.2491741Z ##[start-action display=Install Sonar Scanner CLI;id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action.__run_2]
+2026-10-10T13:37:04.2531564Z ##[group]Run ${GITHUB_ACTION_PATH}/scripts/install-sonar-scanner-cli.sh
+2026-10-10T13:37:04.2531871Z [36;1m${GITHUB_ACTION_PATH}/scripts/install-sonar-scanner-cli.sh[0m
+2026-10-10T13:37:04.2583922Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-10T13:37:04.2584109Z env:
+2026-10-10T13:37:04.2584271Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.2584516Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:37:04.2584754Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.2584973Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.2585186Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:04.2585409Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:37:04.2585751Z   VENV: .venv/bin/activate
+2026-10-10T13:37:04.2587110Z   GITHUB_TOKEN: ***
+2026-10-10T13:37:04.2587247Z   SONAR_TOKEN: 
+2026-10-10T13:37:04.2587374Z   INPUT_SCANNERVERSION: 7.0.2.4839
+2026-10-10T13:37:04.2587630Z   INPUT_SCANNERBINARIESURL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli
+2026-10-10T13:37:04.2587880Z ##[endgroup]
+2026-10-10T13:37:04.2665028Z + mkdir -p /home/runner/work/_temp/sonarscanner
+2026-10-10T13:37:04.2676278Z + cd /home/runner/work/_temp/sonarscanner
+2026-10-10T13:37:04.2676604Z + SCANNER_FILE_NAME=sonar-scanner-cli-7.0.2.4839-linux-x64.zip
+2026-10-10T13:37:04.2677167Z + SCANNER_URI=https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.0.2.4839-linux-x64.zip
+2026-10-10T13:37:04.2677637Z + command -v wget
+2026-10-10T13:37:04.2678204Z + wget --no-verbose --user-agent=sonarqube-scan-action https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.0.2.4839-linux-x64.zip
+2026-10-10T13:37:04.6835799Z 2026-10-10 13:37:04 URL:https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.0.2.4839-linux-x64.zip [57688416/57688416] -> "sonar-scanner-cli-7.0.2.4839-linux-x64.zip" [1]
+2026-10-10T13:37:04.6844779Z + unzip -q -o sonar-scanner-cli-7.0.2.4839-linux-x64.zip
+2026-10-10T13:37:05.4837962Z + SCANNER_UNZIP_FOLDER=sonar-scanner-7.0.2.4839-linux-x64
+2026-10-10T13:37:05.4838389Z + SCANNER_LOCAL_FOLDER=/home/runner/work/_temp/sonar-scanner-cli-7.0.2.4839-Linux-X64
+2026-10-10T13:37:05.4838692Z + '[' -d /home/runner/work/_temp/sonar-scanner-cli-7.0.2.4839-Linux-X64 ']'
+2026-10-10T13:37:05.4839024Z + mv -f sonar-scanner-7.0.2.4839-linux-x64 /home/runner/work/_temp/sonar-scanner-cli-7.0.2.4839-Linux-X64
+2026-10-10T13:37:05.4861147Z ##[end-action id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action.__run_2;outcome=success;conclusion=success;duration_ms=1236]
+2026-10-10T13:37:05.4863433Z ##[start-action display=Add SonarScanner CLI to the PATH;id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action.__run_3]
+2026-10-10T13:37:05.4878941Z ##[group]Run echo "${RUNNER_TEMP}/sonar-scanner-cli-7.0.2.4839-Linux-X64/bin" >> $GITHUB_PATH
+2026-10-10T13:37:05.4879302Z [36;1mecho "${RUNNER_TEMP}/sonar-scanner-cli-7.0.2.4839-Linux-X64/bin" >> $GITHUB_PATH[0m
+2026-10-10T13:37:05.4930358Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-10T13:37:05.4930544Z env:
+2026-10-10T13:37:05.4930699Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:05.4930936Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:37:05.4931168Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:05.4931376Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:05.4931590Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:05.4931804Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:37:05.4931989Z   VENV: .venv/bin/activate
+2026-10-10T13:37:05.4933462Z   GITHUB_TOKEN: ***
+2026-10-10T13:37:05.4933587Z   SONAR_TOKEN: 
+2026-10-10T13:37:05.4933863Z ##[endgroup]
+2026-10-10T13:37:05.5009645Z ##[end-action id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action.__run_3;outcome=success;conclusion=success;duration_ms=14]
+2026-10-10T13:37:05.5013056Z ##[start-action display=Run SonarScanner;id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action.__run_4]
+2026-10-10T13:37:05.5025433Z ##[group]Run ${GITHUB_ACTION_PATH}/scripts/run-sonar-scanner-cli.sh -Dsonar.python.coverage.reportPaths=coverage-integration.xml -Dsonar.testExecutionReportPaths=junit-integration.xml
+2026-10-10T13:37:05.5026123Z [36;1m${GITHUB_ACTION_PATH}/scripts/run-sonar-scanner-cli.sh -Dsonar.python.coverage.reportPaths=coverage-integration.xml -Dsonar.testExecutionReportPaths=junit-integration.xml[0m
+2026-10-10T13:37:05.5077138Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-10T13:37:05.5077470Z env:
+2026-10-10T13:37:05.5077626Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:05.5077870Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-10T13:37:05.5078097Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:05.5078307Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:05.5078517Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-10T13:37:05.5078731Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-10T13:37:05.5078914Z   VENV: .venv/bin/activate
+2026-10-10T13:37:05.5080184Z   GITHUB_TOKEN: ***
+2026-10-10T13:37:05.5080305Z   SONAR_TOKEN: 
+2026-10-10T13:37:05.5080429Z   INPUT_PROJECTBASEDIR: 
+2026-10-10T13:37:05.5080647Z   SONAR_SCANNER_JRE: /home/runner/work/_temp/sonar-scanner-cli-7.0.2.4839-Linux-X64/jre
+2026-10-10T13:37:05.5080878Z ##[endgroup]
+2026-10-10T13:37:05.5158114Z + sonar-scanner -Dsonar.python.coverage.reportPaths=coverage-integration.xml -Dsonar.testExecutionReportPaths=junit-integration.xml
+2026-10-10T13:37:05.7065076Z 13:37:05.704 INFO  Scanner configuration file: /home/runner/work/_temp/sonar-scanner-cli-7.0.2.4839-Linux-X64/conf/sonar-scanner.properties
+2026-10-10T13:37:05.7071283Z 13:37:05.706 INFO  Project root configuration file: /home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine/sonar-project.properties
+2026-10-10T13:37:05.7183967Z 13:37:05.718 INFO  SonarScanner CLI 7.0.2.4839
+2026-10-10T13:37:05.7196171Z 13:37:05.719 INFO  Java 17.0.13 Eclipse Adoptium (64-bit)
+2026-10-10T13:37:05.7200233Z 13:37:05.719 INFO  Linux 6.17.0-1022-azure amd64
+2026-10-10T13:37:05.7414213Z 13:37:05.741 INFO  User cache: /home/runner/.sonar/cache
+2026-10-10T13:37:06.1126496Z 13:37:06.112 INFO  JRE provisioning: os[linux], arch[x86_64]
+2026-10-10T13:37:08.2574519Z 13:37:08.256 INFO  Communicating with SonarQube Cloud
+2026-10-10T13:37:08.4873618Z 13:37:08.486 INFO  Starting SonarScanner Engine...
+2026-10-10T13:37:08.4874598Z 13:37:08.487 INFO  Java 21.0.12.1 Eclipse Adoptium (64-bit)
+2026-10-10T13:37:09.1524734Z 13:37:09.152 INFO  Load global settings
+2026-10-10T13:37:09.9023928Z 13:37:09.902 INFO  Load global settings (done) | time=750ms
+2026-10-10T13:37:09.9554035Z 13:37:09.954 INFO  Server id: 1BD809FA-AWHW8ct9-T_TB3XqouNu
+2026-10-10T13:37:09.9673334Z 13:37:09.966 INFO  Loading required plugins
+2026-10-10T13:37:09.9693325Z 13:37:09.967 INFO  Load plugins index
+2026-10-10T13:37:10.1594769Z 13:37:10.159 INFO  Load plugins index (done) | time=191ms
+2026-10-10T13:37:10.1608992Z 13:37:10.160 INFO  Load/download plugins
+2026-10-10T13:37:10.6753727Z 13:37:10.672 INFO  Load/download plugins (done) | time=512ms
+2026-10-10T13:37:10.8893880Z 13:37:10.889 INFO  Loaded core extensions: a3s, sca, architecture
+2026-10-10T13:37:11.0793924Z 13:37:11.078 INFO  Load project settings for component key: 'Investments-Assistant_investments-assistant'
+2026-10-10T13:37:11.2934041Z 13:37:11.292 INFO  Load project settings for component key: 'Investments-Assistant_investments-assistant' (done) | time=215ms
+2026-10-10T13:37:11.3044349Z 13:37:11.303 INFO  Found an active CI vendor: 'Github Actions'
+2026-10-10T13:37:11.5038923Z 13:37:11.503 ERROR Error retrieving feature flags, using default analyzer behavior
+2026-10-10T13:37:11.5039442Z Not authorized. Please check the 'sonar.token' property or the 'SONAR_TOKEN' environment variable, or contact the project administrator to verify the token's permissions.
+2026-10-10T13:37:11.5039777Z 
+2026-10-10T13:37:11.5124718Z 13:37:11.512 INFO  Process project properties
+2026-10-10T13:37:11.5259878Z 13:37:11.525 INFO  Project key: Investments-Assistant_investments-assistant
+2026-10-10T13:37:11.5260565Z 13:37:11.525 INFO  Base dir: /home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine
+2026-10-10T13:37:11.5262712Z 13:37:11.526 INFO  Working dir: /home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine/.scannerwork
+2026-10-10T13:37:11.5397474Z 13:37:11.539 INFO  Check ALM binding of project 'Investments-Assistant_investments-assistant'
+2026-10-10T13:37:11.6732837Z 13:37:11.672 WARN  Failed to check if project 'Investments-Assistant_investments-assistant' is bound
+2026-10-10T13:37:11.6733647Z 13:37:11.673 INFO  Detected project binding: ERROR
+2026-10-10T13:37:11.6734627Z 13:37:11.673 INFO  Check ALM binding of project 'Investments-Assistant_investments-assistant' (done) | time=134ms
+2026-10-10T13:37:11.6768260Z 13:37:11.676 INFO  Load branch configuration
+2026-10-10T13:37:11.6773350Z 13:37:11.677 INFO  Github event: push
+2026-10-10T13:37:11.6823476Z 13:37:11.682 INFO  Auto-configuring branch main
+2026-10-10T13:37:11.6848450Z 13:37:11.682 INFO  Load branch configuration (done) | time=5ms
+2026-10-10T13:37:11.6850645Z 13:37:11.684 INFO  Create analysis
+2026-10-10T13:37:12.0860852Z 13:37:12.084 ERROR Not authorized. Please check the 'sonar.token' property or the 'SONAR_TOKEN' environment variable, or contact the project administrator to verify the token's permissions.
+2026-10-10T13:37:12.1086292Z 13:37:12.108 INFO  EXECUTION FAILURE
+2026-10-10T13:37:12.1096468Z 13:37:12.109 INFO  Total time: 6.407s
+2026-10-10T13:37:12.4320392Z ##[error]Process completed with exit code 3.
+2026-10-10T13:37:12.4326847Z ##[end-action id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action.__run_4;outcome=failure;conclusion=failure;duration_ms=6931]
+2026-10-10T13:37:12.4331478Z ##[end-action id=__SonarSource_sonarcloud-github-action.__SonarSource_sonarqube-scan-action;outcome=failure;conclusion=failure;duration_ms=8408]
+2026-10-10T13:37:12.4396319Z Post job cleanup.
+2026-10-10T13:37:12.4399236Z ##[start-action display=SonarQube Cloud Scan;id=__fbf1818f-dc8d-4c70-9052-349ff5f212c7.__SonarSource_sonarqube-scan-action]
+2026-10-10T13:37:12.4436049Z Post job cleanup.
+2026-10-10T13:37:12.4437847Z ##[start-action display=Load Sonar Scanner CLI from cache;id=__fbf1818f-dc8d-4c70-9052-349ff5f212c7.__SonarSource_sonarqube-scan-action.sonar-scanner-cli]
+2026-10-10T13:37:12.4439995Z ##[end-action id=__fbf1818f-dc8d-4c70-9052-349ff5f212c7.__SonarSource_sonarqube-scan-action.sonar-scanner-cli;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-10T13:37:12.4442978Z ##[end-action id=__fbf1818f-dc8d-4c70-9052-349ff5f212c7.__SonarSource_sonarqube-scan-action;outcome=success;conclusion=success;duration_ms=4]
+2026-10-10T13:37:12.4496524Z Post job cleanup.
+2026-10-10T13:37:12.5072909Z [command]/usr/bin/git version
+2026-10-10T13:37:12.5094265Z git version 2.55.0
+2026-10-10T13:37:12.5121382Z Temporarily overriding HOME='/home/runner/work/_temp/cff894f8-654b-4c52-aadf-9e06a76ea794' before making global git config changes
+2026-10-10T13:37:12.5122095Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-10T13:37:12.5129517Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine
+2026-10-10T13:37:12.5162981Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-10T13:37:12.5213061Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-10T13:37:12.5402587Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-10T13:37:12.5430137Z http.https://github.com/.extraheader
+2026-10-10T13:37:12.5440046Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-10T13:37:12.5474677Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-10T13:37:12.5679810Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-10T13:37:12.5715166Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-10T13:37:12.6005789Z Print service container logs: 872b004dbc7643408edeb55eb617d309_postgres16_7cd4c5
+2026-10-10T13:37:12.6008959Z ##[command]/usr/bin/docker logs --details 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9
+2026-10-10T13:37:12.6103563Z  The files belonging to this database system will be owned by user "postgres".
+2026-10-10T13:37:12.6105212Z  initdb: warning: enabling "trust" authentication for local connections
+2026-10-10T13:37:12.6106582Z  initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+2026-10-10T13:37:12.6107107Z  This user must also own the server process.
+2026-10-10T13:37:12.6107450Z  
+2026-10-10T13:37:12.6107727Z  The database cluster will be initialized with locale "en_US.utf8".
+2026-10-10T13:37:12.6108138Z  The default database encoding has accordingly been set to "UTF8".
+2026-10-10T13:37:12.6108510Z  The default text search configuration will be set to "english".
+2026-10-10T13:37:12.6108754Z  
+2026-10-10T13:37:12.6108876Z  Data page checksums are disabled.
+2026-10-10T13:37:12.6109027Z  
+2026-10-10T13:37:12.6109221Z  fixing permissions on existing directory /var/lib/postgresql/data ... ok
+2026-10-10T13:37:12.6109449Z  creating subdirectories ... ok
+2026-10-10T13:37:12.6109644Z  selecting dynamic shared memory implementation ... posix
+2026-10-10T13:37:12.6109850Z  selecting default max_connections ... 100
+2026-10-10T13:37:12.6110026Z  selecting default shared_buffers ... 128MB
+2026-10-10T13:37:12.6110200Z  selecting default time zone ... Etc/UTC
+2026-10-10T13:37:12.6110370Z  creating configuration files ... ok
+2026-10-10T13:37:12.6110534Z  running bootstrap script ... ok
+2026-10-10T13:37:12.6110715Z  performing post-bootstrap initialization ... ok
+2026-10-10T13:37:12.6110897Z  syncing data to disk ... ok
+2026-10-10T13:37:12.6111037Z  
+2026-10-10T13:37:12.6111139Z  
+2026-10-10T13:37:12.6111280Z  Success. You can now start the database server using:
+2026-10-10T13:37:12.6111460Z  
+2026-10-10T13:37:12.6111605Z      pg_ctl -D /var/lib/postgresql/data -l logfile start
+2026-10-10T13:37:12.6111780Z  
+2026-10-10T13:37:12.6112149Z  waiting for server to start....2026-10-10 13:34:23.135 UTC [48] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-10-10T13:37:12.6112911Z  2026-10-10 13:34:23.520 UTC [1] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-10-10T13:37:12.6113312Z  2026-10-10 13:34:23.520 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-10-10T13:37:12.6113579Z  2026-10-10 13:34:23.520 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-10-10T13:37:12.6113879Z  2026-10-10 13:34:23.521 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-10-10T13:37:12.6114201Z  2026-10-10 13:34:23.523 UTC [64] LOG:  database system was shut down at 2026-10-10 13:34:23 UTC
+2026-10-10T13:37:12.6114497Z  2026-10-10 13:34:23.526 UTC [1] LOG:  database system is ready to accept connections
+2026-10-10T13:37:12.6114755Z  2026-10-10 13:34:32.450 UTC [75] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6114984Z  2026-10-10 13:34:42.495 UTC [83] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6115210Z  2026-10-10 13:34:52.540 UTC [90] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6115440Z  2026-10-10 13:35:02.587 UTC [183] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6115687Z  2026-10-10 13:35:12.629 UTC [346] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6115916Z  2026-10-10 13:35:22.681 UTC [455] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6116216Z  2026-10-10 13:35:25.821 UTC [528] ERROR:  duplicate key value violates unique constraint "news_articles_url_key"
+2026-10-10T13:37:12.6116597Z  2026-10-10 13:35:25.821 UTC [528] DETAIL:  Key (url)=(https://example.com/unique-test) already exists.
+2026-10-10T13:37:12.6118029Z  2026-10-10 13:35:25.821 UTC [528] STATEMENT:  INSERT INTO news_articles (id, user_id, visibility, title, summary, content, source, url, published_at, fetched_at, available_at, content_hash, provenance, sentiment_label, sentiment_score, tags) VALUES ($1::VARCHAR, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR, $7::VARCHAR, $8::VARCHAR, $9::TIMESTAMP WITH TIME ZONE, $10::TIMESTAMP WITH TIME ZONE, $11::TIMESTAMP WITH TIME ZONE, $12::VARCHAR, $13::JSON, $14::VARCHAR, $15::FLOAT, $16::JSON)
+2026-10-10T13:37:12.6119483Z  2026-10-10 13:35:25.962 UTC [532] ERROR:  duplicate key value violates unique constraint "uq_daily_pnl_user_date"
+2026-10-10T13:37:12.6119831Z  2026-10-10 13:35:25.962 UTC [532] DETAIL:  Key (user_id, date)=(user-a, 2024-01-01) already exists.
+2026-10-10T13:37:12.6120465Z  2026-10-10 13:35:25.962 UTC [532] STATEMENT:  INSERT INTO daily_pnl (user_id, date, realized_usd, unrealized_usd, auto_trading_halted, updated_at) VALUES ($1::VARCHAR, $2::VARCHAR, $3::NUMERIC(28, 10), $4::NUMERIC(28, 10), $5::BOOLEAN, $6::TIMESTAMP WITH TIME ZONE) RETURNING daily_pnl.id
+2026-10-10T13:37:12.6121077Z  2026-10-10 13:35:29.950 UTC [585] ERROR:  canceling statement due to lock timeout
+2026-10-10T13:37:12.6121363Z  2026-10-10 13:35:29.950 UTC [585] CONTEXT:  while updating tuple (0,139) in relation "users"
+2026-10-10T13:37:12.6121780Z  2026-10-10 13:35:29.950 UTC [585] STATEMENT:  UPDATE users SET is_active=$1::BOOLEAN, updated_at=$2::TIMESTAMP WITH TIME ZONE WHERE users.id = $3::VARCHAR
+2026-10-10T13:37:12.6122160Z  2026-10-10 13:35:32.730 UTC [608] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6122548Z  2026-10-10 13:35:42.777 UTC [803] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6122780Z  2026-10-10 13:35:52.825 UTC [1030] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6123053Z  2026-10-10 13:35:56.357 UTC [1099] ERROR:  canceling statement due to lock timeout at character 13
+2026-10-10T13:37:12.6123353Z  2026-10-10 13:35:56.357 UTC [1099] STATEMENT:  INSERT INTO reports VALUES ($1)
+2026-10-10T13:37:12.6123624Z  2026-10-10 13:35:57.296 UTC [62] LOG:  checkpoint starting: immediate force wait
+2026-10-10T13:37:12.6124227Z  2026-10-10 13:35:57.343 UTC [62] LOG:  checkpoint complete: wrote 655 buffers (4.0%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.020 s, sync=0.013 s, total=0.048 s; sync files=511, longest=0.010 s, average=0.001 s; distance=9785 kB, estimate=9785 kB; lsn=0/22AD830, redo lsn=0/22AD7F8
+2026-10-10T13:37:12.6124819Z  2026-10-10 13:36:02.874 UTC [1186] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6125050Z  2026-10-10 13:36:12.924 UTC [1289] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6125298Z  2026-10-10 13:36:16.756 UTC [1312] ERROR:  canceling statement due to lock timeout
+2026-10-10T13:37:12.6125607Z  2026-10-10 13:36:16.756 UTC [1312] CONTEXT:  while locking tuple (28,4) in relation "simulator_accounts"
+2026-10-10T13:37:12.6126571Z  2026-10-10 13:36:16.756 UTC [1312] STATEMENT:  SELECT simulator_accounts.id, simulator_accounts.user_id, simulator_accounts.currency, simulator_accounts.cash, simulator_accounts.reserved, simulator_accounts.initial_capital, simulator_accounts.max_order, simulator_accounts.loss_limit, simulator_accounts.realized_pnl, simulator_accounts.halted, simulator_accounts.halt_reason, simulator_accounts.mandate 
+2026-10-10T13:37:12.6127386Z  	FROM simulator_accounts 
+2026-10-10T13:37:12.6127634Z  	WHERE simulator_accounts.id = $1::VARCHAR AND simulator_accounts.user_id = $2::VARCHAR FOR UPDATE
+2026-10-10T13:37:12.6127947Z  2026-10-10 13:36:21.046 UTC [62] LOG:  checkpoint starting: immediate force wait
+2026-10-10T13:37:12.6128537Z  2026-10-10 13:36:21.050 UTC [62] LOG:  checkpoint complete: wrote 184 buffers (1.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.001 s, total=0.005 s; sync files=73, longest=0.001 s, average=0.001 s; distance=6030 kB, estimate=9410 kB; lsn=0/2891150, redo lsn=0/2891118
+2026-10-10T13:37:12.6129113Z  2026-10-10 13:36:22.967 UTC [1365] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6129573Z  2026-10-10 13:36:25.444 UTC [62] LOG:  checkpoint starting: immediate force wait
+2026-10-10T13:37:12.6130154Z  2026-10-10 13:36:25.447 UTC [62] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.003 s; sync files=4, longest=0.001 s, average=0.001 s; distance=5161 kB, estimate=8985 kB; lsn=0/2D9B900, redo lsn=0/2D9B8C8
+2026-10-10T13:37:12.6130734Z  2026-10-10 13:36:26.746 UTC [62] LOG:  checkpoint starting: immediate force wait
+2026-10-10T13:37:12.6131313Z  2026-10-10 13:36:26.749 UTC [62] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.001 s, sync=0.001 s, total=0.003 s; sync files=4, longest=0.001 s, average=0.001 s; distance=5162 kB, estimate=8603 kB; lsn=0/32A6228, redo lsn=0/32A61F0
+2026-10-10T13:37:12.6131880Z  2026-10-10 13:36:33.014 UTC [1387] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6132131Z  2026-10-10 13:36:39.003 UTC [62] LOG:  checkpoint starting: immediate force wait
+2026-10-10T13:37:12.6132863Z  2026-10-10 13:36:39.006 UTC [62] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.003 s; sync files=4, longest=0.001 s, average=0.001 s; distance=5223 kB, estimate=8265 kB; lsn=0/37C0128, redo lsn=0/37C00F0
+2026-10-10T13:37:12.6133428Z  2026-10-10 13:36:43.056 UTC [1403] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6133675Z  2026-10-10 13:36:51.218 UTC [62] LOG:  checkpoint starting: immediate force wait
+2026-10-10T13:37:12.6134252Z  2026-10-10 13:36:51.220 UTC [62] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.003 s; sync files=4, longest=0.001 s, average=0.001 s; distance=5224 kB, estimate=7961 kB; lsn=0/3CDA150, redo lsn=0/3CDA118
+2026-10-10T13:37:12.6134818Z  2026-10-10 13:36:53.102 UTC [1436] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6135051Z  2026-10-10 13:37:03.145 UTC [1480] FATAL:  role "root" does not exist
+2026-10-10T13:37:12.6135329Z  2026-10-10 13:34:23.136 UTC [48] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-10-10T13:37:12.6135646Z  2026-10-10 13:34:23.138 UTC [51] LOG:  database system was shut down at 2026-10-10 13:34:22 UTC
+2026-10-10T13:37:12.6135939Z  2026-10-10 13:34:23.141 UTC [48] LOG:  database system is ready to accept connections
+2026-10-10T13:37:12.6136151Z   done
+2026-10-10T13:37:12.6136266Z  server started
+2026-10-10T13:37:12.6136390Z  CREATE DATABASE
+2026-10-10T13:37:12.6136512Z  
+2026-10-10T13:37:12.6136619Z  
+2026-10-10T13:37:12.6136807Z  /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+2026-10-10T13:37:12.6137031Z  
+2026-10-10T13:37:12.6137236Z  waiting for server to shut down...2026-10-10 13:34:23.304 UTC [48] LOG:  received fast shutdown request
+2026-10-10T13:37:12.6137536Z  .2026-10-10 13:34:23.305 UTC [48] LOG:  aborting any active transactions
+2026-10-10T13:37:12.6137872Z  2026-10-10 13:34:23.307 UTC [48] LOG:  background worker "logical replication launcher" (PID 54) exited with exit code 1
+2026-10-10T13:37:12.6138178Z  2026-10-10 13:34:23.307 UTC [49] LOG:  shutting down
+2026-10-10T13:37:12.6138405Z  2026-10-10 13:34:23.307 UTC [49] LOG:  checkpoint starting: shutdown immediate
+2026-10-10T13:37:12.6138990Z  2026-10-10 13:34:23.410 UTC [49] LOG:  checkpoint complete: wrote 926 buffers (5.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.066 s, sync=0.036 s, total=0.103 s; sync files=301, longest=0.035 s, average=0.001 s; distance=4273 kB, estimate=4273 kB; lsn=0/191F0F8, redo lsn=0/191F0F8
+2026-10-10T13:37:12.6139563Z  2026-10-10 13:34:23.416 UTC [48] LOG:  database system is shut down
+2026-10-10T13:37:12.6139750Z   done
+2026-10-10T13:37:12.6139862Z  server stopped
+2026-10-10T13:37:12.6139982Z  
+2026-10-10T13:37:12.6140125Z  PostgreSQL init process complete; ready for start up.
+2026-10-10T13:37:12.6140301Z  
+2026-10-10T13:37:12.6144224Z Stop and remove container: 872b004dbc7643408edeb55eb617d309_postgres16_7cd4c5
+2026-10-10T13:37:12.6147887Z ##[command]/usr/bin/docker rm --force 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9
+2026-10-10T13:37:15.2859729Z 4f30d95c3315d40263eac3f5d5a80dedb20193aca22e675963dc6c4962e8aee9
+2026-10-10T13:37:15.2882951Z Remove container network: github_network_a5e94da3df9d46c4b5d686808dd4089c
+2026-10-10T13:37:15.2886042Z ##[command]/usr/bin/docker network rm github_network_a5e94da3df9d46c4b5d686808dd4089c
+2026-10-10T13:37:15.3851845Z github_network_a5e94da3df9d46c4b5d686808dd4089c
+2026-10-10T13:37:15.3905653Z Cleaning up orphan processes
+2026-10-10T13:37:15.4134051Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

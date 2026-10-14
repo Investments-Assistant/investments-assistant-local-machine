@@ -1,0 +1,10 @@
+{
+  "base": "cd049bfdecaeaf77b49f92ff6a4fa9a0d65744ac",
+  "files": {
+    "scripts/soak_acceptance.py": "bb2b090d13a33fbe706ee47213d52adef1534be69bc40b221a502b5925ffb4c9",
+    "tests/integration/soak_guard_test.py": "d2e364548a9b27f6ef9637f793c2dcc2d60e14e59f6ae0a29acfdf653bd1eb64",
+    "tests/unit/soak_continuity_test.py": "1be32df66861f45e32c81db6aba3c8e84090e8255cd45fe6e317888f53b1bfdc",
+    "docs/acceptance/SOAK.md": "5f8c173901f421a7806a3d23f4e10d1cb14db04a37803b1b0e49716733b8947f"
+  },
+  "validation": "23 affected checks PASS53.48s; false PASS_24H reproduced before repair; no productioncode/OS/broker change"
+}

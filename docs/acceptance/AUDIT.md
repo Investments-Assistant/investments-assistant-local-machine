@@ -1,11 +1,13 @@
 # Audit findings and current evidence
 
-Historical reference: `65ea1d769c79bf77df3de1d4a3b6274168d92085`. Current HEAD is
-`9b0df38c333337aee83d8dcd9874fda7f5945eaf`; prior completed work was committed
-externally. Current news-policy/retention and CI changes remain in the working tree.
-The initial checkout was clean. Resumes preserve existing changes; the agent has
-not committed, pushed or deployed to production. Historical logs
-remain evidence of their recorded runs, not assertions that later code was tested.
+Historical reference: `65ea1d769c79bf77df3de1d4a3b6274168d92085`. At the
+2026-10-14 checkpoint, published HEAD is
+`1d01bb5517d5f1a7424efd9daca766223850a2df` (`origin/main`). The reviewed
+`ib_async` migration and earlier user-approved bundles are published. Current
+local source/test/documentation/evidence changes remain in the working tree and
+are preserved; none were committed or pushed in the latest checkpoint. No
+production deployment occurred. Historical logs remain evidence of their
+recorded runs, not assertions that later code was tested.
 
 ## Required regression cases
 
@@ -50,7 +52,7 @@ results and limitations), `REPLAY.md` (new engine and offline reproduction).
 | Startup create_all/raw alterations/owner backfill | Versioned reviewed-schema upgrades through0018, explicit startup schema checks and unknown-owner quarantine. Full0018fixture vault/PDF/model recovery and31table database/valuation/receivable restores verified; see RETENTION.md and ACCOUNTING.md. Production/off-host recovery remains separate. |
 | Nginx all-interface publication | Compose now defaults loopback with explicit LAN bind and exact proxy peer; offline config and origin fixtures pass. Actual Docker/WSL ingress remains unobserved. |
 | CPU image mistaken for GPU path | Build remains CPU; installed native library reports no GPU offload. No GPU acceleration claim. |
-| CI integration loop/transaction/FTS errors | Function-loop NullPool fixtures, positively marked database, outer rollback/savepoints and real PostgreSQL FTS pass locally. Current committedHEAD remote run37657249888 failed fresh-sequence setup; local working-tree fixes pass1041checks from a new empty markedDB and5loopbacksoakchecks. No remote rerun of these fixes. |
+| CI integration loop/transaction/FTS errors | Function-loop NullPool fixtures, positively marked database, outer rollback/savepoints and real PostgreSQL FTS pass locally. The older full-suite result in `evidence/suite-quality-restored.txt` is dated2026-10-11 and contains two failures: a broker disconnect checkpoint remained `running` where the test expected `failed`, and a valuation test hit the intentional `CLOCK_REGRESSION` guard. It is retained as failure history, not current status. After the current code changes (including the Yahoo egress guard and synthetic-soak-mandate fixture fix), local evidence `evidence/suite-ib-async-20261013.txt` reports719 unit tests PASS and `evidence/suite-integration-ib-async-20261013.txt` reports374 PostgreSQL integration tests PASS; focused broker integration has59 PASS. Published HEAD run38478734435 then passed unit, integration, Chromium/PostgreSQL browser, and combined Sonar jobs with82.63% line coverage. That remote run validates published HEAD, not the remaining uncommitted tree; external paper, deployment, and host gates remain separate. |
 | ARM64 Pi deployment workflow inherited | Replaced with manual x86_64 CPU validation; no automatic deployment. Remote build execution unobserved. |
 
 No listed finding is dismissed as “not reproduced” merely because current tests

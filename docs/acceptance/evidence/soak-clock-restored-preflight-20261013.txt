@@ -1,0 +1,10 @@
+{"status": "RUNNING", "cycles": 1, "current_window_seconds": 1.6979628000117373, "control_p95_ms": 26.643674995284528, "restarts": 0}
+{"status": "RUNNING", "cycles": 11, "current_window_seconds": 11.676177111003199, "control_p95_ms": 30.93813100713305, "restarts": 0}
+{"status": "RUNNING", "cycles": 21, "current_window_seconds": 21.691209406999405, "control_p95_ms": 30.47052001056727, "restarts": 0}
+{"status": "RUNNING", "cycles": 31, "current_window_seconds": 32.11515728500672, "control_p95_ms": 30.47052001056727, "restarts": 1}
+{"status": "RUNNING", "cycles": 41, "current_window_seconds": 42.13523666700348, "control_p95_ms": 30.383478006115183, "restarts": 1}
+{"status": "RUNNING", "cycles": 51, "current_window_seconds": 53.50856453900633, "control_p95_ms": 30.47052001056727, "restarts": 2}
+{"status": "RUNNING", "cycles": 61, "current_window_seconds": 62.577015168004436, "control_p95_ms": 30.383478006115183, "restarts": 2}
+{"status": "RUNNING", "cycles": 71, "current_window_seconds": 72.59887070900004, "control_p95_ms": 30.383478006115183, "restarts": 2}
+{"status": "RUNNING", "cycles": 81, "current_window_seconds": 82.97343842100236, "control_p95_ms": 30.383478006115183, "restarts": 3}
+{"status": "SMOKE_PASS", "cycles": 88, "current_window_seconds": 90.2152984370041, "restarts": 3, "failures": []}

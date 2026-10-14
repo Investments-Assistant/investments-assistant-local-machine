@@ -1,0 +1,10 @@
+{
+  "mcp": "1.30.0",
+  "registered_types": [
+    "CallToolRequest",
+    "ListToolsRequest",
+    "PingRequest"
+  ],
+  "tool_count": 20,
+  "network_calls": 0
+}

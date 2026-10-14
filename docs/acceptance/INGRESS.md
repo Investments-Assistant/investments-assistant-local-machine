@@ -70,3 +70,17 @@ Local YAML/shell syntax and fresh-directory preflight checks pass in
 `evidence/ci-ingress-wiring-review.json`. The full real browser rerun passes in
 `evidence/browser-ci-ingress-wiring.txt` (exit0). The remote workflow has not run
 against these uncommitted changes; no upload or publication was performed here.
+
+## Subsequent Docker Desktop evidence
+
+See CONTAINERS.md and `container-ingress-20261010-v2.json` for actual pinned
+Nginx container TLS/WSS and Windows loopback forwarding PASS. Docker rewrites
+the Windows source to the bridge gateway; this does not prove a LAN boundary.
+Current remote run38056156172 passed integration tests but failed missing
+SonarCloud authorization before browser validation. The local workflow now lets
+browser tests run independently; the overall quality gate still requires all
+jobs. `ci-sonar-separation-review.json` records local graph/shell/preflight checks;
+no remote pass or workflow dispatch is claimed. GitHub dependency behavior:
+https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax
+
+Current cd049bf remote38185591707 Chromium and actual TLS/WSS ingress job passed. Updated Docker image ingress also passes all7checks: [evidence](evidence/container-ingress-security.json). Older missing-token/skipped-browser entries above are historical. Loopback/bridge-source limitations remain unchanged.

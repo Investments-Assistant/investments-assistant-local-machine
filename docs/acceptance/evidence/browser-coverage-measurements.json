@@ -1,0 +1,18 @@
+[
+  {
+    "file": ".qa/browser-coverage-security-v2/.coverage.browser.BabaYaga.pid61606.XEnTVhAx.H064fZKsswnh",
+    "source_files": 143,
+    "routes": {
+      "src/web/routes.py": 0,
+      "src/web/simulator_routes.py": 0
+    }
+  },
+  {
+    "file": ".qa/browser-coverage-security-v2/.coverage.browser.BabaYaga.pid61607.XHVLywbx.HkCXCzUAEnrh",
+    "source_files": 144,
+    "routes": {
+      "src/web/routes.py": 1106,
+      "src/web/simulator_routes.py": 194
+    }
+  }
+]

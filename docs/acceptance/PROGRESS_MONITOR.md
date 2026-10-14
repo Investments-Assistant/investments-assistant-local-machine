@@ -18,10 +18,10 @@ not gate PASS statuses; PLAN.md remains the acceptance matrix.
 | L10 | 6 | 5.375 |
 | L11 | 5 | 5 |
 | L12 | 6 | 6 |
-| L13 | 7 | 3.25 |
+| L13 | 7 | 4.75 |
 | L14 | 7 | 2 |
 | L15 | 4 | 0.25 |
-| L16 | 4 | 2 |
+| L16 | 4 | 4 |
 
 Total weight 100. Baseline 53%; next audit 58% (+5 pp) credited persisted
 synthetic cash flows, flow-adjusted risk, collector and migration tests.
@@ -191,3 +191,124 @@ Goal control PAUSED; no completion claimed.
 
 Built-image native smoke audit raw83.375/display83 delta0pp,L13=3.25/7.
 Nonroot/PDF/native/OpenBLAS checks verified; production runtime/restarts pending.
+
+Container recovery audit: raw83.875/100 displayed84% (+1pp), L13=3.75/7. Actual productioncontainer v3PASS12.986s/1.777s, persistedoperatorhalt deniesnewproposals afterbothrestarts, cleanuptrue. Integrationretry97582pending. No24h/thermal/ingress claim.
+
+Final current-boundary audit2026-10-10: raw83.875 displayed84% delta0. Chromium desktop/mobilePASS with no JS errors, integration372PASS after fixture recovery, Docker runtime/ingressPASS. Remote unitPASS and integration test step372PASS; integration jobFAIL due to missingSonar token, browserSKIPPED. Local workflow separation/preflight verified but not published by agent. Goal remains active/incomplete; external/physical requirements unchanged.
+
+CI xUnit routing audit:84% raw83.875 delta0. Three workflow importer mappings repaired/checked; no remote scanner pass or new gate credit.
+
+Remote quality audit: raw83.375/display83 delta-1pp. Published5fefb1a authenticates/uploads to Sonar; 696unit tests PASS, jobFAIL on reliability/security/coverage (56<80), subsequent jobsSKIPPED. L11 reduced to4.5; previous arithmetic correction confirmed by monitor.
+
+Combined coverage/dependency audit:83%raw83.375delta0.1082PASS2FAIL,78.49%linecoverage; followup and updateddependency validation pending. No extra L11credit.
+
+Final local security-validation boundary audit confirmed83raw83.375delta0;710unit+371integration+4otherPASS,1integrationSTALE_JOB_LEASE failure with6backwardclocksteps. Finalupdatedbrowser23flowsPASS; measuredcombinedlinecoverage82.68%. No cleanbackend/remotequality or updatedDockerbuild credit.
+
+Publishedsecuritymilestone audit84%raw83.625delta+1pp(raw+.25). L11=4.75:remoteunit/dependencygraphPASS, alerts81->1medium; remainingCI/imagechecksactive.
+
+Securityimagebuild/native audit84%raw83.750delta0pp(raw+.125),L11=4.875. RealPDF/nonroot/CPUlibraryloadPASS; actualmodelanswer quality not exercised bysmoke. Runtime/CIremainingpending.
+
+Current-image recovery and remotebrowser audit84raw83.875delta0,L11=5. FinalcombinedSonar stillpending; fullpoints are evidence credit, not overallgatePASS. No newL13credit for repeatedruntimecheck againstupdatedimage.
+
+Combined remote audit corrected L11 to4.875/5, reserving final0.125 until mandatorySonar passes. Raw83.750/display84delta0. Remote1086PASS165.877s/noerrors/failures/skips strengthens evidence without prematurefullgatecredit.
+
+Finalremotequality audit84raw83.625delta0,L11=4.75. Four findings total (two security/two reliability); ratings4/3 are not findingcounts. Humanreviewpending; noqualitygatePASS. Alltests/browser/currentcontainers pass, nooperationsactive.
+
+AuthorizedSonarreview audit2026-10-13:84raw83.750delta0,L11=4.875. FourRESOLVED/WONTFIX andqualityOK verified; currentCIrerunpending.
+
+CI acceptance milestone2026-10-13:84raw83.875delta0,L11=5/5PASS. Freshattempt2allfourjobsSUCCESS,1086PASS167.652s,82.63%linecoverage,SonargatePASS. Useracceptedfindings are notcodefixes.
+
+Continuityrepair audit84raw84.125delta0,L13=4/7. FalsePASS_24H reproducedonlyininjectedclocktest andfixed;23checksPASS. Actualfullobservation interruptedbefore24h, freshwindowstarting, notyetcredited.
+
+Publishedcontinuityfix finalaudit84raw84.125delta0. Currentae9c498 allfourCIjobsPASS1093tests/82.67%coverage verifiesalreadycreditedL11. Interrupted24h remainsuncredited; userconfirmedsleep.
+
+Clock experiment/preflight audit84raw84.125delta0. Approved90s timesync stop restoredactive; restoredcontrolmax42.8ms;90s soakSMOKE_PASS88cycles/3restarts. Fresh24h underway, no24hcredit.
+
+Scheduled restart milestone (2026-10-13): audit raw84.375/100 => displayed84%, delta0.25pp; L13 4.25/7. At 911.117s, soak runner468620 recorded one successful service restart (1.693s; PID468624→472995), no failures, halt p9533.766ms. This earns restart evidence only; no24h credit. Physical thermal/sleep and long-run clock stability remain unresolved.
+
+Second scheduled restart milestone: monitor raw84.500/100 =>85%, delta+1pp (raw+0.125); L13=4.375/7. Soak runner468620 observed second restart at1841.443s; service PID472995→477352, restart2.0089s, no failures,haltp9530.972ms. Repeated restart evidence only; no24h credit. Physical host thermal/sleep, research and paper gates remain.
+
+Third scheduled restart milestone: audit raw84.625/100 =>85% displayed, delta+0.125pp raw. Soak runner468620 at2771.631s/101cycles; third restart2.1744s; service PID477352→481593, no failures, haltp9530.673ms. Repeat-restart evidence only; no24h completion. Physical thermal/sleep, research and paper gates remain.
+
+Soak expiry defect audit: raw84.750/100 displayed85%, delta+0.125pp. The failed
+run at ~3609.7s matched the fixture's one-hour expiry; harness fix extends only a
+verified synthetic account. Seven PostgreSQL tests and a 90.165s HTTP/PostgreSQL
+SMOKE_PASS beyond the stale-quote threshold; no 24h credit.
+
+Live-disabled acceptance audit: raw86.750/100 displayed87%, delta+2pp. L16=4/4:
+`.env` false and nine authorization tests prove even a true synthetic live flag
+cannot authorize broker route/cancel. No live authority or order.
+
+Current host sample audit: raw86.875/100 displayed87%, delta+0.125pp. L13=4.75/7
+after read-only Windows RAM/CPU and GPU sample; thermal/cooling and 24h observation
+remain incomplete. Fresh runner487287 was alive at cycle15 with model check PASS;
+no failure or 24h credit.
+
+2026-10-13 continuation audit after unit/integration recovery: raw87.125/100,
+displayed87%, +0.125pp. L04 receives limited local ib_async compatibility credit:
+719 unit and374 full PostgreSQL integration tests pass, plus59 broker-focused
+integration checks. No real paper-account connection/reconciliation claim.
+
+2026-10-13 updated image audit: raw87.250/100, displayed87%, +0.125pp. L13
+receives limited updated-image evidence: current lock builds in Docker and the
+network-disabled non-root image imports ib_async/read-only adapter successfully.
+The new full24h soak is RUNNING but has no completion credit; thermal evidence,
+remote CI for the dirty candidate, paper-account authorization, and licensed
+research data remain outstanding. Keep the fixed weights above unchanged.
+
+Publication audit 2026-10-13: raw87.250/100, displayed87%, delta0pp. The
+user-approved19-file ib_async migration patch is now on origin/main as
+1d01bb5. Its remote CI run38478734435 is pending, so no extra validation credit.
+The 24-hour soak remains RUNNING with no completion credit; external paper and
+rights-cleared research gates remain open.
+
+Remote CI partial audit 2026-10-13: raw87.250/100, displayed87%, delta0pp.
+Run38478734435 unit job passed in54s; browser and integration jobs are active,
+and the combined Sonar gate is not yet complete. No additional CI credit awarded.
+Soak remains active without24-hour credit; paper and licensed research gates are
+still incomplete.
+
+Remote browser audit 2026-10-13: raw87.250/100, displayed87%, delta0pp.
+Run38478734435 unit and Chromium/PostgreSQL browser jobs passed on1d01bb5;
+integration and combined Sonar gate remain pending. The active soak is preliminary
+and receives no24-hour credit.
+
+
+Remote CI integration checkpoint 2026-10-13: raw87.250/100, displayed87%,
+delta0pp. On1d01bb5, unit, PostgreSQL integration, and Chromium/PostgreSQL browser
+jobs pass; combined Sonar gate is still running. Soak PID500853 advanced to33
+cycles /758s, zero failures/restarts, fingerprint match, zero broker operations;
+no24-hour credit. Remaining L04/L10/L13/L14/L15 gates unchanged.
+
+
+First scheduled restart audit 2026-10-13: raw87.250/100, displayed87%, delta0pp.
+The active soak reached38 cycles /909.8s and completed one scheduled restart in
+1.600s with no failures; this earns restart evidence only and no24h credit.
+Remote unit/integration/browser jobs pass; Sonar is active. L04/L10/L11/L13/L14/L15
+remain.
+
+Baseline after user clarified external prerequisites (2026-10-14):
+**GOAL PROGRESS: 87% (Δ: 0 pp; raw 87.375/100)**. Published CI run38478734435
+and combined Sonar gate passed; the current soak remained RUNNING at1,617 cycles,
+49 restarts, zero failures and12.65h, without24h credit. Remaining: verified
+paper account/reconciliation (L04/L15), uninterrupted full soak and physical
+thermal evidence (L10/L13), and named authorized price-history source/universe
+(L14). The user has read-only paper connection authority but does not know how
+to establish/verify a paper-only TWS/Gateway session; user says they have a
+rights-cleared source/universe but cannot identify it or locate the data. Keep the
+fixed rubric unchanged; live trading stays disabled.
+
+
+Thermal counter discovery (2026-10-14): Windows ACPI performance counters expose
+`\_TZ.THM0`; first high-precision value360.2K/87.05C, passive limit100, throttle
+reason0. Hardware association unknown. A 60s low-frequency sampler PID731748
+runs with the soak and stops with it. The old probe only checked absent Linux and
+MSAcpi WMI sources; this is a different provider. No CPU-package mapping or
+sustained thermal credit until reviewed series.
+
+Resumed-goal baseline after the plain-language blocker clarification (2026-10-14):
+**GOAL PROGRESS: 88% (Δ: 0 pp; raw 87.500/100)**. No criterion gained credit from
+clarifying documentation. The soak remains active at1,639 cycles and50 successful
+restarts with no failures, below24hours; thermal sampling continues but component
+mapping and sustained behavior are unknown. L04/L15 paper verification, L10/L13
+full observation and L14 identified rights-cleared data remain open. Live mode OFF.

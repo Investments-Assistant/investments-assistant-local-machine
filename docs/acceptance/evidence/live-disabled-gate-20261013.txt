@@ -1,0 +1,6 @@
+LIVE readiness acceptance: NO-GO; live execution remains disabled.
+
+Environment: .env sets LIVE_TRADING_ENABLED=false. Runtime process env does not override it.
+Regression command: .venv/bin/pytest tests/unit/acceptance_authority_test.py -q
+Result: 9 passed in 0.47s. The test sets live_trading_enabled=True and verifies that neither the broker routing check nor route/cancel paths permit an external write. This is a synthetic unit test; no broker connection/order occurred.
+Source: src/config.py defaults the flag to False; src/execution/external.py permanently denies retained external write entrypoints pending separate acceptance and authority.

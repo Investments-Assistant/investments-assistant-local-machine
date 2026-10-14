@@ -1,0 +1,770 @@
+diff --git a/docs/acceptance/ARCHITECTURE.md b/docs/acceptance/ARCHITECTURE.md
+index 6c1608c..75cdb9d 100644
+--- a/docs/acceptance/ARCHITECTURE.md
++++ b/docs/acceptance/ARCHITECTURE.md
+@@ -12,7 +12,7 @@ Current checkout: local-machine only; audit baseline 65ea1d7. Updated 2026-10-05
+ | Tool permissions and vault | tools/dispatcher.py, broker_accounts.py | Implemented and tested: model self-approval denied; SDK/portfolio helpers reject unscoped reads even with global credentials (scoped-helper-reads.txt) |
+ | Browser simulator approvals | web/simulator_routes.py → execution/service.py | Real browser and PostgreSQL tests; cookie/CSRF and immutable nonce/details checked |
+ | Simulator risk and lifecycle | execution/policy.py, execution/models.py | Implemented and tested in isolated fixtures: locks/reservations, lifecycle races, approved versioned mandates, bounded buy ticks and marked-loss halts; opted-in manual sales tested; separately approved price-band strategy sales tested; durable no-trade decisions and concurrent replay tested; external reconciliation incomplete (MANDATES.md) |
+-| Direct IBKR adapter | tools/brokers/ibkr.py → ib_insync → TWS/Gateway | Explicit-account readonly fixture contracts tested; no external connection evidence |
++| Direct IBKR adapter | tools/brokers/ibkr.py → ib_async 2.1.0 → TWS/Gateway | Explicit-account read-only fixture contracts and installed-package API compatibility tested; no external connection evidence |
+ | Other external SDK adapters | tools/brokers/{alpaca,coinbase,binance}.py | Read implementations retained; all write entrypoints disabled through execution/external.py |
+ | Application MCP bridge | scripts/mcp_server.py → /api/tools/invoke | Application bearer token is separate from ChatGPT connectors; userless broker reads now denied; MCP_USER_ID explicitly binds an active user |
+ | Financial valuation | finance/normalization.py, tools/portfolio.py | Exact fractional quantity/currency/FX totals, synthetic flow/split/earned-and-received-dividend ledger, fee revisions and immutable observed period valuations tested (ACCOUNTING.md); separate observed price/FX attribution verified; historical boundary coverage, benchmark attribution and broader actions remain incomplete |
+@@ -21,7 +21,7 @@ Current checkout: local-machine only; audit baseline 65ea1d7. Updated 2026-10-05
+ | Database | db/models.py, migrations/ | Implemented and tested: reviewed-schema upgrades through 0018, ownership quarantine and durable sessions/evidence/mandates; 0018 database31-table restore verified (job-clock-restore.json); full0018fixture PDF/vault/model recovery and coherent backup-bundle expiry verified; owned chat/report/news/expense retention tested; production/off-host restore remains unverified |
+ | News ingestion | news/ingestion.py, sources.py, search.py | Implemented and tested: public pinned-DNS HTTPS bounds, explicit private newsletter ownership, immutable corrections and availability-aware historical retrieval; durable per-source leases/retry and RSS validators tested (NEWS.md); source-specific policies, syndicated-copy deduplication and expired-text cleanup tested; real configured-provider operation remains unverified |
+ | Jobs and notifications | scheduler/jobs.py | Implemented and tested: scoped leases, in-app coherent latest-evidence dedup/ack and bounded local delivery recovery, bounded simulation/PDF workers, short restart/model contention smoke and0018 clock/token fencing tests; 24-hour observation and OS/Docker interruption pending (SOAK.md) |
+-| Container/network/CI | Dockerfile, docker-compose.yml, .github/workflows | CPU build path retained; manual x86_64 validation replaces automatic Pi deployment; Docker host build blocked by daemon availability |
++| Container/network/CI | Dockerfile, docker-compose.yml, .github/workflows | CPU build path retained; manual x86_64 validation replaces automatic Pi deployment; updated ib_async image build and isolated non-root import smoke pass (`evidence/container-build-ibasync-20261013.txt`) |
+ 
+ ## Authority and data separation
+ 
+@@ -34,7 +34,7 @@ no simulator order can reach a broker SDK.
+ 
+ The external SDK write boundary is closed in `execution/external.py`. A configuration
+ flag, model schema, port 4002, test success, or six-share SPYL example grants no write
+-capability. Direct ib_insync and the HTTP MCP bridge are separate layers; ChatGPT
++capability. Direct ib_async and the HTTP MCP bridge are separate layers; ChatGPT
+ connector credentials are neither discovered nor reused by this application.
+ 
+ IBKR readonly calls bind an actual managed account and preserve contract/currency
+@@ -46,8 +46,8 @@ account evidence remain required before external writes could be considered.
+ 
+ - [IBKR API](https://www.interactivebrokers.com/docs/tws-api/doc/introduction)
+ - [IBKR order placement](https://www.interactivebrokers.com/campus/trading-lessons/python-placing-orders/)
+-- [ib_insync API and event semantics](https://ib-insync.readthedocs.io/api.html)
+-- [IBKR third-party adapter status](https://www.interactivebrokers.com/docs/tws-api/doc/third-party-api-platforms/non-standard-tws-api-languages-and-packages/ib-insync-and-ib-async)
++- [ib_async API and event semantics](https://github.com/ib-api-reloaded/ib_async)
++- [IBKR third-party adapter status and ib_insync deprecation notice](https://www.interactivebrokers.com/docs/tws-api/doc/third-party-api-platforms/non-standard-tws-api-languages-and-packages/ib-insync-and-ib-async)
+ - [IBKR reauthentication](https://www.interactivebrokers.com/docs/tws-api/doc/tws-settings/daily-weekly-reauthentication)
+ - [GoCardless bank-data quickstart](https://docs.gocardless.com/docs/bank-account-data/quickstart-guide)
+ - [SQLAlchemy transaction isolation in tests](https://docs.sqlalchemy.org/en/20/orm/session_transaction.html)
+diff --git a/docs/acceptance/BROKER_CAPABILITIES.md b/docs/acceptance/BROKER_CAPABILITIES.md
+index 8636c00..144bbf1 100644
+--- a/docs/acceptance/BROKER_CAPABILITIES.md
++++ b/docs/acceptance/BROKER_CAPABILITIES.md
+@@ -42,6 +42,13 @@ do not establish a paper/live response field for this adapter's handshake. The
+ external-paper gate therefore still needs separately authorized account/environment
+ verification; no local fixture result is substituted for that observation.
+ 
++Rechecked 2026-10-13 against the current connection documentation: `isConnected()`
++reports socket/API connection state, while the initial handshake returns accessible
++account IDs and `nextValidId` is the documented signal that setup is complete before
++other API calls. None of those facts identifies a paper account. A paper-only TWS
++session and separately verified selected account remain prerequisites; the adapter
++still makes no paper/live inference from a port or account-number pattern.
++
+ Evidence: ibkr-environment-boundary-final.txt,31targeted tests PASS. Tests use
+ otherwise configured IBKR fixtures and assert identity rejection before lock/SDK
+ construction; both common port values leave verified_environment unset.
+@@ -65,13 +72,33 @@ never claims complete broker history or complete late-commission delivery.
+ Current primary references:
+ [IBKR Execution fields](https://www.interactivebrokers.com/docs/tws-api/ref/execution)
+ define separate execution IDs, correction suffixes, account and client/order
+-identity. [ib_insync events](https://ib-insync.readthedocs.io/api.html)
+-define execution/commission/disconnection callbacks. No dependency migration or
+-real connection was performed. Evidence: broker-journal-recovery.txt (7PASS),
++identity. [ib_async API and event semantics](https://github.com/ib-api-reloaded/ib_async)
++define execution/commission/disconnection callbacks. The checkout now uses the
++maintained `ib_async` successor as described below. Evidence:
++broker-journal-recovery.txt (7PASS),
+ broker-refresh-authority.txt (12PASS). Continuous subscriptions, complete external
+ reconciliation, execution authority and observed external-paper acceptance are
+ still incomplete; this journal alone does not satisfy L04 or L15.
+ 
++## Maintained IBKR client decision (2026-10-13)
++
++Current [IBKR third-party package guidance](https://www.interactivebrokers.com/docs/tws-api/doc/third-party-api-platforms/non-standard-tws-api-languages-and-packages/ib-insync-and-ib-async)
++says the original `ib_insync` package uses a legacy TWS API release and is no
++longer updated. It points to `ib_async`, maintained by an original contributor,
++as a migration path while advising direct IBKR API use where possible. The
++checkout pins `ib_async==2.1.0`, updates its lazy imports and locks its
++dependencies. A no-socket test checks the installed package's connection,
++qualification, account, disconnect, `Stock`, and `ExecutionFilter` API surface.
++
++This published client requires `tzdata<2026`, so the lock resolves tzdata
++2025.3 instead of 2026.1. Record this dependency tradeoff: the verified host and
++CI runtime is Python 3.12; no support claim is made for Python 3.14 or other
++untested runtimes. The 48 focused broker unit tests and 11 broker-stream tests
++against marked disposable PostgreSQL pass with the new import path. This remains
++package/API and fixture validation only: no Gateway/TWS login, reauthentication,
++market-data entitlement, external account or order was used. External writes
++remain disabled.
++
+ Retained evidence review now reports conflicting execution/commission versions,
+ correction families, unpaired commissions/executions and mismatched payload hashes.
+ It never adds conflicting/corrected quantities as extra fills. A paired window is
+@@ -97,7 +124,7 @@ EUR/USD without FX. Missing cash is incomplete, not zero. Duplicate contract or
+ currency rows are rejected rather than silently overwritten.
+ 
+ [IBKR per-currency prefixes](https://www.interactivebrokers.com/docs/tws-api/doc/tws-settings/per-currency-account-value-prefix)
+-explain the optional $LEDGER- namespace. The installed ib_insync0.9.86
++explain the optional $LEDGER- namespace. The installed ib_async2.1.0
+ reqAccountSummaryAsync requests $LEDGER:ALL and completes through its summary
+ request future; reqPositionsAsync completes its positions request. These local
+ contracts were inspected and exercised through SDK-shaped fixtures, not a live
+@@ -143,8 +170,9 @@ notes repeated status notifications and that not every transition is reported;
+ execution details must also be considered. This is a historical official reference,
+ not proof of a current connected broker or verified installed runtime compatibility.
+ The current [IBKR introduction](https://www.interactivebrokers.com/docs/tws-api/doc/introduction)
+-and [installed-library API reference](https://ib-insync.readthedocs.io/api.html)
+-were also consulted. No new SDK, connection or dependency migration was performed.
++and [maintained ib_async API](https://github.com/ib-api-reloaded/ib_async)
++were also consulted. The dependency migration is described above; no broker
++connection or order was made.
+ 
+ Evidence: `broker-order-review-reproduction.txt`4FAIL exposed ignored order evidence;
+ `broker-order-review-verified.txt`41PASS3.66s includes marked PostgreSQL late-fill
+@@ -315,7 +343,7 @@ The finite coordinator stops on its next bounded drain, detaches callbacks,
+ performs native cleanup, persists a partial checkpoint and emits an owner-scoped
+ in-app alert. A restoration notice cannot clear the gap or set last_success.
+ The application neither reconnects nor retries automatically. The installed
+-ib_insync library has its own1102account-summary refresh behavior; this is not
++ib_async library has its own1102account-summary refresh behavior; this is not
+ external reconciliation or evidence of completed human reauthentication.
+ 
+ `broker-upstream-reproduction.txt` records4failing regressions before the fix.
+diff --git a/docs/acceptance/CONTAINERS.md b/docs/acceptance/CONTAINERS.md
+index 3af9b74..3fa3029 100644
+--- a/docs/acceptance/CONTAINERS.md
++++ b/docs/acceptance/CONTAINERS.md
+@@ -6,6 +6,13 @@ The actual amd64 image build passed: `container-build-20261010-ad17fb8e.json`,
+ Its source hashes and exported image digest are recorded. This is a local build;
+ the remote workflow has not run against the uncommitted checkout.
+ 
++The current `ib_async==2.1.0` candidate also builds successfully as
++`investment-assistant:local`; a network-disabled, non-root image smoke confirms
++the package and read-only adapter imports. Evidence:
++`evidence/container-build-ibasync-20261013.txt`. This validates dependency
++installation and import only; isolated production startup/restart checks have
++not been rerun against this candidate.
++
+ A Windows Docker client network-none smoke ran as UID1000, produced a real PDF,
+ loaded llama.cpp, and checked that `.env`, `.qa` and model files were absent from
+ the image. GPU offload is unsupported. Library inspection and `ldd` verify the
+@@ -50,3 +57,58 @@ PostgreSQL's temporary initialization server shutdown. Its resources were cleane
+ The runner now waits for the final TCP listener; the reproduction remains in
+ `container-runtime-20261010.json/.txt/.exit`. Do not classify an active retry as
+ PASS before its checks and cleanup finish.
++
++## Verified recovery after startup import repair
++
++v2 FAILED: application23.143s exceeded the fixed15s budget; database2.177s,
++marker/schema persistence and cleanup succeeded. Import profiling found
++market-data dependencies eagerly loaded during service startup. Their imports
++now occur in synchronous data/simulation operations. The failing startup import
++regression and47focusedPASS are preserved.
++
++Updatedimage `investment-assistant:container-startup-20261010` builds successfully.
++v3 PASS: application12.986s, database1.777s, realGGUF readiness and persisted
++operatorhalt. The fixture invokes the actual halt service and verifies a new
++proposal is denied OPERATOR_HALTED after each restart, with cash/reserve unchanged.
++Cleanup passed. See `container-runtime-20261010-v3.json/.txt/.exit` and
++`container-startup-review.json` for scope, image/model/source hashes. This short
++run is not24h, thermal, physicalsleep, externalbroker or Dockeringress acceptance.
++
++## Docker Desktop ingress (2026-10-10)
++
++`container-ingress-20261010-v2.json/.txt/.exit` records PASS for the pinned
++Nginx image, real application authentication/routes and a marked disposable
++PostgreSQL database. Inference/providers are explicit fixtures. Verified TLS,
++static success/error security headers, redirects, trusted proxy identity,
++authenticated WSS and origin/authentication denials passed. A separate
++non-allowlisted container received HTTPS403.
++
++Windows curl verified the fixture certificate through a temporary port bound
++only to127.0.0.1. The application observed172.18.0.1 (the Docker bridge gateway),
++not the physical Windows client address. Do not treat this address as proof of
++a LAN boundary. The fixture permits only its exact app/gateway addresses and
++trusts only its exact Nginx peer. No firewall setting changed. All owned
++containers, anonymous volumes and networks were removed.
++
++The first attempt used an internal-only network, on which Docker suppressed
++the published port. It passed five container-level checks but is preserved as
++FAIL. The successful fixture matches Compose's bridge topology; it has no
++production mounts, provider credentials or scheduler and explicitly rejects
++broker connections. The bridge is not an egress-isolation claim.
++
++Reproduce with a new output path:
++
++```sh
++.venv/bin/python scripts/verify_container_ingress.py \
++  --docker '/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe' \
++  --image investment-assistant:container-startup-20261010 \
++  --postgres postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea \
++  --nginx nginx:alpine@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2 \
++  --output docs/acceptance/evidence/container-ingress-new.json
++```
++
++## Security-updated image validation
++
++The approved cd049bf image `investment-assistant:security-cd049bf` built with manifest `5f56ad6fd7a50fb91edd085f55a5ab8d60d25aa8ab2805713128ea710a0eb626`. Native non-root/PDF/CPU-library checks pass. Actual GGUF startup and restart checks pass: app10.954s, database1.615s within the unchanged15s budget, persistent halt denies proposals after both restarts, and owned-resource cleanup is verified. See [runtime evidence](evidence/container-runtime-security.json) and [build provenance](evidence/container-security-review.json).
++
++[Current-image ingress](evidence/container-ingress-security.json) also passes all seven checks with cleanup verified. Windows loopback forwarding still exposes the Docker bridge gateway to the application. This is not LAN/firewall, physical sleep, thermal or24h acceptance. No real broker connection or order occurred.
+diff --git a/docs/acceptance/PLAN.md b/docs/acceptance/PLAN.md
+index 1680814..3f9d92c 100644
+--- a/docs/acceptance/PLAN.md
++++ b/docs/acceptance/PLAN.md
+@@ -4,10 +4,11 @@ Authority: attached instructions read completely on 2026-09-08. Scope is this
+ local-machine checkout only. No production deployment, broker connections/writes,
+ real notifications, paid calls, OS changes, or live enablement authorized.
+ Historical baseline: 65ea1d769c79bf77df3de1d4a3b6274168d92085; initially clean.
+-Current HEAD: 9b0df38c333337aee83d8dcd9874fda7f5945eaf; prior completed work
+-is committed externally. Current news-policy/retention and CI changes remain dirty
+-and are preserved. The agent has not committed or pushed changes.
+-No applicable AGENTS.md or prior plan found at baseline. Global AGENTS.md now requires task-observer and milestone progress_monitor audits. Existing functionality is retained.
++Current HEAD: ae9c498cf997007dbcce6d7100bb47c9d1568f89 on local `master`,
++tracking `origin/main` at the same commit. Local implementation, regression,
++validation, checkpoint, and evidence changes remain dirty and are preserved.
++No new commit or push is authorized for the current two-file soak-fixture fix.
++Existing functionality is retained.
+ 
+ Sequence (continue while safe productive work remains):
+ 1. Reproduce authorization and numerical defects; fix deterministic boundaries.
+@@ -28,23 +29,29 @@ No aggregate gate is promoted solely on a subset of regression tests.
+ | L01 Baseline | PASS | HEAD/dirty-state preserved; [feature and authority map](ARCHITECTURE.md), [audit disposition](AUDIT.md), [measured host and explicit unknowns](MODEL_HOST.md) |
+ | L02 Authorization | PASS | [Complete local invariant review](AUTHORITY_REVIEW.md), immutable independent approvals/mandates, scope/replay/mode/SDK denials and principal-lifetime fencing; [840 current tests](evidence/suite-owner-lifetime.txt) and [current Chromium workflow](evidence/browser-owner-lifetime.txt) pass. External execution remains separately blocked under L04/L15/L16. |
+ | L03 Risk | PASS | Trusted fixture price/FX, atomic reservations, halt/protected tests; [approved simulator mandates](MANDATES.md), marked-loss/drawdown and concurrent tick tests; manual marked-risk/durable rejection tested; periodic risk monitor and [internal ledger reconciliation](evidence/suite-reconciliation-final.txt) tested; [global manual/strategy caps and concurrency](evidence/global-exposure-guards.txt), [881 current tests](evidence/suite-global-exposure.txt) and [browser](evidence/browser-global-exposure.txt) pass. External broker reconciliation remains L04/L15. |
+-| L04 Broker lifecycle | IN PROGRESS | [40 broker tests](evidence/broker-contracts.txt), durable simulator callbacks/restart and [versioned commission cases](evidence/commissions-first.txt); [scoped callback journal, partial balances and read-recovery tests](evidence/broker-read-failure-alerts-verified.txt); [persisted order/fill/cancel conflict review](BROKER_CAPABILITIES.md) passes41focused tests; [bounded sustained capture and transactional stream checkpoints](BROKER_CAPABILITIES.md) pass56focused tests including the finite continuous coordinator; shared owner read routing and explicit browser activation/stop consent controls fixture-tested; real gateway reauthentication and external reconciliation incomplete |
++| L04 Broker lifecycle | IN PROGRESS | [40 broker tests](evidence/broker-contracts.txt), durable simulator callbacks/restart and [versioned commission cases](evidence/commissions-first.txt); [scoped callback journal, partial balances and read-recovery tests](evidence/broker-read-failure-alerts-verified.txt); [persisted order/fill/cancel conflict review](BROKER_CAPABILITIES.md) passes41focused tests; [bounded sustained capture and transactional stream checkpoints](BROKER_CAPABILITIES.md) pass56focused tests including the finite continuous coordinator; [maintained ib_async 2.1.0 dependency/API compatibility](evidence/ib-async-migration-20261013.txt) passes48 broker unit and59 marked-PostgreSQL broker integration tests, with719 unit and374 full integration tests passing; shared owner read routing and explicit browser activation/stop consent controls fixture-tested; real gateway reauthentication and external reconciliation incomplete |
+ | L05 Financial correctness | PASS (local fixtures) | Decimal/FX/mixed currency/rebalance regressions and [persisted synthetic cash-flow/risk/concurrency tests](evidence/account-events-concurrency.txt) pass; [persisted synthetic splits and restore](evidence/split-recovery-verified-split.json) pass; [received dividend/withholding replay and restore](evidence/dividend-recovery-split.json) pass; [unpaid entitlement/linked payment, risk/valuation/report and exact fixture recovery](ACCOUNTING.md) verified; [1031 fullsuite](evidence/suite-dividend-receivables.txt) and [browser](evidence/browser-dividend-receivables.txt) pass. Foreign/special corporate actions and external reconciliation remain explicit unavailable/partial states and external gate limitations |
+ | L06 Useful chat/autonomy | PASS (local runtime) | [Requirement-by-requirement review](CHAT_REVIEW.md), [923 unit/PostgreSQL tests](evidence/suite-scanner-source-quality.txt), [default scanner factual quality](evidence/workflow-scanner-candidates-cpu-20261007.json), [native comparison](evidence/workflow-scanner-native-cpu-20261007.json), [current source-validator recheck](evidence/source-quality-current-validator.json); scoped reads, parsing, follow-up, exclusions, injection and tool-error conditions pass. Economic edge and external execution remain separate gates. |
+ | L07 Reports | PASS (local fixtures) | Period/evidence repairs, persisted failure status and [422-suite failure/migration checks](evidence/suite-report-status.txt); [real PDF/status reload](evidence/browser-report-status.txt); [history failure propagation verified](evidence/report-history-persistence.txt); [deterministic financial rendering and validated model extracts](evidence/suite-report-authority.txt); [reconciled simulator-period execution/PDF evidence](evidence/execution-period-report-persistence.txt); [immutable boundary valuations, accrued/received income, report truthfulness and restore](ACCOUNTING.md), [1031 fullsuite](evidence/suite-dividend-receivables.txt), [37 affected report checks](evidence/dividend-report-truthfulness.txt) and browser pass. Missing historical marks/benchmark basis remain explicitly unavailable; external reconciliation and comparative research remain separate gates |
+ | L08 Expenses | PASS (local fixtures) | Identity/currency/lifecycle/pagination/isolation, [retention](RETENTION.md), [explicit changed-identity resolution and bounded older-history recovery](BANK_SYNC.md), [12 sync guards](evidence/bank-history-cursor.txt), [899 tests](evidence/suite-bank-history.txt) and [browser](evidence/browser-bank-history.txt) pass. Real bank consent/access/credentials remain a separate blocked external gate. |
+ | L09 Persistence | PASS (local fixtures) | Explicit migrations through 0018, full reviewed-schema upgrade/quarantine tests; [current 0015 fixture vault/PDF/model recovery PASS](evidence/account-events-recovery-full.json), [restored no-trade decision PASS](evidence/strategy-decision-restored.json), [0010 database restore PASS](evidence/restore-report-status.json); [durable chat evidence and inactive-content retention tested](CHAT_EVIDENCE.md); [owned report tombstones and restart recovery](RETENTION.md) tested; [coherent bundle publication/expiry and full 0018 vault/PDF/model recovery](RETENTION.md) verified; production/off-host validation remains separate |
+-| L10 Operations | IN PROGRESS | Durable scoped leases and alerts tested; [fair bounded mandate dispatch, rollback and failure alerts](evidence/suite-bounded-dispatch.txt); bounded PDF admission, publication/commit fencing and [explicit temporary/orphan cleanup](RETENTION.md) tested; broker failure alerts/recovery fenced; [due-aware monitoring and recovered heartbeat alerts](SOAK.md), [report resource alerts](RUNBOOK.md) tested; [actual isolated Nginx HTTPS/WSS and static-header regression](INGRESS.md) pass; actual Docker/host interruption coverage pending |
+-| L11 CI | IN PROGRESS | [1041 current unit/PostgreSQL PASS on an empty marked database](evidence/clean-ci-verified-suite.txt), [5 real loopback soak/migration checks PASS](evidence/clean-ci-loopback-soak.txt); shared-sequence metadata ordering and migrated soak fixture defects repaired. [Current HEAD remote run37657249888](evidence/remote-ci-37657249888-summary.json) had unitPASS/integrationFAIL/browserSKIPPED before these local fixes; no push or remote rerun. Laptop CPU deployment target retained; Docker WSL integration unavailable, build verification pending |
++| L10 Operations | IN PROGRESS | Durable scoped leases and alerts tested; [fair bounded mandate dispatch, rollback and failure alerts](evidence/suite-bounded-dispatch.txt); bounded PDF admission, publication/commit fencing and [explicit temporary/orphan cleanup](RETENTION.md) tested; broker failure alerts/recovery fenced; [due-aware monitoring and recovered heartbeat alerts](SOAK.md), [report resource alerts](RUNBOOK.md) tested; [actual isolated Nginx HTTPS/WSS and static-header regression](INGRESS.md) pass; actual Docker startup/restarts, persistent halt and pinned Nginx/Windows loopback ingress pass (CONTAINERS.md); physical host interruption/24h coverage pending |
++| L11 CI | IN PROGRESS | The published HEAD `ae9c498` has remote CI38411937843 all four jobs PASS including Sonar, 1093 combined tests PASS in183.013s/82.67% line coverage; updated image build/native/runtime and ingress also pass (see QUALITY.md and current CI evidence). The uncommitted `ib_async==2.1.0` dependency migration is not included in that run; local verification now includes [719 unit and374 full PostgreSQL integration tests](evidence/ib-async-migration-20261013.txt). Current local candidate still needs CI after separately authorized publication. |
+ | L12 UI E2E | PASS | [Current real Chromium/PostgreSQL workflow PASS](evidence/browser-broker-order-review.txt): login, synthetic account evidence, simulator proposal/independent approval/fill/fees, alerts/report and cross-user denial; expense/replay/retention/revocation also tested. Model/provider fixtures explicit; external paper remains L15. |
+ | L13 Host/model | IN PROGRESS | [Measured CPU/model baselines and host](MODEL_HOST.md); [short concurrent-control/restart smoke](SOAK.md) passes; full soak pending |
+-| L14 Research | IN PROGRESS | Cost-aware replay and fixed chronological fixture comparison; [web replay/evidence integration tested](REPLAY.md); [proposed forward observation/sample plan](FORWARD_OBSERVATION.md) documented but unapproved; real historical evidence pending; INSUFFICIENT EVIDENCE |
++| L14 Research | IN PROGRESS | Cost-aware replay and fixed chronological fixture comparison; [web replay/evidence integration tested](REPLAY.md); [proposed forward observation/sample plan](FORWARD_OBSERVATION.md) documented but unapproved; [historical source review](evidence/research-source-review-20261013.md) identifies GDELT/SEC news candidates but no authorized historical price series; Yahoo egress is disabled until operator rights review; FRED SP500 and Nasdaq WIKI are unsuitable for acceptance evidence; real historical evidence pending; INSUFFICIENT EVIDENCE |
+ | L15 External paper | BLOCKED | No explicit approved and verified paper account; no connection attempted |
+-| L16 Live readiness | BLOCKED | No versioned live mandate or accepted prerequisites; remains disabled |
++| L16 Live readiness | PASS (NO-GO; safely disabled) | `.env` keeps `LIVE_TRADING_ENABLED=false`; external SDK writes are unconditionally denied. `tests/unit/acceptance_authority_test.py` passes 9/9, including a test that even a true live flag cannot authorize route/cancel. Evidence: [live-disabled gate](evidence/live-disabled-gate-20261013.txt). No live mandate or trading was created. |
+ 
+ ## Decision log
+ 
+-- Keep direct adapter library while verifying its contracts; no unapproved migration.
++- Use maintained `ib_async` 2.1.0 after current IBKR documentation confirmed
++  `ib_insync` is based on a legacy TWS API release and no longer updated. Its
++  no-socket package/API contract and fixture suite pass on the verified Python
++  3.12 runtime. A real gateway login is still required before external readiness;
++  all writes remain denied. `ib_async` constrains tzdata below 2026, so the lock
++  selects 2025.3; revisit this dependency when upstream releases a compatible
++  constraint or the host's timezone data support changes.
+ - Enforce server-side write restrictions before enabling simulator-only workflows.
+   Tool catalogs and model instructions cannot grant authority.
+ - Visible WSL resources are not proof of physical RAM, cooling, GPU acceleration,
+diff --git a/docs/acceptance/QUALITY.md b/docs/acceptance/QUALITY.md
+index 9a45846..e6992b9 100644
+--- a/docs/acceptance/QUALITY.md
++++ b/docs/acceptance/QUALITY.md
+@@ -1,11 +1,17 @@
+ # Quality and dependency review — 2026-10-11
+ 
++Current status (2026-10-13): the user accepted the four reviewed findings. Sonar
++records RESOLVED/WONTFIX and the quality gate is now OK, including 82.6% coverage.
++These are accepted review decisions, not code fixes. The prior failed CI job is
++rerunning at unchanged commit cd049bf. See [review outcome](SONAR_REVIEW.md).
++Earlier failures and review proposals below are historical evidence.
++
+ Remote run38097627974 at5fefb1a authenticates and uploads successfully to Sonar.
+ 696 unit tests pass; its quality gate fails reliability3/security4/newcoverage56
+ against unchanged thresholds1/1/80. Later test jobs are skipped. No remote issue
+ has been dismissed and no threshold/exclusion was changed.
+ 
+-## Pipeline correction prepared locally
++## Published pipeline correction
+ 
+ Partial unit and integration scans previously overwrote the same branch analysis.
+ Their early gates could prevent the combined coverage run from being reached.
+@@ -15,7 +21,9 @@ Standalone unit/integration workflows now report their test tier only. Source:
+ [Sonar Python coverage](https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/test-coverage/python-test-coverage).
+ Local YAML, bash syntax, required dependencies and missing-token checks are in
+ [evidence/ci-combined-gate-review.json](evidence/ci-combined-gate-review.json).
+-Further publication requires approval. Combined coverage is not yet a remotePASS.
++The user approved the exact15-file bundle, published as cd049bf. Remote38185591707
++unit, integration and Chromium/ingress jobs pass; combined1086 tests pass; the mandatory quality gate fails on four remaining
++findings documented in SONAR_REVIEW.md.
+ 
+ ## Findings
+ 
+@@ -50,11 +58,11 @@ regression passes. No application uses PyJWT to authenticate browser sessions;
+ retained broker/MCP dependencies still warranted the update. Reference:
+ [upstream empty-key advisory](https://github.com/jpadilla/pyjwt/security/advisories/GHSA-pxh4-856f-4h89).
+ 
+-Fifteen packages have reviewed lock updates; 78 of 81 recorded alerts meet their
+-published patched-version floors. This is a local version comparison, not remote
+-alert closure. Backend/browser/build verification remains required for the final
+-lock. The updated major security packages passed the23-flow browser/PDF run; the
+-subsequent pydantic-settings update requires a final validation pass. MCP remains on
++Fifteen packages have reviewed lock updates. After publication and a successful
++Dependency Graph run, a read-only GitHub query finds1 open medium diskcache alert,
++down from81; no alerts were manually dismissed. The final23-flow local browser run,
++remote710 unit/372 integration tests and updated Docker build/runtime/ingress pass.
++The separate local host-clock failure remains documented below. MCP remains on
+ supported1.x (>=1.28.1,<2) to preserve the current bridge API, following
+ [upstream support policy](https://github.com/modelcontextprotocol/python-sdk/blob/main/SECURITY.md).
+ WeasyPrint70 is required by its
+@@ -72,7 +80,8 @@ mutation is covered by the passing expired-token/options-preservation regression
+ on2.15.1. WeasyPrint presentational-hints injection requires that feature enabled;
+ this application does not enable it and escapes untrusted Markdown/HTML before
+ rendering. Diskcache exposure is described above. These are contextual assessments,
+-not claims that upstream advisories or remote alerts are closed.
++not claims that every upstream advisory is fixed. The later repository query
++records80 automatic closures and1 remaining diskcache alert.
+ 
+ ## Clock evidence
+ 
+@@ -81,7 +90,7 @@ clock-quality-probe.json captured a backward wall step1.3107s versus forward
+ monotonic0.0104s. This supports a clock-related explanation but does not establish
+ the exact cause of every earlier failure. The later20.623s probe saw no jumps;
+ browser-security-coverage-v2 passes. Production clock/lease safeguards remain
+-unchanged. The next backend run records clock movement for its entire duration.
++unchanged. The following full backend run records six backward wall steps during211.4s.
+ 
+ ## Browser coverage
+ 
+@@ -99,7 +108,7 @@ one integration cancellation/recovery case failsSTALE_JOB_LEASE. The concurrent
+ clock monitor captured six backward steps~0.54–0.63s. No guard was relaxed.
+ The final browser-security-coverage-v3 run passes all23flows on both viewports,
+ including real PDF generation and session/CSRF/isolation checks. Localcombined
+-linecoverage82.63% includes measured browser routes; no remotequalityPASS claimed.
++linecoverage82.68% includes measured browser routes; no remotequalityPASS claimed.
+ A separate60s probe saw no regressions, which does not invalidate the earlier
+ under-test clock failures. Reproduce bounded clock observations with:
+ 
+@@ -108,6 +117,27 @@ under-test clock failures. Reproduce bounded clock observations with:
+ ```
+ 
+ Use a new output filename. The command only reads time and writes its report; it
+-returns1 on backward wall steps. Docker rebuild remains pending because the
+-DockerDesktop Linuxengine pipe is unavailable. No trading, production deployment,
++returns1 on backward wall steps. Docker was restored; updated-image build, native
++smoke, real-GGUF startup/restart and ingress checks pass with owned cleanup.
++Remote710 unit tests pass in25.039s and372 integration tests in149.654s; no
++failures/errors/skips in their JUnit artifacts. The23-flow Chromium and8-check
++Nginx jobs pass. The combined suite passes1086 tests in165.877s without failures/errors/skips;
++measured combined linecoverage is82.63%. Sonar analysis/upload succeeds and newcoverage82.6% passes. The mandatory gate
++still fails on four remaining security/reliability findings; see SONAR_REVIEW.md. See
++evidence/remote-ci-38185591707-test-artifacts.json and
++evidence/container-runtime-security.json. No trading, production deployment,
+ OS configuration or remote Sonar issue state was changed.
++
++CI verification complete: run38185591707 attempt2 atcd049bf finishedSUCCESS, including the mandatory Sonar quality gate. Fresh combined1086testsPASS167.652s; allfourjobsSUCCESS. L11PASS. Accepted findings remain documented decisions, not code repairs; other physical/external/research gates remainopen.
++
++## Current local candidate — 2026-10-13
++
++After migrating the IBKR adapter to `ib_async==2.1.0`, the local candidate
++passes719 unit tests and374 full PostgreSQL integration tests. The updated
++Docker image builds and passes a network-disabled, non-root package/adapter
++import smoke. See `evidence/ib-async-migration-20261013.txt` and
++`evidence/container-build-ibasync-20261013.txt`. These results do not represent
++remote CI for the dirty candidate; its exact dependency/source change remains
++unpublished pending separate approval. The build's yanked `soupsieve 3.0.1`
++warning is documented in the container evidence; the image runtime is Python
++3.12 and both build and import smoke pass.
+diff --git a/poetry.lock b/poetry.lock
+index 6b5e94e..6cfc06a 100644
+--- a/poetry.lock
++++ b/poetry.lock
+@@ -1,5 +1,20 @@
+ # This file is automatically @generated by Poetry 2.3.4 and should not be changed by hand.
+ 
++[[package]]
++name = "aeventkit"
++version = "2.1.0"
++description = "Event-driven data pipelines"
++optional = false
++python-versions = ">=3.10"
++groups = ["main"]
++files = [
++    {file = "aeventkit-2.1.0-py3-none-any.whl", hash = "sha256:962d43f79e731ac43527f2d0defeed118e6dbaa85f1487f5667540ebb8f00729"},
++    {file = "aeventkit-2.1.0.tar.gz", hash = "sha256:4e7d81bb0a67227121da50a23e19e5bbf13eded541a9f4857eeb6b7b857b738a"},
++]
++
++[package.dependencies]
++numpy = "*"
++
+ [[package]]
+ name = "aiofiles"
+ version = "25.1.0"
+@@ -1282,21 +1297,6 @@ files = [
+     {file = "diskcache-5.6.3.tar.gz", hash = "sha256:2c3a3fa2743d8535d832ec61c2054a1641f41775aa7c556758a109941e33e4fc"},
+ ]
+ 
+-[[package]]
+-name = "eventkit"
+-version = "1.0.3"
+-description = "Event-driven data pipelines"
+-optional = false
+-python-versions = "*"
+-groups = ["main"]
+-files = [
+-    {file = "eventkit-1.0.3-py3-none-any.whl", hash = "sha256:0e199527a89aff9d195b9671ad45d2cc9f79ecda0900de8ecfb4c864d67ad6a2"},
+-    {file = "eventkit-1.0.3.tar.gz", hash = "sha256:99497f6f3c638a50ff7616f2f8cd887b18bbff3765dc1bd8681554db1467c933"},
+-]
+-
+-[package.dependencies]
+-numpy = "*"
+-
+ [[package]]
+ name = "exchange-calendars"
+ version = "4.13.2"
+@@ -1890,20 +1890,21 @@ files = [
+ ]
+ 
+ [[package]]
+-name = "ib-insync"
+-version = "0.9.86"
++name = "ib-async"
++version = "2.1.0"
+ description = "Python sync/async framework for Interactive Brokers API"
+ optional = false
+-python-versions = ">=3.6"
++python-versions = ">=3.10"
+ groups = ["main"]
+ files = [
+-    {file = "ib_insync-0.9.86-py3-none-any.whl", hash = "sha256:a61fbe56ff405d93d211dad8238d7300de76dd6399eafc04c320470edec9a4a4"},
+-    {file = "ib_insync-0.9.86.tar.gz", hash = "sha256:73af602ca2463f260999970c5bd937b1c4325e383686eff301743a4de08d381e"},
++    {file = "ib_async-2.1.0-py3-none-any.whl", hash = "sha256:f6d8b991bdbd6dd38e700c61b3dced06ebe0f14be4e5263e2ef10ba10b88d434"},
++    {file = "ib_async-2.1.0.tar.gz", hash = "sha256:6a03a87d6c06acacb0217a5bea60a8a168ecd5b5a7e86e1c73678d5b48cbc796"},
+ ]
+ 
+ [package.dependencies]
+-eventkit = "*"
+-nest-asyncio = "*"
++aeventkit = ">=2.1.0,<3.0.0"
++nest_asyncio = "*"
++tzdata = ">=2025.2,<2026.0"
+ 
+ [[package]]
+ name = "idna"
+@@ -5023,14 +5024,14 @@ typing-extensions = ">=4.12.0"
+ 
+ [[package]]
+ name = "tzdata"
+-version = "2026.1"
++version = "2025.3"
+ description = "Provider of IANA time zone data"
+ optional = false
+ python-versions = ">=2"
+ groups = ["main"]
+ files = [
+-    {file = "tzdata-2026.1-py2.py3-none-any.whl", hash = "sha256:4b1d2be7ac37ceafd7327b961aa3a54e467efbdb563a23655fbfe0d39cfc42a9"},
+-    {file = "tzdata-2026.1.tar.gz", hash = "sha256:67658a1903c75917309e753fdc349ac0efd8c27db7a0cb406a25be4840f87f98"},
++    {file = "tzdata-2025.3-py2.py3-none-any.whl", hash = "sha256:06a47e5700f3081aab02b2e513160914ff0694bce9947d6b76ebd6bf57cfc5d1"},
++    {file = "tzdata-2025.3.tar.gz", hash = "sha256:de39c2ca5dc7b0344f2eba86f49d614019d29f060fc4ebc8a417896a620b56a7"},
+ ]
+ 
+ [[package]]
+@@ -5617,4 +5618,4 @@ mcp = ["mcp"]
+ [metadata]
+ lock-version = "2.1"
+ python-versions = ">=3.12,<3.15,!=3.14.1"
+-content-hash = "fd14c9ee7097049272d069dce94496a2ce67849bb2485bc8d8a90309fc3765e0"
++content-hash = "2f5f75b1738f48e8c8d9b310698190f9b78128b3efed0c7b45ed7bfa91864326"
+diff --git a/pyproject.toml b/pyproject.toml
+index f0bb420..ea53faf 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -71,7 +71,7 @@ lxml = ">=6.1.0"
+ 
+ # ── Brokerages ────────────────────────────────────────────────────────────────
+ alpaca-py = ">=0.35.0"
+-ib_insync = ">=0.9.86"
++ib_async = "==2.1.0"
+ coinbase-advanced-py = ">=1.7.0"
+ python-binance = ">=1.0.19"
+ 
+diff --git a/src/execution/broker_stream.py b/src/execution/broker_stream.py
+index 186f099..515b4f7 100644
+--- a/src/execution/broker_stream.py
++++ b/src/execution/broker_stream.py
+@@ -54,7 +54,7 @@ async def capture_observations(*, user_id, account_id, duration_seconds=60, batc
+ 
+         def drain(ib, actual, *, initial=False, final=False):
+             if initial:
+-                from ib_insync import ExecutionFilter
++                from ib_async import ExecutionFilter
+                 window.request_snapshot(ib, ExecutionFilter(acctCode=actual))
+             # Detach in this same owner operation on any detected gap, before
+             # returning its final batch to the async persistence coordinator.
+diff --git a/src/tools/brokers/ibkr.py b/src/tools/brokers/ibkr.py
+index c65baf6..5764213 100644
+--- a/src/tools/brokers/ibkr.py
++++ b/src/tools/brokers/ibkr.py
+@@ -1,4 +1,4 @@
+-"""Explicit-account read-only IBKR adapter via ib_insync.
++"""Explicit-account read-only IBKR adapter via the maintained ib_async package.
+ 
+ The worker owns its event loop and always disconnects. Live/paper writes remain
+ unavailable pending independent external-account and durable broker acceptance.
+@@ -51,7 +51,7 @@ def _connection(account: BrokerAccountConfig | None):
+     asyncio.set_event_loop(loop)
+     ib = None
+     try:
+-        from ib_insync import IB
++        from ib_async import IB
+ 
+         ib = IB()
+         ib.RequestTimeout = 10
+@@ -221,7 +221,7 @@ def get_ibkr_orders(account: BrokerAccountConfig | None = None) -> list[dict]:
+ 
+ def qualify_stock(ib, *, symbol: str, exchange: str, currency: str) -> dict:
+     """Explicit stock contract resolution; a symbol or port never selects a market."""
+-    from ib_insync import Stock
++    from ib_async import Stock
+ 
+     if not symbol or not exchange or len(currency) != 3:
+         raise ValueError("INCOMPLETE_CONTRACT")
+diff --git a/src/tools/brokers/ibkr_observations.py b/src/tools/brokers/ibkr_observations.py
+index 02f9468..5b81606 100644
+--- a/src/tools/brokers/ibkr_observations.py
++++ b/src/tools/brokers/ibkr_observations.py
+@@ -190,7 +190,7 @@ def collect_ibkr_observations(account):
+     from src.tools.brokers.ibkr_session import ReadSessionWorker, route_read
+ 
+     def collect(ib, actual):
+-        from ib_insync import ExecutionFilter
++        from ib_async import ExecutionFilter
+ 
+         if not ib.isConnected():
+             raise PolicyDenied("BROKER_NOT_CONNECTED")
+diff --git a/tests/integration/broker_stream_test.py b/tests/integration/broker_stream_test.py
+index 3998d99..05a0eb9 100644
+--- a/tests/integration/broker_stream_test.py
++++ b/tests/integration/broker_stream_test.py
+@@ -77,7 +77,7 @@ async def test_stream_preserves_only_authorized_batches_and_cleans_owner(integra
+     sdk.cleanup_failure = scenario == "cleanup_failure"
+     if scenario == "startup_cancel":
+         sdk.startup_hold = threading.Event()
+-    monkeypatch.setitem(sys.modules, "ib_insync", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
++    monkeypatch.setitem(sys.modules, "ib_async", Obj(IB=lambda: sdk, ExecutionFilter=lambda **_: "fixture-filter"))
+     async with factory.begin() as session:
+         user, account = await seed(session)
+         config = vault.decrypt_config(account.config_encrypted)
+diff --git a/tests/unit/acceptance_broker_test.py b/tests/unit/acceptance_broker_test.py
+index 597e94c..2b50ca5 100644
+--- a/tests/unit/acceptance_broker_test.py
++++ b/tests/unit/acceptance_broker_test.py
+@@ -58,7 +58,7 @@ def test_spyl_xetra_eur_contract_fixture_is_only_resolution():
+     sdk.qualifyContracts.return_value = [contract]
+     sdk.reqContractDetails.return_value = [SimpleNamespace(minTick=0.01, minSize=1)]
+     stock = MagicMock()
+-    with patch.dict("sys.modules", {"ib_insync": SimpleNamespace(Stock=stock)}):
++    with patch.dict("sys.modules", {"ib_async": SimpleNamespace(Stock=stock)}):
+         result = ibkr.qualify_stock(sdk, symbol="SPYL", exchange="IBIS2", currency="EUR")
+     stock.assert_called_once_with("SPYL", "IBIS2", "EUR")
+     assert result["currency"] == "EUR" and result["con_id"] == 123
+@@ -69,7 +69,7 @@ def test_ambiguous_contract_is_rejected():
+     sdk = MagicMock()
+     sdk.qualifyContracts.return_value = []
+     with (
+-        patch.dict("sys.modules", {"ib_insync": SimpleNamespace(Stock=MagicMock())}),
++        patch.dict("sys.modules", {"ib_async": SimpleNamespace(Stock=MagicMock())}),
+         pytest.raises(ValueError, match="AMBIGUOUS_CONTRACT"),
+     ):
+         ibkr.qualify_stock(sdk, symbol="SPYL", exchange="IBIS2", currency="EUR")
+@@ -91,7 +91,7 @@ def test_failed_connection_disconnects_and_releases_worker_resources():
+             "client_id": 123,
+         },
+     )
+-    with patch.dict("sys.modules", {"ib_insync": SimpleNamespace(IB=lambda: sdk)}):
++    with patch.dict("sys.modules", {"ib_async": SimpleNamespace(IB=lambda: sdk)}):
+         assert ibkr.get_ibkr_account(fixture)["error"] == "IBKR_READ_UNAVAILABLE"
+     sdk.disconnect.assert_called_once()
+     assert not ibkr._connection_lock.locked()
+@@ -127,7 +127,7 @@ def test_sdk_reads_require_explicit_owned_matching_account(module, invalid, monk
+         account = None
+     constructor = MagicMock(side_effect=AssertionError("IBKR SDK must not run"))
+     with (
+-        patch.dict("sys.modules", {"ib_insync": SimpleNamespace(IB=constructor)}),
++        patch.dict("sys.modules", {"ib_async": SimpleNamespace(IB=constructor)}),
+         patch.object(module, "_connection_lock" if name == "ibkr" else "_get_client") as client,
+     ):
+         for suffix in ("account", "positions", "orders"):
+diff --git a/tests/unit/ibkr_read_routing_test.py b/tests/unit/ibkr_read_routing_test.py
+index 409f398..1737132 100644
+--- a/tests/unit/ibkr_read_routing_test.py
++++ b/tests/unit/ibkr_read_routing_test.py
+@@ -123,7 +123,7 @@ def test_snapshot_read_keeps_continuous_subscription_attached(monkeypatch):
+     def connected(_):
+         yield sdk, "synthetic"
+ 
+-    monkeypatch.setitem(sys.modules, "ib_insync", SimpleNamespace(ExecutionFilter=lambda **_: "fixture-account-filter"))
++    monkeypatch.setitem(sys.modules, "ib_async", SimpleNamespace(ExecutionFilter=lambda **_: "fixture-account-filter"))
+     worker = ReadSessionWorker(selected, connection_factory=connected,
+                                subscription=lambda ib, _: persistent.subscribed(ib))
+     worker.register_reads()
+diff --git a/tests/unit/ibkr_session_test.py b/tests/unit/ibkr_session_test.py
+index 8a1ad8e..0818307 100644
+--- a/tests/unit/ibkr_session_test.py
++++ b/tests/unit/ibkr_session_test.py
+@@ -133,7 +133,7 @@ def test_default_connection_owns_its_event_loop_and_disconnects_without_sdk_writ
+ 
+     sdk.connect, sdk.disconnect = connect, disconnect
+     sdk.managedAccounts = lambda: ["SYNTHETIC-SESSION"]
+-    monkeypatch.setitem(sys.modules, "ib_insync", SimpleNamespace(IB=lambda: sdk))
++    monkeypatch.setitem(sys.modules, "ib_async", SimpleNamespace(IB=lambda: sdk))
+     worker = ReadSessionWorker(account())
+     worker.start()
+     try:
+@@ -215,7 +215,7 @@ def test_existing_snapshot_collector_runs_on_owned_session_and_removes_handlers(
+             self.trace.append(("disconnect", threading.get_ident()))
+ 
+     sdk = ConnectedSDK()
+-    monkeypatch.setitem(sys.modules, "ib_insync", SimpleNamespace(
++    monkeypatch.setitem(sys.modules, "ib_async", SimpleNamespace(
+         IB=lambda: sdk, ExecutionFilter=lambda **kwargs: "fixture-account-filter",
+     ))
+     selected = account()
+diff --git a/wiki/Architecture.md b/wiki/Architecture.md
+index 366bc3b..4e256ff 100644
+--- a/wiki/Architecture.md
++++ b/wiki/Architecture.md
+@@ -37,7 +37,7 @@ control-plane complexity has no benefit at this scale.
+ ## Why Python?
+ 
+ - **Ecosystem**: every data science and brokerage library we need (`yfinance`, `ta`,
+-  `alpaca-py`, `ib_insync`, `binance`) has a Python SDK. Writing the same integrations in
++  `alpaca-py`, `ib_async`, `binance`) has a Python SDK. Writing the same integrations in
+   Go or Rust would require maintaining custom HTTP clients for each broker.
+ - **AsyncIO**: Python 3.12's `asyncio` is mature. `asyncpg` and SQLAlchemy's async layer
+   give genuinely non-blocking database access, which matters when the LLM is running in a
+@@ -79,7 +79,7 @@ control-plane complexity has no benefit at this scale.
+ │   ├─ news_memory.py      PostgreSQL FTS                     │
+ │   ├─ portfolio.py        cross-broker aggregator            │
+ │   ├─ brokers/alpaca.py   alpaca-py SDK                      │
+-│   ├─ brokers/ibkr.py     ib_insync                          │
++│   ├─ brokers/ibkr.py     ib_async                           │
+ │   ├─ brokers/coinbase.py coinbase-advanced-py               │
+ │   ├─ brokers/binance.py  python-binance                     │
+ │   └─ simulator.py        pandas + ta                        │
+diff --git a/wiki/Broker-Integrations.md b/wiki/Broker-Integrations.md
+index da5dacb..ddbc689 100644
+--- a/wiki/Broker-Integrations.md
++++ b/wiki/Broker-Integrations.md
+@@ -78,7 +78,8 @@ orders, the tool would need a `time_in_force` parameter added.
+ 
+ ## Interactive Brokers (`src/tools/brokers/ibkr.py`)
+ 
+-**SDK**: `ib_insync` (third-party async wrapper around IB's TWS API)
++**SDK**: `ib_async` (maintained third-party async wrapper around IB's TWS API;
++`ib_insync` is no longer updated and follows a legacy API release)
+ 
+ **What it supports**: stocks, options, futures, forex, bonds — the full IB universe
+ 
+@@ -89,7 +90,7 @@ or a similar platform. Alpaca only supports equities.
+ **Architecture difference vs other brokers**: IBKR does not have a REST API. Instead:
+ - You run **IB Gateway** or **Trader Workstation (TWS)** on a computer (or in a Docker
+   container)
+-- `ib_insync` connects to it via a TCP socket (`ibkr_host:ibkr_port`)
++- `ib_async` connects to it via a TCP socket (`ibkr_host:ibkr_port`)
+ - Each function connects, executes, then disconnects — a new connection per call
+ 
+ This "connect → do → disconnect" pattern avoids keeping a persistent connection alive,
+diff --git a/tests/unit/ib_async_compatibility_test.py b/tests/unit/ib_async_compatibility_test.py
+new file mode 100644
+--- /dev/null
++++ b/tests/unit/ib_async_compatibility_test.py
+@@ -0,0 +1,34 @@
++"""Contract smoke for the maintained IBKR client; never opens a socket."""
++
++from inspect import signature
++
++
++def test_ib_async_provides_the_read_adapter_contract_without_connecting():
++    from ib_async import IB, Stock, ExecutionFilter
++
++    required = {
++        "host",
++        "port",
++        "clientId",
++        "timeout",
++        "readonly",
++        "account",
++        "raiseSyncErrors",
++    }
++    assert required <= set(signature(IB.connect).parameters)
++    assert callable(IB.qualifyContracts)
++    assert callable(IB.managedAccounts)
++    assert callable(IB.disconnect)
++    assert ExecutionFilter
++
++    client = IB()
++    assert client.RequestTimeout == 0
++    assert client.RaiseRequestErrors is False
++
++    contract = Stock("SPYL", "IBIS2", "EUR")
++    assert (contract.symbol, contract.exchange, contract.currency) == (
++        "SPYL",
++        "IBIS2",
++        "EUR",
++    )
++    assert not client.isConnected()
+diff --git a/docs/acceptance/evidence/ib-async-migration-20261013.txt b/docs/acceptance/evidence/ib-async-migration-20261013.txt
+new file mode 100644
+--- /dev/null
++++ b/docs/acceptance/evidence/ib-async-migration-20261013.txt
+@@ -0,0 +1,40 @@
++IBKR maintained client migration evidence — 2026-10-13
++
++Reason: current IBKR documentation says the original ib_insync package uses a
++legacy TWS API release and is no longer updated. It names ib_async, maintained
++by an original contributor, as a migration path, while advising direct IBKR API
++use where possible:
++https://www.interactivebrokers.com/docs/tws-api/doc/third-party-api-platforms/non-standard-tws-api-languages-and-packages/ib-insync-and-ib-async
++
++Pinned package: ib_async==2.1.0 (Python >=3.10; verified runtime Python 3.12.3).
++PyPI wheel SHA-256:
++f6d8b991bdbd6dd38e700c61b3dced06ebe0f14be4e5263e2ef10ba10b88d434
++The wheel exposes IB.connect with host/port/clientId/timeout/readonly/account/
++raiseSyncErrors, IB.qualifyContracts, IB.managedAccounts, IB.disconnect,
++RequestTimeout, RaiseRequestErrors, Stock and ExecutionFilter. No socket opened.
++
++Dependency resolution: Poetry lock adds aeventkit 2.1.0 and ib-async 2.1.0;
++the published package requires tzdata >=2025.2,<2026, so Poetry resolves tzdata
++2025.3 rather than 2026.1. This is a recorded tradeoff. Current CI targets
++Python 3.12; no claim is made for other untested versions.
++
++Commands/results:
++- poetry lock — PASS
++- poetry sync --no-interaction; poetry sync --all-extras --no-interaction — PASS
++- poetry run pytest -q tests/unit/ib_async_compatibility_test.py
++  tests/unit/acceptance_broker_test.py tests/unit/ibkr_session_test.py
++  tests/unit/ibkr_read_routing_test.py — 48 passed in 1.27s
++- Broker capture/control, observations, stream journal and stream integration
++  tests against a newly created, positively marked disposable PostgreSQL
++  database in the local .qa/pgdata cluster — 59 passed in 15.18s; database
++  dropped after the run
++- Full unit suite — 719 passed, 1 warning in 7.21s
++- Full integration suite against a newly created, positively marked disposable
++  PostgreSQL database — 374 passed, 1 dependency deprecation warning in 96.52s;
++  pytest exit 0 and disposable database cleanup PASS
++- poetry check --lock, Ruff on all touched adapter/test files, compileall on
++  touched runtime files and git diff --check — PASS
++- git diff --check — PASS
++
++No broker connection, paper order, live order, or external data request occurred.
++LIVE_TRADING_ENABLED remains false and the broker write boundary remains closed.
+diff --git a/docs/acceptance/evidence/container-build-ibasync-20261013.txt b/docs/acceptance/evidence/container-build-ibasync-20261013.txt
+new file mode 100644
+--- /dev/null
++++ b/docs/acceptance/evidence/container-build-ibasync-20261013.txt
+@@ -0,0 +1,12 @@
++Updated IBKR dependency image validation — 2026-10-13
++
++Command: docker compose build app
++Result: PASS; image investment-assistant:local built from the current pyproject.toml and poetry.lock. The build installed ib-async 2.1.0 and tzdata 2025.3. Image manifest digest: a64ce3a90cee80e7a93cd6e8e83828c583d3d70b37ff99de0c31ed8f27babe95.
++
++Isolated image smoke:
++  docker run --rm --network none --entrypoint python investment-assistant:local -c 'import os, ib_async; from ib_async import IB, Stock, ExecutionFilter; import src.tools.brokers.ibkr ...'
++Result: exit 0, uid 1000, ib_async 2.1.0, read-only adapter import PASS, API contract present. The container had no network and opened no broker connection.
++
++Build warning: Poetry reported soupsieve 3.0.1 as yanked because Python versions older than 3.11.5 have a regex compatibility issue. The image uses pinned Python 3.12; build and isolated import passed. Preserve this warning for dependency review.
++
++No Compose services or persistent volumes were started. No production deployment, broker connection, order or live setting change occurred.

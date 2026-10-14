@@ -1,6 +1,6 @@
 # Quality and dependency review — 2026-10-11
 
-Current status (2026-10-13): the user accepted the four reviewed findings. Sonar
+Current status (2026-10-14): the user accepted the four reviewed findings. Sonar
 records RESOLVED/WONTFIX and the quality gate is now OK, including 82.6% coverage.
 These are accepted review decisions, not code fixes. The prior failed CI job is
 rerunning at unchanged commit cd049bf. See [review outcome](SONAR_REVIEW.md).
@@ -136,8 +136,14 @@ After migrating the IBKR adapter to `ib_async==2.1.0`, the local candidate
 passes719 unit tests and374 full PostgreSQL integration tests. The updated
 Docker image builds and passes a network-disabled, non-root package/adapter
 import smoke. See `evidence/ib-async-migration-20261013.txt` and
-`evidence/container-build-ibasync-20261013.txt`. These results do not represent
-remote CI for the dirty candidate; its exact dependency/source change remains
-unpublished pending separate approval. The build's yanked `soupsieve 3.0.1`
-warning is documented in the container evidence; the image runtime is Python
-3.12 and both build and import smoke pass.
+`evidence/container-build-ibasync-20261013.txt`. Remote run38478734435 for
+published candidate `1d01bb5` has unit, PostgreSQL integration, and
+Chromium/browser jobs passing; the combined Sonar quality gate remains in
+progress. The build's yanked `soupsieve 3.0.1` warning is documented in the
+container evidence; the image runtime is Python 3.12 and both build and import
+smoke pass.
+
+
+## Published IBKR migration CI — 2026-10-14
+
+GitHub Actions run [38478734435](https://github.com/Investments-Assistant/investments-assistant-local-machine/actions/runs/38478734435) for `1d01bb5517d5f1a7424efd9daca766223850a2df` completed `success`; unit, PostgreSQL integration, Chromium/browser and combined Sonar quality-gate jobs all succeeded. Downloaded artifacts report717 unit tests,373 integration tests,1,094 tests in the combined E2E-tier report (overlapping tiers; do not sum as unique), and82.63% combined line coverage. This validates the published SHA, not the remaining unpublished local work.

@@ -1,0 +1,75 @@
+{
+  "commit": "cd049bfdecaeaf77b49f92ff6a4fa9a0d65744ac",
+  "run_id": 38185591707,
+  "tiers": {
+    "unit": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "710",
+        "time": "25.039",
+        "timestamp": "2026-10-11T23:47:59.874972+00:00",
+        "hostname": "runnervmmprz5"
+      }
+    ],
+    "integration": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "372",
+        "time": "149.654",
+        "timestamp": "2026-10-11T23:49:34.903161+00:00",
+        "hostname": "runnervmmprz5"
+      }
+    ],
+    "combined": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "1086",
+        "time": "165.877",
+        "timestamp": "2026-10-11T23:54:33.149288+00:00",
+        "hostname": "runnervmmprz5"
+      }
+    ]
+  },
+  "ingress": {
+    "status": "PASS",
+    "tier": "actual loopback nginx TLS and application routes/PostgreSQL",
+    "fixture_directory": ".qa/nginx-ingress-f406ee9e2daf498aad63c1c6becc404d",
+    "checks": [
+      "TLS certificate verified; actual upstream health",
+      "Security headers retained on proxied responses",
+      "Static success/error responses retain security headers and successful cache budget",
+      "HTTP redirect preserves requested path/query and published TLS port",
+      "Host retains public port; Nginx overwrites spoofed scheme and real IP",
+      "Authenticated same-origin WSS accepted despite spoofed incoming scheme",
+      "Cross-origin, wrong-scheme, missing-origin and unauthenticated WSS rejected",
+      "Non-allowlisted loopback source denied by Nginx HTTPS access rules"
+    ],
+    "broker_connections": 0,
+    "external_orders": 0,
+    "limitations": [
+      "Fixture listener ports, TLS certificate and exact proxy peer substituted.",
+      "No Docker/WSL forwarding, LAN firewall or external account proof."
+    ]
+  },
+  "browser_output": "{\"status\": \"PASS\", \"tier\": \"real-browser-real-postgres-stub-model\", \"url\": \"http://127.0.0.1:34913\", \"viewports\": [\"1440x1000\", \"390x844\"], \"checks\": [\"login\", \"page identity\", \"profile persistence, project assignment/reload and owner isolation\", \"disabled encrypted IBKR settings create/edit, blank-secret preservation, disable and isolation\", \"portfolio view\", \"proposal\", \"independent approval\", \"independent buy-only and price-band simulator mandate approvals\", \"expense import, currencies, pages, category, full-period export and raw-payload/history retention with re-import suppression\", \"bank disabled status; intercepted consent/selection/retry/history retrieval with fresh expense fetch/disconnect\", \"owner-reviewed pending/booked reconciliation, receipt clocks, export, CSRF/replay denial\", \"cost-aware replay, evidence download/reproduction/isolation\", \"buy/sell opt-in, separate approvals, fills, fees and realized PnL\", \"broker journal, confirmed read and isolation (synthetic source)\", \"immutable valuation capture and flow-adjusted observation comparison\", \"halt\", \"model self-approval denial\", \"CSRF denial\", \"cross-user denial\", \"in-app alert acknowledgement\", \"chat report PDF, confirmed retention tombstone and isolation\", \"durable chat evidence, confirmed retention tombstones, reload and ownership\", \"logout cookie replay and open-WebSocket revocation\"], \"screenshots\": \"/home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine/.qa/browser-evidence\", \"console_errors\": [], \"expected_fixture_http_errors\": [\"Failed to load resource: the server responded with a status of 409 (Conflict)\"], \"broker_connections\": 0, \"external_orders\": 0}\n",
+  "combined_coverage": {
+    "version": "7.13.5",
+    "timestamp": "1791763043193",
+    "lines-valid": "11678",
+    "lines-covered": "9649",
+    "line-rate": "0.8263",
+    "branches-covered": "0",
+    "branches-valid": "0",
+    "branch-rate": "0",
+    "complexity": "0"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "observed_seconds": 90.00933751199045,
+  "samples": 8836,
+  "max_abs_divergence": 0.9135946662863716,
+  "max_clock_read_seconds": 9.366300946567208e-05,
+  "events": [
+    {
+      "elapsed": 23.118181221492705,
+      "wall_delta": 0.747298002243042,
+      "monotonic_delta": 0.01012380600150209,
+      "divergence": 0.7371741962415399,
+      "read_uncertainty": 1.8040009308606386e-06
+    },
+    {
+      "elapsed": 23.158670799486572,
+      "wall_delta": 0.9210939407348633,
+      "monotonic_delta": 0.010159289988223463,
+      "divergence": 0.9109346507466398,
+      "read_uncertainty": 4.1100429370999336e-07
+    },
+    {
+      "elapsed": 53.12662756050122,
+      "wall_delta": 0.6845963001251221,
+      "monotonic_delta": 0.010094616009155288,
+      "divergence": 0.6745016841159668,
+      "read_uncertainty": 1.2020027497783303e-06
+    },
+    {
+      "elapsed": 53.16726557500078,
+      "wall_delta": 0.9238243103027344,
+      "monotonic_delta": 0.010229644016362727,
+      "divergence": 0.9135946662863716,
+      "read_uncertainty": 1.4680044841952622e-06
+    },
+    {
+      "elapsed": 83.12705192499561,
+      "wall_delta": 0.7044341564178467,
+      "monotonic_delta": 0.010154760500881821,
+      "divergence": 0.6942793959169649,
+      "read_uncertainty": 8.414936019107699e-07
+    },
+    {
+      "elapsed": 83.16757537650119,
+      "wall_delta": 0.9230082035064697,
+      "monotonic_delta": 0.010073597499285825,
+      "divergence": 0.9129346060071839,
+      "read_uncertainty": 5.325055099092424e-07
+    }
+  ]
+}
+

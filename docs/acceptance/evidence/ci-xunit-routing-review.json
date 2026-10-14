@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "scope": "YAML/shell and report producer-consumer configuration; no remote scanner run",
+  "checks": [
+    {
+      "workflow": "unit-tests.yml",
+      "report": "junit-unit.xml",
+      "producer_matches": true
+    },
+    {
+      "workflow": "integration-tests.yml",
+      "report": "junit-integration.xml",
+      "producer_matches": true
+    },
+    {
+      "workflow": "e2e-tests.yml",
+      "report": "junit-e2e.xml",
+      "producer_matches": true
+    }
+  ],
+  "existing_pytest_report_root": "testsuites",
+  "existing_report_tests": 304,
+  "official_reference": "https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/test-coverage/test-execution-parameters",
+  "remaining": "Authorized SONAR_TOKEN and published workflow required for remote scanner acceptance"
+}

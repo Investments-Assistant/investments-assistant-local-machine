@@ -1,0 +1,25 @@
+{
+  "pid": 500741,
+  "detached_session": true,
+  "output": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-24h-ib-async-20261013",
+  "log": "/home/lulu/investments-assistant/investments-assistant-local-machine/docs/acceptance/evidence/soak-24h-ib-async-20261013.txt",
+  "command": [
+    "/usr/bin/python3.12",
+    "scripts/soak_acceptance.py",
+    "--hours",
+    "24",
+    "--interval",
+    "30",
+    "--restart-every",
+    "900",
+    "--model",
+    "models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "--output",
+    "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-24h-ib-async-20261013"
+  ],
+  "database": "marked disposable test_soak_ibasync_4de6dac5 via .qa/socket:55439",
+  "started_at": "2026-10-13T22:27:19.087272+00:00",
+  "code_sha256": "36ee15eb9f882cf8845e54733b0fa434df6b0f514e0b8e053414a0b1cba45a82",
+  "scope": "local synthetic HTTP/PostgreSQL soak; existing local model only; no broker/provider access",
+  "live_trading": false
+}

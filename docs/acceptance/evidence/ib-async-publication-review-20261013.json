@@ -1,0 +1,38 @@
+{
+  "base_head": "ae9c498cf997007dbcce6d7100bb47c9d1568f89",
+  "target": "origin/main (local master tracks origin/main)",
+  "files": [
+    "docs/acceptance/ARCHITECTURE.md",
+    "docs/acceptance/BROKER_CAPABILITIES.md",
+    "docs/acceptance/CONTAINERS.md",
+    "docs/acceptance/PLAN.md",
+    "docs/acceptance/QUALITY.md",
+    "poetry.lock",
+    "pyproject.toml",
+    "src/execution/broker_stream.py",
+    "src/tools/brokers/ibkr.py",
+    "src/tools/brokers/ibkr_observations.py",
+    "tests/integration/broker_stream_test.py",
+    "tests/unit/acceptance_broker_test.py",
+    "tests/unit/ibkr_read_routing_test.py",
+    "tests/unit/ibkr_session_test.py",
+    "wiki/Architecture.md",
+    "wiki/Broker-Integrations.md",
+    "tests/unit/ib_async_compatibility_test.py",
+    "docs/acceptance/evidence/ib-async-migration-20261013.txt",
+    "docs/acceptance/evidence/container-build-ibasync-20261013.txt"
+  ],
+  "patch_bytes": 56170,
+  "patch_sha256": "d4e3ca84f833946e789a3b4a7b8860fe14fb4fe18885c4cf6e1680109d4355be",
+  "validation": [
+    "719 unit tests passed",
+    "374 PostgreSQL integration tests passed",
+    "59 broker-focused PostgreSQL integration tests passed",
+    "poetry check --lock passed",
+    "Ruff passed on touched adapters/tests",
+    "compileall passed",
+    "git diff --check passed",
+    "Docker image built; isolated non-root network-none import smoke passed"
+  ],
+  "publication_status": "not authorized; patch prepared for exact review only"
+}

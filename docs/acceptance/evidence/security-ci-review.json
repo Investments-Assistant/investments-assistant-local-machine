@@ -1,0 +1,69 @@
+{
+  "base_commit": "5fefb1ac5e21244ef6d4f395f62333938b0a69a9",
+  "target": "origin/main",
+  "files": [
+    {
+      "path": ".github/workflows/unit-tests.yml",
+      "sha256": "24c24e6b808d70311f95f6199d22486d820a68439845c039de5d68b01284b7e6"
+    },
+    {
+      "path": ".github/workflows/integration-tests.yml",
+      "sha256": "4efcc82945516fd487e563ad2b75977ac5a6031f0c486bca68016c0e06c65f83"
+    },
+    {
+      "path": ".github/workflows/e2e-tests.yml",
+      "sha256": "11fb16ec970f08b1176290e6ae6b6750a37ed3509ac819994cf42f0f823d7a89"
+    },
+    {
+      "path": "config/coverage-browser.ini",
+      "sha256": "0aebcbe5201340848149dad05f44c4093b1022fc273bc4966b353bd04cf34e38"
+    },
+    {
+      "path": "poetry.lock",
+      "sha256": "08e38451378212e36eba156ae764cbd1c3efabb9227454b6e0a2d131fc2ee813"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "fea4d1c3c9f79c573c7a2528abbf9786113e4341deed2d86b39c66238905c600"
+    },
+    {
+      "path": "src/web/routes.py",
+      "sha256": "5c2c4170dc2cea29a3ef7076c56e6c456ddd8376dceef824f289ac1f2461da2f"
+    },
+    {
+      "path": "src/execution/broker_monitor.py",
+      "sha256": "69f4fd2fdcea18a8108796e9ba2fee8d88d4f9c06ff40e128892bae511d312c2"
+    },
+    {
+      "path": "tests/unit/web_routes_test.py",
+      "sha256": "75297b39e6071dff133eedf7c326b5c3941139096e96168dc0b39328e739e535"
+    },
+    {
+      "path": "tests/unit/route_error_logging_test.py",
+      "sha256": "27942319e1070d2437bfd11016539cac441c203a1e92758d4d383c75b53ddece"
+    },
+    {
+      "path": "tests/unit/public_fetch_tls_test.py",
+      "sha256": "c186fbdb7bfa80fd44f87092911d8ebdfd34f37ed5cc96a449cab60693018029"
+    },
+    {
+      "path": "tests/unit/dependency_security_test.py",
+      "sha256": "53e510f66ecf7ead3fc4ab33c4f41aa62a60430ef6491ba7f5d67e02312299b6"
+    },
+    {
+      "path": "tests/unit/cookie_security_test.py",
+      "sha256": "228d35e7e745790fc06f6a566004c72e7ebdc98c137b1e8c1ecd6dc5eaeb5888"
+    },
+    {
+      "path": "scripts/verify_clock_stability.py",
+      "sha256": "45608f8adff7368d968d48fbdca18f67b61aeb70e048f9620dab5ba373e2a863"
+    },
+    {
+      "path": "docs/acceptance/QUALITY.md",
+      "sha256": "77289727c482bfda429ea802564a1a8bf2445bb28d90143bbf07e0ae585152c0"
+    }
+  ],
+  "published": false,
+  "validation": "710 unit + 371 integration + 4 other passed; one integration STALE_JOB_LEASE failure with six backward clock steps; final browser 23 flows desktop/mobile PASS; combined line coverage 82.63%; Docker engine unavailable",
+  "remote_sonar_issues_not_changed": true
+}

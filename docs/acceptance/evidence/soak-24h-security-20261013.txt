@@ -1,0 +1,3 @@
+{"status": "RUNNING", "cycles": 1, "current_window_seconds": 2.234843568992801, "control_p95_ms": 32.06969999882858, "restarts": 0}
+{"status": "RUNNING", "cycles": 11, "current_window_seconds": 12.235045187990181, "control_p95_ms": 42.42324999358971, "restarts": 0}
+{"status": "INTERRUPTED", "cycles": 14, "current_window_seconds": 15.790111409995006, "restarts": 0, "failures": []}

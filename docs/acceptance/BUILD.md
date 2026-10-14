@@ -11,11 +11,13 @@ Poetry2.3.4 now matches the existing CI toolchain and installs the existing
 environment, models, reports, Git history, caches and disposable PostgreSQL data.
 Runtime models remain read-only mounts; they are not image build inputs.
 
-This fixes declared image, apt repository and Poetry bootstrap inputs, but is
-not a bit-identical native compilation or successfully built image claim.
-The image has not been built or booted here because Docker's Linux daemon is
-unavailable. The isolated Ubuntu Nginx check does not validate this Alpine image.
-Container acceptance remains pending; registry metadata is not runtime evidence.
+The pinned amd64 image now builds successfully on Docker Desktop's Linux engine.
+`evidence/container-build-20261010-ad17fb8e.*` records the first successful build;
+`evidence/container-startup-build.txt/.exit` records the updated image after
+deferring unused market-data imports. See CONTAINERS.md for actual native-library,
+startup and restart results. This is not a bit-identical compilation or ARM64
+execution claim. The isolated Ubuntu Nginx check does not validate the Alpine
+container or Docker Desktop source-address handling.
 
 Update digests deliberately when reviewing security updates. Retrieve each
 official registry manifest, verify its SHA256 and required platforms, update
@@ -83,8 +85,21 @@ nothing. Evidence: `debian-snapshot-probe-20261010.json`, `debian-snapshot-apt.t
 and `.exit`, `debian-snapshot-resolution.txt` and `.exit`, and
 `debian-snapshot-review.json` in the evidence directory.
 
-This validates amd64 repository authentication and dependency resolution from an
-empty isolated status file. It is not resolution inside the pinned Python image,
-an ARM64 build, or application startup. Those checks still require Docker.
+The isolated apt check validates amd64 repository authentication and dependency
+resolution from an empty status file. The subsequent Docker build also installs
+these dependencies inside the pinned Python image. ARM64 execution remains
+unverified; application startup/restart has its own evidence in CONTAINERS.md.
 References: https://snapshot.debian.org/ and
 https://manpages.debian.org/bookworm/apt/apt-secure.8.en.html
+
+## CI test-report import repair
+
+The unit, integration and combined workflows generate pytest JUnit XML. They
+now pass those files through `sonar.python.xunit.reportPath`, rather than the
+generic `sonar.testExecutionReportPaths` importer, which requires a different
+XML schema. Producer filenames, YAML and shell syntax were checked in
+`evidence/ci-xunit-routing-review.json`; a retained actual pytest report has
+`testsuites`/`testcase` elements. This configuration verification is not a
+successful remote Sonar scan. Missing authorized SONAR_TOKEN still blocks it.
+Primary reference:
+https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/test-coverage/test-execution-parameters

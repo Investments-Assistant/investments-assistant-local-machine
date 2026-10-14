@@ -1,0 +1,8 @@
+{
+  "observed_seconds": 90.00529619099689,
+  "samples": 8853,
+  "max_abs_divergence": 0.0427809926768532,
+  "max_clock_read_seconds": 5.90069976169616e-05,
+  "events": []
+}
+

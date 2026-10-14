@@ -1,0 +1,145 @@
+diff --git a/scripts/soak_acceptance.py b/scripts/soak_acceptance.py
+index efa3bf8..d21e04c 100644
+--- a/scripts/soak_acceptance.py
++++ b/scripts/soak_acceptance.py
+@@ -19,7 +19,7 @@ import asyncio
+ import hashlib
+ from pathlib import Path
+ import argparse
+-from datetime import UTC, datetime
++from datetime import UTC, datetime, timedelta
+ from threading import Event
+ import subprocess
+ 
+@@ -117,6 +117,49 @@ async def verify_database(url, marker):
+         await engine.dispose()
+ 
+ 
++async def extend_synthetic_fixture_mandate(url, account_id, hours):
++    """Give the disposable soak fixture a mandate valid for its whole window.
++
++    The browser fixture route intentionally creates short-lived one-hour
++    allocations. A 24-hour soak must keep its synthetic mandate valid so each
++    stale-quote probe reaches the quote-age guard instead of the earlier
++    mandate-expiry guard. Never change real or unmarked accounts here.
++    """
++    if not 0 < hours <= 72:
++        raise ValueError("INVALID_SOAK_FIXTURE_DURATION")
++    engine = create_async_engine(
++        url,
++        poolclass=NullPool,
++        connect_args={"timeout": 5, "command_timeout": 5},
++    )
++    try:
++        async with engine.begin() as connection:
++            result = await connection.execute(
++                text("""
++                    SELECT mandate FROM simulator_accounts
++                    WHERE id = :account_id
++                    FOR UPDATE
++                """),
++                {"account_id": account_id},
++            )
++            mandate = result.scalar_one_or_none()
++            if (
++                not isinstance(mandate, dict)
++                or mandate.get("fixture") is not True
++                or mandate.get("environment") != "simulator"
++            ):
++                raise RuntimeError("SOAK_ACCOUNT_NOT_SYNTHETIC_FIXTURE")
++            mandate["expires_at"] = (
++                datetime.now(UTC) + timedelta(hours=hours + 1)
++            ).isoformat()
++            await connection.execute(
++                text("UPDATE simulator_accounts SET mandate = CAST(:mandate AS json) WHERE id = :account_id"),
++                {"account_id": account_id, "mandate": json.dumps(mandate)},
++            )
++    finally:
++        await engine.dispose()
++
++
+ def terminate(process):
+     if process and process.poll() is None:
+         process.terminate()
+@@ -281,6 +324,7 @@ def main():
+                 stale["account_id"],
+                 stale["instrument_id"],
+             )
++        asyncio.run(extend_synthetic_fixture_mandate(url, state["stale_account"], args.hours))
+         while time.monotonic() < deadline and not STOP.is_set():
+             last_observation = observe_continuity(last_observation, args.interval)
+             cycle = time.monotonic()
+diff --git a/tests/integration/soak_guard_test.py b/tests/integration/soak_guard_test.py
+index 9e5e642..c446508 100644
+--- a/tests/integration/soak_guard_test.py
++++ b/tests/integration/soak_guard_test.py
+@@ -51,6 +51,69 @@ async def soak_database(integration_engine, monkeypatch):
+             await admin.execute(text(f'DROP DATABASE "{name}"'))
+ 
+ 
++async def test_soak_extends_only_synthetic_fixture_mandate(integration_engine):
++    import json
++    import uuid
++    from datetime import UTC, datetime, timedelta
++
++    from scripts.soak_acceptance import extend_synthetic_fixture_mandate
++
++    account_id = str(uuid.uuid4())
++    now = datetime.now(UTC)
++    mandate = {
++        "environment": "simulator",
++        "fixture": True,
++        "expires_at": (now + timedelta(hours=1)).isoformat(),
++    }
++    async with integration_engine.begin() as connection:
++        await connection.execute(
++            text("""
++                INSERT INTO simulator_accounts
++                    (id, user_id, currency, cash, reserved, initial_capital,
++                     max_order, loss_limit, realized_pnl, halted, mandate)
++                VALUES
++                    (:id, :user_id, 'EUR', 1000, 0, 1000, 500, 50, 0, false,
++                     CAST(:mandate AS json))
++            """),
++            {
++                "id": account_id,
++                "user_id": str(uuid.uuid4()),
++                "mandate": json.dumps(mandate),
++            },
++        )
++
++    try:
++        await extend_synthetic_fixture_mandate(
++            os.environ["TEST_DATABASE_URL"], account_id, 24
++        )
++        async with integration_engine.connect() as connection:
++            extended = await connection.scalar(
++                text("SELECT mandate FROM simulator_accounts WHERE id = :id"),
++                {"id": account_id},
++            )
++        assert extended["fixture"] is True
++        assert extended["environment"] == "simulator"
++        assert datetime.fromisoformat(extended["expires_at"]) >= (
++            datetime.now(UTC) + timedelta(hours=24)
++        )
++
++        async with integration_engine.begin() as connection:
++            await connection.execute(
++                text("UPDATE simulator_accounts SET mandate = CAST(:mandate AS json) WHERE id = :id"),
++                {"id": account_id, "mandate": json.dumps({"environment": "simulator"})},
++            )
++        with pytest.raises(RuntimeError, match="SOAK_ACCOUNT_NOT_SYNTHETIC_FIXTURE"):
++            await extend_synthetic_fixture_mandate(
++                os.environ["TEST_DATABASE_URL"], account_id, 24
++            )
++    finally:
++        async with integration_engine.begin() as connection:
++            await connection.execute(
++                text("DELETE FROM simulator_accounts WHERE id = :id"),
++                {"id": account_id},
++            )
++
++
+ @pytest.mark.parametrize("optimized", [False, True])
+ async def test_soak_rejects_wrong_disposable_marker_even_when_optimized(soak_database, optimized):
+     code = """import asyncio, os

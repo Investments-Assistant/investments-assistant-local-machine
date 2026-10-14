@@ -1,0 +1,295 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.58kB 0.0s done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#2 ...
+
+#3 [auth] library/python:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#2 DONE 1.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 503B 0.0s done
+#4 DONE 0.1s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [ 1/16] FROM docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#6 resolve docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258 0.0s done
+#6 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 696.64kB 0.2s done
+#5 DONE 0.3s
+
+#7 [ 2/16] COPY config/build/debian.sources /tmp/ia-debian.sources
+#7 CACHED
+
+#8 [ 3/16] RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/*     && cp /tmp/ia-debian.sources /etc/apt/sources.list.d/debian.sources     && rm /tmp/ia-debian.sources     && apt-get update && apt-get install -y --no-install-recommends     build-essential     ca-certificates     cmake     libopenblas-dev     libpq-dev     libffi-dev     libxml2-dev     libxslt1-dev     libcairo2     libpango-1.0-0     libpangocairo-1.0-0     libgdk-pixbuf-2.0-0     libfontconfig1     pkg-config     shared-mime-info     && apt-get clean && rm -rf /var/lib/apt/lists/*
+#8 CACHED
+
+#9 [ 4/16] WORKDIR /app
+#9 CACHED
+
+#10 [ 5/16] COPY requirements-poetry.txt ./requirements-poetry.txt
+#10 CACHED
+
+#11 [ 6/16] RUN pip install --no-cache-dir --require-hashes --only-binary=:all: -r requirements-poetry.txt
+#11 CACHED
+
+#12 [ 7/16] COPY pyproject.toml poetry.lock ./
+#12 DONE 0.1s
+
+#13 [ 8/16] RUN poetry config virtualenvs.create false     && poetry install --only main --no-root --no-interaction
+#13 4.738 Skipping virtualenv creation, as specified in config file.
+#13 5.156 Installing dependencies from lock file
+#13 5.847 
+#13 5.847 Package operations: 87 installs, 10 updates, 0 removals
+#13 5.847 
+#13 5.848   - Installing aiofiles (25.1.0)
+#13 5.849   - Installing aiohappyeyeballs (2.6.1)
+#13 5.850   - Installing aiohttp (3.14.5)
+#13 5.851   - Installing aiosignal (1.4.0)
+#13 5.852   - Installing alembic (1.18.4)
+#13 5.853   - Installing alpaca-py (0.43.2)
+#13 5.853   - Installing annotated-doc (0.0.4)
+#13 5.854   - Installing annotated-types (0.7.0)
+#13 5.860   - Downgrading anyio (4.15.1 -> 4.13.0)
+#13 5.868   - Installing apscheduler (3.11.2)
+#13 5.871   - Installing asyncpg (0.31.0)
+#13 5.874   - Installing attrs (26.1.0)
+#13 5.880   - Installing backoff (2.2.1)
+#13 5.883   - Installing beautifulsoup4 (4.14.3)
+#13 5.885   - Installing brotli (1.2.0)
+#13 5.886   - Downgrading certifi (2026.7.22 -> 2026.2.25)
+#13 5.890   - Downgrading cffi (2.1.1 -> 2.0.0)
+#13 5.892   - Downgrading charset-normalizer (3.5.2 -> 3.4.7)
+#13 5.895   - Installing click (8.3.2)
+#13 5.897   - Installing coinbase-advanced-py (1.7.0)
+#13 8.037   - Installing cssselect2 (0.9.0)
+#13 8.092   - Installing curl-cffi (0.15.0)
+#13 8.214   - Installing dateparser (1.4.0)
+#13 8.279   - Installing diskcache (5.6.3)
+#13 8.564   - Installing eventkit (1.0.3)
+#13 8.709   - Installing exchange-calendars (4.13.2)
+#13 9.295   - Installing fastapi (0.135.3)
+#13 9.313   - Installing feedparser (6.0.12)
+#13 9.456   - Installing fonttools (4.62.1)
+#13 9.531   - Installing frozendict (2.4.7)
+#13 9.911   - Installing frozenlist (1.8.0)
+#13 10.02   - Installing greenlet (3.4.0)
+#13 10.38   - Installing httptools (0.7.1)
+#13 10.57   - Installing ib-insync (0.9.86)
+#13 10.59   - Installing jinja2 (3.1.6)
+#13 10.79   - Installing korean-lunar-calendar (0.4.0)
+#13 11.23   - Installing llama-cpp-python (0.3.20)
+#13 11.32   - Installing lxml (6.1.0)
+#13 11.46   - Installing mako (1.4.3)
+#13 11.79   - Installing markdown-it-py (4.0.0)
+#13 11.98   - Installing markupsafe (3.0.3)
+#13 11.99   - Installing mdurl (0.1.2)
+#13 12.00   - Downgrading msgpack (1.2.3 -> 1.1.2)
+#13 12.59   - Installing multidict (7.1.0)
+#13 12.64   - Installing multitasking (0.0.12)
+#13 12.65   - Installing nest-asyncio (1.6.0)
+#13 12.72   - Installing newsapi-python (0.2.7)
+#13 12.92   - Installing numpy (2.4.4)
+#13 13.01   - Installing pandas (3.0.2)
+#13 13.11   - Installing peewee (4.0.4)
+#13 13.67   - Installing pillow (12.3.0)
+#13 13.80   - Downgrading platformdirs (4.12.4 -> 4.9.6)
+#13 14.02   - Installing propcache (0.4.1)
+#13 14.07   - Installing protobuf (7.34.1)
+#13 14.07   - Downgrading pycparser (3.11 -> 3.0)
+#13 14.27   - Installing pycryptodome (3.23.0)
+#13 14.38   - Installing pydantic (2.12.5)
+#13 15.15   - Installing pydantic-core (2.41.5)
+#13 15.45   - Installing pydantic-settings (2.15.0)
+#13 15.62   - Installing pydyf (0.12.1)
+#13 16.40   - Installing pygments (2.20.0)
+#13 16.41   - Installing pyjwt (2.15.1)
+#13 16.77   - Installing pyluach (2.3.0)
+#13 16.80   - Installing pyphen (0.17.2)
+#13 17.42   - Installing python-binance (1.0.36)
+#13 17.45   - Installing python-dateutil (2.9.0.post0)
+#13 17.55   - Installing python-dotenv (1.2.2)
+#13 17.73   - Installing python-multipart (0.0.32)
+#13 18.43   - Installing pytz (2026.1.post1)
+#13 18.53   - Installing pyyaml (6.0.3)
+#13 18.78   - Installing regex (2026.4.4)
+#13 18.91   - Downgrading requests (2.34.2 -> 2.33.1)
+#13 19.00   - Installing rich (14.3.4)
+#13 19.06   - Installing sgmllib3k (1.0.0)
+#13 19.33   - Installing six (1.17.0)
+#13 20.14   - Installing soupsieve (3.0.1)
+#13 20.98   - Installing sqlalchemy (2.0.49)
+#13 21.12   - Installing sseclient-py (1.9.0)
+#13 21.18   - Installing starlette (1.7.0)
+#13 21.87   - Installing ta (0.11.0)
+#13 21.96   - Installing tinycss2 (1.5.1)
+#13 21.98   - Installing tinyhtml5 (2.1.0)
+#13 22.86   - Installing toolz (1.1.0)
+#13 22.92   - Downgrading typing-extensions (4.16.0 -> 4.15.0)
+#13 22.93   - Installing typing-inspection (0.4.2)
+#13 23.00   - Installing tzdata (2026.1)
+#13 23.46   - Installing tzlocal (5.3.1)
+#13 23.67   - Downgrading urllib3 (2.8.0 -> 2.6.3)
+#13 24.17   - Installing uvicorn (0.44.0)
+#13 24.40   - Installing uvloop (0.22.1)
+#13 25.16   - Installing watchfiles (1.1.1)
+#13 26.07   - Installing weasyprint (70.0)
+#13 27.26   - Installing webencodings (0.5.1)
+#13 27.71   - Installing websockets (16.0)
+#13 28.01   - Installing yarl (1.25.1)
+#13 28.71   - Installing yfinance (1.2.2)
+#13 28.90   - Installing zopfli (0.4.1)
+#13 32.27 /tmp/tmpj9_6jw0_/.venv/lib/python3.12/site-packages/setuptools/dist.py:765: BuildBackendWarning: License classifiers are deprecated.
+#13 32.27 !!
+#13 32.27 
+#13 32.27         ********************************************************************************
+#13 32.27         Please consider removing the following classifiers in favor of a SPDX license expression:
+#13 32.27 
+#13 32.27         License :: OSI Approved :: Apache Software License
+#13 32.27 
+#13 32.27         See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+#13 32.27         ********************************************************************************
+#13 32.27 
+#13 32.27 !!
+#13 32.27   self._finalize_license_expression()
+#13 32.54 /tmp/tmpj5wjtmla/.venv/lib/python3.12/site-packages/setuptools/_distutils/dist.py:318: BuildBackendWarning: Unknown distribution option: 'test_suite'
+#13 32.54   warnings.warn(msg)
+#13 32.55 /tmp/tmpj5wjtmla/.venv/lib/python3.12/site-packages/setuptools/dist.py:765: BuildBackendWarning: License classifiers are deprecated.
+#13 32.55 !!
+#13 32.55 
+#13 32.55         ********************************************************************************
+#13 32.55         Please consider removing the following classifiers in favor of a SPDX license expression:
+#13 32.55 
+#13 32.55         License :: OSI Approved :: BSD License
+#13 32.55 
+#13 32.55         See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+#13 32.55         ********************************************************************************
+#13 32.55 
+#13 32.55 !!
+#13 32.55   self._finalize_license_expression()
+#13 33.85 /tmp/tmpdb5z98kd/.venv/lib/python3.12/site-packages/setuptools/dist.py:765: BuildBackendWarning: License classifiers are deprecated.
+#13 33.85 !!
+#13 33.85 
+#13 33.85         ********************************************************************************
+#13 33.85         Please consider removing the following classifiers in favor of a SPDX license expression:
+#13 33.85 
+#13 33.85         License :: OSI Approved :: MIT License
+#13 33.85 
+#13 33.85         See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+#13 33.85         ********************************************************************************
+#13 33.85 
+#13 33.85 !!
+#13 33.85   self._finalize_license_expression()
+#13 33.85 /tmp/tmpdb5z98kd/.venv/lib/python3.12/site-packages/setuptools/dist.py:483: BuildBackendWarning: Cannot find any files for the given pattern.
+#13 33.85 !!
+#13 33.85 
+#13 33.85         ********************************************************************************
+#13 33.85         Pattern 'LICENSE' did not match any files.
+#13 33.85 
+#13 33.85         By 2027-Feb-18, you need to update your project and remove deprecated calls
+#13 33.85         or your builds will no longer be supported.
+#13 33.85         ********************************************************************************
+#13 33.85 
+#13 33.85 !!
+#13 33.85   for path in sorted(cls._find_pattern(pattern, enforce_match))
+#13 34.32 /tmp/tmpj9_6jw0_/.venv/lib/python3.12/site-packages/setuptools/dist.py:765: BuildBackendWarning: License classifiers are deprecated.
+#13 34.32 !!
+#13 34.32 
+#13 34.32         ********************************************************************************
+#13 34.32         Please consider removing the following classifiers in favor of a SPDX license expression:
+#13 34.32 
+#13 34.32         License :: OSI Approved :: Apache Software License
+#13 34.32 
+#13 34.32         See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+#13 34.32         ********************************************************************************
+#13 34.32 
+#13 34.32 !!
+#13 34.32   self._finalize_license_expression()
+#13 34.56 /tmp/tmpj5wjtmla/.venv/lib/python3.12/site-packages/setuptools/_distutils/dist.py:318: BuildBackendWarning: Unknown distribution option: 'test_suite'
+#13 34.56   warnings.warn(msg)
+#13 34.56 /tmp/tmpj5wjtmla/.venv/lib/python3.12/site-packages/setuptools/dist.py:765: BuildBackendWarning: License classifiers are deprecated.
+#13 34.56 !!
+#13 34.56 
+#13 34.56         ********************************************************************************
+#13 34.56         Please consider removing the following classifiers in favor of a SPDX license expression:
+#13 34.56 
+#13 34.56         License :: OSI Approved :: BSD License
+#13 34.56 
+#13 34.56         See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+#13 34.56         ********************************************************************************
+#13 34.56 
+#13 34.56 !!
+#13 34.56   self._finalize_license_expression()
+#13 35.69 /tmp/tmpdb5z98kd/.venv/lib/python3.12/site-packages/setuptools/dist.py:765: BuildBackendWarning: License classifiers are deprecated.
+#13 35.69 !!
+#13 35.69 
+#13 35.69         ********************************************************************************
+#13 35.69         Please consider removing the following classifiers in favor of a SPDX license expression:
+#13 35.69 
+#13 35.69         License :: OSI Approved :: MIT License
+#13 35.69 
+#13 35.69         See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+#13 35.69         ********************************************************************************
+#13 35.69 
+#13 35.69 !!
+#13 35.69   self._finalize_license_expression()
+#13 35.69 /tmp/tmpdb5z98kd/.venv/lib/python3.12/site-packages/setuptools/dist.py:483: BuildBackendWarning: Cannot find any files for the given pattern.
+#13 35.69 !!
+#13 35.69 
+#13 35.69         ********************************************************************************
+#13 35.69         Pattern 'LICENSE' did not match any files.
+#13 35.69 
+#13 35.69         By 2027-Feb-18, you need to update your project and remove deprecated calls
+#13 35.69         or your builds will no longer be supported.
+#13 35.69         ********************************************************************************
+#13 35.69 
+#13 35.69 !!
+#13 35.69   for path in sorted(cls._find_pattern(pattern, enforce_match))
+#13 DONE 211.9s
+
+#14 [ 9/16] COPY src/ ./src/
+#14 DONE 0.3s
+
+#15 [10/16] COPY alembic.ini ./alembic.ini
+#15 DONE 0.1s
+
+#16 [11/16] COPY migrations/ ./migrations/
+#16 DONE 0.1s
+
+#17 [12/16] COPY .env.example ./.env.example
+#17 DONE 0.1s
+
+#18 [13/16] RUN mkdir -p /app/scripts
+#18 DONE 0.3s
+
+#19 [14/16] COPY scripts/create_user.py ./scripts/create_user.py
+#19 DONE 0.1s
+
+#20 [15/16] COPY scripts/create_broker_key.py ./scripts/create_broker_key.py
+#20 DONE 0.1s
+
+#21 [16/16] RUN mkdir -p /app/reports /app/models     && useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+#21 DONE 1.4s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 27.6s done
+#22 exporting manifest sha256:d565062120566e88db26a319fa732130b970fa208ca97ebe668ae6369300ea93 0.0s done
+#22 exporting config sha256:b69f6ba9322f787b98c67a37360f1a3aca1cfdfb2472abafea416c3b1fb27c7c 0.0s done
+#22 exporting attestation manifest sha256:659dc00edcfe6674ccce87f9b7563d3bf8f8fa2e42d53579df432401a7463132
+#22 exporting attestation manifest sha256:659dc00edcfe6674ccce87f9b7563d3bf8f8fa2e42d53579df432401a7463132 0.0s done
+#22 exporting manifest list sha256:5f56ad6fd7a50fb91edd085f55a5ab8d60d25aa8ab2805713128ea710a0eb626 0.0s done
+#22 naming to docker.io/library/investment-assistant:security-cd049bf done
+#22 unpacking to docker.io/library/investment-assistant:security-cd049bf
+#22 unpacking to docker.io/library/investment-assistant:security-cd049bf 6.6s done
+#22 DONE 34.5s

@@ -1,0 +1,8 @@
+{
+  "status": "NO_REGRESSION_OBSERVED",
+  "finished_at": "2026-10-13T15:14:28.005273+00:00",
+  "observed_seconds": 60.003804978,
+  "samples": 5927,
+  "regressions": [],
+  "scope": "Bounded observation only; not proof of future stability or wall-clock accuracy"
+}

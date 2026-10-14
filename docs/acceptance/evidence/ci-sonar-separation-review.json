@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "checks": [
+    "YAML and all shell steps parse",
+    "Browser tier depends on unit tests independently of integration scanner",
+    "Combined quality gate still requires all three jobs",
+    "Missing authorization preflight exits1; supplied synthetic placeholder exits0 without network",
+    "No continue-on-error added"
+  ],
+  "remote_validation": "PENDING publication and authorized Sonar secret; no workflow dispatched"
+}

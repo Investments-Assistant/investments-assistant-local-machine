@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "run_id": "ia-ingress-e004da69cc40",
+  "checks": [
+    "Verified TLS, real application and static success/error security headers",
+    "HTTP redirect retains production published port, path and query",
+    "Exact trusted proxy overwrites forged scheme/IP and app uses verified peer",
+    "Authenticated same-origin WSS accepted through container proxy",
+    "Wrong/missing origin, wrong scheme and unauthenticated WSS denied",
+    "Windows loopback TLS verified; actual Docker forwarded source observed",
+    "Separate non-allowlisted container source rejected with HTTPS403"
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "limitations": [
+    "Synthetic model/provider evidence; real auth/routes",
+    "Windows loopback forwarding only, not LAN/firewall or physical client identity"
+  ],
+  "fixture_addresses": {
+    "gateway": "172.18.0.1",
+    "app": "172.18.0.2",
+    "proxy": "172.18.0.3"
+  },
+  "observed_headers": {
+    "host": "nginx",
+    "x-real-ip": "172.18.0.2",
+    "x-forwarded-proto": "https",
+    "x-forwarded-for": "203.0.113.7, 172.18.0.2",
+    "effective_client_ip": "172.18.0.2"
+  },
+  "port_bindings": [
+    {
+      "HostIp": "127.0.0.1",
+      "HostPort": "64429"
+    }
+  ],
+  "windows_forwarding": {
+    "published_address": "127.0.0.1",
+    "port": "64429",
+    "headers": {
+      "host": "127.0.0.1:64429",
+      "x-real-ip": "172.18.0.1",
+      "x-forwarded-proto": "https",
+      "x-forwarded-for": "172.18.0.1",
+      "effective_client_ip": "172.18.0.1"
+    }
+  },
+  "cleanup_verified": true,
+  "fixture_directory": ".qa/ia-ingress-e004da69cc40"
+}

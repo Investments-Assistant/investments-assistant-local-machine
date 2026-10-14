@@ -260,3 +260,45 @@ This closes the previous same-process contention evidence gap for this short
 synthetic fixture. It does not establish network admission, Docker/Nginx routing,
 physical cooling/sleep, arbitrary blocking dependencies or24h stability. The
 arithmetic text is only a load fixture; no answer-quality claim follows.
+
+## Current read-only host sample (2026-10-13)
+
+Windows CIM reconfirmed the Lenovo 20Y6S14U00, i7-11850H (8 cores/16 logical),
+68,408,107,008 bytes RAM, and Intel UHD + RTX 3050 Ti. During the corrected soak,
+`nvidia-smi` reported 4096 MiB VRAM, 57 C, 7.27 W; WSL filesystem free space was
+930,382,483,456 bytes. This is a point GPU reading, not sustained thermal proof.
+CPU temperature/cooling and actual suspend/resume reliability remain unverified;
+the user-confirmed sleep event and prior discontinuous soak are recorded separately.
+Raw sample: `evidence/host-windows-hardware-current-20261013.txt`.
+
+## Thermal sensor availability recheck (2026-10-14)
+
+During the active CPU soak, a read-only probe found no WSL thermal zones, no
+`sensors` utility, and no results from Windows `MSAcpi_ThermalZoneTemperature`.
+NVML returned one GPU sample (65 C,8.71 W,32% utilization,716 MiB) at the probe
+instant. This does not characterize the CPU-bound workload or demonstrate
+sustained cooling/throttling behavior; L13 thermal acceptance remains pending.
+Raw probe: `evidence/thermal-telemetry-availability-20261014.txt`.
+
+### Windows ACPI thermal-zone counter discovered during soak (2026-10-14)
+
+The initial probe checked Linux thermal zones and the `MSAcpi_ThermalZoneTemperature`
+WMI class, both absent here. A deeper read-only Windows performance-counter query
+found the `\\_TZ.THM0` zone. Microsoft's Windows thermal documentation defines
+thermal-zone temperature in Kelvin and explains that a 100% passive limit is
+unthrottled and throttle reason0 means no throttling. The first high-precision
+sample was360.2K (87.05C),100%, reason0 at11:17:43Z. This is a system thermal
+zone with unknown component mapping, not confirmed CPU-package temperature. A
+low-frequency monitor runs alongside the soak (PID731748, one sample per minute)
+and stops when the soak ends. Evidence: `evidence/thermal-telemetry-sampler-start-20261014.json`; live samples are in ignored `.qa/thermal-monitor-20261014.csv`. Sustained thermal acceptance remains pending.
+
+Follow-up correlation at11:23:08Z found PnP instance
+`ACPI\THERMALZONE\THM0`, location `ACPI(_SB_)#ACPI(THM0)`, parent
+`ACPI_HAL\PNP0C08\0`. A separately enumerated Lenovo Intelligent Thermal
+Solution device has another PnP parent/location path, so it does not identify
+the component measured by THM0. The sampler series reached95.05C once at
+11:21:43Z and was84.05C at11:23:08Z; both samples reported passive limit100 and
+throttle reasons0. At11:23:08Z total CPU use was5.36%; the RTX3050Ti reported72C
+at39% utilization/8.97W. These are point-in-time readings; no CPU-package
+association, sustained cooling result or thermal acceptance claim is made.
+Details: `evidence/thermal-telemetry-correlation-20261014.json` and `.txt`.

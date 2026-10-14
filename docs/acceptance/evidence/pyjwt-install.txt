@@ -1,0 +1,11 @@
+Collecting PyJWT==2.15.1 (from -r .qa/pyjwt-security-requirement.txt (line 1))
+  Downloading pyjwt-2.15.1-py3-none-any.whl (33 kB)
+Installing collected packages: PyJWT
+  Attempting uninstall: PyJWT
+    Found existing installation: PyJWT 2.12.1
+    Uninstalling PyJWT-2.12.1:
+      Successfully uninstalled PyJWT-2.12.1
+Successfully installed PyJWT-2.15.1
+
+[notice] A new release of pip is available: 25.2 -> 26.2.1
+[notice] To update, run: /home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python -m pip install --upgrade pip

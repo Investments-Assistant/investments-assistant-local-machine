@@ -1,0 +1,23 @@
+{"status": "RUNNING", "cycles": 1, "current_window_seconds": 1.43904124799883, "control_p95_ms": 25.223169999662787, "restarts": 0}
+{"status": "RUNNING", "cycles": 11, "current_window_seconds": 69.46658320400456, "control_p95_ms": 39.40282200346701, "restarts": 0}
+{"status": "RUNNING", "cycles": 21, "current_window_seconds": 369.42999303300167, "control_p95_ms": 33.76599500188604, "restarts": 0}
+{"status": "RUNNING", "cycles": 31, "current_window_seconds": 669.4247565999976, "control_p95_ms": 33.76599500188604, "restarts": 0}
+{"status": "RUNNING", "cycles": 41, "current_window_seconds": 969.4764648499986, "control_p95_ms": 33.76599500188604, "restarts": 1}
+{"status": "RUNNING", "cycles": 51, "current_window_seconds": 1269.4260804600053, "control_p95_ms": 33.76599500188604, "restarts": 1}
+{"status": "RUNNING", "cycles": 61, "current_window_seconds": 1569.4382983120013, "control_p95_ms": 30.971674001193605, "restarts": 1}
+{"status": "RUNNING", "cycles": 71, "current_window_seconds": 1869.4608161460055, "control_p95_ms": 30.971674001193605, "restarts": 2}
+{"status": "RUNNING", "cycles": 81, "current_window_seconds": 2169.4361265140033, "control_p95_ms": 30.853352989652194, "restarts": 2}
+{"status": "RUNNING", "cycles": 91, "current_window_seconds": 2469.4466085909953, "control_p95_ms": 30.853352989652194, "restarts": 2}
+{"status": "RUNNING", "cycles": 101, "current_window_seconds": 2771.6312371230015, "control_p95_ms": 30.673243003548123, "restarts": 3}
+{"status": "RUNNING", "cycles": 111, "current_window_seconds": 3069.476066542993, "control_p95_ms": 31.39837300113868, "restarts": 3}
+{"status": "RUNNING", "cycles": 121, "current_window_seconds": 3369.460370533998, "control_p95_ms": 31.39837300113868, "restarts": 3}
+{"status": "FAILED", "cycles": 128, "current_window_seconds": 3609.656287291, "restarts": 3, "failures": [{"at": "2026-10-13T21:47:02.091365+00:00", "code": "STALE_QUOTE_GATE_FAILED"}]}
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 471, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 350, in main
+    require_gate(
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 61, in require_gate
+    raise RuntimeError(code)
+RuntimeError: STALE_QUOTE_GATE_FAILED

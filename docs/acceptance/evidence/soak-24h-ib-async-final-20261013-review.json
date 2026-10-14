@@ -1,0 +1,97 @@
+{
+  "reviewed_at": "2026-10-14T22:50:28.875828+00:00",
+  "status": "PASS_24H_VERIFIED",
+  "scope": "Real loopback HTTP/PostgreSQL with deterministic application inference plus separate real CPU-model processes",
+  "source_fingerprint": "36ee15eb9f882cf8845e54733b0fa434df6b0f514e0b8e053414a0b1cba45a82",
+  "started_at": "2026-10-13T22:27:39.591369+00:00",
+  "finished_at": "2026-10-14T22:30:11.508731+00:00",
+  "continuous_seconds": 86400.21601625999,
+  "observation_windows": 1,
+  "cycles": 3060,
+  "failures": [],
+  "control": {
+    "samples": 3060,
+    "p95_ms": 28.275207994738594,
+    "maximum_ms": 60.89694099500775,
+    "budget_ms": 250,
+    "largest_intersample_gap_seconds": 30.018711398006417,
+    "terminal_tail_seconds": 21.10445289799827,
+    "gap_budget_seconds": 60.0,
+    "clock_divergence_budget_seconds": 0.25,
+    "during_model_process_samples": 187,
+    "during_model_process_p95_ms": 33.694975019898266
+  },
+  "restarts": {
+    "count": 93,
+    "maximum_seconds": 3.1175231039815117,
+    "budget_seconds": 15
+  },
+  "model": {
+    "runs": 24,
+    "tasks": 72,
+    "correct_tasks": 72,
+    "sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+    "threads": 4,
+    "gpu_layers": 0,
+    "load_seconds_range": [
+      0.8207300330104772,
+      1.9212715229950845
+    ],
+    "peak_process_rss_mib": 1962.09765625,
+    "pooled_task_p95_seconds": 2.3854515700077172
+  },
+  "thermal": {
+    "samples": 672,
+    "first_at": "2026-10-14T11:17:43.171182+00:00",
+    "last_at": "2026-10-14T22:29:34.477058+00:00",
+    "elapsed_wall_seconds": 40311.305876,
+    "zone": "ACPI THM0",
+    "component_mapping": "UNKNOWN",
+    "temperature_celsius_range": [
+      67.05,
+      95.05
+    ],
+    "temperature_celsius_median": 75.05,
+    "temperature_celsius_p95": 87.05,
+    "all_passive_limits_100": true,
+    "all_throttle_reasons_zero": true
+  },
+  "broker_connections": 0,
+  "external_orders": 0,
+  "limitations": [
+    "Raw samples omit wall timestamps; each-cycle and terminal clock-divergence guards passed, but posthoc reconstruction of each wall/monotonic pair is unavailable.",
+    "Broker-zero fields declare fixture scope; fixture blocks IBKR connection and disables live mode.",
+    "No production in-process inference, Docker, physical sleep, external-network/broker recovery, GPU inference or economic-edge claim.",
+    "Thermal series covers only the last approximately11hours and the ACPI sensor is not mapped to a CPU/GPU/chassis component."
+  ],
+  "artifact_sha256": {
+    ".qa/soak-24h-ib-async-final-20261013/checkpoint.json": "f47deb8e1b7fabd2b94de4d142dfcbd61b1986b2dfe531c69e5e98ae3f037246",
+    ".qa/soak-24h-ib-async-final-20261013/latency-samples.jsonl": "0bae19e6174928a45165391c1e5576199cb815461673f4ba88ce1053b3961c15",
+    "docs/acceptance/evidence/soak-24h-ib-async-final-20261013.txt": "956988aaa67b480249b8fbeadc8935dba51f00b13e119ae1f385e0d91eca1794",
+    ".qa/thermal-monitor-20261014.csv": "0f4ea42f4eaa2e3738bcdb25f9e8cacc68b129e832a0cd08d285f9a538b932b2",
+    ".qa/soak-24h-ib-async-final-20261013/model-0000-7a925926.json": "038b6aa95cdc8d106f8d674130375e6d40ded9cb47cc7bc1f0f71d7a59a4a72a",
+    ".qa/soak-24h-ib-async-final-20261013/model-0001-e9c90230.json": "6426886f4aabae2a947aacb09867e20054f2379236ebfe848a0d3d19d7213eb8",
+    ".qa/soak-24h-ib-async-final-20261013/model-0002-1a29b760.json": "ef49ac44eaba79935df5b166a4770486159afd91bc1289f343a0b876d6b4c37d",
+    ".qa/soak-24h-ib-async-final-20261013/model-0003-4137e556.json": "24de55767be4d6b603228d4a707229e1bd50ca00c991bda804aeefe1ca715c02",
+    ".qa/soak-24h-ib-async-final-20261013/model-0004-46c1a1d0.json": "ca569e2ce4f176f4a1abf3f4560fea1230d9dc6e9aa147827f1d63c6fc769796",
+    ".qa/soak-24h-ib-async-final-20261013/model-0005-59235e4a.json": "82c97f748534f8b8ea2692d381857e7fc64c144e99402df3f5e86c84376bb8f5",
+    ".qa/soak-24h-ib-async-final-20261013/model-0006-542f1403.json": "27ceb2a8d268024108c678ce085d2af7c7ac6594cc26d80c649f20b8137dc899",
+    ".qa/soak-24h-ib-async-final-20261013/model-0007-45ec9350.json": "8f594f7f511b6de1ffc6cba9201343c624023541ede0ef24c6248613ba980bb8",
+    ".qa/soak-24h-ib-async-final-20261013/model-0008-481afc68.json": "831ed8a775354a65f4208d4b424474a1237bfabaa0e0bd208bc22dcdba4a3c67",
+    ".qa/soak-24h-ib-async-final-20261013/model-0009-d0f4fb4a.json": "6755426e1e58ec9c232394f36a3a502b4650bb9b76546f050483cb0b2bd92517",
+    ".qa/soak-24h-ib-async-final-20261013/model-0010-cc7cb435.json": "50a4110c6a5b1fd121eb995be3a44354f2397586af008501a0618ecefa40d2c1",
+    ".qa/soak-24h-ib-async-final-20261013/model-0011-31a61354.json": "327e32c7af447ab98d69302636d9c65ace3b82cc4a40bdffefb75de2b3760837",
+    ".qa/soak-24h-ib-async-final-20261013/model-0012-c9167995.json": "7973f441e85effffe4a774260071407e3067179e19fda6d4771d80d3f5866cfb",
+    ".qa/soak-24h-ib-async-final-20261013/model-0013-7d68dce5.json": "f869681d00a059121fa3bc650d8072b75f5ba3a7579992ad4c74d132e7c61702",
+    ".qa/soak-24h-ib-async-final-20261013/model-0014-10f6c2bd.json": "aa33de2ef480080507122c19e0e00a9aec54422cece5c424a1e5769a679278eb",
+    ".qa/soak-24h-ib-async-final-20261013/model-0015-28bc34c8.json": "ae04c4382d300c4669b88d0ad703c43eabcf9af5572991311ac468598cb7e7f0",
+    ".qa/soak-24h-ib-async-final-20261013/model-0016-9da7eb94.json": "2fb732ba5a6e2b6e18e190ca66303cc2f28c5fe9df818f71742643fbbd6f63e3",
+    ".qa/soak-24h-ib-async-final-20261013/model-0017-3ef61eb1.json": "c0c2b143bb5c618423aa568954350329e94b4f8a360a06bb5af1f98cdcfdb4d0",
+    ".qa/soak-24h-ib-async-final-20261013/model-0018-e0b88502.json": "d6133038ad746c9ab7d77e7d4158cc3c12447834a6ba9009f5a6509fbb577a33",
+    ".qa/soak-24h-ib-async-final-20261013/model-0019-3bd0803c.json": "a08c89c840a8f771c5cb9c5749ffacbe86864b111c252d3001315e1f8d9a4485",
+    ".qa/soak-24h-ib-async-final-20261013/model-0020-b77c3cf6.json": "1e49f4b9cfb128edcd660ea3054c56fc45d9430a156f2297e1c4999659e71aef",
+    ".qa/soak-24h-ib-async-final-20261013/model-0021-beda4a52.json": "7f2f93187da8bf9d6d142d8afa29af035d0afa34adf01d2c842b8b646bc3c29b",
+    ".qa/soak-24h-ib-async-final-20261013/model-0022-01d962dd.json": "5f296321579ac254d6abab684bebfb1c26ecd69eda46ea3bcabe1196fd19d1a1",
+    ".qa/soak-24h-ib-async-final-20261013/model-0023-37933ff3.json": "d2299a6ddf50673716085f5cff4554894955e91f75e8f5515feb8d4774322bfb"
+  }
+}

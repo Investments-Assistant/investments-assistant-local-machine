@@ -1,0 +1,14 @@
+{"status": "RUNNING", "cycles": 1, "current_window_seconds": 1.6197540919965832, "control_p95_ms": 17.010615003528073, "restarts": 0}
+{"status": "FAILED", "cycles": 7, "current_window_seconds": 8.843452848988818, "restarts": 0, "failures": [{"at": "2026-10-13T15:12:55.666145+00:00", "code": "CLOCK_DISCONTINUITY"}]}
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 471, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 285, in main
+    last_observation = observe_continuity(last_observation, args.interval)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 73, in observe_continuity
+    require_gate(
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 61, in require_gate
+    raise RuntimeError(code)
+RuntimeError: CLOCK_DISCONTINUITY

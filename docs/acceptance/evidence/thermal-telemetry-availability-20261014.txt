@@ -1,0 +1,36 @@
+Read-only telemetry probe on the WSL2 acceptance host (2026-10-14T11:11:47Z)
+
+- `/sys/class/thermal` exposes no thermal zones in this WSL environment.
+- `sensors` is not installed.
+- Windows `root/wmi:MSAcpi_ThermalZoneTemperature` returned no rows.
+- NVIDIA telemetry is available: GeForce RTX 3050 Ti Laptop GPU, 65 C,
+  8.71 W, 32% utilization, 716 MiB memory at the sample.
+
+This is a point-in-time GPU reading only. The soak uses CPU inference; this does
+not measure CPU temperature, fan/cooling behavior, sustained thermal throttling,
+or Windows host temperature. No OS settings were changed. L13 thermal evidence
+remains incomplete.
+
+Correction after a deeper Windows performance-counter check (2026-10-14):
+Although `MSAcpi_ThermalZoneTemperature` and `Win32_TemperatureProbe` return no
+rows, Windows `Win32_PerfFormattedData_Counters_ThermalZoneInformation` exposes
+one ACPI zone named `\\_TZ.THM0`. Microsoft documents thermal-zone performance
+counter temperature in Kelvin and describes the zone as a sensor-backed thermal
+region; `PercentPassiveLimit=100` means unthrottled, `ThrottleReasons=0` means
+no thermal/electrical throttling. A Get-Counter high-precision sample at
+2026-10-14T11:17:43Z was360.2K (87.05C),100,0. This zone's hardware association
+is unknown, so do not call it CPU package temperature. A low-frequency sampler
+is active as PID731748 and will stop when the 24h soak runner exits. Its data is
+in ignored `.qa/thermal-monitor-20261014.csv`; sustained evidence is pending.
+
+Follow-up correlation at11:23:08Z:
+- Windows PnP reports `ACPI\THERMALZONE\THM0`, location
+  `ACPI(_SB_)#ACPI(THM0)`, parent `ACPI_HAL\PNP0C08\0`.
+- A separate Lenovo Intelligent Thermal Solution PnP device is under the
+  embedded-controller path with parent `ACPI\PNP0C09\0`; no direct mapping to
+  THM0 was established.
+- The one-minute series ranged82.05C-95.05C; at11:23:08Z it read84.05C with
+  passive limit100 and throttle0. Total CPU activity was5.36%; the GPU was72C,
+  39% utilization,8.97W. These point samples cannot establish CPU temperature
+  or sustained cooling behavior. Details:
+  `thermal-telemetry-correlation-20261014.json`.

@@ -1,0 +1,21 @@
+{
+  "status": "FAILED",
+  "current_window_started_at": "2026-10-13T01:07:00.368474+00:00",
+  "finished_at": "2026-10-13T14:10:33.285126+00:00",
+  "current_window_seconds": 1155.5549632990005,
+  "cycles": 51,
+  "restarts": 1,
+  "restart_seconds": [
+    2.4896527849923586
+  ],
+  "control_p95_ms": 46.76984099205583,
+  "failures": [
+    {
+      "at": "2026-10-13T14:10:33.070537+00:00",
+      "code": "CLOCK_DISCONTINUITY"
+    }
+  ],
+  "runner_pid": null,
+  "service_pid": null,
+  "code_sha256": "175c099b113b43cb84a246cd8bed6d6f45ec2fcdd90f19be851d99790ef394e6"
+}

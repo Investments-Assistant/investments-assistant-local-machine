@@ -1,0 +1,3 @@
+Command: TEST_DATABASE_URL=<marked test_acceptance_expenses> TEST_DATABASE_DISPOSABLE_TOKEN=<matching marker> .venv/bin/python scripts/soak_acceptance.py --hours 0.025 --interval 1 --restart-every 10 --output .qa/soak-expiry-regression-20261013
+Result: SMOKE_PASS (exit 0), 90.165 seconds, 88 cycles, 8 restarts, p95 halt latency 23.221 ms, no failures. The stale-quote probe ran after 65 seconds and continued through completion. No broker connections or external orders. Full 24-hour gate remains unverified.
+PostgreSQL integration: TEST_DATABASE_URL=<marked test_acceptance_expenses> .venv/bin/pytest tests/integration/soak_guard_test.py -q — 7 passed in 40.19 seconds. Ruff and compileall passed for scripts/soak_acceptance.py and tests/integration/soak_guard_test.py.

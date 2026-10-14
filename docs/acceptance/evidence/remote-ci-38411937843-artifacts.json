@@ -1,0 +1,49 @@
+{
+  "junit-e2e/junit-e2e.xml": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "1093",
+      "time": "183.013",
+      "timestamp": "2026-10-13T14:21:55.650582+00:00",
+      "hostname": "runnervmmprz5"
+    }
+  ],
+  "junit-unit/junit-unit.xml": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "716",
+      "time": "20.294",
+      "timestamp": "2026-10-13T14:16:54.930070+00:00",
+      "hostname": "runnervmmprz5"
+    }
+  ],
+  "junit-integration/junit-integration.xml": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "373",
+      "time": "162.294",
+      "timestamp": "2026-10-13T14:18:10.168592+00:00",
+      "hostname": "runnervmmprz5"
+    }
+  ],
+  "coverage-combined/coverage-combined.xml": {
+    "version": "7.13.5",
+    "timestamp": "1791901503039",
+    "lines-valid": "11678",
+    "lines-covered": "9654",
+    "line-rate": "0.8267",
+    "branches-covered": "0",
+    "branches-valid": "0",
+    "branch-rate": "0",
+    "complexity": "0"
+  }
+}

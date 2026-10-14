@@ -1,0 +1,10 @@
+Read-only local prerequisite check (2026-10-14 UTC)
+
+- No candidate CSV, Parquet, Feather, XLSX, or JSONL research dataset was found
+  under this checkout by the extension scan (virtualenv/node_modules excluded).
+- No listener was present on local API ports 4001 or 4002.
+- `.env` currently sets `LIVE_TRADING_ENABLED=false`.
+
+This only describes the current checkout/WSL environment. It does not establish
+whether a paper account exists in the IBKR Client Portal or whether data exists
+outside this checkout. No broker connection or data retrieval was attempted.

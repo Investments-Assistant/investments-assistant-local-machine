@@ -1,0 +1,3 @@
+Combined data file .qa/browser-coverage-security-v2/.coverage.browser.BabaYaga.pid61606.XEnTVhAx.H064fZKsswnh
+Combined data file .qa/browser-coverage-security-v2/.coverage.browser.BabaYaga.pid61607.XHVLywbx.HkCXCzUAEnrh
+Wrote XML report to docs/acceptance/evidence/coverage-security-combined.xml

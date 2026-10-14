@@ -1,0 +1,5 @@
+llama_context: n_ctx_seq (4096) < n_ctx_train (32768) -- the full capacity of the model will not be utilized
+{"task": "precision", "latency_seconds": 2.235, "correct": true}
+{"task": "authority", "latency_seconds": 1.414, "correct": true}
+{"task": "missing_data", "latency_seconds": 1.627, "correct": true}
+.qa/clock-ntp-stopped-model-20261013.json

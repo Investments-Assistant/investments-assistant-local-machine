@@ -1,0 +1,1 @@
+{"status": "PASS", "uid": 1000, "versions": {"weasyprint": "70.0", "cryptography": "50.0.2", "PyJWT": "2.15.1", "pydantic-settings": "2.15.0"}, "pdf_bytes": 3632, "gpu_offload": false, "llama_system_info": "CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | BMI2 = 1 | AVX512 = 1 | AVX512_VBMI = 1 | AVX512_VNNI = 1 | LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 | "}

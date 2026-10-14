@@ -1,0 +1,25 @@
+{
+  "commit": "cd049bfdecaeaf77b49f92ff6a4fa9a0d65744ac",
+  "remote_main": "cd049bfdecaeaf77b49f92ff6a4fa9a0d65744ac",
+  "exact_reviewed_files": [
+    ".github/workflows/e2e-tests.yml",
+    ".github/workflows/integration-tests.yml",
+    ".github/workflows/unit-tests.yml",
+    "config/coverage-browser.ini",
+    "docs/acceptance/QUALITY.md",
+    "poetry.lock",
+    "pyproject.toml",
+    "scripts/verify_clock_stability.py",
+    "src/execution/broker_monitor.py",
+    "src/web/routes.py",
+    "tests/unit/cookie_security_test.py",
+    "tests/unit/dependency_security_test.py",
+    "tests/unit/public_fetch_tls_test.py",
+    "tests/unit/route_error_logging_test.py",
+    "tests/unit/web_routes_test.py"
+  ],
+  "review_hashes_verified": true,
+  "push_exit": 0,
+  "ci_run": 38185591707,
+  "dependency_graph_run": 38185594614
+}

@@ -1,0 +1,20 @@
+{
+  "pid": 492940,
+  "session_id": 13790,
+  "command": [
+    ".venv/bin/python",
+    "scripts/soak_acceptance.py",
+    "--hours", "24",
+    "--interval", "30",
+    "--restart-every", "900",
+    "--model", "models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "--output", ".qa/soak-24h-research-guard-20261013"
+  ],
+  "database": "marked disposable test_acceptance_expenses via .qa/socket:55439",
+  "started_at": "2026-10-13T22:09:44.242690+00:00",
+  "code_sha256": "39920839d98145dbf7d8ae871bd14838ce3a615a23d4b5debab3ad2134412eb7",
+  "detached_from_chat": false,
+  "live_trading": false,
+  "broker_connections": 0,
+  "external_orders": 0
+}

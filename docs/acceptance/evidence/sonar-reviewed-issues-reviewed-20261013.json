@@ -1,0 +1,270 @@
+{
+  "total": 4,
+  "p": 1,
+  "ps": 100,
+  "paging": {
+    "pageIndex": 1,
+    "pageSize": 100,
+    "total": 4
+  },
+  "effortTotal": 45,
+  "debtTotal": 45,
+  "issues": [
+    {
+      "key": "AaEoT1R0IbC7RohpPcR3",
+      "rule": "python:S4830",
+      "severity": "CRITICAL",
+      "component": "Investments-Assistant_investments-assistant:src/news/http.py",
+      "project": "Investments-Assistant_investments-assistant",
+      "line": 82,
+      "hash": "7fb29bf54d8fb1ebdb8938d4cff71423",
+      "textRange": {
+        "startLine": 82,
+        "endLine": 82,
+        "startOffset": 70,
+        "endOffset": 92
+      },
+      "flows": [],
+      "resolution": "WONTFIX",
+      "status": "RESOLVED",
+      "message": "Enable server certificate validation on this SSL/TLS connection.",
+      "effort": "5min",
+      "debt": "5min",
+      "tags": [
+        "cryptography",
+        "cwe",
+        "privacy",
+        "ssl"
+      ],
+      "creationDate": "2026-10-11T00:13:20+0000",
+      "updateDate": "2026-10-13T00:52:13+0000",
+      "type": "VULNERABILITY",
+      "organization": "investments-assistant",
+      "cleanCodeAttribute": "TRUSTWORTHY",
+      "cleanCodeAttributeCategory": "RESPONSIBLE",
+      "impacts": [
+        {
+          "softwareQuality": "SECURITY",
+          "severity": "HIGH"
+        }
+      ],
+      "issueStatus": "ACCEPTED",
+      "projectName": "investments-assistant",
+      "internalTags": [],
+      "lastChangeAnalysisUuid": "8ef698ee-1b48-4f83-ab5c-5adeb5fb8c8c",
+      "lastChangeSource": "USER"
+    },
+    {
+      "key": "AaEoT1C0IbC7RohpPcLN",
+      "rule": "pythonbugs:S2583",
+      "severity": "MAJOR",
+      "component": "Investments-Assistant_investments-assistant:src/tools/dispatcher.py",
+      "project": "Investments-Assistant_investments-assistant",
+      "line": 668,
+      "hash": "d210b815db1962ffda385677ea10778c",
+      "textRange": {
+        "startLine": 668,
+        "endLine": 668,
+        "startOffset": 7,
+        "endOffset": 47
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "Investments-Assistant_investments-assistant:src/tools/dispatcher.py",
+              "textRange": {
+                "startLine": 670,
+                "endLine": 670,
+                "startOffset": 7,
+                "endOffset": 25
+              },
+              "msg": "Unreachable code"
+            }
+          ]
+        }
+      ],
+      "resolution": "WONTFIX",
+      "status": "RESOLVED",
+      "message": "Fix this condition that always evaluates to true.",
+      "effort": "15min",
+      "debt": "15min",
+      "tags": [
+        "cwe",
+        "pitfall",
+        "suspicious",
+        "unused"
+      ],
+      "creationDate": "2026-10-11T00:13:20+0000",
+      "updateDate": "2026-10-13T00:52:18+0000",
+      "type": "BUG",
+      "organization": "investments-assistant",
+      "cleanCodeAttribute": "LOGICAL",
+      "cleanCodeAttributeCategory": "INTENTIONAL",
+      "impacts": [
+        {
+          "softwareQuality": "RELIABILITY",
+          "severity": "MEDIUM"
+        }
+      ],
+      "issueStatus": "ACCEPTED",
+      "projectName": "investments-assistant",
+      "internalTags": [],
+      "lastChangeAnalysisUuid": "8ef698ee-1b48-4f83-ab5c-5adeb5fb8c8c",
+      "lastChangeSource": "USER"
+    },
+    {
+      "key": "AaEoT1C0IbC7RohpPcLO",
+      "rule": "pythonbugs:S2583",
+      "severity": "MAJOR",
+      "component": "Investments-Assistant_investments-assistant:src/tools/dispatcher.py",
+      "project": "Investments-Assistant_investments-assistant",
+      "line": 725,
+      "hash": "f1584c8011e053bccc4a5995355209b0",
+      "textRange": {
+        "startLine": 725,
+        "endLine": 725,
+        "startOffset": 7,
+        "endOffset": 62
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "Investments-Assistant_investments-assistant:src/tools/dispatcher.py",
+              "textRange": {
+                "startLine": 727,
+                "endLine": 729,
+                "startOffset": 13,
+                "endOffset": 25
+              },
+              "msg": "Unreachable code"
+            }
+          ]
+        }
+      ],
+      "resolution": "WONTFIX",
+      "status": "RESOLVED",
+      "message": "Fix this condition that always evaluates to true.",
+      "effort": "15min",
+      "debt": "15min",
+      "tags": [
+        "cwe",
+        "pitfall",
+        "suspicious",
+        "unused"
+      ],
+      "creationDate": "2026-10-11T00:13:20+0000",
+      "updateDate": "2026-10-13T00:52:22+0000",
+      "type": "BUG",
+      "organization": "investments-assistant",
+      "cleanCodeAttribute": "LOGICAL",
+      "cleanCodeAttributeCategory": "INTENTIONAL",
+      "impacts": [
+        {
+          "softwareQuality": "RELIABILITY",
+          "severity": "MEDIUM"
+        }
+      ],
+      "issueStatus": "ACCEPTED",
+      "projectName": "investments-assistant",
+      "internalTags": [],
+      "lastChangeAnalysisUuid": "8ef698ee-1b48-4f83-ab5c-5adeb5fb8c8c",
+      "lastChangeSource": "USER"
+    },
+    {
+      "key": "AaEoT1J9IbC7RohpPcNR",
+      "rule": "python:S3330",
+      "severity": "MINOR",
+      "component": "Investments-Assistant_investments-assistant:src/web/routes.py",
+      "project": "Investments-Assistant_investments-assistant",
+      "line": 329,
+      "hash": "f69523819544afb4cf6ab2ce403083f9",
+      "textRange": {
+        "startLine": 329,
+        "endLine": 329,
+        "startOffset": 4,
+        "endOffset": 23
+      },
+      "flows": [],
+      "resolution": "WONTFIX",
+      "status": "RESOLVED",
+      "message": "Make sure creating this cookie without the \"HttpOnly\" flag is safe.",
+      "effort": "10min",
+      "debt": "10min",
+      "tags": [
+        "cwe",
+        "django",
+        "fastapi",
+        "flask",
+        "former-hotspot",
+        "privacy"
+      ],
+      "creationDate": "2026-10-11T00:13:20+0000",
+      "updateDate": "2026-10-13T00:52:25+0000",
+      "type": "VULNERABILITY",
+      "organization": "investments-assistant",
+      "cleanCodeAttribute": "COMPLETE",
+      "cleanCodeAttributeCategory": "INTENTIONAL",
+      "impacts": [
+        {
+          "softwareQuality": "SECURITY",
+          "severity": "LOW"
+        }
+      ],
+      "issueStatus": "ACCEPTED",
+      "projectName": "investments-assistant",
+      "internalTags": [],
+      "lastChangeAnalysisUuid": "8ef698ee-1b48-4f83-ab5c-5adeb5fb8c8c",
+      "lastChangeSource": "USER"
+    }
+  ],
+  "components": [
+    {
+      "organization": "investments-assistant",
+      "key": "Investments-Assistant_investments-assistant:src/web/routes.py",
+      "uuid": "AZ2OYePIk1BJ_1KS54RM",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "routes.py",
+      "longName": "src/web/routes.py",
+      "path": "src/web/routes.py"
+    },
+    {
+      "organization": "investments-assistant",
+      "key": "Investments-Assistant_investments-assistant:src/tools/dispatcher.py",
+      "uuid": "AZ2OYePIk1BJ_1KS54Q9",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "dispatcher.py",
+      "longName": "src/tools/dispatcher.py",
+      "path": "src/tools/dispatcher.py"
+    },
+    {
+      "organization": "investments-assistant",
+      "key": "Investments-Assistant_investments-assistant",
+      "uuid": "AZ14uXZeq7d3JReRiPrQ",
+      "enabled": true,
+      "qualifier": "TRK",
+      "name": "investments-assistant",
+      "longName": "investments-assistant"
+    },
+    {
+      "organization": "investments-assistant",
+      "key": "Investments-Assistant_investments-assistant:src/news/http.py",
+      "uuid": "AaEoTz4oIbC7RohpPcIU",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "http.py",
+      "longName": "src/news/http.py",
+      "path": "src/news/http.py"
+    }
+  ],
+  "organizations": [
+    {
+      "key": "investments-assistant",
+      "name": "Investments Assistant"
+    }
+  ],
+  "facets": []
+}

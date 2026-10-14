@@ -193,6 +193,11 @@ class Settings(BaseSettings):
     # Catalog entries alone never authorize persistent collection.
     news_source_policies: dict[str, dict] = Field(default_factory=dict)
 
+    # Yahoo/yfinance history is a third-party egress path. Keep it unavailable
+    # until the operator has reviewed the applicable data rights and explicitly
+    # enabled its research use. This is not a license assertion by the app.
+    yahoo_historical_data_enabled: bool = False
+
     # ── Scheduler ─────────────────────────────────────────────────────────────
     market_data_refresh_minutes: int = Field(5, ge=1)
     news_ingestion_minutes: int = Field(60, ge=1, le=1440)

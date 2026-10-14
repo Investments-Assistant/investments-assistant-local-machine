@@ -26,6 +26,11 @@ qualified broker contracts. Split-adjusted share units are retained and split
 actions are not reapplied; independent vendor corporate-action, delisting and
 historical availability reconciliation is unverified. No provider request was
 needed for the synthetic acceptance tests. Source limitations travel with results.
+The Yahoo history adapter is disabled by default with
+`YAHOO_HISTORICAL_DATA_ENABLED=false`; enabling it requires the operator to
+review the provider's applicable data-use rights and explicitly authorize that
+egress. The application does not assert that the package license grants rights
+to Yahoo data. Synthetic adapter tests opt in only to mocked transport.
 The engine separately tests raw split/dividend events with explicit fixtures.
 
 Each saved run retains exact bars, source/version metadata, configuration, engine

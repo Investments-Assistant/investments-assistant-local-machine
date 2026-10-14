@@ -19,7 +19,7 @@ import asyncio
 import hashlib
 from pathlib import Path
 import argparse
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from threading import Event
 import subprocess
 
@@ -112,6 +112,49 @@ async def verify_database(url, marker):
             require_gate(
                 await connection.scalar(text("SELECT version_num FROM alembic_version")) == "0018_job_lease_clock",
                 "DISPOSABLE_SCHEMA_REVISION_MISMATCH",
+            )
+    finally:
+        await engine.dispose()
+
+
+async def extend_synthetic_fixture_mandate(url, account_id, hours):
+    """Give the disposable soak fixture a mandate valid for its whole window.
+
+    The browser fixture route intentionally creates short-lived one-hour
+    allocations. A 24-hour soak must keep its synthetic mandate valid so each
+    stale-quote probe reaches the quote-age guard instead of the earlier
+    mandate-expiry guard. Never change real or unmarked accounts here.
+    """
+    if not 0 < hours <= 72:
+        raise ValueError("INVALID_SOAK_FIXTURE_DURATION")
+    engine = create_async_engine(
+        url,
+        poolclass=NullPool,
+        connect_args={"timeout": 5, "command_timeout": 5},
+    )
+    try:
+        async with engine.begin() as connection:
+            result = await connection.execute(
+                text("""
+                    SELECT mandate FROM simulator_accounts
+                    WHERE id = :account_id
+                    FOR UPDATE
+                """),
+                {"account_id": account_id},
+            )
+            mandate = result.scalar_one_or_none()
+            if (
+                not isinstance(mandate, dict)
+                or mandate.get("fixture") is not True
+                or mandate.get("environment") != "simulator"
+            ):
+                raise RuntimeError("SOAK_ACCOUNT_NOT_SYNTHETIC_FIXTURE")
+            mandate["expires_at"] = (
+                datetime.now(UTC) + timedelta(hours=hours + 1)
+            ).isoformat()
+            await connection.execute(
+                text("UPDATE simulator_accounts SET mandate = CAST(:mandate AS json) WHERE id = :account_id"),
+                {"account_id": account_id, "mandate": json.dumps(mandate)},
             )
     finally:
         await engine.dispose()
@@ -281,6 +324,7 @@ def main():
                 stale["account_id"],
                 stale["instrument_id"],
             )
+        asyncio.run(extend_synthetic_fixture_mandate(url, state["stale_account"], args.hours))
         while time.monotonic() < deadline and not STOP.is_set():
             last_observation = observe_continuity(last_observation, args.interval)
             cycle = time.monotonic()

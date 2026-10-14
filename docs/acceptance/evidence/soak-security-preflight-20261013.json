@@ -1,0 +1,26 @@
+{
+  "status": "SMOKE_PASS",
+  "cycles": 51,
+  "restarts": 3,
+  "failures": [],
+  "model_runs": [
+    {
+      "path": "model-0000-22e5ec77.json",
+      "status": "PASS"
+    }
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "tier": "real HTTP/PostgreSQL; synthetic app model; optional separate CPU model",
+  "code_sha256": "82c7a1b4a7d74ff20fd3d92fd953d86b03a5d1a74499a0ec5ddc3086126b1e81",
+  "current_window_seconds": 90.16487365600187,
+  "control_p95_ms": 45.69530099979602,
+  "restart_seconds": [
+    1.9574382499995409,
+    2.0047196859959513,
+    2.3692932179983472
+  ],
+  "runner_pid": null,
+  "service_pid": null,
+  "finished_at": "2026-10-13T01:02:10.980961+00:00"
+}

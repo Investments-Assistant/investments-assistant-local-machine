@@ -51,6 +51,69 @@ async def soak_database(integration_engine, monkeypatch):
             await admin.execute(text(f'DROP DATABASE "{name}"'))
 
 
+async def test_soak_extends_only_synthetic_fixture_mandate(integration_engine):
+    import json
+    import uuid
+    from datetime import UTC, datetime, timedelta
+
+    from scripts.soak_acceptance import extend_synthetic_fixture_mandate
+
+    account_id = str(uuid.uuid4())
+    now = datetime.now(UTC)
+    mandate = {
+        "environment": "simulator",
+        "fixture": True,
+        "expires_at": (now + timedelta(hours=1)).isoformat(),
+    }
+    async with integration_engine.begin() as connection:
+        await connection.execute(
+            text("""
+                INSERT INTO simulator_accounts
+                    (id, user_id, currency, cash, reserved, initial_capital,
+                     max_order, loss_limit, realized_pnl, halted, mandate)
+                VALUES
+                    (:id, :user_id, 'EUR', 1000, 0, 1000, 500, 50, 0, false,
+                     CAST(:mandate AS json))
+            """),
+            {
+                "id": account_id,
+                "user_id": str(uuid.uuid4()),
+                "mandate": json.dumps(mandate),
+            },
+        )
+
+    try:
+        await extend_synthetic_fixture_mandate(
+            os.environ["TEST_DATABASE_URL"], account_id, 24
+        )
+        async with integration_engine.connect() as connection:
+            extended = await connection.scalar(
+                text("SELECT mandate FROM simulator_accounts WHERE id = :id"),
+                {"id": account_id},
+            )
+        assert extended["fixture"] is True
+        assert extended["environment"] == "simulator"
+        assert datetime.fromisoformat(extended["expires_at"]) >= (
+            datetime.now(UTC) + timedelta(hours=24)
+        )
+
+        async with integration_engine.begin() as connection:
+            await connection.execute(
+                text("UPDATE simulator_accounts SET mandate = CAST(:mandate AS json) WHERE id = :id"),
+                {"id": account_id, "mandate": json.dumps({"environment": "simulator"})},
+            )
+        with pytest.raises(RuntimeError, match="SOAK_ACCOUNT_NOT_SYNTHETIC_FIXTURE"):
+            await extend_synthetic_fixture_mandate(
+                os.environ["TEST_DATABASE_URL"], account_id, 24
+            )
+    finally:
+        async with integration_engine.begin() as connection:
+            await connection.execute(
+                text("DELETE FROM simulator_accounts WHERE id = :id"),
+                {"id": account_id},
+            )
+
+
 @pytest.mark.parametrize("optimized", [False, True])
 async def test_soak_rejects_wrong_disposable_marker_even_when_optimized(soak_database, optimized):
     code = """import asyncio, os

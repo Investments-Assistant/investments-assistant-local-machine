@@ -1,0 +1,29 @@
+{
+  "sample_timestamp_utc": "2026-10-14T11:23:08.5889627Z",
+  "windows_acpi_zone": {
+    "name": "\\_TZ.THM0",
+    "pnp_instance_id": "ACPI\\THERMALZONE\\THM0",
+    "location_path": "ACPI(_SB_)#ACPI(THM0)",
+    "parent": "ACPI_HAL\\PNP0C08\\0",
+    "high_precision_temperature_tenths_kelvin": 3572,
+    "temperature_kelvin": 357.2,
+    "temperature_celsius": 84.05,
+    "percent_passive_limit": 100,
+    "throttle_reasons": 0
+  },
+  "host_activity": {
+    "windows_total_processor_time_percent": 5.3630116343715395,
+    "gpu_name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+    "gpu_temperature_celsius": 72,
+    "gpu_utilization_percent": 39,
+    "gpu_power_watts": 8.97
+  },
+  "separate_oem_thermal_device": {
+    "friendly_name": "Lenovo Intelligent Thermal Solution",
+    "pnp_instance_id": "ACPI\\LEN0103\\5&2890D699&0",
+    "location_path": "ACPI(_SB_)#ACPI(PC00)#ACPI(LPCB)#ACPI(EC__)#ACPI(ITSD)",
+    "parent": "ACPI\\PNP0C09\\0"
+  },
+  "interpretation": "PnP confirms the THM0 ACPI zone and a separate Lenovo thermal-management device, but they have different PnP parents/location paths; no evidence maps the zone to CPU package, GPU, or chassis. Prior sampler readings ranged 82.05C to 95.05C, all with passive limit 100 and throttle reason 0. This point-in-time sample does not prove sustained thermal behavior or acceptable component temperature.",
+  "source": "Windows Get-Counter/Get-PnpDeviceProperty and NVIDIA nvidia-smi; read-only host diagnostics"
+}

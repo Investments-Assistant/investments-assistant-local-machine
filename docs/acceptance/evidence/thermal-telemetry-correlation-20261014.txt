@@ -1,0 +1,15 @@
+Read-only host thermal correlation probe (2026-10-14T11:23:08Z)
+
+- Windows Get-Counter for `\_TZ.THM0`: 357.2K / 84.05C, passive limit100,
+  throttle reasons0; Windows total processor time was5.36%.
+- Same-window NVIDIA `nvidia-smi`: GeForce RTX3050Ti Laptop GPU72C,39% use,
+  8.97W. This is a discrete-GPU temperature sample, not CPU temperature.
+- PnP identifies the zone as `ACPI\THERMALZONE\THM0`, location
+  `ACPI(_SB_)#ACPI(THM0)`, parent `ACPI_HAL\PNP0C08\0`. A separate
+  `Lenovo Intelligent Thermal Solution` device exists under a different
+  location path and parent (`ACPI\PNP0C09\0`); the relationship to THM0 is not
+  established.
+- The low-frequency series included one95.05C sample at11:21:43Z, followed by
+  84.05C at11:23:08Z. Both samples report passive limit100/throttle0. The zone's
+  physical component remains unknown; no CPU-package or sustained thermal claim
+  is supported. No OS settings were changed.

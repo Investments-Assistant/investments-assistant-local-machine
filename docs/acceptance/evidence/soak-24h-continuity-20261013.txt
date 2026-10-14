@@ -1,0 +1,19 @@
+{"status": "RUNNING", "cycles": 1, "current_window_seconds": 2.454961383002228, "control_p95_ms": 38.25134699582122, "restarts": 0}
+{"status": "RUNNING", "cycles": 11, "current_window_seconds": 12.423312539991457, "control_p95_ms": 50.224849008372985, "restarts": 0}
+{"status": "RUNNING", "cycles": 21, "current_window_seconds": 225.41447624999273, "control_p95_ms": 47.528559996862896, "restarts": 0}
+{"status": "RUNNING", "cycles": 31, "current_window_seconds": 525.4498121549987, "control_p95_ms": 47.528559996862896, "restarts": 0}
+{"status": "RUNNING", "cycles": 41, "current_window_seconds": 825.4355487409921, "control_p95_ms": 45.6778670049971, "restarts": 0}
+{"status": "RUNNING", "cycles": 51, "current_window_seconds": 1125.5007271270006, "control_p95_ms": 46.76984099205583, "restarts": 1}
+{"status": "FAILED", "cycles": 51, "current_window_seconds": 1155.5549632990005, "restarts": 1, "failures": [{"at": "2026-10-13T14:10:33.070537+00:00", "code": "CLOCK_DISCONTINUITY"}]}
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 471, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 285, in main
+    last_observation = observe_continuity(last_observation, args.interval)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 73, in observe_continuity
+    require_gate(
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 61, in require_gate
+    raise RuntimeError(code)
+RuntimeError: CLOCK_DISCONTINUITY

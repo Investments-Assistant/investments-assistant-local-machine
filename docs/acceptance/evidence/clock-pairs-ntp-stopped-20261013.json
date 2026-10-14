@@ -1,0 +1,22 @@
+{
+  "observed_seconds": 90.00407291800366,
+  "samples": 8865,
+  "max_abs_divergence": 0.12187300306686666,
+  "max_clock_read_seconds": 8.617799903731793e-05,
+  "events": [
+    {
+      "elapsed": 36.681925229000626,
+      "wall_delta": 0.11273503303527832,
+      "monotonic_delta": 0.010164094011997804,
+      "divergence": 0.10257093902328052,
+      "read_uncertainty": 2.0229999790899456e-06
+    },
+    {
+      "elapsed": 66.6855588555045,
+      "wall_delta": 0.13204216957092285,
+      "monotonic_delta": 0.010169166504056193,
+      "divergence": 0.12187300306686666,
+      "read_uncertainty": 1.637497916817665e-06
+    }
+  ]
+}

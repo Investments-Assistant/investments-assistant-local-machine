@@ -1,0 +1,9 @@
+{
+  "initial_service": "active",
+  "authorized_seconds": 90,
+  "during_service": "inactive",
+  "probe_exit": 0,
+  "model_exit_at_restore": 0,
+  "restored_service": "active",
+  "stop_restore_elapsed_seconds": 90.26573632299551
+}

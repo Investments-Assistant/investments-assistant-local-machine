@@ -33,6 +33,55 @@ def ticker(data, currency="EUR", exchange="GER"):
     )
 
 
+@pytest.fixture(autouse=True)
+def allow_synthetic_yahoo_transport(monkeypatch):
+    """Synthetic transport tests opt in explicitly; they never make requests."""
+    monkeypatch.setattr(
+        "src.research.history.get_settings",
+        lambda: SimpleNamespace(yahoo_historical_data_enabled=True),
+    )
+
+
+def test_yahoo_provider_is_disabled_by_default_before_network(monkeypatch):
+    from src.config import Settings
+    from src.tools.simulator import _simulate
+
+    monkeypatch.setattr(
+        "src.research.history.get_settings", lambda: Settings(_env_file=None)
+    )
+    provider = Mock(side_effect=AssertionError("provider must not be contacted"))
+    monkeypatch.setattr("src.research.history.yf.Ticker", provider)
+    with pytest.raises(ValueError, match="YAHOO_RESEARCH_SOURCE_DISABLED"):
+        load_history(["SPYL.DE"], "2024-03-28", "2024-04-03", "EUR")
+    provider.assert_not_called()
+    result = _simulate(
+        "blocked fixture",
+        ["SPYL.DE"],
+        {"type": "buy_and_hold", "params": {}},
+        period_start="2024-03-28",
+        period_end="2024-04-03",
+        base_currency="EUR",
+    )
+    assert "YAHOO_RESEARCH_SOURCE_DISABLED" in result["error"]
+    provider.assert_not_called()
+
+
+def test_operator_environment_opt_in_is_read(monkeypatch):
+    from src.config import Settings
+
+    data = frame(["2024-04-02", "2024-04-03"])
+    provider = Mock(return_value=ticker(data))
+    monkeypatch.setenv("YAHOO_HISTORICAL_DATA_ENABLED", "true")
+    monkeypatch.setattr(
+        "src.research.history.get_settings",
+        lambda: Settings(_env_file=None),
+    )
+    monkeypatch.setattr("src.research.history.yf.Ticker", provider)
+    series, _ = load_history(["SPYL.DE"], "2024-04-02", "2024-04-04", "EUR")
+    assert len(series["SPYL.DE"]) == 2
+    provider.assert_called_once_with("SPYL.DE")
+
+
 def test_xetra_calendar_observes_dst_and_preserves_eur():
     data = frame(["2024-03-28", "2024-04-02"])
     with patch("src.research.history.yf.Ticker", return_value=ticker(data)):

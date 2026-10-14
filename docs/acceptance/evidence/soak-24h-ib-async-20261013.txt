@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/soak_acceptance.py", line 26, in <module>
+    import httpx
+ModuleNotFoundError: No module named 'httpx'

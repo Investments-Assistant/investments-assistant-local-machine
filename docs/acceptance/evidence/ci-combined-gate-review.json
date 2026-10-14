@@ -1,0 +1,16 @@
+{
+  "checks": [
+    "YAML",
+    "shell syntax",
+    "single mandatory combined scan/gate",
+    "all test tiers required",
+    "missing token fails",
+    "browser coverage artifact required and merged before scan"
+  ],
+  "sha256": {
+    "e2e-tests.yml": "11fb16ec970f08b1176290e6ae6b6750a37ed3509ac819994cf42f0f823d7a89",
+    "unit-tests.yml": "24c24e6b808d70311f95f6199d22486d820a68439845c039de5d68b01284b7e6",
+    "integration-tests.yml": "4efcc82945516fd487e563ad2b75977ac5a6031f0c486bca68016c0e06c65f83"
+  },
+  "remote_verified": false
+}

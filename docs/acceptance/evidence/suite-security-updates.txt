@@ -1,0 +1,388 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 1086 items
+
+tests/integration/account_events_test.py .......                         [  0%]
+tests/integration/alert_evidence_test.py ....                            [  1%]
+tests/integration/bank_sync_test.py ............                         [  2%]
+tests/integration/broker_capture_control_test.py .............           [  3%]
+tests/integration/broker_observations_test.py ....................       [  5%]
+tests/integration/broker_stream_journal_test.py ...............          [  6%]
+tests/integration/broker_stream_test.py ...........                      [  7%]
+tests/integration/chat_evidence_test.py ......                           [  8%]
+tests/integration/chat_retention_test.py ........                        [  8%]
+tests/integration/commissions_test.py .....                              [  9%]
+tests/integration/db_models_test.py ..........                           [ 10%]
+tests/integration/dividend_events_test.py .........                      [ 11%]
+tests/integration/dividend_receipts_test.py ...........                  [ 12%]
+tests/integration/execution_owner_lifetime_test.py .                     [ 12%]
+tests/integration/execution_reporting_test.py ......                     [ 12%]
+tests/integration/execution_test.py .......                              [ 13%]
+tests/integration/expense_export_test.py ...                             [ 13%]
+tests/integration/expense_history_retention_test.py .....                [ 14%]
+tests/integration/expense_persistence_test.py ...                        [ 14%]
+tests/integration/expense_reconciliation_test.py ...........             [ 15%]
+tests/integration/expense_retention_test.py ...                          [ 15%]
+tests/integration/global_exposure_test.py ..........                     [ 16%]
+tests/integration/heartbeat_test.py .....                                [ 17%]
+tests/integration/mandates_test.py .........                             [ 17%]
+tests/integration/manual_risk_test.py ........                           [ 18%]
+tests/integration/migrations_test.py ..                                  [ 18%]
+tests/integration/monitoring_dispatch_test.py .......F                   [ 19%]
+tests/integration/news_cleanup_test.py ........                          [ 20%]
+tests/integration/news_pipeline_test.py ..........                       [ 21%]
+tests/integration/news_policy_expiry_test.py ......                      [ 21%]
+tests/integration/news_privacy_test.py ..                                [ 21%]
+tests/integration/news_runtime_test.py ........                          [ 22%]
+tests/integration/news_syndication_visibility_test.py ..                 [ 22%]
+tests/integration/operations_test.py ........                            [ 23%]
+tests/integration/reconciliation_test.py ...............                 [ 24%]
+tests/integration/report_coverage_test.py ...                            [ 25%]
+tests/integration/report_failure_test.py ............                    [ 26%]
+tests/integration/report_orphans_test.py ...........                     [ 27%]
+tests/integration/report_retention_test.py ........                      [ 28%]
+tests/integration/risk_monitor_test.py ......                            [ 28%]
+tests/integration/sessions_test.py ....                                  [ 29%]
+tests/integration/simulator_dispatch_test.py ..........                  [ 29%]
+tests/integration/simulator_sales_test.py .............                  [ 31%]
+tests/integration/soak_guard_test.py .....                               [ 31%]
+tests/integration/split_events_test.py ....                              [ 31%]
+tests/integration/strategy_sales_test.py .............                   [ 33%]
+tests/integration/valuation_snapshots_test.py ............               [ 34%]
+tests/smoke_test.py ....                                                 [ 34%]
+tests/unit/acceptance_authority_test.py .........                        [ 35%]
+tests/unit/acceptance_broker_test.py ...............................     [ 38%]
+tests/unit/acceptance_financial_test.py ........                         [ 39%]
+tests/unit/acceptance_network_test.py ....                               [ 39%]
+tests/unit/acceptance_reports_test.py .....................              [ 41%]
+tests/unit/acceptance_workflows_test.py .....                            [ 41%]
+tests/unit/accounting_actions_test.py ...................                [ 43%]
+tests/unit/agent_workflow_test.py .............                          [ 44%]
+tests/unit/auth_test.py .....                                            [ 45%]
+tests/unit/backup_retention_test.py ...........                          [ 46%]
+tests/unit/bank_provider_test.py ............                            [ 47%]
+tests/unit/broker_accounts_test.py .....                                 [ 47%]
+tests/unit/broker_attribution_test.py ..........                         [ 48%]
+tests/unit/broker_order_review_test.py ........                          [ 49%]
+tests/unit/broker_review_test.py ...                                     [ 49%]
+tests/unit/chat_evidence_bounds_test.py ...                              [ 50%]
+tests/unit/config_test.py ................                               [ 51%]
+tests/unit/cookie_security_test.py .                                     [ 51%]
+tests/unit/dependency_security_test.py ....                              [ 51%]
+tests/unit/dispatcher_test.py ..........................                 [ 54%]
+tests/unit/dividend_receivables_test.py ...............                  [ 55%]
+tests/unit/dividend_timing_test.py .............                         [ 56%]
+tests/unit/download_model_test.py ......                                 [ 57%]
+tests/unit/email_reader_test.py ........................                 [ 59%]
+tests/unit/execution_accounting_test.py .............                    [ 60%]
+tests/unit/execution_inventory_test.py ............                      [ 61%]
+tests/unit/expenses_test.py ....                                         [ 62%]
+tests/unit/financial_answers_test.py .....                               [ 62%]
+tests/unit/heartbeat_cycle_test.py ..                                    [ 62%]
+tests/unit/history_adapter_test.py .....                                 [ 63%]
+tests/unit/ibkr_balances_test.py ......                                  [ 63%]
+tests/unit/ibkr_observations_test.py ...........                         [ 65%]
+tests/unit/ibkr_read_routing_test.py ........                            [ 65%]
+tests/unit/ibkr_session_test.py ........                                 [ 66%]
+tests/unit/inference_lifetime_test.py .......                            [ 67%]
+tests/unit/ledger_schema_order_test.py .                                 [ 67%]
+tests/unit/market_data_test.py ............................              [ 69%]
+tests/unit/multi_user_test.py ...                                        [ 70%]
+tests/unit/native_evidence_test.py .                                     [ 70%]
+tests/unit/native_read_recovery_test.py .....                            [ 70%]
+tests/unit/news_analysis_test.py .......                                 [ 71%]
+tests/unit/news_ephemeral_policy_test.py .........                       [ 72%]
+tests/unit/news_ingestion_test.py ........                               [ 72%]
+tests/unit/news_memory_test.py .......                                   [ 73%]
+tests/unit/news_policy_test.py .........                                 [ 74%]
+tests/unit/news_quality_test.py ....                                     [ 74%]
+tests/unit/news_search_test.py .......                                   [ 75%]
+tests/unit/news_sources_test.py ..................................       [ 78%]
+tests/unit/news_syndication_test.py ....                                 [ 78%]
+tests/unit/nft_test.py ..                                                [ 79%]
+tests/unit/portfolio_precision_test.py ...                               [ 79%]
+tests/unit/portfolio_replay_test.py .........                            [ 80%]
+tests/unit/portfolio_review_test.py .......                              [ 80%]
+tests/unit/portfolio_test.py ..............                              [ 82%]
+tests/unit/public_fetch_test.py .................                        [ 83%]
+tests/unit/public_fetch_tls_test.py ...                                  [ 83%]
+tests/unit/read_exclusion_answer_test.py .....                           [ 84%]
+tests/unit/read_followup_test.py ...........                             [ 85%]
+tests/unit/read_scope_test.py .......                                    [ 86%]
+tests/unit/recovery_bundle_publication_test.py ..........                [ 86%]
+tests/unit/recovery_bundle_retention_test.py ......                      [ 87%]
+tests/unit/report_analysis_test.py .........                             [ 88%]
+tests/unit/report_cleanup_test.py ......                                 [ 88%]
+tests/unit/report_inventory_test.py .....                                [ 89%]
+tests/unit/report_repair_test.py .....                                   [ 89%]
+tests/unit/report_source_timeout_test.py .                               [ 89%]
+tests/unit/research_cost_limits_test.py .......                          [ 90%]
+tests/unit/research_replay_test.py ......                                [ 91%]
+tests/unit/route_error_logging_test.py ......                            [ 91%]
+tests/unit/scanner_analysis_test.py ............                         [ 92%]
+tests/unit/scheduler_identity_test.py ..                                 [ 92%]
+tests/unit/simulation_clarification_test.py ..............               [ 94%]
+tests/unit/simulator_test.py ..................                          [ 95%]
+tests/unit/soak_startup_test.py ..                                       [ 96%]
+tests/unit/soak_transport_test.py .........                              [ 96%]
+tests/unit/startup_imports_test.py .                                     [ 96%]
+tests/unit/storage_budget_test.py ...                                    [ 97%]
+tests/unit/structured_report_client_test.py ....                         [ 97%]
+tests/unit/web_routes_test.py ........................                   [ 99%]
+tests/unit/workloads_test.py ..                                          [100%]
+
+=================================== FAILURES ===================================
+_ test_failed_or_interrupted_read_job_recovers_once_with_fresh_work[cancellation] _
+
+db_session = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7313c2927d70>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7313c29f5670>
+failure = 'cancellation'
+
+    @pytest.mark.parametrize("failure", ["network", "cancellation"])
+    async def test_failed_or_interrupted_read_job_recovers_once_with_fresh_work(db_session, monkeypatch, failure):
+        owner = "000-recover-" + uuid.uuid4().hex[:16]
+        db_session.add(User(id=owner, username=owner, password_hash="fixture", is_active=True,
+                           preferences={"monitoring_enabled": True}))
+        await db_session.flush()
+        monkeypatch.setattr(runner, "async_session", SharedSession(db_session))
+        name = "recovery-" + uuid.uuid4().hex
+        observed = []
+    
+        async def failed(user_id):
+            observed.append("failed")
+            if failure == "cancellation":
+                raise asyncio.CancelledError
+            raise ConnectionError("synthetic offline dependency")
+    
+        if failure == "cancellation":
+            with pytest.raises(asyncio.CancelledError):
+                await runner.run_scoped(owner, name, failed)
+        else:
+            assert await runner.run_scoped(owner, name, failed) == {"status": "failed"}
+        lease = await db_session.scalar(select(JobLease).where(JobLease.user_id == owner))
+        assert lease.last_success is None and lease.checkpoint == {}
+        alerts = list(await db_session.scalars(select(OperationalAlert).where(OperationalAlert.user_id == owner)))
+        assert len(alerts) == (1 if failure == "network" else 0)
+        assert owner not in await runner.monitoring_users(name)
+        # A two-day missed interval is represented in this disposable row, not the host clock.
+        lease.lease_until = lease.next_due = datetime.now(UTC) - timedelta(days=2)
+        await db_session.flush()
+        assert owner in await runner.monitoring_users(name)
+    
+        async def fresh(user_id):
+            assert user_id == owner
+            observed.append("fresh")
+    
+>       assert await runner.run_scoped(owner, name, fresh) == {"status": "complete"}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/monitoring_dispatch_test.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/operations/runner.py:66: in run_scoped
+    await complete(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+session = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7313c2927d70>
+
+    async def complete(
+        session,
+        *,
+        lease_id: str,
+        token: str,
+        checkpoint: dict,
+        interval_seconds: int,
+        failure_code: str | None = None,
+    ):
+        if not 1 <= interval_seconds <= 86400:
+            raise ValueError("Invalid job interval")
+        now = await session.scalar(select(func.clock_timestamp()))
+        values = dict(
+            token=str(uuid.uuid4()),  # Completed authority must never survive a clock regression.
+            lease_until=now,
+            next_due=now + timedelta(seconds=interval_seconds),
+            failure_code=failure_code,
+        )
+        if failure_code is None:
+            values.update(last_success=now, checkpoint=checkpoint)
+        result = await session.execute(
+            update(JobLease)
+            .where(JobLease.id == lease_id, JobLease.token == token,
+                   JobLease.leased_at.is_not(None), JobLease.leased_at <= now, JobLease.lease_until > now)
+            .values(**values)
+        )
+        if result.rowcount != 1:
+>           raise PolicyDenied("STALE_JOB_LEASE")
+E           src.execution.policy.PolicyDenied: STALE_JOB_LEASE
+
+src/operations/jobs.py:69: PolicyDenied
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/integration/execution_reporting_test.py::test_real_collector_persists_linked_execution_evidence_and_pdf
+  /home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/weasyprint/text/ffi.py:528: DeprecationWarning: HarfBuzz-Subset will be required by future versions of WeasyPrint. Please install this library with your package manager.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /home/lulu/investments-assistant/investments-assistant-local-machine/docs/acceptance/evidence/junit-security-updates.xml -
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.3-final-0 ________________
+
+Name                                      Stmts   Miss   Cover   Missing
+------------------------------------------------------------------------
+src/__init__.py                               1      0 100.00%
+src/agent/__init__.py                         0      0 100.00%
+src/agent/clients/__init__.py                 6      2  66.67%   15-17
+src/agent/clients/base.py                     7      0 100.00%
+src/agent/clients/llama_cpp_client.py       582     99  82.99%   131, 135-137, 158, 192-193, 207, 215-216, 220, 239, 246, 271-272, 274, 287, 289-290, 313, 325, 330, 346, 348, 439-474, 498-499, 510, 526, 528-529, 533-534, 538-539, 560-563, 593, 616, 622-623, 632-634, 699-701, 776, 789-821, 893-896, 914, 944-949, 953, 985, 1023-1024, 1041, 1052-1058, 1096-1097
+src/agent/clients/news_analysis.py           86     12  86.05%   41, 53-55, 60-61, 64, 66-67, 76, 105, 108
+src/agent/clients/read_scope.py              52      1  98.08%   82
+src/agent/orchestrator.py                   143     17  88.11%   31-34, 69, 126, 142, 203-204, 212, 247, 263, 269-272, 291
+src/agent/prompts.py                          2      0 100.00%
+src/agent/utils/logger.py                    10      0 100.00%
+src/app.py                                   32     32   0.00%   3-68
+src/chat/__init__.py                          0      0 100.00%
+src/chat/evidence.py                         67     12  82.09%   17, 27, 39-40, 48-52, 61-64, 116
+src/chat/persistence.py                      43      4  90.70%   21, 40, 61, 85
+src/chat/retention.py                        47      0 100.00%
+src/config.py                               136      0 100.00%
+src/db/__init__.py                            7      4  42.86%   21-25
+src/db/database.py                           56     41  26.79%   36-44, 49-52, 57-82, 87-90, 95-139
+src/db/models.py                            196      0 100.00%
+src/execution/__init__.py                     0      0 100.00%
+src/execution/account_events.py             144     17  88.19%   55, 61-63, 92, 94, 99-100, 134, 145, 210, 212, 230, 276, 283, 329, 331
+src/execution/accounting.py                 198      5  97.47%   146, 154, 169, 177, 194
+src/execution/autonomy.py                   154     20  87.01%   41, 59, 61, 91-92, 99, 107, 140, 143, 145, 165, 175-176, 182-183, 218, 220, 245, 309, 311
+src/execution/broker_attribution.py         106      9  91.51%   43-44, 53, 105, 124-125, 129-131
+src/execution/broker_balances.py             98      7  92.86%   41, 51, 87, 110-111, 125, 136
+src/execution/broker_capture_control.py      55      1  98.18%   27
+src/execution/broker_monitor.py              57      0 100.00%
+src/execution/broker_observations.py        144     11  92.36%   35, 42, 121, 141, 149, 155, 157, 162, 209, 219-220
+src/execution/broker_order_review.py         82      6  92.68%   12, 17, 42-43, 53-54
+src/execution/broker_refresh_state.py        35      0 100.00%
+src/execution/broker_review.py               34      1  97.06%   44
+src/execution/broker_stream.py               63      2  96.83%   41, 71
+src/execution/broker_stream_journal.py       53      0 100.00%
+src/execution/commissions.py                 92     14  84.78%   31, 33-34, 67, 69, 71, 76, 86, 137-138, 158-160, 167
+src/execution/decisions.py                    8      0 100.00%
+src/execution/dividend_receipts.py           96     12  87.50%   25, 41, 43, 56, 63, 69, 101-102, 104, 115, 136-137
+src/execution/exposure.py                    27      0 100.00%
+src/execution/external.py                     8      0 100.00%
+src/execution/inventory.py                   38      3  92.11%   17, 29, 32
+src/execution/mandates.py                    96      9  90.62%   50, 52, 54, 56, 76, 78, 80, 96, 105
+src/execution/models.py                     126      0 100.00%
+src/execution/monitor.py                     76      7  90.79%   28-30, 77, 88, 127, 133
+src/execution/numeric.py                     15      0 100.00%
+src/execution/policy.py                      73     15  79.45%   21-22, 60, 62, 64, 68, 70, 81, 85, 89, 92, 97-98, 104, 108
+src/execution/reconciliation.py             218     32  85.32%   33, 39, 46, 48, 57, 69, 82, 84, 152-158, 189, 217, 228-229, 239, 241, 245, 249-251, 267, 269, 282, 284, 294, 299, 306, 310, 319, 324, 377-378
+src/execution/reporting.py                   49      1  97.96%   27
+src/execution/risk.py                       100     20  80.00%   27, 42-44, 79, 84, 95, 97, 104-105, 113, 123, 129, 131, 134-138, 175
+src/execution/runtime.py                     86      3  96.51%   38-39, 113
+src/execution/service.py                    197     15  92.39%   52, 74, 91, 99, 236, 240, 250, 256, 270, 287, 364, 375, 380-382
+src/execution/valuation.py                  117     12  89.74%   58, 60, 78, 81, 108, 154-155, 157, 196, 225, 237, 259
+src/execution/valuation_attribution.py       68      4  94.12%   18, 45, 85, 87
+src/expenses/__init__.py                      0      0 100.00%
+src/expenses/categories.py                   33      4  87.88%   249-254
+src/expenses/history_retention.py            40      0 100.00%
+src/expenses/models.py                       19      0 100.00%
+src/expenses/persistence.py                  24      0 100.00%
+src/expenses/provider_sync.py               125     11  91.20%   35, 37-38, 70, 73, 108, 113, 116, 153, 156, 162
+src/expenses/providers.py                   121     16  86.78%   84, 87, 89, 112, 120, 122, 125, 135, 154, 163, 168, 174, 183, 188, 191, 201
+src/expenses/reconciliation.py               60      3  95.00%   23, 48-49
+src/expenses/retention.py                    39      0 100.00%
+src/expenses/runtime.py                      36     19  47.22%   24-28, 32-61
+src/expenses/status.py                        8      0 100.00%
+src/expenses/summary.py                      13      3  76.92%   11, 15-16
+src/expenses/sync.py                         76     10  86.84%   17, 19, 27-28, 37, 44-45, 52, 105, 147
+src/finance/__init__.py                       0      0 100.00%
+src/finance/answers.py                       51      3  94.12%   29, 97-98
+src/finance/normalization.py                 45      1  97.78%   39
+src/finance/portfolio_review.py              67      0 100.00%
+src/finance/simulation_answer.py             24      4  83.33%   11, 18, 24, 27
+src/inference/__init__.py                     0      0 100.00%
+src/inference/budget.py                      47      1  97.87%   48
+src/news/__init__.py                          0      0 100.00%
+src/news/cleanup.py                          44      1  97.73%   25
+src/news/email_reader.py                    148     12  91.89%   181, 184-185, 188-189, 196, 202-203, 224, 230, 253-254
+src/news/http.py                            133     27  79.70%   39-41, 53, 58-59, 76, 92-93, 105, 108-110, 115, 119-121, 135, 138, 143, 150, 154, 162, 167, 172, 176, 178, 181
+src/news/ingestion.py                        54      0 100.00%
+src/news/policy.py                           93      3  96.77%   28, 51, 88
+src/news/quality.py                           9      0 100.00%
+src/news/retention.py                        21      0 100.00%
+src/news/runtime.py                         105     11  89.52%   49, 82, 90, 100, 131, 136, 183, 209, 218-221
+src/news/search.py                           39      3  92.31%   75-76, 146
+src/news/sources.py                         143     28  80.42%   225, 228, 358-393
+src/news/syndication.py                      22      0 100.00%
+src/news/visibility.py                        9      0 100.00%
+src/operations/__init__.py                    0      0 100.00%
+src/operations/alerts.py                     55      5  90.91%   31, 35, 90, 111, 118
+src/operations/backup_retention.py          108     10  90.74%   50, 54, 59, 70, 73, 95, 102, 105, 114, 176
+src/operations/heartbeat.py                  51      1  98.04%   39
+src/operations/jobs.py                       28      3  89.29%   16, 20, 52
+src/operations/models.py                     52      0 100.00%
+src/operations/recovery_bundle.py           133     11  91.73%   35, 44, 54, 58, 96, 101, 116, 124, 126, 147, 154
+src/operations/report_cleanup.py             54      2  96.30%   41, 76
+src/operations/report_inventory.py           55      1  98.18%   25
+src/operations/report_orphans.py             62      2  96.77%   28, 77
+src/operations/report_retention.py           84      5  94.05%   92, 120, 122, 128, 137
+src/operations/runner.py                     43      1  97.67%   21
+src/operations/storage.py                    47      4  91.49%   37, 44-45, 57
+src/operations/workloads.py                  34      3  91.18%   38-40
+src/research/__init__.py                      0      0 100.00%
+src/research/dividends.py                    68      3  95.59%   15, 21, 25
+src/research/history.py                      56      5  91.07%   32, 34, 36, 69, 89
+src/research/portfolio.py                   169     15  91.12%   28, 33, 47, 55, 64, 74, 90, 92, 96, 132-139, 158-165, 179, 239
+src/research/replay.py                      172     25  85.47%   84, 95, 97, 102, 109, 113, 120, 122, 128, 135, 137, 157, 165, 173, 215, 224-230, 246, 276, 278
+src/scheduler/__init__.py                     0      0 100.00%
+src/scheduler/jobs.py                        83     30  63.86%   28, 34-51, 56-70, 75-77, 82-84, 90, 230-232
+src/scheduler/report_analysis.py             92      6  93.48%   57, 102-103, 106-107, 114
+src/scheduler/reporter.py                   352     31  91.19%   50, 52, 61, 120-121, 141, 165, 167, 172-173, 192-193, 317-318, 331-332, 438, 449, 463-464, 481, 502, 520, 530, 538, 546, 548, 627-629, 723
+src/security/__init__.py                      0      0 100.00%
+src/security/sessions.py                     49      5  89.80%   35-39, 116
+src/tools/__init__.py                         3      0 100.00%
+src/tools/broker_accounts.py                110     41  62.73%   82, 87-88, 96, 103-104, 112-113, 115, 122, 125, 132, 135-146, 149-156, 165-176
+src/tools/brokers/__init__.py                 0      0 100.00%
+src/tools/brokers/alpaca.py                  87     58  33.33%   31-34, 44-60, 66-84, 92-117, 130-185, 192-199
+src/tools/brokers/binance.py                 81     51  37.04%   30-38, 44-66, 74, 82-108, 123-170, 179-186
+src/tools/brokers/coinbase.py                90     60  33.33%   30-33, 39-58, 66, 72-91, 107-151, 158-169
+src/tools/brokers/ibkr.py                   133     13  90.23%   29, 31, 47, 49, 70, 227, 233, 236, 241, 262-263, 280, 285
+src/tools/brokers/ibkr_balances.py           25      2  92.00%   18, 37
+src/tools/brokers/ibkr_observations.py      115     13  88.70%   18, 78-79, 82-99, 115, 161, 167, 196, 209
+src/tools/brokers/ibkr_session.py           151     15  90.07%   34, 61, 77, 92, 96-97, 99, 105, 111, 136, 164-165, 167, 170-171
+src/tools/definitions.py                      4      0 100.00%
+src/tools/dispatcher.py                     398    168  57.79%   87-88, 91, 126-143, 156-165, 180, 182, 185, 206, 213, 219-223, 230, 238-240, 284-316, 330-331, 333, 336, 338, 340, 342, 344, 352-353, 359, 361, 370, 372, 376, 380, 387, 393, 400, 404-409, 429-433, 459, 463-465, 472, 491-516, 521-537, 545-590, 596, 604, 641, 675, 692, 710, 718, 742, 748, 757-768, 780-782, 793-822
+src/tools/forex.py                           75     61  18.67%   54-57, 62-63, 68-70, 74-78, 96-116, 121-146, 151-180
+src/tools/market_data.py                    153     41  73.20%   76, 81-117, 284-286, 294-313, 321-347
+src/tools/news.py                           111     13  88.29%   93-96, 109, 120, 125-129, 138, 166, 229-230
+src/tools/news_memory.py                     18      0 100.00%
+src/tools/nft.py                             47      9  80.85%   19-20, 39, 51, 63, 66, 69-72
+src/tools/portfolio.py                       98     19  80.61%   22-33, 155, 164-170
+src/tools/simulator.py                      159     67  57.86%   28-30, 43, 120-141, 160-201, 210-251, 271, 364-365, 369-376
+src/web/__init__.py                           0      0 100.00%
+src/web/alert_routes.py                      26     13  50.00%   18-37, 57-63
+src/web/auth.py                             149     19  87.25%   79, 128, 143, 160, 178, 199-202, 229-230, 235-243, 249, 252, 260
+src/web/bank_routes.py                      118     79  33.05%   50-53, 57, 62-73, 94-124, 129-147, 152-173, 178-183, 188-209, 214-231
+src/web/broker_observations.py               72     34  52.78%   39-41, 47-53, 63-66, 73-82, 87-97
+src/web/chat_retention.py                    49     25  48.98%   34-37, 42-52, 57-68
+src/web/chat_routes.py                       17      1  94.12%   18
+src/web/expense_export.py                    71      9  87.32%   26, 28, 60, 86-89, 115, 118
+src/web/expense_reconciliation.py            51     24  52.94%   36-39, 44-53, 58-71
+src/web/expense_retention.py                 80     45  43.75%   34-37, 42-50, 55-64, 78-91, 96-115
+src/web/expense_routes.py                    36      2  94.44%   27, 30
+src/web/network.py                           13      3  76.92%   11, 18-19
+src/web/report_retention.py                  63     37  41.27%   40-43, 47-48, 53-65, 70-105
+src/web/research_routes.py                   18      9  50.00%   17-29
+src/web/routes.py                          1203    717  40.40%   108-113, 132-229, 249-261, 272-283, 294-305, 346, 349-350, 352, 364-366, 385, 388, 392-393, 395, 402, 410, 414, 428-430, 432-438, 476-497, 512, 515-516, 518, 524, 526, 528, 531-532, 536, 543, 549-552, 567, 570-571, 574, 580, 584-587, 591, 601-618, 626-644, 653, 670-681, 694-730, 745, 748-749, 751, 754-780, 782, 784, 786, 804, 807-818, 820, 828-851, 873-960, 988, 1011-1074, 1078-1087, 1096-1140, 1154-1171, 1184-1215, 1230, 1233-1234, 1237, 1243-1254, 1260, 1262, 1281-1314, 1325, 1328-1369, 1371, 1389, 1392-1393, 1397-1429, 1431, 1449, 1485, 1511-1512, 1524-1538, 1543-1549, 1557-1565, 1569, 1573, 1621-1625, 1634, 1653, 1672, 1698-1702, 1795-1828, 1851, 1854-1855, 1857, 1860, 1865, 1869-1870, 1884, 1888, 1890-1892, 1923-1955, 1978-2008, 2042-2045, 2050, 2052, 2056, 2062, 2066, 2071, 2074, 2077-2078, 2080, 2089-2091, 2094, 2127-2128, 2144-2145, 2149, 2172-2174, 2222-2251, 2302-2344, 2357-2364
+src/web/simulator_routes.py                 173     85  50.87%   46-49, 65-66, 69, 75, 77-89, 110-111, 126-128, 203-204, 226-251, 256-261, 266-273, 278-291, 301-307, 317-343, 348-357
+------------------------------------------------------------------------
+TOTAL                                     11678   2511  78.50%
+Coverage XML written to file docs/acceptance/evidence/coverage-security-backend.xml
+=========================== short test summary info ============================
+FAILED tests/integration/monitoring_dispatch_test.py::test_failed_or_interrupted_read_job_recovers_once_with_fresh_work[cancellation]
+============ 1 failed, 1085 passed, 2 warnings in 207.12s (0:03:27) ============

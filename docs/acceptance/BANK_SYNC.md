@@ -4,8 +4,10 @@ GoCardless contract was checked against its current
 [quickstart](https://docs.gocardless.com/docs/bank-account-data/quickstart-guide),
 [endpoints](https://docs.gocardless.com/docs/bank-account-data/endpoints), and
 [statuses](https://docs.gocardless.com/docs/bank-account-data/statuses-and-error-code)
-on 2026-09-08. Published API documentation is available; this does not establish
-this user's eligibility, free allowance, credentials, or institution access.
+on 2026-10-13. The current quickstart requires user secrets from the Bank Account
+Data portal to create a refresh token, which is exchanged for access tokens. The
+published contract does not establish the user's eligibility, free allowance,
+credentials, or institution access.
 HTTP 402 produces an explicit decision-required error and never buys access.
 
 `expenses/providers.py` implements the token/refresh, consent requisition,

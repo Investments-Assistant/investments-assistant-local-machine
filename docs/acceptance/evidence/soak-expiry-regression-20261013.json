@@ -1,0 +1,24 @@
+{
+  "status": "SMOKE_PASS",
+  "target_hours": 0.025,
+  "current_window_seconds": 90.16458211900317,
+  "cycles": 88,
+  "restarts": 8,
+  "restart_seconds": [
+    1.285489490008331,
+    1.1946559050120413,
+    1.2296368349925615,
+    1.141955079001491,
+    1.1337774479907239,
+    1.0785056189924944,
+    1.1355710569914663,
+    1.2871047609951347
+  ],
+  "control_p95_ms": 23.220980001497082,
+  "failures": [],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "runner_pid": null,
+  "service_pid": null,
+  "code_sha256": "81faecb7c235f4c884f777cbe46cfa810ce7e586f95685787973db0012755142"
+}

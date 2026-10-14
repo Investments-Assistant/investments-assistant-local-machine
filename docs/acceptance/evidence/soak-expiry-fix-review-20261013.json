@@ -1,0 +1,19 @@
+{
+  "base": "ae9c498cf997007dbcce6d7100bb47c9d1568f89",
+  "files": [
+    "scripts/soak_acceptance.py",
+    "tests/integration/soak_guard_test.py"
+  ],
+  "patch_sha256": "1f834a38cd99c170fff13d9b12ec1551d09cb9f7ea54da28639633f6b99496f6",
+  "patch_bytes": 5825,
+  "checks": {
+    "integration": "tests/integration/soak_guard_test.py: 7 passed in 40.19s",
+    "smoke": "90.165s SMOKE_PASS, 88 cycles, 8 restarts, p95 23.221ms, no failures",
+    "ruff": "passed",
+    "compileall": "passed",
+    "diff_check": "passed"
+  },
+  "live_trading": "unchanged; disabled",
+  "broker_connections": 0,
+  "external_orders": 0
+}

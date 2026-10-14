@@ -1,0 +1,40 @@
+{
+  "user": "soak-f476b15fa0f64d7d",
+  "database_fingerprint": "ccd0a8f2f90b7e123077f3c3aa931325bd1c1e33262465c94dd3e81b45b5afcf",
+  "observation_windows": 1,
+  "continuity": "continuous",
+  "cycles": 88,
+  "restarts": 3,
+  "failures": [],
+  "model_runs": [
+    {
+      "path": "model-0000-3bcf4711.json",
+      "status": "PASS"
+    }
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "tier": "real HTTP/PostgreSQL; synthetic app model; optional separate CPU model",
+  "code_sha256": "175c099b113b43cb84a246cd8bed6d6f45ec2fcdd90f19be851d99790ef394e6",
+  "runner_pid": null,
+  "status": "SMOKE_PASS",
+  "current_window_started_at": "2026-10-13T20:45:07.527738+00:00",
+  "target_hours": 0.025,
+  "control_p95_budget_ms": 250,
+  "observation_gap_budget_seconds": 31.0,
+  "clock_divergence_budget_seconds": 0.25,
+  "halt_account": "29a79214-f6a2-48c5-8d09-f80e1758de4e",
+  "stale_account": "93f72e61-e2c0-4b3c-b829-246121a72aa2",
+  "stale_instrument": "7845594a-fa7b-49ca-a5a0-5f07a514957d",
+  "current_window_seconds": 90.2152984370041,
+  "last_observed_at": "2026-10-13T20:46:37.638721+00:00",
+  "service_pid": null,
+  "control_p95_ms": 30.383478006115183,
+  "latency_samples": 88,
+  "restart_seconds": [
+    1.3930559079890372,
+    1.3953514190070564,
+    1.3425283010001294
+  ],
+  "finished_at": "2026-10-13T20:46:37.886501+00:00"
+}

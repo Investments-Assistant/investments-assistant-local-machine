@@ -1,0 +1,16 @@
+Milestone: require explicit operator authorization before Yahoo/yfinance historical egress.
+
+Changes:
+- `src/config.py`: `yahoo_historical_data_enabled` defaults to false.
+- `src/research/history.py`: rejects the provider before constructing a Yahoo client unless the setting is true.
+- `.env.example` and `docs/acceptance/REPLAY.md` document the opt-in boundary and data-rights prerequisite.
+- `tests/unit/history_adapter_test.py`: disabled-by-default direct and simulator-path regression; existing transport tests explicitly opt into mocked transport.
+
+Verification:
+- `.venv/bin/pytest -q tests/unit/history_adapter_test.py tests/unit/research_replay_test.py tests/unit/research_cost_limits_test.py tests/unit/portfolio_replay_test.py tests/unit/simulator_test.py` — 47 passed.
+- `.venv/bin/ruff check src/config.py src/research/history.py tests/unit/history_adapter_test.py` — passed.
+- `.venv/bin/python` with `Settings(_env_file=None)` — `yahoo_historical_data_enabled=False`; the explicitly set `YAHOO_HISTORICAL_DATA_ENABLED=true` is also covered using mocked transport.
+- `git diff --check` — passed.
+- The test stubs `yfinance.Ticker` to raise if constructed and asserts it is never called both from `load_history` and `_simulate` when disabled.
+
+No provider request or data download occurred. No credentials, broker access, orders, or trading settings changed. Enabling the provider remains an explicit operator decision after applicable source terms and rights review.

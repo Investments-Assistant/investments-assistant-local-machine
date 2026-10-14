@@ -9,9 +9,45 @@ the remote workflow has not run against the uncommitted checkout.
 The current `ib_async==2.1.0` candidate also builds successfully as
 `investment-assistant:local`; a network-disabled, non-root image smoke confirms
 the package and read-only adapter imports. Evidence:
-`evidence/container-build-ibasync-20261013.txt`. This validates dependency
-installation and import only; isolated production startup/restart checks have
-not been rerun against this candidate.
+`evidence/container-build-ibasync-20261013.txt`. The separate current-candidate
+runtime validation below now also passes.
+
+At the 2026-10-14 checkpoint Docker Desktop is available and the candidate image
+exists as `sha256:a64ce3a90cee80e7a93cd6e8e83828c583d3d70b37ff99de0c31ed8f27babe95`.
+The pinned PostgreSQL image `postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea` is also present locally, and the existing Qwen model is readable with SHA-256
+`6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e`. The app
+image is linux/amd64 and runs as `appuser`. These checks avoided image pulls during
+the runtime validation. The isolated runtime/migration/model/restart harness ran
+after the 24-hour CPU soak reached terminal status, avoiding competing load:
+
+```sh
+.venv/bin/python scripts/verify_container_runtime.py \
+  --docker docker \
+  --image investment-assistant:local \
+  --postgres postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea \
+  --model models/qwen2.5-1.5b-instruct-q4_k_m.gguf \
+  --output docs/acceptance/evidence/container-runtime-ibasync-new.json
+```
+
+### Current candidate runtime result — 2026-10-14
+
+The command above completed with exit0 and `PASS`. A network-disabled source
+comparison confirmed all178 source/migration and copied configuration files in
+the cached image match the checkout; see
+[source hashes](evidence/container-source-comparison-20261014.json).
+The run verified the new database's disposable marker before migrations, actual
+production-entrypoint database/model readiness, and a persistent operator halt
+that denies new proposals after both application and PostgreSQL restarts.
+Application recovery took6.584s and database recovery1.044s, each within the
+unchanged15s budget. Image/model digests match the preflight.
+
+[Runtime evidence](evidence/container-runtime-ibasync-new.json), the `.txt` log
+and `.exit` record are retained. Runner cleanup passed; a separate read-only
+[labelled-resource check](evidence/container-runtime-ibasync-cleanup-20261014.json)
+found no owned containers, networks or volumes remaining. No host ports,
+production storage, broker connections or external orders were used.
+This does not establish LAN/firewall, physical sleep, remote broker/provider
+recovery or strategy profitability. Use a new output path for any justified rerun.
 
 A Windows Docker client network-none smoke ran as UID1000, produced a real PDF,
 loaded llama.cpp, and checked that `.env`, `.qa` and model files were absent from

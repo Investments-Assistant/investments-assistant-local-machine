@@ -1,0 +1,7 @@
+Read-only host diagnostics captured 2026-10-13 21:56 UTC while the synthetic soak ran.
+
+Windows CIM: Lenovo 20Y6S14U00; Intel 11th Gen Core i7-11850H, 8 cores/16 logical processors; physical RAM 68,408,107,008 bytes; Intel UHD Graphics and NVIDIA GeForce RTX 3050 Ti Laptop GPU.
+WSL nvidia-smi sample: RTX 3050 Ti Laptop GPU, 4096 MiB VRAM, 57 C, 7.27 W. This is a point sample, not a sustained thermal or workload result; CPU temperature/cooling remains unmeasured.
+WSL filesystem available: 930,382,483,456 bytes.
+
+No settings were changed. The read-only diagnostics were run during the soak. The runner checkpoint at 21:56:15Z remained RUNNING, cycle 15, 218.23 seconds, no failures, halt p95 28.77 ms, first local model benchmark PASS, zero broker connections/orders. This is early status only; no 24-hour credit.

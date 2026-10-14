@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "run_id": "ia-runtime-a57cc25347d4",
+  "image": "investment-assistant:container-startup-20261010",
+  "checks": [
+    "New isolated database and ownership marker verified",
+    "Built image explicitly upgrades empty disposable database",
+    "Production application starts with migrated DB and actual local GGUF loaded",
+    "Persisted operator halt denies proposals after app and database restart",
+    "Application and database restart recover readiness and preserve marker/schema"
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "limitations": [
+    "No Nginx/LAN ingress, OS sleep or 24-hour observation",
+    "Readiness/model load, not a model answer-quality benchmark"
+  ],
+  "owned_names": {
+    "app": "ia-runtime-a57cc25347d4-app",
+    "database": "ia-runtime-a57cc25347d4-db",
+    "network": "ia-runtime-a57cc25347d4",
+    "volume": "ia-runtime-a57cc25347d4-data"
+  },
+  "image_id": "sha256:4c5ce724d94b946c2939bbc3e1b01c32459d9db67e84a2a67fb8b285fed10f28",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "restart_seconds": {
+    "app": 12.986,
+    "database": 1.777
+  },
+  "restart_command_seconds": {
+    "app": 1.506,
+    "database": 1.045
+  },
+  "cleanup_verified": true,
+  "fixture_logs": ".qa/ia-runtime-a57cc25347d4"
+}

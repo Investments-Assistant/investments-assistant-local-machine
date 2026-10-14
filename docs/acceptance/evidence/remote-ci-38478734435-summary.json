@@ -1,0 +1,42 @@
+{
+  "run_id": 38478734435,
+  "url": "https://github.com/Investments-Assistant/investments-assistant-local-machine/actions/runs/38478734435",
+  "head_sha": "1d01bb5517d5f1a7424efd9daca766223850a2df",
+  "status": "completed",
+  "conclusion": "success",
+  "jobs": {
+    "Unit Tests / Run Unit Tests": "success",
+    "Integration Tests / Run Integration Tests": "success",
+    "Chromium + PostgreSQL (synthetic model)": "success",
+    "SonarCloud Quality Gate (combined coverage)": "success"
+  },
+  "junit": {
+    "unit": {
+      "tests": 717,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 10.391
+    },
+    "integration": {
+      "tests": 373,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 151.724
+    },
+    "combined_e2e_tier": {
+      "tests": 1094,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 158.216
+    }
+  },
+  "coverage": {
+    "lines_valid": 11678,
+    "lines_covered": 9649,
+    "line_percent": 82.63
+  },
+  "notes": "Tier reports overlap; counts are not additive unique tests. Artifacts downloaded under ignored .qa/remote-ci-38478734435."
+}

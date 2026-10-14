@@ -1,0 +1,21 @@
+{
+  "pid": 397695,
+  "detached_session": true,
+  "output": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-24h-awake-20261013",
+  "log": "/home/lulu/investments-assistant/investments-assistant-local-machine/docs/acceptance/evidence/soak-24h-awake-20261013.txt",
+  "command": [
+    "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+    "scripts/soak_acceptance.py",
+    "--hours",
+    "24",
+    "--interval",
+    "30",
+    "--restart-every",
+    "900",
+    "--model",
+    "models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "--output",
+    "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-24h-awake-20261013"
+  ],
+  "scope": "local synthetic soak; no model API requests"
+}

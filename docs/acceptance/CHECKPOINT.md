@@ -4337,3 +4337,921 @@ Modelcopy underway, appCreated; no runtimePASS. Read-only dockerlogs query52904
 alsoawaiting completion. Inspect both handles before retry. CONTAINERS.md added.
 
 Runtime milestone 2026-10-10: sessions89885 and52904 terminal (1/0). v2 startup/migration/model load and marker/schema persistence verified; app restart23.143s FAIL fixed15s budget, DB2.177s; cleanup_verified true. Monitor unchanged83% raw83.375. Network-none import profile session53427 terminal exit0; inspect container-import-profile.txt. No broker connections/orders or live changes.
+
+Startup optimization milestone2026-10-10: eager market-data import reproduced FAIL; moved yfinance/pandas/ta imports into synchronous data/simulation operations. 47focusedPASS5.07s. Imagebuild70424PASSexit0 tagcontainer-startup-20261010 digest4c5ce724d94b946c2939bbc3e1b01c32459d9db67e84a2a67fb8b285fed10f28. Fullsuite14790terminalexit1:706PASS362setupERRORS448.83s, fixturePG Unixsocket refused; no postgres process, stale5241pid underowned.qa/pgdata. Restoreownedfixture then verify marker before retryintegration. Container v3 session59665 ACTIVE, includes actualpersistedhalt denial, inspectbefore retry. Monitor83%raw83.375delta0. Noexternal connections/orders/livechanges.
+
+Runtime recovery milestone2026-10-10:59665terminalPASSexit0 v3app12.986sDB1.777s fixed15s; actualserviceoperatorhalt persists anddeniesproposals afterbothrestarts; cleanuptrue. Image/source/modelhashes container-startup-review.json. Hostfixture84106exit0 recoveredexistingdata; markerverified. HEAD changedexternallyto0814db3; sourcechangescommittedexternally, preserved. Agentdidnotstage/commit/push. Integrationretrydurableintegration-startup-lazy-restored active; inspecthandle before retry. Unit706PASS reused; nooverallPASSclaimuntilintegrationcompletes. UpdatedBUILD/BLOCKERS/PLAN staleDockerstate.
+
+Integration recovery milestone:97582terminalexit0,372integrationPASS133.34s. Prior706PASS includes10integration; unit696PASS (not706unit), pluscurrent372integration establishes1068distinctbackendchecks acrossruns. Sourceunchanged afterstartupimportrepair. Nginxpull69748exit0. Docker ingress27483 ACTIVE outputcontainer-ingress-20261010.json; uniquelyownedinternalnetwork/app/PG/nginx, onlytemporaryWindows127.0.0.1TLS port, nohostdata mounts/providers. Inspecthandle/durableevidence before retry. Monitor84%raw83.875 prioraudit; latestintegrationaudit requested.
+
+Dockeringress firstattempt27483terminalFAIL: fiveactualcontainerTLS/header/auth/WSSchecks pass; Windowsportbindingassertfailed becauseinternal-onlyDocker network hasNetworkSettings443/tcp=[] even withHostConfig127.0.0.1 ephemeralbinding. Cleanuptrue. Separateownedbindingprobe85769exit0 confirmed;resourcesremoved. FixturecorrectedtomatchCompose normalbridge, stillonlyWindowsloopbackpublish, no productionmounts/providercredentials/scheduler, browserbrokerconnectiondenialretained. Retry44644ACTIVE container-ingress-20261010-v2.json. Inspectbeforeretry. Monitorlatest84%raw83.875delta0after372integrationPASS.
+
+Docker ingress milestone:44644 terminal PASS exit0; seven checks including actual Windows loopback TLS and observed bridge gateway source, invalid WSS and unlisted container HTTPS403. Cleanup verified. CONTAINERS.md documents reproduction/limits. Read-only remote CI discovery: current externally committed HEAD0814db3 run38056156172 failed; jobs JSON saved, failed-log download68380 active. Investigate before any rerun. No broker connections/orders, liveOFF, no OS/network policy changes.
+
+CI milestone: read-only job log68380/REST fetch completed. Run38056156172 integration372PASS124.90s, then emptySONAR_TOKEN authorizationFAIL; browserSKIPPED. Local patch browserneedsunit-tests (independent of integration scanner), combined quality gate stillrequiresallthree. Integration missing-token preflight exits1; no continue-on-error. YAML/allbash and absent/synthetic-token preflightPASS ci-sonar-separation-review.json. User asked asynchronously toconfigureauthorizedrepositorysecret (neverpastevalue). No push/dispatch/secrets modified. Final browsercheck69959ACTIVE against positivelymarkedtest_browser_expenses; prior screenshots preserved .qa/browser-evidence-before-startup-20261010.
+
+## Resume checkpoint — Docker restored, local validation completed (2026-10-10)
+
+- Goal ACTIVE and incomplete. Final monitor84% (raw83.875), delta0. No broker
+  connection/order, external notification, real bank access, live enablement,
+  production deployment, OS firewall/power change, agent commit/push or CI dispatch.
+- HEAD0814db3e8717a9b75e7b8b0e706a135f388e1b34 changed externally and is preserved.
+  Working changes: two CI workflow files; acceptance docs/evidence; new isolated
+  Docker ingress runner/probe. Startup repair and runtime runner were committed
+  externally during work. Never reset/revert these changes.
+- All command handles listed above are terminal.69959 browserPASSexit0;
+  97582 integration372PASS133.34s; 59665 runtimePASS;44644 ingressPASS;
+  70424 imagebuildPASS. Earlier failures remain as evidence, not current passes.
+- Backend verification:696unit checks passed in the failed-fixture run, then
+  all372integration checks passed after positively identified PostgreSQL recovery.
+  This covers1068checks across two runs; do not describe it as one clean full run.
+- Actual container app restart12.986s and DB1.777s meet unchanged15s. Operatorhalt
+  persisted and rejected new proposals after both restarts. Real existing GGUF
+  loaded; model/image/source hashes in container-startup-review.json.
+- Pinned Nginx/TLS/WSS/forwarded-header/static-security/denial checks PASS.
+  Windows loopback request source becomes Docker bridge gateway172.18.0.1;
+  real LAN identity/firewall is NOT established. All labelled acceptance
+  containers/networks/volumes absent in final read-only Docker listing.
+- Desktop/mobile Chromium workflows PASS, zero JS errors. Current screenshots
+  in.qa/browser-evidence, previous copies in.qa/browser-evidence-before-startup-20261010.
+  Desktop halt and mobile expense views inspected; no new visual failure found.
+- Host PostgreSQL fixture remains available, Unixsocket.qa/socket:55439, positively
+  markedtest_acceptance_expenses/test_browser_expenses. Never initialize/drop it
+  blindly. Earlier stopped-fixture failure and recovery logs retained.
+- Current remote run38056156172: unit jobPASS; integration test step372PASS124.90s;
+  SonarCloud scanFAIL because SONAR_TOKEN absent; browserSKIPPED. Local CI patch
+  lets browser depend independently on unit success and retains all final quality
+  dependencies. Missing-token preflight fails explicitly; local graph/bash/checksPASS.
+- Pending user question: configure an authorized repository SONAR_TOKEN secret,
+  never paste it into chat. No secret has been modified or inspected. Publication
+  of the reviewed workflow change and a new remote run are not claimed.
+- Remaining: remote quality/browser verification; physical LAN/firewall client,
+  sleep/thermal/24h observation (runner available, observation pending as allowed);
+  approved verified IBKR paper environment, real bank/provider/outbound authority;
+  attributable historical research inputs. Research INSUFFICIENT EVIDENCE, liveNO-GO/OFF.
+- Resume by inspecting HEAD/status and any new remote run, checking the pending
+  secret response, and reviewing BLOCKERS.md/PLAN.md. Reuse current local evidence
+  unless affected source changes. Runtime/ingress reproduction commands are in
+  CONTAINERS.md; choose fresh output paths and verify existing run state first.
+
+## CI report-format milestone (2026-10-10)
+
+Previous goal turn was progress (runtime/ingress/browser/CI repair). Current
+HEAD0814db3 and remote run38056156172 remain unchanged; no secret response or
+active operation found. Additional local defect verified: pytest JUnit reports
+were passed to Sonar's generic test-data importer in all three workflows.
+Changed each to documented Python xUnit reportPath. Existing actual pytest XML
+is testsuites/testcase format; all three producer/importer names, YAML and bash
+syntax PASS in ci-xunit-routing-review.json. Remote scanner remains unverified
+and requires authorized SONAR_TOKEN; no quality gate disabled or remote writes.
+Application source unchanged; prior backend/browser/container results remain
+valid. Working-tree scope now includes unit-tests.yml as well as integration
+and e2e workflow files. No active command handles. No broker connections/orders;
+live OFF. Await final monitor audit; no completion claim.
+
+Final report-format audit:84% raw83.875 delta0. Workflow repair verified locally; authorized remote scanner, physical/external gates still pending. Goal ACTIVE, no active test/build process.
+
+Prerequisite check1 after the productive xUnit CI repair: HEAD0814db3 unchanged; repository secret-name metadata is[]; current remote38056156172 remains completedFAIL, no newrun. No secret values requested. Every hash recorded in container-startup-review.json matches; runtimev3/ingressv2/integration-restored/browser durable exits0. No active operation or newly identified independent local defect. Outstanding external/physical prerequisites unchanged; pending usersecret question unanswered. This turn is NO PROGRESS, not implementation credit. First consecutive no-progress check; Goal remainsACTIVE until three-check blocked threshold or changed evidence.
+
+Prerequisite check2: user has token and asked where to store it; directed to GitHub Actions repository secret SONAR_TOKEN, not local.env/chat. Current metadata still[], latest38056156172 completedFAIL and HEAD0814db3 unchanged. No new process, implementation or validation evidence; prior results retained. Second explicit unchanged prerequisite check after CIrepair; GoalACTIVE, no secret values read/written, no remote writes/trading changes.
+
+Prerequisite check3: repository secret-name metadata still[], latest38056156172 completedFAIL and HEAD0814db3 unchanged; gitdiffcheckPASS. Third consecutive explicit no-progress check after last productive CIrepair. No active operation, new consent, or newly identified safe independent repair. Final progress audit requested before marking GoalBLOCKED. Smallest next action: add authorized GitHub Actions repository secret SONAR_TOKEN (not.env/chat), then resume; publication/newCI execution must respect existing scope. Physical/external/research blockers remain as listed inBLOCKERS.md. All local passing evidence and working changes preserved. No brokerconnections/orders/livechanges.
+
+Resumed prerequisite change: get_goalACTIVE; GitHub secret-name metadata nowcontainsSONAR_TOKEN (value notread/requested). HEAD0814db3 andfailed38056156172 unchanged. ThreeCIworkflowdiffs re-reviewed, localvalidationvalid. Asyncapproval requested: commit/pushONLY .github/workflows/{unit-tests,integration-tests,e2e-tests}.yml tomaster, theninspectautomaticCI; alternateuserpublishes. No dependentGit/remote mutation beforeapproval. Earlier missingsecretblockedstate is historical; nowawaitingpublicationapproval. Monitor84%raw83.875delta0; no gatecredit forsecretpresence. Existinglocalresults remainvalid; noactivecommands, brokerconnections/orders, livechanges.
+
+Publication preflight correction: localbranchmaster tracks origin/main (branch.master.merge=refs/heads/main). gitlsremoteheads shows onlymain at0814db3; GitHubdefaultmain. Earlier pending question incorrectlynamedmaster. Supersedingasyncquestion requestsapprovalcommit/pushONLY3CIyaml toorigin/main oruserpublishes. Do not create/remotelypushmaster. NoGitmutation performed; latestCI38056156172unchanged. Review/testevidencevalid; no gateprogress credit. Awaitexplicitresponse beforepublication.
+
+Publication prerequisite check1 after branch correction: origin/main0814db3 unchanged; latest38056156172completedFAIL, no approval reply/newpublishedcommit; gitdiffcheckPASS. Noactiveoperation/newverification. GoalACTIVE, waitingonlyforrequiredpublicationaction plusotherdocumentedexternalgates. NoGitwrites/livechanges.
+
+Publication prerequisite check2: origin/main0814db3 andlatestCI38056156172completedFAIL unchanged; correctedapprovalquestionunanswered. Noactiveoperation/newwork orvalidation; noGitwrites. GoalACTIVE; samepublicationprerequisite secondconsecutivecheck. AllpreviouslocalPASS andliveOFF preserved.
+
+Publication prerequisite check3: origin/main0814db3/latestCI38056156172 completedFAIL unchanged, gitdiffcheckPASS. Thirdconsecutivecheck withapprovalunanswered andnoindependentlocalrepair. Finalmonitoraudit requestedbeforeGoalBLOCKED. SONAR_TOKEN nowpresent; currentblocker ispublicationapproval (notmissingsecret). Resumeafterexplicitapprovalto commit/pushONLY3reviewedCIyaml toorigin/main oruserpublication. Alllocalwork/evidencepreserved; noactiveoperation/Gitwrites/livechanges.
+
+Approved publication milestone2026-10-11: userexplicitlyapprovedthreeCIworkflowfiles toorigin/main. Commit5fefb1ac5e21244ef6d4f395f62333938b0a69a9 containsONLYunit-tests.yml,integration-tests.yml,e2e-tests.yml (16insertions4deletions). Push29311exit0 fastforward0814db3..5fefb1a. Otherworkingchangespreserved. CI38097627974queuedexactSHA; watchstarted, inspecthandleanddurablewatch evidencebeforeretry. No trading/OS/providerchanges.
+
+CI watch25808 confirmedlive; remote38097627974 progressed toUnitSonarCloudScan. GoalcontrolstillreportsBLOCKED (toolcannotreactivate); userauthorizedpublication was completed notwithstandingoldcontrolstate. Read-only GitHubpushnotice followup found81openDependabotalerts inclcriticalPyJWT#79fixed2.14.0; sanitizedmetadata dependency-alerts-20261011.json. This is newly discovered dependency/security review work, not resolved or acceptancePASS. No dependency/source edits or additionalpublication performed duringapprovedCI action.
+
+## Remote quality findings and log repair (2026-10-11)
+
+Approved three-file publication completed at5fefb1a; remote38097627974 and watch25808 terminalFAIL (exit1). Unit test step696PASS20.88s, Sonar authentication/upload/Python JUnit import succeeded; quality conditions fail reliability3/security4/newcoverage56 (required1/1/80). Integration/browser/combined jobs skipped. Saved remote summary, full unit log and sonar-quality/sonar-issues-5fefb1a.json. Token/publication prerequisites are resolved; further publication needs separate approval. Goalactive after resume.
+
+Six raw identifier/exception logging findings reproduced with injected newline/private text: route-log-reproduction.exit1, sixFAIL. Routes now retain fixed operation and exception type; same raw exception pattern repaired in other route error logs and rejected report paths omitted. New route_error_logging_test.py covers six reported handlers. Initial focused35:33PASS2FAIL due to existing simulation tests relying on import-time settings; explicit simulation-class settings fixture removes collection-order dependence. Followup route-log-verified-v2.exit0:35PASS. Terminalhandles48359(exit1) and46362(exit0) inspected, no retry needed. No fullsuite/image build after current source edits yet.
+
+Monitor corrected raw83.375/display83; no credit for unverified remote repairs. Investigate remaining TLS default-context finding (potential false positive), intentional CSRF double-submit cookie, dispatcher permanently denied dead routes, combined versus unit-only coverage, and81dependencyalerts (critical PyJWT). No unsafe gateway enabled, no broker connection/order, liveOFF. All unrelated dirty work preserved.
+
+## Combined quality pipeline and dependency/TLS verification milestone
+
+702unitPASS14.01s, unit-route-log.exit0. Unit and integration Sonar scans separately overwrite project coverage and make unit-only56% block combined analysis. Local workflow repair performs the unchanged mandatory quality gate once after all three test tiers and combined pytest coverage; missing SONAR_TOKEN now fails mandatory final preflight. YAML/bash/graph/preflight checksPASS ci-combined-gate-review.json. No remote publication of these new workflow changes.
+
+TLS finding investigated with actual local handshakes: trusted matching hostname accepted, wrong hostname and untrusted certificate rejected. public-tls-verification20PASS1.63s; no productionTLS code or DNS policy changed. Candidate Sonar falsepositive, remote issue unchanged. PyJWT GHSA-pxh4-856f-4h89 reproduced3FAIL in installed2.12.1; targetedlock2.15.1 changesonlythatpackage and hash-verified localinstall then3PASS. Further high dependency updates resolving/lockonly; no runningtest environment mutation.
+
+Combined suite34497 abortedexit2 after ownedPG connection setup errors; no PG process found, socketempty, stalePID115889. Ownedpg_ctl20083exit0 recoveredcluster (log .qa/postgres-quality.log), noTCPconfigured. Retry75413 running fullsuite+coverage against test_acceptance_expenses markerfixture-acceptance-20260909; inspect durable suite-quality-restored files/handle before retry. PyJWT alreadyupdated in this test environment; otherdependencychanges notinstalled. No brokerconnections/orders, liveOFF.
+
+## Security dependencies and current combined validation
+
+Monitor83%raw83.375delta0. Combined suite75413 exited1:1082PASS2FAIL214.68s, linecoverage78.49%. Failures: broker-stream disconnect checkpoint remainedrunning (failurewrite rejected, exception class now logged without rawmessage); valuation ownedfixture raisedCLOCK_REGRESSION.23focused brokerstream/valuation checks withcoverage thenPASS23.17s; not a claim that full-run failures are resolved. Clock regression/lease-time guard remains intact.
+
+Security locks updated14packages (dependency-security-changes.json); MCP keptsupported1.x>=1.28.1,<2, resolved1.30.0. Poetry install --extras mcp completed0; pipcheckPASS; server registers20tools withoutnetwork (mcp-security-compatibility.json). tzdata aligned installed2026.3 to existinglock2026.1, not newlockchange. No productiondeployment. Fullbackend/browser/nativecontainerverification afterchanges remainsneeded.
+
+14policy/JWT/cookie focusedPASS3.06s before broaddependencyinstall. Sonar TLS/cookie/intentionalcloseddispatcher findings documented inQUALITY.md; no suppression or remoteissuechange. Unpatched diskcache exposure documented (no app diskcache construction); PyJWT options mutation regression passes2.15.1.
+
+Coverage gap includes actual browser-exercised server routes. Added config/coverage-browser.ini (official coverage subprocess patch, relativepaths, SIGTERM saving) and workflow download/combine measured browser data with unit/integration data before unchangedSonargate. No fabricatedcoveredlines. Localbrowser91594 runningonmarked test_browser_expenses; output browser-security-coverage.*, coveragefiles .qa/browser-coverage-security. Inspectbefore retry. Other recenthandles84105install0/77807focused0; no brokerconnections/orders/livechanges.
+
+Clock finding after interruption: clock probe91717 handle gone but durableclock-quality-probe.json proves it completed21.045s and observed wall_delta=-1.310713612s while monotonic_delta=0.010433343s. Browser91594 terminalexit1 at freshfixtureproposeSTALE_QUOTE. These support clock-regression cause (not definitive proof of every prior failure); do not relax time/lease guards. HEAD5fefb1a/worktree preserved; no pytest/browser process active, ownedPG stillrunning. Fresh clockcheck underway before affectedtestretry. GoalACTIVE, local work remains.
+
+Browser/dependency coverage milestone: browser77111exit0, browser-security-coverage-v2PASS23flows1440x1000/390x844,noJSerrors; no brokerconnections/orders. Actual coveragefiles measured1106mainroute/194simulatorroute lines, browser-coverage-measurements.json. Freshclock71624durable20.623s/nojumps. Dockerinfo49508(oldhandle)exit1 missingLinuxenginepipe; askeduserrestart, no newcontainerbuild. Fullsuite49508(newhandle) active with updatedall15dependencylocks includingpydantic-settings and clockprobe; files suite-security-updates.*, clock-during-security-suite.json. Inspect before retry. Backend coverage .qa/coverage-security/.coverage; successful browsercoverage .qa/browser-coverage-security-v2.
+
+Updated workflow YAML/shell/requiredartifact/preflight checksPASS ci-combined-gate-review.json.78/81dependencyalerts meetpatchedfloors, remaining3no-patched-version records contextualreview inQUALITY.md. Monitor83raw83.375delta0, no newCIcredit yet. No remotechanges beyondapproved5fefb1a.
+
+## Full updated-dependency run and measured clock regressions
+
+Suite49508 terminal1:1085PASS1FAIL207.12s (monitoring_dispatch cancellation recovery ->STALE_JOB_LEASE). Concurrentclock-during-security-suite.json:6actualnegativewallsteps~.54-.63s in211.4s. No productionguardchanged. All15packagesinstalled, currentlockvalid. Backendlinecoverage78.50; actualbrowserdata combine yields82.63% (coverage-security-combined.*), but measurement doesnot make failedsuitePASS. Monitor83raw83.375delta0.
+
+Read-onlyOSdiagnosis: WSL6.18.33.2, clocksource tsc; HyperVtimesync_implicit=Y and active systemd-timesyncd. These are facts, not yet proof of which synchronizer causes jumps. No OS/clocksettingschanged. Added read-only scripts/verify_clock_stability.py bounded1..3600s/non-overwritingreport/exit1onbackwardsteps;60sprobe77513active. Browser77111PASSpredates finalpydantic-settings2.15.0 install, so finalbrowsercoveragev3 rerunstarted separately; inspectactivehandle before retry. DockerLinuxenginepipe unavailable; userstartenginerequestpending. No furtherpublication.
+
+Final local review milestone: finalbrowser64972terminal0, browser-security-coverage-v3PASS23flows with all15dependencyupdates. Merging its actualservercoverage raisescombinedlinecoverage82.68%; doesnotconvert1085PASS1FAILbackendrun toPASS. Clockprobe77513completed60.004sNO_REGRESSION_OBSERVED, contrastedwith6under-suitebacksteps; no hoststabilityPASS claimed. Readonlytimedatectl observedWSLNTPpoll32s,offset-357.537ms,jitter201.385ms; Windowsw32tm source time.windows.com, lastsync18:32:42. HyperVsync alsoenabled. Competingtimeadjustment is a hypothesis, noOSchangesmade.
+
+Prepared15-file publication bundle security-ci-review.json/.patch:3workflows,coverage-browser.ini,pyproject/lock,routes/broker_monitor,5unitfiles,clockobserver,QUALITY.md. Asyncapproval requested foronlythisbundle toorigin/main; prior3-fileapprovalalreadyfulfilled andnotreused. Gitindexunchanged. Dockerstartrequestalsopending. No test/browser/clockobserver leftactive, no brokerconnections/orders/livechanges. KeepGoalACTIVE; externalpublication/engine prerequisites newlypending afterproductivework, notthreeconsecutiveblockedchecks.
+
+Finalmonitor confirmed83%raw83.375delta0; L11remains4.5. Allcurrentoperations terminal, userpublication/Dockerresponses pending. GoalACTIVE/incomplete; no newremote writes, brokerconnections ororders.
+
+Prerequisite check1 after security/coverage milestone: HEAD5fefb1a and remote38097627974 completedFAIL unchanged; all15preparedpublicationhashesmatch; gitdiffcheckPASS. Dockerinfo terminal1 missingLinuxenginepipe. No approval reply or newactiveoperation. Previousturnwasproductive; thisturnNO PROGRESS, firstconsecutive unchanged prerequisite check. GoalACTIVE; no publication, OSclock or trading changes.
+
+Prerequisite check2: HEAD5fefb1a/remote38097627974completedFAIL unchanged, Dockerinfoexit1missingLinuxpipe, gitdiffcheckPASS. No publicationapproval or newactiveoperation; no newimplementation/verificationcredit. SecondconsecutiveNO PROGRESS turn aftersecuritymilestone; GoalACTIVE. Prior evidence/workingchanges preserved; no remote/OS/trading writes.
+
+Prerequisite check3: thirdconsecutive unchangedno-progress turn. DockerLinuxenginepipe stillmissing, no15-filepublicationapproval, HEAD5fefb1a/latestremote38097627974completedFAIL unchanged; reviewhashesallmatch. Noactiveoperation or safeindependentrepair identified. Finalprogressauditrequested beforeGoalBLOCKED. Resumeafterauthorizedbundlepublication orDocker/clockenvironment restoration; otherexternal/physical/researchgates unchanged. Worktreeandalltestevidence preserved; no brokerconnections/orders/livechanges.
+
+Userapproved15-filepublication andconfirmedDockerengine running. Verifiedallreviewhashes/base5fefb1a/indexempty; committedexact15files cd049bfdecaeaf77b49f92ff6a4fa9a0d65744ac and push10928exit0 toorigin/main. Otherworkingchangespreserved. DockerinfoLinux29.8.2PASS. NewCI38185591707/38185594614 observedactive/queued atsameSHA; inspectworkflow names. Actualimagebuild70464 active, imageinvestment-assistant:security-cd049bf, durablecontainer-security-build.txt/.exit. Previousblockedprerequisites resolved beforegoalstatusblocked was set; noblockedmark needed. Goalactive/noorders/liveOFF.
+
+Remote milestone: Unitjob114607099012 completedSUCCESS in E2E38185591707; integration/browseractive, combinedSonarpending. ghjoblogretrieval deferred untilworkflowcomplete (emptyunitlogfile nottestproof). DependencyGraph38185594614completedSUCCESS. Read-onlyremoteDependabot now1openmedium (downfrom81inclcritical/high), evidence dependency-alerts-after-cd049bf.json; no manualdismissal. Build70464/CIwatch80962stillactive; inspectbefore retry. Publishedreceipt verifiesexact15blobs andremoteSHAcd049bf.
+
+Monitor84%raw83.625delta+1pp,L11=4.75. Remainingremoteintegration/browser/Sonarandimagebuildactive; no completegoalclaim.
+
+Securityimagebuild70464exit0, imageinvestment-assistant:security-cd049bf manifest5f56ad6fd7a50fb91edd085f55a5ab8d60d25aa8ab2805713128ea710a0eb626. Native25237exit0:UID1000,noenv/qa/git/modelbundled,versionsweasy70/crypto50.0.2/JWT2.15.1/settings2.15.0,realPDF3632bytes,llamaCPU,noGPU. Provenancecontainer-security-review.json. IsolatedrealGGUFruntime/restart validationstarted (container-runtime-security.*); inspecthandle/statusbefore retry. CI38185591707integration/browserstillactive.
+
+Monitor84raw83.750delta0,L11=4.875. Native smoke meansCPUlibraryload, notmodelinferencequality. Runtimehandle91264active,CIwatch80962active.
+
+
+Current-image recovery milestone: runtime91264 terminal0, container-runtime-security.json PASS; app10.954s/database1.615s within15s, actualGGUF loaded, migrated markedDB, persistedoperatorhalt deniesproposal afterbothrestarts, cleanuptrue. Remote38185591707 currentcd049bf unit/integration/browser+TLS/WSS jobsSUCCESS; finalcombinedsuite/Sonaractive. Currentimageingress15596 active, container-ingress-security.*; inspectbefore retry. Monitor84raw83.875delta0,L11=5 for current test/build evidence, Sonar remains pending and L11 matrix notyetPASS. LiveOFF/no brokerconnections/orders.
+
+Currentimageingress15596 terminal0:7checksPASS, actualTLS/WSS/staticheaders/forwardedpeer/originauthdenials/Windowsloopback/nonallowlisted403, cleanuptrue. container-ingress-security.json is updatedartifact proof; noLAN/firewallclaim. Monitor84raw83.875delta0, no duplicatecredit. Remotecombinedsuite/Sonar stillrunning.
+
+Remotecombined milestone: downloaded JUnit proves1086PASS165.877s, zeroerrors/failures/skips; unit710PASS25.039s andintegration372PASS149.654s. Combinedcoverage XML9649/11678lines82.63%, notSonarnewcodecoverageclaim. Artifacts summarized remote-ci-38185591707-test-artifacts.json. CIcurrentlySonarCloudScan, watch80962active. Alllocalcontainerchecks terminal0/cleanuptrue. Monitorcorrects L11=4.875 whileSonar pending:84raw83.750delta0. Localclockfailure remainsseparate unresolvedhostcondition.
+
+FinalcurrentCI: watch80962terminal1;38185591707completedFAIL solelySonarquality. Alllogs25884terminal0 saved remote-ci-38185591707-all.txt; ANALYSIS SUCCESSFUL thenqualityFAILED. Sonarnewcoverage82.6PASS, reliability3/security4FAIL, fourremainingissues (TLSdefaults,CSRFcookie,twointentionalclosedguards), sixlogInjectiongone. SONAR_REVIEW.md contains exactkeys/evidence/proposedreview; askedauthorizeduserreview, no remoteissuechanges. Allcombined1086testsPASS. Artifacts/downloads65640/17662terminal0. No active tests/builds/containers remain; actualfixturecleanuptrue. Resume bycheckingreviewresponse andSonarAPI, not rerunning successfultests blindly. Headcd049bf; onlylocaldocs/evidence and earlier ingressharnesses dirty; no furtherpublication. Physicalclock/soak, researchinputs and externalaccountauthority remainblockedconditions. GoalACTIVE; no brokerconnection/order, liveOFF. Finalmonitorpending.
+
+Finalmonitor confirmed84raw83.625delta0,L11=4.75. Corrected findingcount: fourTOTAL(two security,two reliability); security4/reliability3 are ratings. GoalACTIVE/incomplete awaitingnewlyrequestedreview; no newsource/Git/remote/trading changes.
+
+Review prerequisite check1: previous turn made substantive progress (approvedpublication,1086CItests,currentDockerchecks andfinalSonarfindingevidence). This continuation is first NO PROGRESS check: HEADcd049bf unchanged, gitdiffcheckPASS, Sonarquality stillERROR securityrating4/reliability3 withcoverage82.6PASS. Requiredauthorizedreview unanswered; otherphysical/external/research prerequisites unchanged. All prioroperations terminal, no retryjustified. GoalACTIVE, no source/remote/tradingchanges.
+
+Usercouldnotlocate4findingsamong978allissues/7Topissues. RecheckedAPI: exact4 unresolvedBUG/VULNERABILITYinNewCodePeriodmain; added individualissue links toSONAR_REVIEW.md. No reviewdecision or authorityinferred; no remotestatechanges. Clarificationdelivered, scoresunchanged.
+
+Blocked-boundary recheck: HEADcd049bf anddiffcheckPASS; liveSonarAPI confirmsallfourfindingsOPEN. Samehumanreviewprerequisite persisted across initialno-progresscheck, navigationclarification(withoutreviewdecision) andcurrentcontinuation. No activeoperation or independentauthorizedrepairidentified. Finalmonitorrequested beforemarkingGoalBLOCKED. Resumeafterauthorizedreviewresponse/statechange; inspectexactissues inSONAR_REVIEW.md, retain1086CI/browser/Dockerpasses. No source/remote/OS/tradingwrites, liveOFF.
+
+Resume2026-10-13: useracceptedall4Sonarissues; API confirmsRESOLVED/WONTFIX andqualityOK (ratings1/1,coverage82.6). GoalACTIVE; no codefix implied byacceptance. HEADcd049bf unchanged diffcheckPASS. gh run rerun38185591707 --failed succeeded; API attempt2in_progress/combinedjobqueued. Initialghview unsupportedattemptfield failed onlyread, rerunexecutedonce; doNOTretryblindly. Monitor84raw83.750,L11=4.875 pendingfreshCI. External/physical/research constraints unchanged.
+
+CI acceptance complete2026-10-13:38185591707attempt2 completedSUCCESS atcd049bf; allfourjobsSUCCESS. FreshcombinedJUnit1086PASS167.652s/noerrors/failures/skips,coverage9649/11678=82.63%; SonargatePASS. Currentmetadata/log/artifacts stored remote-ci-38185591707-attempt2-{summary,all,artifacts}.*. Monitor84raw83.875delta0,L11=5PASS. No sourcechanges/newpublication/externalorders/connections. Allremainingphysical/research/paper/live gates retainoriginalscope. GoalACTIVE/incomplete. Finalwatch66289 mayfinishitsinterval; inspecthandlebeforeassumingrunning/retrying.
+
+Finalhandles verified:98447 log/checkpoint commandexit0,66289 CIwatchexit0. No operation remainsactive; gitdiffcheckPASS.
+
+Host observation preparation2026-10-13: current candidate cd049bf CIgreen, no source changes. ExistingownedPG6624 available; soakrunner verified disposableidentity/marker/schema. Started90s updated-dependency preflight95708, output .qa/soak-security-preflight-20261013, runner376606; independent100s clockobserver1935, clock-soak-preflight-20261013.*. These are active, inspecthandlesbefore retry. Useraskedwhetherhostcanstayawake24h; no power/OSchanges. Originaltaskauthorizesisolatedsyntheticobservation. Preflight not24hclaim.
+
+Currenthostpreflight milestone:95708terminal0 SMOKE_PASS90.165s/51cycles/3restarts/p95halt45.695ms; actualseparateGGUFbenchmarkPASS.1935terminal0 clock100.005s/9827samplesNO_REGRESSION_OBSERVED. InitialclockJSONreadracedunfinishedfile; waitedoriginalhandleandreadterminaloutput, no processrestart. Durablesummaries soak-security-preflight-20261013.json andclock-soak-preflight-20261013.json. No activeoperation/ownedchildleft. Awaitinguserhostavailability24h; originalphysical/paper/researchgates remainpending. GoalACTIVE, liveOFF.
+
+Soak continuity defect discovered during full observation preparation. Originaltask authorizesisolated24h observation; availabilityquestion isoptional, notnewpermission. Started43395 runner377271, then explicitlystoppedownedrunner afterfindingmissinggapcheck; terminal1/INTERRUPTED, no24hclaim. Regression1774terminal1 provesoldrunner incorrectlyreportsPASS_24H after injectedunobservedday in9.75s. Addedinterval+30s gapbudget and250ms wall/monotonic divergencebudget, checked eachcycleandafterdeadline. Affectedunit/realPGCLIchecks13631active (soak-continuity-verified.*); inspectbefore retry. No productioncode/OS/brokerchanges. Newtestharness/sourcefingerprint meansfullwindow muststartfreshafterverification.
+
+Continuityrepair verified:13631terminal0,23checksPASS53.48s, reproduction1774terminal1(oldcodefalsePASS_24H ininjectedclocktestonly). Monitor84raw84.125delta0,L13=4/7. Freshfullwindow .qa/soak-24h-continuity-20261013 startedaftertests atnewfingerprint. Preparedexact4-file publicationreview soak-continuity-review.json/.patch, noGitstagingorpublication. Original24hfixtureauthority suffices; availabilityquestionoptional, interruptionsinvalidatewindow. Sourcefingerprintmustremainfrozen.
+
+Fresh24h handle25686 verifiedlive; runner378117, statusRUNNING, fingerprint175c099b113b43cb84a246cd8bed6d6f45ec2fcdd90f19be851d99790ef394e6, started2026-10-13T01:07:00.368474+00:00. Budgetsmaxgap60s/divergence250ms. Inspect25686 andcheckpointbeforeanyretry; no24hcredit whileRUNNING. Four-filepublicationapprovalpending.
+
+Verified wait: livehandle25686 remainedactive through60s observation; {"status": "RUNNING", "cycles": 18, "restarts": 0, "current_window_seconds": 135.44963471099618, "control_p95_ms": 50.224849008372985, "failures": []}. Do not restart or count as24hPASS. Four-filepublicationapprovalpending, no source/Git/OS/tradingchanges.
+
+Verified wait: samehandle25686 confirmedlive through two60s waits; {"status": "RUNNING", "runner_pid": 378117, "cycles": 24, "restarts": 0, "current_window_seconds": 315.42998260998866, "control_p95_ms": 47.528559996862896, "failures": []}. No retry/sourcechange. Firstrestart due900s; no24hcredit. ReadonlyWSLthermalinterfaces have coolingdevices butnoexposedthermalzones/sensorscommand; CPUthermalacceptance remainsunknown. Four-filepublicationapprovalstillpending.
+
+Approved4-filepublication fulfilled: reviewhashes/base/indexchecked, commitae9c498 andpush42051exit0 toorigin/main; exactblobhashes/files/remoteSHAverifiedinsoak-continuity-publication.json. Otherdirtyfilespreserved. Beforepush,soak25686terminal1FAILED CLOCK_DISCONTINUITY,51cycles/1restart/1155.555monotonicseconds, start01:07Z/fail14:10Z; no24hcredit. Runner/servicePIDnull; noautorerun. Preservedsummarysoak-24h-continuity-20261013.json. CInewcommitdiscoveryunderway. No OS/broker/tradingchanges.
+
+Userconfirmed laptop slept/was suspended duringfailedsoak. This supports interruptioncause for13hwall/19minobservedgap; doesnotresolvepriorunder-suitebackwardsteps. Fullsoakrequiresfreshavailablewindow; no blindretryorOSchanges. NewCI38411937843 atae9c498 active, watch7771. Existingavailabilityquestion stillpending.
+
+Currentae9c498 CI38411937843 unit/integration/browserjobsSUCCESS; combinedtest/Sonarinitializing. Watch7771alive; inspectbefore retry. No soakrunner/fixturewebserveractive. Awaitfreshawakewindow for24h afteruserconfirmedsleep, notguardrelaxation.
+
+Publication acceptance:ae9c498 CI38411937843 completedSUCCESS allfourjobsinclSonar. FreshJUnit1093combinedPASS183.013s,716unitPASS20.294s,373integrationPASS162.294s,noerrors/fails/skips;9654/11678lines82.67%. Artifacts/metadata/logs remote-ci-38411937843-{artifacts,summary,all}.*. Monitor84raw84.125delta0,L11PASSatcurrentHEAD. Scopeonlyapproved4filespublished; allotherdirtyworkpreserved. Userconfirmedsleepexplainsinterrupted24h; no newfullrun untilfreshawakewindow, priorwindowfailednotresumablecredit. Remainingexternalresearchpaperphysicalgatesunchanged. GoalACTIVE/incomplete; no brokerconnections/orders, liveOFF.
+
+Fresh-window prerequisite check1: previousgoalturnproductive ae9c498publication/currentCI1093PASS. CurrentHEADae9c498/diffcheckPASS unchanged; failedsoakterminal/noPIDs andpgrepnone. Userconfirmedsleep, nofreshawakewindowresponse. This is firstNO PROGRESSturn; GoalACTIVE. Existinghostavailabilityquestionpending, researchdata/paperconsent stillunavailable. No repeats/source/OS/Git/tradingchanges.
+
+Fresh-window prerequisite check2: HEADae9c498/diffcheckPASS unchanged, noactivesoak. No newawakewindowanswer, researchinputs orpaperconsent. SecondconsecutiveNO PROGRESSturn; GoalACTIVE, no repeatedtests/source/OS/Git/tradingchanges.
+
+Fresh-window prerequisite check3: thirdconsecutiveunchangedNO PROGRESSturn. HEADae9c498/diffcheckPASS/currentCI1093PASS; failedsoaknoPIDs/pgrepnone. No freshawakewindowreply, attributable researchinputs orpaperaccountconsent. FinalmonitorrequestedbeforeGoalBLOCKED. Resumeafterhostwindowavailable withfreshoutputdirectory (do notcreditinterruptedwindow), orotherexplicitexternalprerequisiteprovided. Preserveallsource/tests/evidence andliveOFF.
+
+Userconfirmed freshawakewindow available now andwarnedCodexlimits. Started detachedlocal24h runner397695 withstart_new_session/stdinDEVNULL/logfile independentofexecsession; noAPIcallsbyrunner. Launch succeeded but subsequent verification found terminalFAILED CLOCK_DISCONTINUITY after7cycles/~10s; runnerPIDnull, checkpoint .qa/soak-24h-awake-20261013/checkpoint.json; launchreceiptsoak-24h-awake-20261013-launch.json. Modelavailabilitylimitscanpreventagentchecks butrunnerdoesnotrequiremodelAPI. OS/WSLshutdown/sleep stillinvalidatesobservation; no guaranteeagainsthost/processmanagementtermination. InspectPID/cmdline/checkpointbeforeanyretry. Sourcefrozenatae9c498 contentfingerprint; liveOFF.
+
+Freshdetachedrun terminalFAILED CLOCK_DISCONTINUITY after~10s/7cycles; PID397695 gone/childPIDnull. This isnot tokenexhaustion andnotstillrunning.60s backwardclockobserver54443terminal0(NO_REGRESSION_OBSERVED), doesnotexclude forwardsteps/wall-mono divergence. ReadonlyWSLtimesync activeoffset+910.292ms,HyperVimplicitY,TSC; rootcauseunproven. NoOSchanges/retry. Monitor84raw84.125delta0; GoalACTIVE. Nextsafeaction measure both forward/backward wall-minus-monotonic deltas underlocalmodelload; anyOSsynchronizationchange needsseparateapproval. Userconfirmedawakewindow, notclockrepairauthority.
+
+Clockdiagnostic resumedaftermissingtoolhandle42106: durable90.009s8836samplescomplete, sixpositivewall/mono divergenceevents0.6745–0.9136s, pairedreaduncertainty~microseconds; clustered~30sapart. No activeclock/modelprocess, model65572durableexit0. Neverretriedcompletedcommands. Evidenceclock-pairs-load-20261013.json. Proposed90s temporaryWSLtimesyncdstop/pairedprobe/alwaysrestore inCLOCK_REVIEW.md; rootcauseunproven, noOSchangeauthorizedyet. GoalACTIVE; finalmonitorrequested, current24hnotrunning.
+
+
+Approved90s timesyncd experiment completed terminal0(handle76267), active/inactive/active verified, restoration90.266s. Independent100s watchdog canceled after successfulrestore. Paired8865samples max121.9ms vs prior913.6ms; model exit0. No persistentOSchange/livechange/newsoak. Matching restored-service observation handle38886 and model50898 active; inspect before retry. Evidenceclock-service-test-20261013.json/clock-pairs-ntp-stopped-20261013.json.
+
+
+Restored-service control finished: 90.005 seconds, 8,853 samples, maximum wall/
+monotonic divergence 42.8 ms, no event above 50 ms. Matching model benchmark
+exit0. Service remains active; latest reported offset +101.798 ms. The control
+is better than the stopped-service trial, so these observations do NOT establish
+that disabling NTP is a fix. Normal service settings are retained. Starting a
+90-second isolated soak preflight before a fresh full window; no guard changed.
+Evidence: `evidence/clock-pairs-ntp-restored-20261013.json`.
+
+Preflight output .qa/soak-clock-restored-preflight-20261013; inspect before retry.
+
+
+2026-10-13 restored-clock milestone: service-restored 90s paired observation
+max42.8ms divergence (8,853 samples), model exit0. Short isolated soak preflight
+handle19313 exit0 SMOKE_PASS:90.215s,88cycles,3restarts(1.34–1.40s), halt p95
+30.38ms vs250ms budget, real CPU modelPASS. Evidence
+soak-clock-restored-preflight-20261013.json. No permanent fix inferred.
+Started fresh detached24h runner468620; launch receipt
+soak-24h-clock-restored-20261013-launch.json; checkpoint
+.qa/soak-24h-clock-restored-20261013/checkpoint.json. Inspect process/checkpoint
+before any retry. Source fingerprint unchanged175c099b113b43cb84a246cd8bed6d6f45ec2fcdd90f19be851d99790ef394e6.
+Time-sync service restoredactive, no persistentsettingschanged. No broker/orders;
+liveOFF. No24h credit until continuous actual verification completes.
+
+Final boundary monitor84%raw84.125delta0. Latest runner verification: {"status": "RUNNING", "runner_pid": 468620, "cycles": 10, "restarts": 0, "current_window_seconds": 39.430756532005034, "failures": [], "model_runs": [{"path": "model-0000-178d627a.json", "status": "PASS"}]}. GoalACTIVE; inspect this checkpoint and PID before retry.
+
+Verified wait after clock preflight: previousturnproductive approved90s experiment/restoration and SMOKE_PASS. Same detachedrunner after50s observation: {"status": "RUNNING", "runner_pid": 468620, "cycles": 12, "restarts": 0, "current_window_seconds": 99.4474591199978, "failures": [], "last_observed_at": "2026-10-13T20:48:26.560734+00:00", "process_command": "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python scripts/soak_acceptance.py --hours 24 --interval 30 --restart-every 900 --model models/qwen2.5-1.5b-instruct-q4_k_m.gguf --output /home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-24h-clock-restored-20261013 "}. No restart/source/OS/tradingchange; no24hcredit.
+
+Verified wait: previousturn verifiedwait; existingsoak observedalive after50s: {"status": "RUNNING", "runner_pid": 468620, "cycles": 15, "restarts": 0, "current_window_seconds": 189.4298009040067, "failures": [], "last_observed_at": "2026-10-13T20:49:56.677225+00:00", "process_verified": true}. No changes/restart; full24h gatepending.
+
+Verified wait: prior turn verifiedwait; same existingprocess after50s {"status": "RUNNING", "runner_pid": 468620, "cycles": 17, "restarts": 0, "current_window_seconds": 249.43921394199424, "failures": [], "last_observed_at": "2026-10-13T20:50:56.775731+00:00", "process_verified": true}. No restart or code/settings changes;24h gatepending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "cycles": 20, "restarts": 0, "current_window_seconds": 339.4478538419935, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T20:52:26.919465+00:00", "process_verified": true}. Actualprocess verified after50s; no restart/code/settings changes; no24h credit.
+
+Verified wait (previousturn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "cycles": 23, "restarts": 0, "current_window_seconds": 429.4368923580041, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T20:53:57.040737+00:00", "process_verified": true}. Existingprocess checked before/after50s. No restart/code/settings changes;24h acceptancepending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 468624, "cycles": 25, "restarts": 0, "current_window_seconds": 489.4286447159975, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T20:54:57.117315+00:00", "runner_process_verified": true}. Soak PID verified alive before/after45s; no modifications or restart. Full24h gate remains pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 468624, "cycles": 28, "restarts": 0, "current_window_seconds": 579.4405413810018, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T20:56:27.259443+00:00", "runner_process_verified": true}. Runner checked alive before/after45s; no files/code/settings altered. No24h credit.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 468624, "cycles": 29, "restarts": 0, "current_window_seconds": 609.439543970002, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T20:56:57.303103+00:00", "runner_process_verified": true}. PID checked before/after45s; no rerun or code/config/trading changes;24h gate incomplete.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 468624, "cycles": 31, "restarts": 0, "current_window_seconds": 669.4247565999976, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T20:57:57.376657+00:00", "runner_process_verified": true}. Actual runner checked before/after45s. No restart/config/source changes; full24h credit only if terminal PASS_24H.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 468624, "cycles": 33, "current_window_seconds": 729.435186571005, "restarts": 0, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T20:58:57.470442+00:00", "process_verified": true}. Process confirmed before/after45s; no source/config/service restart. No24h credit.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 468624, "cycles": 35, "restarts": 0, "current_window_seconds": 789.4300301259937, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T20:59:57.557521+00:00", "process_verified": true}. Runner verified before/after45s; no source/config changes. No24h credit.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 468624, "cycles": 37, "restarts": 0, "current_window_seconds": 849.4308343529992, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:00:57.640275+00:00", "process_verified": true}. PID checked before/after45s; no source/config change. Full24h gate pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 39, "restarts": 1, "current_window_seconds": 911.116766414998, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:01:59.409643+00:00", "runner_process_verified": true}. Runner confirmed before/after45s; no code or service changes. Full24h gate pending.
+
+Scheduled restart milestone: runner468620 remained RUNNING after45s verification, checkpoint39cycles/911.117s, one restart_seconds=1.692535, fixture service PID468624→472995, failures[], p9533.766ms. Progress monitor raw84.375 (+0.25pp) displayed84; L13=4.25/7. Full24h still pending. No source/OS/trading changes.
+
+Verified wait (previous turn recorded restart milestone): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 41, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 969.4764648499986, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:02:57.848608+00:00", "process_verified": true}. Runner verified alive before/after45s; no code/setting changes;24h pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 43, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1029.4332309419988, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:03:57.896217+00:00", "runner_process_verified": true}. Process verified before/after45s; full24h still pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 44, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1059.4254445719998, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:04:27.929464+00:00", "process_verified": true}. Runner alive before/after45s; no changes;24h gate pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 46, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1119.4299325809989, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:05:28.017080+00:00", "process_verified": true}. Process checked before/after45s; no changes;24h still pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 48, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1179.4328521779971, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:06:28.109104+00:00", "process_verified": true}. Runner process checked before/after45s; no code/OS/config changes. Full24h gate pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 50, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1239.4302265339938, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:07:28.191850+00:00", "process_verified": true}. Runner checked alive before/after45s; no source/config changes,24h gate pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 52, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1299.4252214080043, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:08:28.278097+00:00", "process_verified": true}. Process checked before/after45s; no code/config changes, full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 53, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1329.4408885979938, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:08:58.335923+00:00", "process_verified": true}. Runner checked alive before/after45s; no source/config change. Full24h not yet earned.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 55, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1389.4489733539958, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:09:58.436177+00:00", "process_verified": true}. Same runner checked before/after45s; no source/config changes. Full24h pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 57, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1449.449104326006, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:10:58.522264+00:00", "process_verified": true}. Process checked before/after45s, no settings/source changes. Full24h acceptance pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 59, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1509.439817395003, "control_p95_ms": 33.76599500188604, "failures": [], "last_observed_at": "2026-10-13T21:11:58.602700+00:00", "process_verified": true}. Process confirmed alive before/after45s; no code/config change. Full24h remains unverified.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 61, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1569.4382983120013, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:12:58.684963+00:00", "process_verified": true}. Runner PID checked before/after45s; no code/config change. Full24h remains pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 63, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1629.4309096780053, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:13:58.764721+00:00", "process_verified": true}. Runner verified before/after45s; no settings/source change. Full24h pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 65, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1689.447374077994, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:14:58.877418+00:00", "process_verified": true}. Runner checked alive before/after45s; source/settings unchanged. Full24h pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 67, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1749.429948859004, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:15:58.952911+00:00", "process_verified": true}. Runner verified before/after45s; no source/config change. Full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 472995, "cycles": 68, "restarts": 1, "restart_seconds": [1.6925349770026514], "current_window_seconds": 1779.4338048909995, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:16:29.001413+00:00", "process_verified": true}. Process checked alive before/after45s; no source/settings changes;24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 70, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 1841.4433644819946, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:17:31.110711+00:00", "process_verified": true}. Process confirmed before/after45s; no source/config changes, full24h pending.
+
+Second scheduled restart milestone: at1841.443s, PID468620 RUNNING,70cycles,2 restarts [1.6925,2.0089] seconds, service472995→477352, failures[], p95=30.972ms. Monitor score raw84.500/display85 (+1pp rounded;raw+.125), L13=4.375/7. Full24h pending; no source/OS/trading modifications.
+
+Verified wait (prior turn second-restart milestone): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 72, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 1899.4996210429963, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:18:29.246952+00:00", "process_verified": true}. Process checked alive before/after45s; no code/setting changes;24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 75, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 1989.4546137809957, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:19:59.340797+00:00", "process_verified": true}. PID confirmed before/after45s; no source/setting changes. No24h credit yet.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 77, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2049.435893439004, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:20:59.424259+00:00", "process_verified": true}. Process confirmed before/after45s; no source/config changes;24h pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 79, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2109.440392245, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:21:59.524680+00:00", "process_verified": true}. Process confirmed before/after45s; no implementation/config mutation. Full24h pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 80, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2139.440243849007, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:22:29.569663+00:00", "process_verified": true}. Runner verified before/after45s; no code/config changes;24h still pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 82, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2199.4488956330024, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:23:29.688555+00:00", "process_verified": true}. Soak runner confirmed before/after45s; no source/OS/config changes. No24h credit yet.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 84, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2259.439587593006, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:24:29.772517+00:00", "process_verified": true}. Runner checked before/after45s; no implementation/settings changes. No24h pass yet.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 86, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2319.4426733260043, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:25:29.881076+00:00", "process_verified": true}. Runner verified before/after45s; no source/config mutation. Full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 88, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2379.4447651530063, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:26:29.975514+00:00", "process_verified": true}. Actual runner confirmed before/after45s; no code/config changes. Full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 90, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2439.444597679001, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:27:30.077853+00:00", "process_verified": true}. Runner checked alive before/after45s, no source/config changes;24h not met.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 92, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2499.4332628539996, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:28:30.160392+00:00", "process_verified": true}. Process verified before/after45s; no code/config changes. Full24h pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 94, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2559.443500416004, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:29:30.266852+00:00", "process_verified": true}. Runner checked alive before/after45s; no code/config changes. Full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 95, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2589.4364735980053, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:30:00.307756+00:00", "process_verified": true}. Existing runner checked before/after45s; no implementation/config changes. Full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 97, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2649.441494611994, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:31:00.421201+00:00", "process_verified": true}. Runner verified before/after45s; no implementation/config changes. Full24h pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 477352, "cycles": 99, "restarts": 2, "restart_seconds": [1.6925349770026514, 2.0088901620038087], "current_window_seconds": 2709.4393354170024, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:32:00.512496+00:00", "process_verified": true}. Existing runner checked alive before/after45s; no code/config change. Full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 101, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 2771.6312371230015, "control_p95_ms": 30.673243003548123, "failures": [], "last_observed_at": "2026-10-13T21:33:02.810393+00:00", "process_verified": true}. Runner confirmed before/after45s; no source/config change;24h pending.
+
+Third scheduled restart verified: status RUNNING, runner468620, cycles101, restarts3 with durations [1.6925,2.0089,2.1744], service PID477352→481593, failures[], haltp9530.673ms at2771.631s. Monitor raw84.625/100, +.125pp raw, displayed85%. This does not earn24h pass. diffcheckPASS, no source/OS/trading change.
+
+Verified wait (prior turn restart milestone): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 103, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 2829.572759142, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:34:00.843378+00:00", "process_verified": true}. Runner process verified before/after45s; no code/config changes. Full24h pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 105, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 2889.4817557969945, "control_p95_ms": 30.853352989652194, "failures": [], "last_observed_at": "2026-10-13T21:35:00.864753+00:00", "process_verified": true}. Runner confirmed before/after45s; no source/config change. 24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 107, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 2949.5755942810065, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:36:01.055940+00:00", "process_verified": true}. Runner verified alive before/after45s; no code/config changes. Full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 109, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 3009.484717137995, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:37:01.076171+00:00", "process_verified": true}. Existing process confirmed before/after45s; no source/config change. Full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 110, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 3039.4828909350035, "control_p95_ms": 30.971674001193605, "failures": [], "last_observed_at": "2026-10-13T21:37:31.123021+00:00", "process_verified": true}. Runner confirmed active before/after45s; no source/config changes. Full24h gate pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 112, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 3099.475414034998, "control_p95_ms": 31.39837300113868, "failures": [], "last_observed_at": "2026-10-13T21:38:31.230574+00:00", "process_verified": true}. Runner alive before/after45s; no source/config change. Full24h still pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 114, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 3159.4962535609957, "control_p95_ms": 32.291356998030096, "failures": [], "last_observed_at": "2026-10-13T21:39:31.282339+00:00", "process_verified": true}. Runner checked active before/after45s; no source/config changes. Full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 116, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 3219.463824885999, "control_p95_ms": 32.291356998030096, "failures": [], "last_observed_at": "2026-10-13T21:40:31.354195+00:00", "process_verified": true}. Runner process verified before/after45s; no code/config changes; full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 118, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 3279.5187845089968, "control_p95_ms": 32.291356998030096, "failures": [], "last_observed_at": "2026-10-13T21:41:31.517848+00:00", "process_verified": true}. Existing process checked alive before/after45s. No source/settings changes;24h pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 120, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 3339.474812941, "control_p95_ms": 31.39837300113868, "failures": [], "last_observed_at": "2026-10-13T21:42:31.593914+00:00", "process_verified": true}. Process checked active before/after45s; no source/config change; 24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 122, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 3399.4603233560047, "control_p95_ms": 31.39837300113868, "failures": [], "last_observed_at": "2026-10-13T21:43:31.704154+00:00", "process_verified": true}. Runner checked active before/after45s; no code/config change, full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 123, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 3429.472711319002, "control_p95_ms": 31.39837300113868, "failures": [], "last_observed_at": "2026-10-13T21:44:01.774141+00:00", "process_verified": true}. Runner checked alive before/after45s; no source/settings changed. Full24h pending.
+
+Verified wait (previous turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 125, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 3489.4718434550014, "control_p95_ms": 31.39837300113868, "failures": [], "last_observed_at": "2026-10-13T21:45:01.898075+00:00", "process_verified": true}. Runner verified before/after45s, no source/config changes,24h gate pending.
+
+Verified wait (prior turn verifiedwait): {"status": "RUNNING", "runner_pid": 468620, "service_pid": 481593, "cycles": 127, "restarts": 3, "restart_seconds": [1.6925349770026514, 2.0088901620038087, 2.174393310007872], "current_window_seconds": 3549.455118494996, "control_p95_ms": 31.39837300113868, "failures": [], "last_observed_at": "2026-10-13T21:46:01.994151+00:00", "process_verified": true}. Runner checked before/after45s; no code/config change; full24h pending.
+
+## 2026-10-13 soak fixture-expiry repair
+
+- Diagnosed the prior continuous soak failure at ~3609.7 seconds: the synthetic
+  fixture mandate expired at one hour, and order preflight checks mandate expiry
+  before stale quote age. This made the harness's exact `STALE_QUOTE` probe fail
+  with `MANDATE_EXPIRED`, despite the quote-age guard remaining intact.
+- Updated `scripts/soak_acceptance.py` to extend only the marked synthetic soak
+  fixture mandate to the requested run plus one hour. It verifies `fixture=true`
+  and `environment=simulator` under a row lock and repeats on server startup,
+  including an explicitly resumed window. Production risk policy is unchanged.
+- Added PostgreSQL integration coverage for the 24-hour extension and denial of
+  an unmarked account. `tests/integration/soak_guard_test.py`: **7 passed**;
+  Ruff and Python compile checks passed.
+- 90-second local HTTP/PostgreSQL smoke completed **SMOKE_PASS**: 88 cycles,
+  8 restarts, halt p95 23.221 ms, no failures. The stale-quote probe ran beyond
+  65 seconds and remained healthy to completion. No broker connections/orders.
+  Evidence: `evidence/soak-expiry-regression-20261013.{json,txt}`.
+- The previous 24-hour run remains failed and earns no 24-hour credit. A fresh
+  continuous 24-hour synthetic soak is still required. Remaining physical-host,
+  research-data, and verified paper-account gates remain open; live trading OFF.
+
+## Fresh corrected soak launched
+
+- Started detached runner PID **487287** at `2026-10-13T21:52:36Z` against the
+  marked disposable `test_acceptance_expenses` database, loopback fixture server,
+  30-second checks, 15-minute service restarts, and the existing local Qwen 1.5B
+  CPU benchmark. Launch receipt: `evidence/soak-24h-expiry-fixed-20261013-launch.json`.
+- Initial independent verification found checkpoint **RUNNING**, cycle 1, no
+  failures, halt latency 20.81 ms, zero broker connections/orders; model benchmark
+  was active. Inspect the live PID and `.qa/soak-24h-expiry-fixed-20261013/checkpoint.json`
+  before any retry. Do not edit fingerprinted application files during the run.
+- This detached process is independent of this chat's token budget. It still
+  requires the host to remain awake and available; any sleep, suspend, clock jump,
+  or missed observation invalidates the continuous 24-hour window. No 24-hour
+  credit until terminal `PASS_24H`.
+- Rechecked L16 safely: `.env` retains `LIVE_TRADING_ENABLED=false`; the focused
+  authority suite passed **9/9**, including denied route/cancel attempts even
+  when a synthetic Settings instance sets the flag true. Recorded L16 as
+  `PASS (NO-GO; safely disabled)` in PLAN.md; evidence is
+  `evidence/live-disabled-gate-20261013.txt`. No broker connection/order occurred.
+- Review bundle for the two uncommitted harness/test files is saved at
+  `evidence/soak-expiry-fix-review-20261013.patch` (SHA-256
+  `1f834a38cd99c170fff13d9b12ec1551d09cb9f7ea54da28639633f6b99496f6`). Earlier
+  publication approvals do not cover this new patch; do not push until approved.
+- Rechecked primary IBKR connection docs and GoCardless Bank Account Data
+  quickstart on 2026-10-13. The IBKR handshake exposes accessible accounts but no
+  paper/live field; connection readiness uses the `nextValidId` callback. The
+  GoCardless quickstart requires portal user secrets to create/refresh tokens.
+  Evidence boundaries are updated in BROKER_CAPABILITIES.md and BANK_SYNC.md;
+  no external connection/request occurred.
+- Latest monitor reports: **87%**, raw86.875/100. Fixed rubric remains unchanged;
+  L16 now4/4, L13 4.75/7. 24-hour run has no credit while active. L04, L14 and
+  L15 remain incomplete pending external broker validation/data permission.
+
+- Read-only Windows CIM/WSL host sample reconfirmed 8C/16T i7-11850H,
+  68,408,107,008 bytes physical RAM, RTX 3050 Ti with 4096 MiB, and current
+  GPU sample 57 C/7.27 W. Free filesystem space: 930,382,483,456 bytes. CPU
+  cooling/temperature and sustained thermal behavior remain unknown. Evidence:
+  `evidence/host-windows-hardware-current-20261013.txt`. No settings changed.
+- At 21:56:15Z the 24h runner remained PID487287/RUNNING, cycle15, 218.23s,
+  no failures, halt p95 28.77ms, first local model benchmark PASS, no broker
+  connections/orders. This status is not completion evidence.
+
+## 2026-10-13 token-budget and clock-test checkpoint
+
+- The approved temporary `systemd-timesyncd` test completed and restored the
+  service to active. Stopped-service sampling recorded two divergences (maximum
+  121.9 ms); the restored-service control recorded none above 50 ms (maximum
+  42.8 ms). This comparison does not establish a persistent fix; the service is
+  active and no configuration changed. See `CLOCK_REVIEW.md` and the paired
+  evidence files.
+- At `2026-10-13T22:00:46Z`, detached soak PID487287 was alive and its saved
+  checkpoint reported RUNNING, 24 cycles, 488.2 seconds, zero failures,
+  zero restarts, halt p95 27.86 ms, model PASS, and zero broker connections or
+  external orders. The 24-hour criterion remains pending; sleep or observation
+  discontinuity invalidates this run.
+- The detached process is independent of Codex chat-token availability. If chat
+  usage ends, the process can continue while WSL/the host remains awake; saved
+  state and logs allow later inspection. Token availability does not guarantee
+  host uptime and does not complete remaining Goal work.
+- Progress monitor: **87%**, delta **0 pp**, raw86.875/100 (fixed rubric).
+  L04, L14 and L15 remain incomplete. Live trading remains disabled. Resume by
+  inspecting the runner PID and `.qa/soak-24h-expiry-fixed-20261013/checkpoint.json`
+  before taking any action; do not restart or relabel this window.
+
+## 2026-10-13 historical research-source review
+
+- Reviewed primary source terms and technical documentation for GDELT, SEC
+  EDGAR, Nasdaq Data Link and Alpha Vantage. Recorded candidate coverage,
+  attribution/timestamp conditions and product-specific license limits in
+  `evidence/research-source-review-20261013.md`.
+- GDELT and SEC are candidate no-cost news inputs, not approved/configured
+  providers. Neither resolves an approved, rights-cleared market-price history
+  for the as-yet-unselected universe. No source data were requested or saved.
+  L14 remains `INSUFFICIENT EVIDENCE`; user source/data decisions remain needed.
+- The note is linked from PLAN.md and BLOCKERS.md. No code, data source, model,
+  test result or acceptance status changed; fixed progress rubric unchanged.
+- Last verified soak state in this continuation: PID487287 alive, RUNNING,
+  25 cycles, 518.2 seconds, zero failures/restarts, halt p95 27.86 ms, model
+  PASS, no broker connections/orders; service restored active. This is a
+  verified live state only and earns no 24-hour credit.
+
+## 2026-10-13 acceptance ledger reconciliation
+
+- Rechecked checkout state: HEAD and `origin/main` are both
+  `ae9c498cf997007dbcce6d7100bb47c9d1568f89`; local `master` tracks `origin/main`.
+- Replaced superseded blocker summaries with a current gate-focused ledger and
+  corrected PLAN.md's stale HEAD. Historical decisions remain in this file.
+  The exact two-file soak-fixture patch is still local pending its separate
+  publication approval; its previous local verification remains applicable.
+- At `2026-10-13T22:02:46Z`, live runner PID487287 and checkpoint both showed
+  RUNNING: 28 cycles, 608.2 seconds, no failures/restarts, halt p95 27.86 ms,
+  model PASS, no broker connections/orders. Service is active. No 24-hour credit.
+- Documentation changes passed `git diff --check`; tests were not rerun because
+  only the plan, blocker ledger and checkpoint prose changed. Research remains
+  `INSUFFICIENT EVIDENCE`, L04/L14/L15 incomplete, and live mode OFF.
+
+## 2026-10-13 publication-bundle integrity check
+
+- Verified the pending review patch against its metadata and current working
+  diff: SHA-256 `1f834a38cd99c170fff13d9b12ec1551d09cb9f7ea54da28639633f6b99496f6`,
+  5,825 bytes, exactly `scripts/soak_acceptance.py` and
+  `tests/integration/soak_guard_test.py`, based on current HEAD
+  `ae9c498cf997007dbcce6d7100bb47c9d1568f89`. Current diff is byte-for-byte
+  identical to the reviewed patch. This confirms review integrity only; it does
+  not grant publication approval or remote CI evidence.
+- Earlier local evidence remains applicable: seven PostgreSQL integration
+  tests, Ruff, compileall and the 90.165-second real HTTP/PostgreSQL smoke pass.
+  No code changed in this verification and no publication occurred.
+- Reviewed the existing news source-policy, ingestion and replay boundaries.
+  Persistent fetch requires current operator policy; DB availability is the
+  application's actual observation clock, while ReplayNews separately requires
+  source publication and availability times. GDELT's retrieval clock cannot
+  prove this application had access. Added this limitation to the L14 source
+  review; no adapter/source was enabled and no external data were requested.
+
+## 2026-10-13 Yahoo historical-data rights review
+
+- Re-read the full attached Goal instructions and the current gate ledger. The
+  existing optional historical adapter invokes `yfinance.Ticker.history`; the
+  official yfinance maintainer README says the package is unaffiliated with
+  Yahoo, intended for research/education, and that Yahoo's API is intended for
+  personal use. It directs users to Yahoo terms for rights to downloaded data.
+  Automated access to Yahoo's linked legal pages returned 999/429, so this
+  application's research, backtest, retention, and potential commercial-use
+  rights are not established.
+- Updated `evidence/research-source-review-20261013.md`: do not invoke the
+  Yahoo adapter for acceptance evidence until applicable data rights are
+  established. No Yahoo endpoint was queried and no data/provider was enabled.
+  `git diff --check` passes; this is documentation-only; no tests needed.
+- Last safe soak observation at 2026-10-13T22:07:21Z: PID487287 alive,
+  RUNNING, 37 cycles, 878.2 seconds, no failures/restarts, halt p95 27.86 ms,
+  local model PASS, no broker connections or external orders. The 24h criterion
+  remains pending and no completion credit is awarded.
+- Worktree preserved; no acceptance status or fixed rubric changed. L04/L14/L15
+  incomplete; L10/L13 await uninterrupted host window and thermal evidence;
+  live trading remains OFF. Latest monitor report: 87%, delta 0 pp.
+
+## 2026-10-13 historical-provider egress guard
+
+- The optional simulator backtest path could call Yahoo/yfinance by default even
+  though its applicable data rights remained unresolved. Added
+  `YAHOO_HISTORICAL_DATA_ENABLED=false` by default and a fail-closed check before
+  constructing a Yahoo client. Documented operator opt-in in `.env.example` and
+  `REPLAY.md`; mocked adapter tests opt in explicitly.
+- Regression test also calls the simulator path under default settings and
+  proves `yfinance.Ticker` is never constructed. Focused replay/history/simulator
+  suite: **46 passed**; Ruff and `git diff --check` passed; venv Settings check
+  reports default false. Durable results: `evidence/yahoo-source-egress-guard-20261013.txt`.
+- This is local code/test progress. No provider request/data download occurred.
+  L14 still needs licensed/authorized source and universe/price history.
+- The prior soak PID487287 ended FAILED at 2026-10-13T22:08:47Z with
+  `CODE_CHANGED_OBSERVATION_INVALIDATED` after this fingerprinted code change;
+  it earns no 24-hour credit. Started fresh runner PID492940 with tracked command
+  session13790 and output `.qa/soak-24h-research-guard-20261013` at
+  22:09:44Z against marked disposable `test_acceptance_expenses`. At 22:09:52Z:
+  RUNNING, 8 cycles, 8.3s, 0 failures/restarts, halt p95 25.91ms, model PASS,
+  broker connections/orders 0. Fingerprint `39920839d98145dbf7d8ae871bd14838ce3a615a23d4b5debab3ad2134412eb7`.
+  This is preliminary only; host-awake uninterrupted 24h and thermal checks remain.
+- Avoid edits to fingerprinted application files while this run is active. Docs
+  and evidence may be updated. Live remains OFF; no broker connection/order.
+- Revalidated new run at 2026-10-13T22:10:22Z: PID492940 alive, checkpoint
+  RUNNING, 9 cycles/38.3s, no failures/restarts, halt p95 25.91ms, model PASS,
+  no broker connections/orders. Launch receipt saved as
+  `evidence/soak-24h-research-guard-20261013-launch.json`; command session13790
+  remains active. No further fingerprinted code changes are planned during this
+  window. This is a verified wait, not 24-hour completion evidence.
+
+## 2026-10-13 additional public-price-source review
+
+- Checked primary documentation for FRED's SP500 series and the Nasdaq Data Link
+  WIKI/PRICES feed. FRED's index is price-only, capped at ten years on its page,
+  and copyrighted by S&P DJI with reproduction permission required; FRED's API
+  also requires a registered key and does not override third-party rights.
+  Nasdaq describes WIKI as unsupported since 2018 and not recommended for
+  investment/analysis. Neither resolves the authorized, rights-cleared daily
+  instrument history needed for L14. No API keys, accounts, or data were
+  requested; no data downloaded.
+- Updated the source review with these rejected candidates. This is evidence
+  against assuming a superficially free benchmark feed is licensed/fit for the
+  evaluation; L14 remains `INSUFFICIENT EVIDENCE`, and the provider guard remains
+  default-off. No code or evaluation parameters changed.
+- The latest verified 24h runner state remains PID492940 under command session
+  13790, output `.qa/soak-24h-research-guard-20261013`; no host interruption
+  should be inferred without checking the live process and checkpoint again.
+- Follow-up configuration regression confirms `YAHOO_HISTORICAL_DATA_ENABLED=true`
+  is recognized for explicitly opted-in mocked transport. The refreshed focused
+  history/replay/simulator suite passes **47 tests**; Ruff, diff check pass, and
+  the effective checkout config remains false. No Yahoo request was made.
+- Code-fingerprint integrity recheck using the checkout venv: current runner
+  fingerprint exactly matches checkpoint `39920839d98145dbf7d8ae871bd14838ce3a615a23d4b5debab3ad2134412eb7`; status remained RUNNING at 14 cycles/188.3s. Only docs/evidence and a non-fingerprinted unit test changed after launch. This confirms the new code window has not been invalidated.
+- Safe thermal diagnostic at 2026-10-13T22:13:48Z: Windows
+  `MSAcpi_ThermalZoneTemperature` returned `CimException`; WSL exposed no files
+  in `/sys/class/thermal` for a usable temperature sample. The earlier NVIDIA
+  sample measures GPU temperature only. CPU temperature/cooling and sustained
+  throttling therefore remain unknown; no OS/power settings changed.
+- Same-time runner check: PID492940 alive, checkpoint RUNNING at 15 cycles /
+  218.3s, no failures/restarts, p95 25.91ms, local model PASS, and zero broker
+  connections/orders. This remains preliminary and has no 24h credit.
+- Approved temporary clock-service comparison was completed and restored:
+  `systemd-timesyncd` state active → inactive → active. The 90-second stopped
+  trial saw two ~103–122ms forward divergences; the restored-service control
+  saw none above 50ms. This does not establish a cause or a fix; retain the
+  existing 250ms discontinuity guard. No persistent OS or power setting changed.
+  See `CLOCK_REVIEW.md` and `evidence/clock-service-test-20261013.json`.
+- Resume verification: PID492940 and tracked command session13790 remain active;
+  the latest saved checkpoint is RUNNING at 22 cycles / 428.3s, no failures or
+  restarts, halt p95 24.84ms, model PASS, and zero broker connections/orders.
+  The code fingerprint remains `39920839d98145dbf7d8ae871bd14838ce3a615a23d4b5debab3ad2134412eb7`.
+  `git diff --check` passes. No soak-fingerprinted files changed in this resume.
+- Follow-up state check: `systemd-timesyncd` is active and runner PID492940
+  remains alive; checkpoint advanced to 23 cycles / 458.3s with no failures or
+  restarts and unchanged fingerprint. This is still only a short preliminary
+  window, not 24-hour evidence. No broker connections or orders occurred.
+
+## 2026-10-13 IBKR dependency migration and fresh soak checkpoint
+
+- Migrated the direct IBKR adapter from unmaintained `ib_insync` to the
+  IBKR-documented `ib_async==2.1.0`. Updated lazy imports, mocks and API
+  compatibility checks. The lock records `tzdata 2025.3` because the package
+  currently constrains tzdata below 2026; this tradeoff and package wheel hash
+  are recorded in `evidence/ib-async-migration-20261013.txt`.
+- Verification: 719 unit tests pass (7.21s); 59 broker-focused tests pass on a
+  marked disposable PostgreSQL database (15.18s); all374 integration tests pass
+  on a newly created marked disposable database (96.52s, exit0, cleanup PASS).
+  `poetry check --lock`, Ruff for touched adapters/tests, compileall and
+  `git diff --check` pass. The full suite emitted only dependency deprecation
+  warnings. Existing published remote CI does not include this local change.
+- The old soak was explicitly interrupted at27 cycles/590.7s before migration;
+  it earns no24-hour credit. Two immediate fresh-launch attempts exited before
+  sampling due to wrapper setup errors; their logs are retained. The active
+  attempt is detached PID500853, started `2026-10-13T22:27:39Z`, at
+  `.qa/soak-24h-ib-async-final-20261013`; its launch receipt is
+  `evidence/soak-24h-ib-async-final-20261013-launch.json`. Initial checkpoint:
+  RUNNING,4 cycles/4.18s, no failures/restarts, p95 26.85ms, fingerprint
+  `36ee15eb9f882cf8845e54733b0fa434df6b0f514e0b8e053414a0b1cba45a82`, zero
+  broker connections/orders. Keep host and WSL awake; inspect PID/checkpoint
+  before any retry. Only terminal PASS_24H earns the gate.
+- The disposable DB is `test_soak_ibasync_4de6dac5` in `.qa/pgdata`, with token
+  stored mode0600 under ignored `.qa/soak-current-marker.txt`; endpoint uses
+  `.qa/socket:55439`. The marker and migration revision were verified before
+  launch. Do not connect any broker/provider. `.env` and effective config both
+  report `LIVE_TRADING_ENABLED=false`; `systemd-timesyncd` is active.
+- Current fixed progress rubric remains unchanged. Latest audit:
+  **87%**, delta **+0.125 pp**, raw87.125/100. Remaining: external paper-account
+  verification/reconciliation, authorized research history and universe,
+  uninterrupted24-hour/thermal evidence, and CI for this unpublished candidate.
+
+## 2026-10-13 updated container build checkpoint
+
+- With Docker Desktop's Linux engine available, `docker compose build app`
+  completed successfully against the current pyproject/lock and emitted image
+  digest `a64ce3a90cee80e7a93cd6e8e83828c583d3d70b37ff99de0c31ed8f27babe95`.
+  A `--network none` one-shot container import smoke passed as uid1000 and
+  confirmed `ib_async 2.1.0` plus the read-only adapter/API import. No Compose
+  services or persistent volumes were started; no broker socket was opened.
+  Evidence: `evidence/container-build-ibasync-20261013.txt`.
+- The build warned that soupsieve3.0.1 is yanked due to a regex compatibility
+  issue on Python older than3.11.5; this image is pinned to Python3.12. The build
+  and container import pass, but retain this warning for review.
+- At 2026-10-13T22:31Z the fresh soak remained alive/RUNNING,15 cycles/218.2s,
+  zero failures/restarts, p95 32.65ms, matching code fingerprint, zero broker
+  connections/orders. This is preliminary only, not a long-run gate result.
+- At `2026-10-13T22:32:23Z`, the detached soak remained PID500853/RUNNING at
+  17 cycles / 278.2 seconds, zero failures/restarts, halt p95 32.65ms, exact
+  candidate fingerprint match, and zero broker connections/orders. Docker image
+  build and offline non-root import did not interrupt its observation window.
+  No 24-hour credit; the host/WSL must remain awake.
+
+## 2026-10-13 approved IBKR migration publication checkpoint
+
+- The user approved publication of the exact19-file patch (review SHA256
+  `d4e3ca84f833946e789a3b4a7b8860fe14fb4fe18885c4cf6e1680109d4355be`). It was
+  committed as `1d01bb5517d5f1a7424efd9daca766223850a2df` and pushed to
+  `origin/main`; only those19 reviewed paths were committed. All other dirty
+  work remains unstaged and preserved.
+- GitHub Actions run38478734435 started for the new SHA. At the last query the
+  unit job had started; no CI result is credited until all required jobs finish.
+- The push notice about one moderate vulnerability matches existing open
+  Dependabot alert #1 for diskcache5.6.3 in poetry.lock. It has no patched
+  version recorded and was already documented in QUALITY.md before this push;
+  no new open alert was introduced by ib_async. The alert is tracked, not
+  dismissed.
+- Active soak PID500853 remains on the same code fingerprint; publication
+  changed no source files. Continue checking its checkpoint and the CI run.
+  Live trading remains false; no broker connection/order occurred.
+- Read-only `gh secret list` confirms the repository-level Actions secret named
+  `SONAR_TOKEN` is configured; its value was neither read nor exposed. It should
+  not be copied into the root `.env`. GitHub's push warning was matched to the
+  pre-existing open medium Dependabot diskcache#1 alert; the alert was created
+  before this change, has no patched version listed, and is documented in
+  `QUALITY.md`. No alert state was changed.
+- Remote run38478734435: unit job PASS in54s. Chromium+PostgreSQL browser and
+  Integration Tests/PostgreSQL jobs started at `2026-10-13T22:35:49Z` and were
+  still running at last query; the combined Sonar gate is pending. No complete
+  remote-CI credit yet. The repository Actions secret name `SONAR_TOKEN` is
+  configured; token value remains private.
+- Remote run38478734435 has unit and Chromium+PostgreSQL browser jobs PASS on
+  `1d01bb5`; the PostgreSQL integration job and combined Sonar gate are pending.
+  The browser job is on the current published dependency change, not the older
+  HEAD. Latest progress audit is87% (delta0pp, raw87.250/100); no additional
+  point was awarded because L12 was already complete.
+
+
+## 2026-10-13 remote CI and soak checkpoint
+
+- Remote run38478734435 for published commit `1d01bb5` now has unit,
+  PostgreSQL integration, and Chromium/PostgreSQL browser jobs completed
+  successfully. SonarCloud combined-coverage gate remains in progress; L11 stays
+  IN PROGRESS until it finishes successfully. The run is linked in PLAN.md.
+- Fresh soak PID500853 remains alive and advancing. At 2026-10-13T22:40:19Z it
+  recorded33 cycles /758.2 seconds in one continuous window, zero failures or
+  restarts, control p95 31.17ms, matching code fingerprint, model PASS, and zero
+  broker connections/orders. No24-hour credit; keep the host and WSL awake.
+- The fixed progress audit remains87% (raw87.250/100, delta0pp); no extra credit
+  is assigned until Sonar passes or the soak reaches terminal PASS_24H. Outstanding
+  gates remain L04 external gateway/reconciliation, L10/L13 full awake soak and
+  thermal evidence, L14 approved research history/universe, and L15 verified
+  paper-account authorization. Live trading remains disabled.
+- Worktree remains dirty with prior local changes preserved; only the previously
+  approved19-file patch is committed/published.
+
+
+## 2026-10-13 first scheduled restart checkpoint
+
+- The previously detached soak runner PID500853 and current fixture-service
+  PID506404 are live. Its saved checkpoint at `2026-10-13T22:43:20Z` records39
+  cycles /938.2 seconds in one continuous window, zero failures, one scheduled
+  restart in1.600s (service PID500855→506404), p95 31.17ms, matching source
+  fingerprint, and zero broker connections/orders. No24-hour credit.
+- On published commit `1d01bb5`, remote unit, integration, and browser jobs pass.
+  Sonar job115577460897 has an assigned GitHub-hosted runner and is installing
+  dependencies/downloading browser coverage; its quality result is pending.
+- Progress-monitor audit:87%, delta0pp, raw87.250/100. L04/L10/L11/L13/L14/L15
+  remain open; live mode is still disabled. `git diff --check` passes and the
+  current source/test modifications remain preserved and unstaged.
+
+
+- Safe-boundary recheck at `2026-10-13T22:44:14Z`: runner PID500853 remains
+  live; fixture PID506404 remains live. Soak advanced to40 cycles /968.2s,
+  zero failures, one restart, one continuous window, matching fingerprint, and
+  zero broker connections/orders. Run38478734435 Sonar is still progressing
+  through dependency installation and measured browser-coverage download; other
+  three jobs pass. No retries or source changes made.
+
+## 2026-10-14 resumed goal checkpoint — CI terminal, external inputs clarified
+
+- Current nested checkout remains at `1d01bb5517d5f1a7424efd9daca766223850a2df`
+  == `origin/main`; dirty source/tests/docs/evidence are preserved. No source or
+  dependency files were touched in this checkpoint.
+- Verified remote run38478734435 terminal `success` for the exact HEAD. Its unit,
+  PostgreSQL integration, Chromium+PostgreSQL browser, and combined Sonar
+  Quality Gate jobs all report `success`. Downloaded JUnit artifacts show717
+  unit,373 integration, and1,094 combined E2E-tier cases with zero failures,
+  errors or skips; tiers overlap. Combined coverage is9,649/11,678 lines
+  (82.63%). Durable summary: `evidence/remote-ci-38478734435-summary.json`.
+  L11 is now PASS.
+- User authorizes read-only paper connectivity but says they have only an IBKR
+  login and do not understand paper accounts/TWS/Gateway. No paper-only session
+  or account is verified; no broker connection/order occurred. L04/L15 remain
+  blocked pending a properly selected and independently verified paper session.
+- User initially said a rights-cleared source/universe exists, then clarified
+  they cannot identify the source, instrument universe, coverage period, or
+  permitted local data path. No data was fetched or read; L14 remains
+  INSUFFICIENT EVIDENCE pending those specifics.
+- Soak runner PID500853 remains RUNNING under
+  `.qa/soak-24h-ib-async-final-20261013`; saved checkpoint at
+  `2026-10-14T11:08:32Z`:45,552.9s (12.65h),1,617 cycles,49 restarts, one
+  observation window, no failures, control p95 29.58ms, fingerprint
+  `36ee15eb9f882cf8845e54733b0fa434df6b0f514e0b8e053414a0b1cba45a82`, zero
+  broker connections/orders. No24-hour credit until terminal `PASS_24H`.
+- Progress audit baseline after this clarification:87% (delta0pp, raw87.375/100).
+  Fixed rubric unchanged. Live mode remains false; no trades or external data
+  access occurred. Next safe work: check soak at milestone boundaries, retain
+  actual thermal/host validation as pending if unavailable, and explain the
+  minimum safe paper/data setup information if the user wants to proceed.
+
+- To make the external blockers actionable, checked current official IBKR guidance: paper mode is distinct from live; newer clients generally receive a paper account while older accounts may not; the platform login explicitly selects Paper. Added the official setup/overview links and a plain-language data-source checklist to `BLOCKERS.md`. This is guidance only; no login/session or data access occurred.
+
+- Safe host-telemetry probe while the soak process was confirmed live: no WSL
+  thermal zones, no `sensors` binary, and no Windows ACPI thermal-zone rows;
+  NVML returned a point-in-time GPU temperature of65 C while the soak is CPU
+  inference. Saved `evidence/thermal-telemetry-availability-20261014.txt` and
+  updated `MODEL_HOST.md`. This is not sustained thermal evidence; L13 remains
+  partial. No OS settings changed.
+
+- Follow-up live-process check at `2026-10-14T11:11:02Z` confirmed runner PID500853 is still active and advancing:45,702.9s,1,622 cycles,49 restarts, zero failures, one observation window, p95 29.50ms, unchanged fingerprint and zero broker connections/orders. Updated PLAN/BLOCKERS to this saved sample; no 24h credit.
+
+- Current local prerequisite recheck: no candidate CSV/Parquet/Feather/XLSX/JSONL
+  research file was found under this checkout; no service listens on local IBKR
+  API ports4001/4002; `.env` remains `LIVE_TRADING_ENABLED=false`. Evidence:
+  `evidence/local-paper-data-prerequisite-check-20261014.txt`. This does not
+  determine whether the user has a paper account or data elsewhere.
+
+- Revalidated the existing live process at `2026-10-14T11:13:32Z`: PID500853
+  RUNNING at45,852.9s (12.74h),1,627 cycles,49 restarts,0 failures, one
+  observation window, p95 29.50ms, matching fingerprint, and no broker
+  connections/orders. Updated current L10 references; this remains partial and
+  earns no 24-hour credit.
+
+- Revalidated PID500853 at `2026-10-14T11:14:33Z`: RUNNING at45,912.9s
+  (12.75h),1,629 cycles,49 restarts,0 failures, one window,p95 29.50ms,
+  unchanged fingerprint, zero broker connections/orders. Updated PLAN/BLOCKERS;
+  no 24-hour credit. HEAD still equals origin/main and `git diff --check` passes.
+
+- Verified the same active process again at `2026-10-14T11:15:03Z`: PID500853
+  RUNNING at45,942.9s (12.76h),1,630 cycles,49 restarts,0 failures, one window,
+  p95 29.50ms, unchanged fingerprint, zero broker connections/orders. Updated
+  the current PLAN/BLOCKERS summary; no 24-hour credit.
+
+- Thermal instrumentation correction: Windows performance counters expose
+  `\_TZ.THM0` despite empty `MSAcpi_ThermalZoneTemperature` and Linux sensor
+  results. At11:17:43Z it measured360.2K/87.05C, passive limit100, throttle
+  reason0. Hardware association is unknown. Started low-frequency sampler PID731748
+  (60s, ignored CSV under `.qa`) which exits with the soak; durable start evidence
+  is `evidence/thermal-telemetry-sampler-start-20261014.json`. This is partial
+  host thermal evidence, not CPU-package or sustained cooling proof.
+
+## 2026-10-14 plain-language blocker guidance
+
+- The user clarified they do not know what an IBKR paper account/session or a
+  rights-cleared historical-price source means. No credentials, broker session,
+  data path, instruments or coverage period were supplied; no connection or data
+  access was attempted.
+- Added a plain-language explanation to `BLOCKERS.md`: Paper is a simulated
+  account/session selected at IBKR platform login; the user need only confirm
+  the visible Paper selection, with no credentials/account IDs in chat. No
+  order will be placed. Research requires an existing permitted historical
+  price file and its instrument/date coverage; if unavailable, retain
+  INSUFFICIENT EVIDENCE.
+- Official IBKR material confirms Paper must be selected at login and paper
+  credentials are used for paper trading: https://www.interactivebrokers.com/campus/glossary-terms/paper-trading-account/
+  and https://www.interactivebrokers.com/campus/trading-lessons/request-paper-trading-account/.
+- Soak PID500853 remains RUNNING. At `2026-10-14T11:19:34Z` it recorded
+  46,214.5s,1,639 cycles,50 scheduled restarts, zero failures, one continuous
+  window, p95 29.50ms, unchanged code fingerprint and zero broker connections
+  or orders. Thermal sampler PID731748 is active; samples remain limited and
+  do not yet establish sustained cooling or component identity.
+- Only documentation/checkpoint files changed; no fingerprinted application
+  files changed. External L04/L15 and L14 conditions remain unavailable pending
+  user setup/data details. Live trading stays disabled.
+- Progress-monitor baseline after this clarification:88%, delta0pp, raw87.500/100.
+  Rubric unchanged; documentation-only clarification earned no credit. The soak
+  is RUNNING below24hours; thermal mapping/sustained response, L04/L15 and L14
+  remain unresolved. `git diff --check` passes.
+
+## 2026-10-14 thermal-zone correlation milestone
+
+- Read-only Windows PnP inspection confirmed the performance-counter zone as
+  `ACPI\\THERMALZONE\\THM0` at `ACPI(_SB_)#ACPI(THM0)`, parent
+  `ACPI_HAL\\PNP0C08\\0`. A separate Lenovo Intelligent Thermal Solution device
+  sits under a different embedded-controller path/parent; no association to the
+  measured THM0 component is proven.
+- At11:23:08Z, THM0 measured357.2K/84.05C, passive limit100 and throttle0;
+  total CPU use5.36%. The same-window RTX3050Ti reported72C,39% utilization,
+  8.97W. The one-minute series ranged82.05C-95.05C; the95.05C sample at
+  11:21:43Z also had throttle0. These are point observations, not sustained
+  cooling or CPU-package evidence. See
+  `evidence/thermal-telemetry-correlation-20261014.json` and `.txt`.
+- Soak PID500853 remains RUNNING at11:24:03Z:46,482.9s (12.91h),1,648 cycles,
+  50 restarts, zero failures, one continuous observation window, p95 29.50ms,
+  unchanged fingerprint, no broker connections/orders. No24-hour credit yet.
+- Documentation and evidence only changed; the soak's fingerprinted source was
+  untouched. `git diff --check` and JSON validation pass. `.env` still has
+  `LIVE_TRADING_ENABLED=false`.
+
+## 2026-10-14 acceptance evidence reconciliation
+
+- Re-read the historical full-suite failure artifact: it is dated2026-10-11
+  and records two failures, a broker disconnect checkpoint left `running` rather
+  than `failed`, and an intentional `CLOCK_REGRESSION` risk guard. It predates
+  the latest local validation and was incorrectly described as current in
+  `AUDIT.md`.
+- Updated `AUDIT.md` to distinguish historical failures, local current-tree
+  validation (719 unit +374 PostgreSQL integration passes, plus59 broker
+  integration passes, all after current local source changes), and published
+  HEAD remote CI run38478734435 (all four jobs pass,82.63% coverage). Remote
+  CI does not prove uncommitted changes or external broker/host gates.
+- Current soak PID500853 verified RUNNING at11:25:33Z:46,572.9s (12.94h),
+  1,651 cycles,50 restarts,0 failures, one continuous window, p95 29.50ms,
+  unchanged fingerprint and zero broker connections/orders. No24-hour credit.
+- `git diff --check` passes; no application source/test changes were made in
+  this milestone. Live trading remains disabled.
+
+## 2026-10-14 current candidate container gate identified
+
+- Read-only Docker check confirms Docker Desktop29.8.2 Linux/x86_64 and the
+  current `investment-assistant:local` image exists with digest
+  `sha256:a64ce3a90cee80e7a93cd6e8e83828c583d3d70b37ff99de0c31ed8f27babe95`.
+  No containers were running at this check. Existing candidate evidence covers
+  build and non-root import only; startup/model/database readiness and restart
+  validation were on a prior image. This is an additional L10 acceptance item.
+- Added a pinned, isolated runtime-validation command to `CONTAINERS.md` and
+  documented it in `PLAN.md`/`BLOCKERS.md`. Defer execution until the running
+  CPU soak reaches terminal state to avoid adding competing load and risking
+  its continuity. The command uses owned test resources and creates no host
+  ports or production mounts.
+- Soak PID500853 remains RUNNING at11:27:03Z:46,662.9s (12.96h),1,654 cycles,
+  50 restarts,0 failures, one continuous window,p95 29.50ms, matching fingerprint,
+  zero broker connections/orders. No24-hour credit.
+- `git diff --check` passes. Only documentation changed; no container run,
+  application mutation, commit, push or deployment occurred. Live remains OFF.
+
+## 2026-10-14 resumed-state verification
+
+- Current checkout remains at published HEAD `1d01bb5517d5f1a7424efd9daca766223850a2df`; 228 changed/untracked paths are preserved, `git diff --check` passes, and origin/main matches. No application files changed.
+- Verified soak PID500853 and thermal sampler PID731748 are alive. The runner checkpoint at11:28:03Z reports RUNNING at46,722.9s (12.98h),1,656 cycles,50 restarts,0 failures,one continuous window,p95 29.50ms, unchanged fingerprint, and zero broker operations. The sampler latest CSV entry at11:27:43Z reads81.05C, passive limit100, throttle0; component mapping remains unknown.
+- Docker Desktop29.8.2 is available; candidate image digest and untested current-image runtime boundary are documented. Validation remains deferred until the soak exits.
+- `.env` remains `LIVE_TRADING_ENABLED=false`. Paper-only account and rights-cleared price-data specifics remain unavailable. No broker/data access, Docker mutation, commit, push or deploy occurred.
+
+## 2026-10-14 isolated-container preflight
+
+- Docker Desktop29.8.2 remains available. Read-only image inspection confirmed
+  candidate `investment-assistant:local` digest
+  `sha256:a64ce3a90cee80e7a93cd6e8e83828c583d3d70b37ff99de0c31ed8f27babe95`
+  (`linux/amd64`, user `appuser`) and pinned PostgreSQL image
+  `postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea`
+  are both cached. Local model is readable and hashes to
+  `6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e`.
+- This removes image-pull uncertainty from the queued runtime test. It does not
+  verify current-candidate startup/restarts. That test remains deferred until
+  the current soak terminates to avoid competing CPU load. No containers were
+  created; only CONTAINERS/BLOCKERS/CHECKPOINT docs changed. `git diff --check`
+  passes.
+
+## 2026-10-14 user prerequisite clarification and resumed checkpoint
+
+- User clarified they do not know what an IBKR Paper account/session or a rights-cleared historical-price source/universe means and cannot currently verify or identify either. No credentials, broker connection, market data, or orders were accessed. L04/L15 and L14 remain open; no acceptance credit added.
+- Latest saved soak checkpoint at11:30:33Z: RUNNING,46,872.9s (13.02h),1,661 cycles,50 restarts,0 failures, one continuous window, control p95 29.50ms, unchanged code fingerprint,0 broker connections/orders. Keep it running; no24h credit until terminal PASS_24H.
+- Latest thermal CSV sample at11:29:43Z was85.05C, passive limit100, throttle reason0; zone-to-component mapping and sustained evidence remain unknown.
+- Candidate-container runtime remains queued until the soak terminates. `.env` remains `LIVE_TRADING_ENABLED=false`; worktree preserved; no source changes, containers, publication, or deployment in this checkpoint.
+- Fixed-rubric progress monitor baseline: **GOAL PROGRESS: 88% (Δ: 0 pp; raw 87.500/100)**. No substantive acceptance progress since the previous audit.

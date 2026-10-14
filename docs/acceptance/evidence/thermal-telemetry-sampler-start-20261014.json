@@ -1,0 +1,13 @@
+{
+  "sample_timestamp_utc": "2026-10-14T11:17:43.171182+00:00",
+  "zone": "\\_TZ.THM0",
+  "temperature_kelvin": 360.2,
+  "temperature_celsius": 87.05,
+  "percent_passive_limit": 100,
+  "throttle_reasons": 0,
+  "source": "Windows Win32_PerfFormattedData_Counters_ThermalZoneInformation / Get-Counter High Precision Temperature",
+  "sampler_pid": 731748,
+  "sampler_output": ".qa/thermal-monitor-20261014.csv",
+  "associated_device": "unknown; this is a platform ACPI thermal zone and is not confirmed to be the CPU package",
+  "interpretation": "Single sample only; sustained thermal acceptance remains pending"
+}
