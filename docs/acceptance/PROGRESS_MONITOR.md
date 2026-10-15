@@ -15,11 +15,11 @@ not gate PASS statuses; PLAN.md remains the acceptance matrix.
 | L07 | 6 | 6 |
 | L08 | 5 | 5 |
 | L09 | 6 | 6 |
-| L10 | 6 | 5.375 |
+| L10 | 6 | 5.875 |
 | L11 | 5 | 5 |
 | L12 | 6 | 6 |
-| L13 | 7 | 4.75 |
-| L14 | 7 | 2 |
+| L13 | 7 | 6.75 |
+| L14 | 7 | 1.875 |
 | L15 | 4 | 0.25 |
 | L16 | 4 | 4 |
 
@@ -312,3 +312,71 @@ clarifying documentation. The soak remains active at1,639 cycles and50 successfu
 restarts with no failures, below24hours; thermal sampling continues but component
 mapping and sustained behavior are unknown. L04/L15 paper verification, L10/L13
 full observation and L14 identified rights-cleared data remain open. Live mode OFF.
+
+Verified terminal soak and candidate-image milestone (2026-10-14):
+**GOAL PROGRESS: 90% (displayed Δ: +1 pp; raw89.625/100)**. The earlier terminal
+baseline was89%/raw88.500, awarding provisionalL13+1 pending review. Independent
+raw-sample review confirmed24h continuity,control/restart budgets and24CPU runs;
+L10 now6/6 (+0.625). Current-source178file image comparison and production
+startup/model/database/halting/restart/cleanup evidence raisedL13 to6.25/7 (+0.5).
+The fixed weights remain unchanged. Unmapped CPU cooling,L04/L15 verified paper
+account/reconciliation andL14 identified rights-cleared data remain incomplete.
+No broker connection/order occurred; live remainsOFF.
+
+Remaining-work source audit corrected completion claims (2026-10-15): bare native
+read admission and raw provider errors were unresolved original requirements.
+Displayed90% dropped to88%/raw88.250 after provisional credit reductions and
+correction of a0.625 arithmetic discrepancy between historical reports and the
+listed gate values. The weights did not change. Preserve that correction; sum
+listed earned points for future reports instead of carrying the erroneous raw.
+After synthetic reproductions and100focused authority/read plus126overlapping
+read/redaction checks, progress_monitor restoredL02=8,L06=6,L10=5.875:
+**GOAL PROGRESS: 89% (displayed Δ:+1pp; raw88.625/100)**. L04=6.375,L13=6.125;
+Alpaca transport contract and currentfullsuite/browser/image/runtime/new24h remain
+pending. Earlier24h/runtime PASS remains true only for its frozen candidate.
+
+Full changed-candidate validation (2026-10-15):773unit,374markedPGintegration,
+realChromiumworkflow,179fileimage/sourcecomparison andcurrentruntime/cleanup
+PASS. InstalledAlpacatransport/finallycleanup tests pass too. Monitor restored
+L04=6.5 andL13=6.5; **GOAL PROGRESS:89% (displayedΔ:0pp;raw89.125/100)**.
+Prior24h belongs to its oldfingerprint; newobservation andunmappedcooling,
+verifiedPaper andlicenseddata remain incomplete. No newweights or100%claim.
+
+Final market/FX boundary review (2026-10-15): same-process native halt benchmark
+passes1,362overlaprequests,p95 52.833ms<250ms,withownedDBcleanup. However internally
+caughtmarket/FXrawexceptions andunguardedYahoo-market/scheduledpaths remained
+unresolved originalrequirements. Monitor provisionallyreducedL02=7.875,L06=5.875,
+L10=5.75,L14=1.75: **GOAL PROGRESS:89% (displayΔ:0pp;raw88.500/100)**.
+Thosefixesareunderway;no24hnewwindowlauncheduntilfinalsourcefreeze.
+
+Final source-boundary repair audit (2026-10-15):802unit,374markedPG and clean
+Chromium-v4 PASS; market-only default/native abstention regression reproduced
+and now passes. Monitor restored L02=8,L06=6,L10=5.875,L14=1.875, raw89.000.
+A small L14 deduction remains for an unintended unmocked Yahoo lookup attempt
+whose connection/data outcome was not retained; corrected subsequent tests use
+mocks/denials. Final image19c1f198… complete179-file match, runtime7.033s/1.104s
+under15s and independent owned-resource cleanup PASS raises L13=6.75/7:
+**GOAL PROGRESS:89% (display delta0pp; raw89.250/100)**. Fresh current-source
+soak, mapped cooling, verified Paper and authorized research/economic evidence
+remain incomplete. Remote CI for this new bundle is not claimed.
+
+Fresh observation launch/final safe-boundary audit (2026-10-15):
+**GOAL PROGRESS:89% (delta0pp;raw89.250/100)**. Newcurrent-fingerprint
+detached24h starts with no failures and no24hcredit. Fixed earned points
+unchanged. Preserve live run; remaining fullcurrentwindow/mappedthermal,
+verifiedPaper/externalreconciliation,rights-clearedresearch andcurrentremoteCI
+stay explicit. GoalACTIVE/incomplete;liveOFF.
+
+Approved publication audit2026-10-15:GOAL PROGRESS89%,delta0pp,raw89.250.
+Exact23-file source patch is onmain as4e62b88; its currentCI is pending, so
+no newcredit. Livecurrent-fingerprint soak has10.28h/40restarts/11CPUchecksPASS
+withzero failures; no24hcredit. Fixed weights/earnedpoints unchanged.
+
+Published test-tier audit:89%,delta0pp,raw89.250. Current4e62b88 remote802unit/374PG,
+24-flowbrowser and8ingresschecks verifiedPASS; combinedSonarjob pending.
+No full24h/thermal/Paper/data credit added.
+
+FinalcurrentpublishedCI audit2026-10-15:GOAL PROGRESS89%,delta0pp,raw89.250.
+CI38717676258 all4jobsSUCCESS andSonargatePASS on4e62b88; L11already5/5.
+Current10.42h soak islivewithoutfailures, no24hcredit; Paper/data/mappedcooling
+stillopen. GoalACTIVE/incomplete;fixedweightsandearnedpoints unchanged.

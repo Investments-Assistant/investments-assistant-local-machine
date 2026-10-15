@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-15T10:26:59.522658+00:00",
+  "scope": "Read-only metadata for two explicit existing Lenovo WMI classes; no method invoked, no configuration/service changes",
+  "exit_code": 0,
+  "result": [
+    {
+      "class": "LENOVO_GAMEZONE_DATA",
+      "status": "UNAVAILABLE",
+      "error_code": "HRESULT 0x80041002,Microsoft.Management.Infrastructure.CimCmdlets.GetCimClassCommand"
+    },
+    {
+      "class": "LENOVO_CPU_METHOD",
+      "status": "UNAVAILABLE",
+      "error_code": "HRESULT 0x80041002,Microsoft.Management.Infrastructure.CimCmdlets.GetCimClassCommand"
+    }
+  ]
+}

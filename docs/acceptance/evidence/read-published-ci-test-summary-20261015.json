@@ -1,0 +1,66 @@
+{
+  "run_id": 38717676258,
+  "head": "4e62b88c9277d1d6f599a82be1490cd87ef043ff",
+  "at": "2026-10-15T10:10:44.277523+00:00",
+  "tiers": {
+    "unit": {
+      "tests": 802,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 20.435,
+      "sha256": "807d620d152c2a282f8c6383840f8ede703b23aa6b8a529e96bba8d9dab7e397"
+    },
+    "integration": {
+      "tests": 374,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 165.826,
+      "sha256": "d0baaf7c41e73d9ecd1d38db13f53855abb6862d27a0a2b8627719dd5b895ac7"
+    },
+    "combined": {
+      "tests": 1180,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 176.467,
+      "sha256": "31c495c1326de80581e31f49b5a0cc975c327be3d8ea11cb50a84d0715ec7f86"
+    }
+  },
+  "all_ci_pass": true,
+  "browser_tail": [
+    "{\"status\": \"PASS\", \"tier\": \"real-browser-real-postgres-stub-model\", \"url\": \"http://127.0.0.1:59535\", \"viewports\": [\"1440x1000\", \"390x844\"], \"checks\": [\"login\", \"page identity\", \"market snapshot unavailable/source permission (intercepted provider state)\", \"profile persistence, project assignment/reload and owner isolation\", \"disabled encrypted IBKR settings create/edit, blank-secret preservation, disable and isolation\", \"portfolio view\", \"proposal\", \"independent approval\", \"independent buy-only and price-band simulator mandate approvals\", \"expense import, currencies, pages, category, full-period export and raw-payload/history retention with re-import suppression\", \"bank disabled status; intercepted consent/selection/retry/history retrieval with fresh expense fetch/disconnect\", \"owner-reviewed pending/booked reconciliation, receipt clocks, export, CSRF/replay denial\", \"cost-aware replay, evidence download/reproduction/isolation\", \"buy/sell opt-in, separate approvals, fills, fees and realized PnL\", \"broker journal, confirmed read and isolation (synthetic source)\", \"immutable valuation capture and flow-adjusted observation comparison\", \"halt\", \"model self-approval denial\", \"CSRF denial\", \"cross-user denial\", \"in-app alert acknowledgement\", \"chat report PDF, confirmed retention tombstone and isolation\", \"durable chat evidence, confirmed retention tombstones, reload and ownership\", \"logout cookie replay and open-WebSocket revocation\"], \"screenshots\": \"/home/runner/work/investments-assistant-local-machine/investments-assistant-local-machine/.qa/browser-evidence\", \"console_errors\": [], \"expected_fixture_http_errors\": [\"Failed to load resource: the server responded with a status of 409 (Conflict)\"], \"broker_connections\": 0, \"external_orders\": 0}"
+  ],
+  "nginx": {
+    "status": "PASS",
+    "tier": "actual loopback nginx TLS and application routes/PostgreSQL",
+    "fixture_directory": ".qa/nginx-ingress-cae9e9287752450f914593d5708eb7ba",
+    "checks": [
+      "TLS certificate verified; actual upstream health",
+      "Security headers retained on proxied responses",
+      "Static success/error responses retain security headers and successful cache budget",
+      "HTTP redirect preserves requested path/query and published TLS port",
+      "Host retains public port; Nginx overwrites spoofed scheme and real IP",
+      "Authenticated same-origin WSS accepted despite spoofed incoming scheme",
+      "Cross-origin, wrong-scheme, missing-origin and unauthenticated WSS rejected",
+      "Non-allowlisted loopback source denied by Nginx HTTPS access rules"
+    ],
+    "broker_connections": 0,
+    "external_orders": 0,
+    "limitations": [
+      "Fixture listener ports, TLS certificate and exact proxy peer substituted.",
+      "No Docker/WSL forwarding, LAN firewall or external account proof."
+    ]
+  },
+  "combined_coverage": {
+    "line-rate": "0.8393",
+    "branch-rate": "0",
+    "lines-covered": "9922",
+    "lines-valid": "11822",
+    "sha256": "48f186a96d6a280c702050a8d8842d219fe774c23b384ac76a0f03080938d9a3"
+  },
+  "sonar_quality_gate": "PASS",
+  "verified_at": "2026-10-15T10:17:32.241461+00:00",
+  "ci_url": "https://github.com/Investments-Assistant/investments-assistant-local-machine/actions/runs/38717676258"
+}

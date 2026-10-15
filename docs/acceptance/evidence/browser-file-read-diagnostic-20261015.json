@@ -1,0 +1,31 @@
+{
+  "browser_path": "existing .qa/playwright1234",
+  "plugin": "Browser plugin not available; existing Playwright workflow used",
+  "scope": "about:blank synthetic file only; no app,broker,provider or secrets",
+  "results": [
+    {
+      "mode": "memory",
+      "status": "PASS",
+      "bytes": 18315,
+      "ms": 3.0999999940395355
+    },
+    {
+      "mode": "path",
+      "status": "PASS",
+      "bytes": 18315,
+      "ms": 4.9000000059604645
+    },
+    {
+      "mode": "memory",
+      "status": "PASS",
+      "bytes": 18315,
+      "ms": 1.100000023841858
+    },
+    {
+      "mode": "path",
+      "status": "PASS",
+      "bytes": 18315,
+      "ms": 4.0999999940395355
+    }
+  ]
+}

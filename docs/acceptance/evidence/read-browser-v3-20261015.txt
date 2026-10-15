@@ -1,0 +1,156 @@
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 484, in <module>
+    main()
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/scripts/verify_browser.py", line 255, in main
+    expect(page.locator("#expense-import-status")).to_contain_text("Imported 202; updated 0")
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 22016, in to_contain_text
+    self._sync(
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 303, in to_contain_text
+    await self._expect_impl(
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to contain text 'Imported 202; updated 0'
+Actual value:  
+Call log:
+  - Expect "to_contain_text" with timeout 5000ms
+  - waiting for locator("#expense-import-status")
+    12 × locator resolved to <p role="status" id="expense-import-status"></p>
+       - unexpected value ""
+
+Aria snapshot:
+- complementary:
+  - text: 📈 InvestAI
+  - button "＋ New chat"
+  - text: Projects
+  - button "Create project": ＋
+  - text: Search chats ⌕
+  - searchbox "Search chats ⌕"
+  - text: Create a project to organise chats. Other chats
+  - button "New chat No messages yet now"
+  - button "Delete chat"
+  - group: Chat retention
+  - text: Trading Mode
+  - button "Recommend"
+  - button "Auto"
+  - text: Recommend mode — every order needs explicit confirmation.
+  - button "Halt auto-trading today"
+  - text: Your Assistant Profile
+  - textbox "Display name"
+  - textbox "Describe your goals, experience, and constraints…"
+  - 'textbox "{\"risk_tolerance\":\"moderate\",\"base_currency\":\"EUR\"}"': "{}"
+  - button "Save profile"
+  - text: Profile loaded Brokerage Accounts Credentials are encrypted locally and never shown to the assistant. No active brokerage accounts. Market analysis still works without them.
+  - combobox:
+    - option "Alpaca" [selected]
+    - option "Interactive Brokers"
+    - option "Coinbase"
+    - option "Binance"
+  - textbox "Account name (e.g. Long-term)"
+  - text: Api Key
+  - textbox "Api Key":
+    - /placeholder: Required credential
+  - checkbox "Paper" [checked]
+  - text: Paper Secret Key
+  - textbox "Secret Key":
+    - /placeholder: Required credential
+  - button "Save account"
+  - text: Encrypted account settings ready Market Snapshot Snapshot not yet available — check back in a few minutes.
+  - button "↻ Refresh"
+  - text: Quick Prompts
+  - button "Market Overview"
+  - button "Portfolio Analysis"
+  - button "Crypto Risk Review"
+  - button "Backtest"
+  - button "Weekly Report"
+  - button "Fed News"
+  - text: Recent Reports No reports yet.
+  - group: Report retention
+- main:
+  - button "☰"
+  - text: Investment Assistant New chat Personal workspace
+  - combobox "Conversation project":
+    - option "No project" [selected]
+  - button "Rename conversation": ✎
+  - navigation "Primary views":
+    - button "Assistant"
+    - button "Portfolio"
+    - button "Expenses" [pressed]
+    - button "Simulation"
+  - text: Connected
+  - region "Expenses dashboard":
+    - text: LIVE CASHFLOW
+    - heading "Where your money goes" [level=1]
+    - paragraph: 2025-10-14 → 2026-10-14 · Connect a bank-data provider to start receiving transactions.
+    - text: Not connected
+    - button "↻ Refresh"
+    - text: Totals cover the displayed page. No successful provider synchronization recorded. WINDOW
+    - heading "Spending period" [level=2]
+    - text: Period
+    - combobox "Period":
+      - option "This month"
+      - option "Last 7 days"
+      - option "Last 30 days"
+      - option "Last 90 days"
+      - option "Last 12 months" [selected]
+    - text: Category
+    - combobox "Category":
+      - option "All categories" [selected]
+      - option "Housing"
+      - option "Food & dining"
+      - option "Transport"
+      - option "Health"
+      - option "Personal"
+      - option "Leisure & pleasure"
+      - option "Financial"
+      - option "Family & gifts"
+      - option "Pets"
+      - option "Work & business"
+      - option "Income"
+      - option "Transfers"
+      - option "Other"
+    - button "How bank sync works"
+    - article:
+      - text: Spent this period
+      - strong: —
+      - text: 0 expense transactions
+    - article:
+      - text: Income received
+      - strong: —
+      - text: Credits in the same period
+    - article:
+      - text: Net cashflow
+      - strong: —
+      - text: Income less spending
+    - article:
+      - text: Top category
+      - strong: —
+      - text: Waiting for data
+    - region "Import expense JSON":
+      - heading "Import transactions" [level=2]
+      - paragraph: Choose a JSON file with a transactions array and provider name. Dates, currencies and bank-account identifiers are required for accurate records. Imports stay in your account and do not connect to a bank.
+      - text: Transaction JSON file
+      - button "Transaction JSON file"
+      - button "Import selected file" [disabled]
+      - status
+    - group: Raw import data retention
+    - group: Export and remove expense history
+    - group: Resolve an unmatched pending transaction
+    - region "Bank connections":
+      - heading "Bank connections" [level=2]
+      - status: Bank access is disabled. Transaction file imports remain available.
+      - paragraph: Authorize access at your bank through the provider. This application never asks for your bank password.
+      - text: Provider institution identifier
+      - textbox "Provider institution identifier":
+        - /placeholder: Identifier from your provider setup
+        - text: FIXTURE_BANK
+      - button "Start bank consent" [disabled]
+      - status: Local synchronization stopped and local tokens removed. Revoke provider consent at your bank or provider separately.
+    - text: €
+    - heading "No bank transactions yet" [level=2]
+    - paragraph: The dashboard is ready for a consented bank-data connection. Once a provider imports transactions, categories and cashflow will update here automatically.
+    - button "See connection options"

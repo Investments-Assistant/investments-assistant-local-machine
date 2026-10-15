@@ -1,0 +1,12 @@
+{
+  "scope": "New marked local test databases only; no broker/provider/production access",
+  "runs": [
+    {
+      "stage": "contention",
+      "database": "test_read_contention_bf985a8200",
+      "identity_verified": true,
+      "cleanup_verified": true,
+      "exit_code": 0
+    }
+  ]
+}

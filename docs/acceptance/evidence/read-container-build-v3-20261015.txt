@@ -1,0 +1,88 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.58kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#2 ...
+
+#3 [auth] library/python:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#2 DONE 0.9s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 503B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [ 1/16] FROM docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#6 resolve docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258 0.1s done
+#6 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 226.53kB 0.0s done
+#5 DONE 0.0s
+
+#7 [ 3/16] RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/*     && cp /tmp/ia-debian.sources /etc/apt/sources.list.d/debian.sources     && rm /tmp/ia-debian.sources     && apt-get update && apt-get install -y --no-install-recommends     build-essential     ca-certificates     cmake     libopenblas-dev     libpq-dev     libffi-dev     libxml2-dev     libxslt1-dev     libcairo2     libpango-1.0-0     libpangocairo-1.0-0     libgdk-pixbuf-2.0-0     libfontconfig1     pkg-config     shared-mime-info     && apt-get clean && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [ 5/16] COPY requirements-poetry.txt ./requirements-poetry.txt
+#8 CACHED
+
+#9 [ 2/16] COPY config/build/debian.sources /tmp/ia-debian.sources
+#9 CACHED
+
+#10 [ 6/16] RUN pip install --no-cache-dir --require-hashes --only-binary=:all: -r requirements-poetry.txt
+#10 CACHED
+
+#11 [ 7/16] COPY pyproject.toml poetry.lock ./
+#11 CACHED
+
+#12 [ 4/16] WORKDIR /app
+#12 CACHED
+
+#13 [ 8/16] RUN poetry config virtualenvs.create false     && poetry install --only main --no-root --no-interaction
+#13 CACHED
+
+#14 [ 9/16] COPY src/ ./src/
+#14 DONE 0.1s
+
+#15 [10/16] COPY alembic.ini ./alembic.ini
+#15 DONE 0.1s
+
+#16 [11/16] COPY migrations/ ./migrations/
+#16 DONE 0.1s
+
+#17 [12/16] COPY .env.example ./.env.example
+#17 DONE 0.1s
+
+#18 [13/16] RUN mkdir -p /app/scripts
+#18 DONE 0.3s
+
+#19 [14/16] COPY scripts/create_user.py ./scripts/create_user.py
+#19 DONE 0.2s
+
+#20 [15/16] COPY scripts/create_broker_key.py ./scripts/create_broker_key.py
+#20 DONE 0.1s
+
+#21 [16/16] RUN mkdir -p /app/reports /app/models     && useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+#21 DONE 1.8s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 1.3s done
+#22 exporting manifest sha256:380ff0992eda7937a8024ad8e6417f87930c0e8ee37d5da04df2cde37dccca92 0.0s done
+#22 exporting config sha256:51ee6bbfe772386d1ebc5b83a3b6e05fdc74050653565900392200e1710548c5 0.0s done
+#22 exporting attestation manifest sha256:6f560977430c9d02d890287750d72509c7ec0fbe14833bb96ca15746602debf0
+#22 exporting attestation manifest sha256:6f560977430c9d02d890287750d72509c7ec0fbe14833bb96ca15746602debf0 0.1s done
+#22 exporting manifest list sha256:60af0d05f049657e2964669988f258776aadf06d1e1b78fe16757c58d9ca5cff 0.1s done
+#22 naming to docker.io/library/investment-assistant:read-final-20261015
+#22 naming to docker.io/library/investment-assistant:read-final-20261015 done
+#22 unpacking to docker.io/library/investment-assistant:read-final-20261015
+#22 unpacking to docker.io/library/investment-assistant:read-final-20261015 0.4s done
+#22 DONE 2.0s

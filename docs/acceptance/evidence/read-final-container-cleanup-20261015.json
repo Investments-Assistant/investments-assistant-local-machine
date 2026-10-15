@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-14T23:48:10.248550+00:00",
+  "run_id": "ia-runtime-df0dde130dd8",
+  "cleanup_verified": true,
+  "remaining_owned_resources": {
+    "containers": [],
+    "networks": [],
+    "volumes": []
+  }
+}

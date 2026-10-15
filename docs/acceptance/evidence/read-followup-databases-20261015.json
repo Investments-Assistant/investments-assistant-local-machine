@@ -1,0 +1,19 @@
+{
+  "scope": "New marked local test databases only; no broker/provider/production access",
+  "runs": [
+    {
+      "stage": "integration",
+      "database": "test_read_integration_207779b216",
+      "identity_verified": true,
+      "cleanup_verified": true,
+      "exit_code": 0
+    },
+    {
+      "stage": "browser",
+      "database": "test_read_browser_844aef770c",
+      "identity_verified": true,
+      "cleanup_verified": true,
+      "exit_code": 1
+    }
+  ]
+}

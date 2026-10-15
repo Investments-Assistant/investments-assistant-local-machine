@@ -1,0 +1,51 @@
+{
+  "at": "2026-10-15T10:21:45.075001+00:00",
+  "scope": "Only selected historical Power-Troubleshooter event1 time/state fields; read-only, no wake device/identity/message data or OS changes",
+  "exit_code": 0,
+  "result": {
+    "status": "QUERY_OK",
+    "lookback_days": 7,
+    "max_events": 20,
+    "events": [
+      {
+        "at_utc": "2026-10-13T14:10:17.8670856Z",
+        "event_id": 1,
+        "provider": "Microsoft-Windows-Power-Troubleshooter",
+        "fields": {
+          "SleepTime": "2026-10-13T01:42:22.0729280Z",
+          "WakeDuration": "2042",
+          "EffectiveState": "5",
+          "WakeTime": "2026-10-13T14:10:17.5430303Z",
+          "TargetState": "5",
+          "SleepDuration": "6201"
+        }
+      },
+      {
+        "at_utc": "2026-10-11T12:59:39.6572468Z",
+        "event_id": 1,
+        "provider": "Microsoft-Windows-Power-Troubleshooter",
+        "fields": {
+          "SleepTime": "2026-10-11T01:15:22.9961084Z",
+          "WakeDuration": "2086",
+          "EffectiveState": "5",
+          "WakeTime": "2026-10-11T12:59:38.5864513Z",
+          "TargetState": "6",
+          "SleepDuration": "1974"
+        }
+      },
+      {
+        "at_utc": "2026-10-10T08:12:44.6644187Z",
+        "event_id": 1,
+        "provider": "Microsoft-Windows-Power-Troubleshooter",
+        "fields": {
+          "SleepTime": "2026-10-10T00:44:26.5563195Z",
+          "WakeDuration": "2104",
+          "EffectiveState": "5",
+          "WakeTime": "2026-10-10T08:12:43.6050436Z",
+          "TargetState": "6",
+          "SleepDuration": "3338"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "status": "RUNNING",
+  "runner_pid": 984335,
+  "service_pid": 1176005,
+  "current_window_started_at": "2026-10-14T23:50:18.204344+00:00",
+  "last_observed_at": "2026-10-15T10:07:47.608288+00:00",
+  "cycles": 1320,
+  "restarts": 40,
+  "current_window_seconds": 37019.635138474,
+  "control_p95_ms": 26.956109009915963,
+  "code_sha256": "f945c38df60e639a6791976385f4e7a2d4be7f347b89e9852582b6ab15c9ddb6",
+  "failures": [],
+  "model_runs": [
+    {
+      "path": "model-0000-91b69e9a.json",
+      "status": "PASS"
+    },
+    {
+      "path": "model-0001-29f35c8f.json",
+      "status": "PASS"
+    },
+    {
+      "path": "model-0002-8c801f43.json",
+      "status": "PASS"
+    },
+    {
+      "path": "model-0003-50247597.json",
+      "status": "PASS"
+    },
+    {
+      "path": "model-0004-820dae37.json",
+      "status": "PASS"
+    },
+    {
+      "path": "model-0005-1b08779b.json",
+      "status": "PASS"
+    },
+    {
+      "path": "model-0006-6e76b458.json",
+      "status": "PASS"
+    },
+    {
+      "path": "model-0007-fb74a79f.json",
+      "status": "PASS"
+    },
+    {
+      "path": "model-0008-bf3fad42.json",
+      "status": "PASS"
+    },
+    {
+      "path": "model-0009-c8407938.json",
+      "status": "PASS"
+    },
+    {
+      "path": "model-0010-3aea831b.json",
+      "status": "PASS"
+    }
+  ],
+  "observation_windows": 1,
+  "continuity": "continuous",
+  "broker_connections": 0,
+  "external_orders": 0,
+  "reviewed_at": "2026-10-15T10:08:02.685711+00:00",
+  "live_runner_verified": true,
+  "current_source_fingerprint_verified": true,
+  "max_restart_seconds": 1.8021696679934394,
+  "all_recorded_models_pass": true,
+  "completed_24h": false,
+  "source_head": "4e62b88c9277d1d6f599a82be1490cd87ef043ff"
+}

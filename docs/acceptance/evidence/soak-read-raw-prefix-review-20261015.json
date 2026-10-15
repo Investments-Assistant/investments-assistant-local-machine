@@ -1,0 +1,95 @@
+{
+  "reviewed_at": "2026-10-15T10:31:18.434644+00:00",
+  "status": "RUNNING_PREFIX_VERIFIED",
+  "snapshot": ".qa/read-soak-prefix-audit-20261015T103118039766Z",
+  "source_fingerprint": "f945c38df60e639a6791976385f4e7a2d4be7f347b89e9852582b6ab15c9ddb6",
+  "cycles": 1366,
+  "continuous_seconds_so_far": 38399.60106679,
+  "control_p95_ms": 26.935278991004452,
+  "control_maximum_ms": 36.675331997685134,
+  "largest_intersample_gap_seconds": 30.00350171001628,
+  "checkpoint_tail_seconds": 0.0626234770170413,
+  "restarts": 41,
+  "maximum_restart_seconds": 1.8021696679934394,
+  "completed_model_runs": 11,
+  "model_answers_independently_rechecked": 33,
+  "model_records": [
+    {
+      "path": "model-0000-91b69e9a.json",
+      "status": "ANSWERS_RECHECKED",
+      "sha256": "9b7457e06a73cc0fb3ac255170bb6cd964a625c2af1714841bb999ee0ad656c4"
+    },
+    {
+      "path": "model-0001-29f35c8f.json",
+      "status": "ANSWERS_RECHECKED",
+      "sha256": "8203b30390003ae2023e0921425dde4e3efbcf5997edb9f19c7e955cc8accbc8"
+    },
+    {
+      "path": "model-0002-8c801f43.json",
+      "status": "ANSWERS_RECHECKED",
+      "sha256": "cfc32fa4740573596b089dd6cc3b2d89da3243a086c8f0b5fb7342369803f657"
+    },
+    {
+      "path": "model-0003-50247597.json",
+      "status": "ANSWERS_RECHECKED",
+      "sha256": "f4b99028a825848e8fb4ccfcdea3fc055c7f1e97cd5fae2662725d5b6575b5f1"
+    },
+    {
+      "path": "model-0004-820dae37.json",
+      "status": "ANSWERS_RECHECKED",
+      "sha256": "b9859d389ce55b56e8133b4645cd3caf15eaf2268a159c60097ce873845d7e4f"
+    },
+    {
+      "path": "model-0005-1b08779b.json",
+      "status": "ANSWERS_RECHECKED",
+      "sha256": "0b58d8d0164926e343811193c1103bd3ec29ff1c36318cdf0afb09c93e03e3d2"
+    },
+    {
+      "path": "model-0006-6e76b458.json",
+      "status": "ANSWERS_RECHECKED",
+      "sha256": "01782ee93c782bb8190331d418591a44b9d48d5dc0b7893d725f5ffa3fe54eb8"
+    },
+    {
+      "path": "model-0007-fb74a79f.json",
+      "status": "ANSWERS_RECHECKED",
+      "sha256": "ade6cb384292f26dd82d3f3cfb32698d68f886cbcc7c256c2b753ca325348ed0"
+    },
+    {
+      "path": "model-0008-bf3fad42.json",
+      "status": "ANSWERS_RECHECKED",
+      "sha256": "d393797026f24e3308e323c4c2c2d30144fc0c1e65b3f3bbdbe1ca141cefb282"
+    },
+    {
+      "path": "model-0009-c8407938.json",
+      "status": "ANSWERS_RECHECKED",
+      "sha256": "06e7a50e66723e79eb0e350e3459f57a3d0b214f20e24bdf2fba55fc0bb74756"
+    },
+    {
+      "path": "model-0010-3aea831b.json",
+      "status": "ANSWERS_RECHECKED",
+      "sha256": "c873530d996192131c67e1f04895125159103963b53fd1c1617171ead677b79a"
+    }
+  ],
+  "snapshot_sha256": {
+    "model-0005-1b08779b.json": "0b58d8d0164926e343811193c1103bd3ec29ff1c36318cdf0afb09c93e03e3d2",
+    "model-0006-6e76b458.json": "01782ee93c782bb8190331d418591a44b9d48d5dc0b7893d725f5ffa3fe54eb8",
+    "model-0010-3aea831b.json": "c873530d996192131c67e1f04895125159103963b53fd1c1617171ead677b79a",
+    "model-0000-91b69e9a.json": "9b7457e06a73cc0fb3ac255170bb6cd964a625c2af1714841bb999ee0ad656c4",
+    "model-0007-fb74a79f.json": "ade6cb384292f26dd82d3f3cfb32698d68f886cbcc7c256c2b753ca325348ed0",
+    "model-0008-bf3fad42.json": "d393797026f24e3308e323c4c2c2d30144fc0c1e65b3f3bbdbe1ca141cefb282",
+    "model-0001-29f35c8f.json": "8203b30390003ae2023e0921425dde4e3efbcf5997edb9f19c7e955cc8accbc8",
+    "model-0004-820dae37.json": "b9859d389ce55b56e8133b4645cd3caf15eaf2268a159c60097ce873845d7e4f",
+    "latency-samples.jsonl": "36af779f6feda954a146ffdbb0503f9dc515db0ce718f8d5cfb97f209231ae7d",
+    "model-0003-50247597.json": "f4b99028a825848e8fb4ccfcdea3fc055c7f1e97cd5fae2662725d5b6575b5f1",
+    "model-0002-8c801f43.json": "cfc32fa4740573596b089dd6cc3b2d89da3243a086c8f0b5fb7342369803f657",
+    "checkpoint.json": "2930bee486868dde473c802b2b50342e56e3aeeac7539cd536076853fc06ec05",
+    "model-0009-c8407938.json": "06e7a50e66723e79eb0e350e3459f57a3d0b214f20e24bdf2fba55fc0bb74756"
+  },
+  "completed_24h": false,
+  "limitations": [
+    "Live prefix only; does not accept the final 24-hour gate.",
+    "Raw samples omit wall timestamps; clock-pair continuity is enforced by the runner, not independently reconstructable.",
+    "Restart durations are runner-recorded; independent process-level restart traces are not retained.",
+    "Three small synthetic model tasks; no end-to-end inference, broker, physical recovery, cooling or economic claim."
+  ]
+}

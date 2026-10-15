@@ -1,0 +1,371 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/unit/read_admission_test.py FFFF                                   [100%]
+
+=================================== FAILURES ===================================
+________________ test_cancelled_market_read_rejects_excess_work ________________
+
+fut = <coroutine object dispatch_tool at 0x7330ac9995d0>, timeout = 0.2
+
+    async def wait_for(fut, timeout):
+        """Wait for the single Future or coroutine to complete, with timeout.
+    
+        Coroutine will be wrapped in Task.
+    
+        Returns result of the Future or coroutine.  When a timeout occurs,
+        it cancels the task and raises TimeoutError.  To avoid the task
+        cancellation, wrap it in shield().
+    
+        If the wait is cancelled, the task is also cancelled.
+    
+        If the task suppresses the cancellation and returns a value instead,
+        that value is returned.
+    
+        This function is a coroutine.
+        """
+        # The special case for timeout <= 0 is for the following case:
+        #
+        # async def test_waitfor():
+        #     func_started = False
+        #
+        #     async def func():
+        #         nonlocal func_started
+        #         func_started = True
+        #
+        #     try:
+        #         await asyncio.wait_for(func(), 0)
+        #     except asyncio.TimeoutError:
+        #         assert not func_started
+        #     else:
+        #         assert False
+        #
+        # asyncio.run(test_waitfor())
+    
+    
+        if timeout is not None and timeout <= 0:
+            fut = ensure_future(fut)
+    
+            if fut.done():
+                return fut.result()
+    
+            await _cancel_and_wait(fut)
+            try:
+                return fut.result()
+            except exceptions.CancelledError as exc:
+                raise TimeoutError from exc
+    
+        async with timeouts.timeout(timeout):
+>           return await fut
+                   ^^^^^^^^^
+
+/usr/lib/python3.12/asyncio/tasks.py:520: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/tools/dispatcher.py:89: in dispatch_tool
+    result = await _dispatch(tool_name, tool_input)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/tools/dispatcher.py:130: in _dispatch
+    return await asyncio.to_thread(_SYNC_DISPATCH[name], inp)  # type: ignore[arg-type]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+func = <function test_cancelled_market_read_rejects_excess_work.<locals>.blocked at 0x7330ac94bf60>
+args = ({},), kwargs = {}
+loop = <_UnixSelectorEventLoop running=False closed=False debug=False>
+ctx = <_contextvars.Context object at 0x7330aced8240>
+func_call = functools.partial(<built-in method run of _contextvars.Context object at 0x7330aced8240>, <function test_cancelled_market_read_rejects_excess_work.<locals>.blocked at 0x7330ac94bf60>, {})
+
+    async def to_thread(func, /, *args, **kwargs):
+        """Asynchronously run function *func* in a separate thread.
+    
+        Any *args and **kwargs supplied for this function are directly passed
+        to *func*. Also, the current :class:`contextvars.Context` is propagated,
+        allowing context variables from the main thread to be accessed in the
+        separate thread.
+    
+        Return a coroutine that can be awaited to get the eventual result of *func*.
+        """
+        loop = events.get_running_loop()
+        ctx = contextvars.copy_context()
+        func_call = functools.partial(ctx.run, func, *args, **kwargs)
+>       return await loop.run_in_executor(None, func_call)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       asyncio.exceptions.CancelledError
+
+/usr/lib/python3.12/asyncio/threads.py:25: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7330ac99d400>
+
+    async def test_cancelled_market_read_rejects_excess_work(monkeypatch):
+        pool = WorkPool(1, "MARKET_READ")
+        monkeypatch.setattr(dispatcher, "market_read_work", pool, raising=False)
+        entered, release = Event(), Event()
+        calls = []
+    
+        def blocked(inp):
+            calls.append(inp)
+            entered.set()
+            assert release.wait(5)
+            return {"value": 1}
+    
+        monkeypatch.setitem(dispatcher._SYNC_DISPATCH, "get_stock_data", blocked)
+        first = asyncio.create_task(dispatcher.dispatch_tool("get_stock_data", {"symbol": "fixture"}))
+        try:
+            assert await asyncio.to_thread(entered.wait, 1)
+            first.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await first
+>           result = json.loads(await asyncio.wait_for(dispatcher.dispatch_tool("get_stock_data", {}), .2))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/read_admission_test.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/tasks.py:519: in wait_for
+    async with timeouts.timeout(timeout):
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Timeout [expired]>
+exc_type = <class 'asyncio.exceptions.CancelledError'>
+exc_val = CancelledError(), exc_tb = <traceback object at 0x7330ac9a9c40>
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+    
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+    
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+    
+            if self._task.uncancel() <= self._cancelling and exc_type is exceptions.CancelledError:
+                # Since there are no new cancel requests, we're
+                # handling this.
+>               raise TimeoutError from exc_val
+E               TimeoutError
+
+/usr/lib/python3.12/asyncio/timeouts.py:115: TimeoutError
+______________ test_read_timeout_keeps_capacity_and_owner_context ______________
+
+fut = <coroutine object dispatch_tool at 0x7330ac999d50>, timeout = 0.2
+
+    async def wait_for(fut, timeout):
+        """Wait for the single Future or coroutine to complete, with timeout.
+    
+        Coroutine will be wrapped in Task.
+    
+        Returns result of the Future or coroutine.  When a timeout occurs,
+        it cancels the task and raises TimeoutError.  To avoid the task
+        cancellation, wrap it in shield().
+    
+        If the wait is cancelled, the task is also cancelled.
+    
+        If the task suppresses the cancellation and returns a value instead,
+        that value is returned.
+    
+        This function is a coroutine.
+        """
+        # The special case for timeout <= 0 is for the following case:
+        #
+        # async def test_waitfor():
+        #     func_started = False
+        #
+        #     async def func():
+        #         nonlocal func_started
+        #         func_started = True
+        #
+        #     try:
+        #         await asyncio.wait_for(func(), 0)
+        #     except asyncio.TimeoutError:
+        #         assert not func_started
+        #     else:
+        #         assert False
+        #
+        # asyncio.run(test_waitfor())
+    
+    
+        if timeout is not None and timeout <= 0:
+            fut = ensure_future(fut)
+    
+            if fut.done():
+                return fut.result()
+    
+            await _cancel_and_wait(fut)
+            try:
+                return fut.result()
+            except exceptions.CancelledError as exc:
+                raise TimeoutError from exc
+    
+        async with timeouts.timeout(timeout):
+>           return await fut
+                   ^^^^^^^^^
+
+/usr/lib/python3.12/asyncio/tasks.py:520: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/tools/dispatcher.py:89: in dispatch_tool
+    result = await _dispatch(tool_name, tool_input)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/tools/dispatcher.py:125: in _dispatch
+    return await _dispatch_broker_read(name, inp)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/tools/dispatcher.py:239: in _dispatch_broker_read
+    return await asyncio.to_thread(get_account_info, broker=broker, account=account)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+func = <function test_read_timeout_keeps_capacity_and_owner_context.<locals>.blocked at 0x7330ac9b0400>
+args = ()
+kwargs = {'account': <object object at 0x7330acd28d90>, 'broker': 'ibkr'}
+loop = <_UnixSelectorEventLoop running=False closed=False debug=False>
+ctx = <_contextvars.Context object at 0x7330ac9a9880>
+func_call = functools.partial(<built-in method run of _contextvars.Context object at 0x7330ac9a9880>, <function test_read_timeout_...pacity_and_owner_context.<locals>.blocked at 0x7330ac9b0400>, broker='ibkr', account=<object object at 0x7330acd28d90>)
+
+    async def to_thread(func, /, *args, **kwargs):
+        """Asynchronously run function *func* in a separate thread.
+    
+        Any *args and **kwargs supplied for this function are directly passed
+        to *func*. Also, the current :class:`contextvars.Context` is propagated,
+        allowing context variables from the main thread to be accessed in the
+        separate thread.
+    
+        Return a coroutine that can be awaited to get the eventual result of *func*.
+        """
+        loop = events.get_running_loop()
+        ctx = contextvars.copy_context()
+        func_call = functools.partial(ctx.run, func, *args, **kwargs)
+>       return await loop.run_in_executor(None, func_call)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       asyncio.exceptions.CancelledError
+
+/usr/lib/python3.12/asyncio/threads.py:25: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7330ac99fb00>
+
+    async def test_read_timeout_keeps_capacity_and_owner_context(monkeypatch):
+        pool = WorkPool(1, "BROKER_QUERY")
+        monkeypatch.setattr(dispatcher, "broker_query_work", pool, raising=False)
+        monkeypatch.setattr(dispatcher, "_READ_TIMEOUT_SECONDS", .03, raising=False)
+        monkeypatch.setattr(dispatcher, "_resolve_single_account", AsyncMock(return_value=(object(), None)))
+        entered, release = Event(), Event()
+        owners = []
+    
+        def blocked(**kwargs):
+            owners.append(dispatcher._tool_user_id.get())
+            entered.set()
+            assert release.wait(5)
+            return {"available": True}
+    
+        monkeypatch.setattr(dispatcher, "get_account_info", blocked)
+        try:
+            with dispatcher.tool_context("fixture-session", "fixture-owner"):
+>               result = json.loads(await asyncio.wait_for(dispatcher.dispatch_tool("get_account_info", {"broker": "ibkr"}), .2))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/read_admission_test.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/tasks.py:519: in wait_for
+    async with timeouts.timeout(timeout):
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Timeout [expired]>
+exc_type = <class 'asyncio.exceptions.CancelledError'>
+exc_val = CancelledError(), exc_tb = <traceback object at 0x7330aaf6c5c0>
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+    
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+    
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+    
+            if self._task.uncancel() <= self._cancelling and exc_type is exceptions.CancelledError:
+                # Since there are no new cancel requests, we're
+                # handling this.
+>               raise TimeoutError from exc_val
+E               TimeoutError
+
+/usr/lib/python3.12/asyncio/timeouts.py:115: TimeoutError
+_______________ test_portfolio_http_shares_broker_read_capacity ________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7330aaffaae0>
+
+    async def test_portfolio_http_shares_broker_read_capacity(monkeypatch):
+        pool = WorkPool(1, "BROKER_QUERY")
+        monkeypatch.setattr(dispatcher, "broker_query_work", pool, raising=False)
+        monkeypatch.setattr(routes, "broker_query_work", pool, raising=False)
+        monkeypatch.setattr(routes, "require_authenticated", AsyncMock(return_value=SimpleNamespace(user_id="fixture-owner")))
+        monkeypatch.setattr(routes, "ensure_broker_vault", lambda: None)
+        monkeypatch.setattr(routes, "load_user_broker_accounts", AsyncMock(return_value=[]))
+        entered, release = Event(), Event()
+    
+        def blocked(inp):
+            entered.set()
+            assert release.wait(5)
+    
+        first = asyncio.create_task(pool.arun(blocked, {}))
+        try:
+            assert await asyncio.to_thread(entered.wait, 1)
+>           with pytest.raises(routes.HTTPException) as failure:
+E           Failed: DID NOT RAISE <class 'fastapi.exceptions.HTTPException'>
+
+tests/unit/read_admission_test.py:95: Failed
+___________ test_dispatch_error_does_not_disclose_provider_exception ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7330ab0a37a0>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x7330ac9b72f0>
+
+    async def test_dispatch_error_does_not_disclose_provider_exception(monkeypatch, caplog):
+        secret = "fixture-token-123 https://example.test/?token=fixture-token-123\naccount=fixture-account-789"
+        monkeypatch.setattr(dispatcher, "_dispatch", AsyncMock(side_effect=RuntimeError(secret)))
+        result = await dispatcher.dispatch_tool("get_stock_data", {})
+>       assert "fixture-token-123" not in result + caplog.text
+E       assert 'fixture-token-123' not in '{"error": "...ccount-789\n'
+E         
+E         'fixture-token-123' is contained here:
+E           {"error": "fixture-token-123 https://example.test/?token=fixture-token-123\naccount=fixture-account-789", "tool": "get_stock_data"}ERROR    src.tools.dispatcher:dispatcher.py:93 Tool get_stock_data raised an exception
+E         ?            +++++++++++++++++
+E           Traceback (most recent call last):
+E             File "/home/lulu/investments-assistant/investments-assistant-local-machine/src/tools/dispatcher.py", line 89, in dispatch_tool
+E               result = await _dispatch(tool_name, tool_input)...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/unit/read_admission_test.py:108: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    src.tools.dispatcher:dispatcher.py:93 Tool get_stock_data raised an exception
+Traceback (most recent call last):
+  File "/home/lulu/investments-assistant/investments-assistant-local-machine/src/tools/dispatcher.py", line 89, in dispatch_tool
+    result = await _dispatch(tool_name, tool_input)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/unittest/mock.py", line 2262, in _execute_mock_call
+    raise effect
+RuntimeError: fixture-token-123 https://example.test/?token=fixture-token-123
+account=fixture-account-789
+=========================== short test summary info ============================
+FAILED tests/unit/read_admission_test.py::test_cancelled_market_read_rejects_excess_work
+FAILED tests/unit/read_admission_test.py::test_read_timeout_keeps_capacity_and_owner_context
+FAILED tests/unit/read_admission_test.py::test_portfolio_http_shares_broker_read_capacity
+FAILED tests/unit/read_admission_test.py::test_dispatch_error_does_not_disclose_provider_exception
+============================== 4 failed in 4.29s ===============================

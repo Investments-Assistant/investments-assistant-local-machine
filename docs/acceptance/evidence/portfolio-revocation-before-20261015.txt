@@ -1,0 +1,87 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/lulu/investments-assistant/investments-assistant-local-machine
+configfile: pyproject.toml
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 9 items
+
+tests/unit/read_admission_test.py .......FF                              [100%]
+
+=================================== FAILURES ===================================
+______ test_portfolio_does_not_publish_after_mid_read_revocation[session] ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7376f0eea450>
+revocation = 'session'
+
+    @pytest.mark.parametrize("revocation", ["session", "account"])
+    async def test_portfolio_does_not_publish_after_mid_read_revocation(monkeypatch, revocation):
+        from src.tools.broker_accounts import BrokerAccountConfig
+    
+        principal = SimpleNamespace(user_id="fixture-owner")
+        account = BrokerAccountConfig("fixture-id", "fixture-owner", "alpaca", "fixture", {})
+        auth = AsyncMock(side_effect=[principal, routes.HTTPException(status_code=401)] if revocation == "session" else None)
+        if revocation != "session":
+            auth.return_value = principal
+        monkeypatch.setattr(routes, "require_authenticated", auth)
+        monkeypatch.setattr(routes, "ensure_broker_vault", lambda: None)
+        accounts = AsyncMock(side_effect=[[account], []] if revocation == "account" else None)
+        if revocation != "account":
+            accounts.return_value = [account]
+        monkeypatch.setattr(routes, "load_user_broker_accounts", accounts)
+        entered, release = Event(), Event()
+    
+        def private_read(**kwargs):
+            entered.set()
+            assert release.wait(5)
+            return {"positions": [], "accounts": [], "errors": []}
+    
+        monkeypatch.setattr(routes, "get_portfolio_summary", private_read)
+        task = asyncio.create_task(routes.portfolio_snapshot(SimpleNamespace()))
+        try:
+            assert await asyncio.to_thread(entered.wait, 1)
+            release.set()  # The mocked revocation is observed after native work returns.
+>           with pytest.raises(routes.HTTPException) as denied:
+E           Failed: DID NOT RAISE <class 'fastapi.exceptions.HTTPException'>
+
+tests/unit/read_admission_test.py:203: Failed
+______ test_portfolio_does_not_publish_after_mid_read_revocation[account] ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7376f0ee8830>
+revocation = 'account'
+
+    @pytest.mark.parametrize("revocation", ["session", "account"])
+    async def test_portfolio_does_not_publish_after_mid_read_revocation(monkeypatch, revocation):
+        from src.tools.broker_accounts import BrokerAccountConfig
+    
+        principal = SimpleNamespace(user_id="fixture-owner")
+        account = BrokerAccountConfig("fixture-id", "fixture-owner", "alpaca", "fixture", {})
+        auth = AsyncMock(side_effect=[principal, routes.HTTPException(status_code=401)] if revocation == "session" else None)
+        if revocation != "session":
+            auth.return_value = principal
+        monkeypatch.setattr(routes, "require_authenticated", auth)
+        monkeypatch.setattr(routes, "ensure_broker_vault", lambda: None)
+        accounts = AsyncMock(side_effect=[[account], []] if revocation == "account" else None)
+        if revocation != "account":
+            accounts.return_value = [account]
+        monkeypatch.setattr(routes, "load_user_broker_accounts", accounts)
+        entered, release = Event(), Event()
+    
+        def private_read(**kwargs):
+            entered.set()
+            assert release.wait(5)
+            return {"positions": [], "accounts": [], "errors": []}
+    
+        monkeypatch.setattr(routes, "get_portfolio_summary", private_read)
+        task = asyncio.create_task(routes.portfolio_snapshot(SimpleNamespace()))
+        try:
+            assert await asyncio.to_thread(entered.wait, 1)
+            release.set()  # The mocked revocation is observed after native work returns.
+>           with pytest.raises(routes.HTTPException) as denied:
+E           Failed: DID NOT RAISE <class 'fastapi.exceptions.HTTPException'>
+
+tests/unit/read_admission_test.py:203: Failed
+=========================== short test summary info ============================
+FAILED tests/unit/read_admission_test.py::test_portfolio_does_not_publish_after_mid_read_revocation[session]
+FAILED tests/unit/read_admission_test.py::test_portfolio_does_not_publish_after_mid_read_revocation[account]
+========================= 2 failed, 7 passed in 1.99s ==========================

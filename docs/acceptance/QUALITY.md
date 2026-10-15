@@ -147,3 +147,14 @@ smoke pass.
 ## Published IBKR migration CI — 2026-10-14
 
 GitHub Actions run [38478734435](https://github.com/Investments-Assistant/investments-assistant-local-machine/actions/runs/38478734435) for `1d01bb5517d5f1a7424efd9daca766223850a2df` completed `success`; unit, PostgreSQL integration, Chromium/browser and combined Sonar quality-gate jobs all succeeded. Downloaded artifacts report717 unit tests,373 integration tests,1,094 tests in the combined E2E-tier report (overlapping tiers; do not sum as unique), and82.63% combined line coverage. This validates the published SHA, not the remaining unpublished local work.
+
+## Current approved read/source-safety CI — 2026-10-15
+
+Commit4e62b88/run38717676258 passes unit, PostgreSQL integration, Chromium and
+combinedSonar jobs. Current rawreports confirm802unit/374PG/1180combined tests
+(0errors/failures/skips;overlappingtiers),83.93%combinedbrowser linecoverage.
+Scannerlog explicitly reports QualityGatePASSED at10:15:19Z. Evidence:
+read-published-ci-38717676258.json/.txt and read-published-ci-test-summary-20261015.json.
+No security finding was accepted/dismissed in this publication. Previously
+authorized dispositions are still dispositions, not code remediation. Existing
+mediumDiskCache#1 remainsopen/no patchedversion, as documented above.

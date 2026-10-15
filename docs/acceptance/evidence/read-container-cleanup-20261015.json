@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "run_id": "ia-runtime-b2e84dffbcf9",
+  "independent_cleanup_check": {
+    "container": [],
+    "network": [],
+    "volume": []
+  },
+  "image_id": "sha256:9cdc9c8614aaf2ae19aeb931fd150ae5bf02562274f0253d14cf5a019fb6de66",
+  "restart_seconds": {
+    "app": 11.695,
+    "database": 1.509
+  },
+  "scope": "Separate read-only check after exit0, no fixture-labelled resources remain"
+}

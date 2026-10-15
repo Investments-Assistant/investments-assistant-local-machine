@@ -1,0 +1,24 @@
+{
+  "status": "RUNNING",
+  "last_observed_at": "2026-10-14T23:52:57.539340+00:00",
+  "runner_pid": 984335,
+  "service_pid": 984337,
+  "cycles": 14,
+  "restarts": 0,
+  "current_window_seconds": 159.2191321749997,
+  "control_p95_ms": 36.675331997685134,
+  "failures": [],
+  "code_sha256": "f945c38df60e639a6791976385f4e7a2d4be7f347b89e9852582b6ab15c9ddb6",
+  "observation_windows": 1,
+  "broker_connections": 0,
+  "external_orders": 0,
+  "model_runs": [
+    {
+      "path": "model-0000-91b69e9a.json",
+      "status": "PASS"
+    }
+  ],
+  "recorded_at": "2026-10-14T23:53:18.958558+00:00",
+  "live_trading_enabled": false,
+  "source_patch_hashes_unchanged": true
+}

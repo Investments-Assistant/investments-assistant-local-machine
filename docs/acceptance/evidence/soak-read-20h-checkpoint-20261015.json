@@ -1,0 +1,150 @@
+{
+  "at": "2026-10-15T20:11:22.703060+00:00",
+  "live_runner_verified": true,
+  "current_source_fingerprint_verified": true,
+  "head": "4e62b88c9277d1d6f599a82be1490cd87ef043ff",
+  "live_trading_disabled": true,
+  "checkpoint": {
+    "status": "RUNNING",
+    "runner_pid": 984335,
+    "cycles": 2599,
+    "restarts": 79,
+    "current_window_seconds": 73185.96315319897,
+    "control_p95_ms": 27.527176978765056,
+    "failures": [],
+    "observation_windows": 1,
+    "last_observed_at": "2026-10-15T20:10:57.417538+00:00",
+    "code_sha256": "f945c38df60e639a6791976385f4e7a2d4be7f347b89e9852582b6ab15c9ddb6"
+  },
+  "models": [
+    {
+      "path": "model-0000-91b69e9a.json",
+      "status": "PASS",
+      "sha256": "9b7457e06a73cc0fb3ac255170bb6cd964a625c2af1714841bb999ee0ad656c4",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0001-29f35c8f.json",
+      "status": "PASS",
+      "sha256": "8203b30390003ae2023e0921425dde4e3efbcf5997edb9f19c7e955cc8accbc8",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0002-8c801f43.json",
+      "status": "PASS",
+      "sha256": "cfc32fa4740573596b089dd6cc3b2d89da3243a086c8f0b5fb7342369803f657",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0003-50247597.json",
+      "status": "PASS",
+      "sha256": "f4b99028a825848e8fb4ccfcdea3fc055c7f1e97cd5fae2662725d5b6575b5f1",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0004-820dae37.json",
+      "status": "PASS",
+      "sha256": "b9859d389ce55b56e8133b4645cd3caf15eaf2268a159c60097ce873845d7e4f",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0005-1b08779b.json",
+      "status": "PASS",
+      "sha256": "0b58d8d0164926e343811193c1103bd3ec29ff1c36318cdf0afb09c93e03e3d2",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0006-6e76b458.json",
+      "status": "PASS",
+      "sha256": "01782ee93c782bb8190331d418591a44b9d48d5dc0b7893d725f5ffa3fe54eb8",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0007-fb74a79f.json",
+      "status": "PASS",
+      "sha256": "ade6cb384292f26dd82d3f3cfb32698d68f886cbcc7c256c2b753ca325348ed0",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0008-bf3fad42.json",
+      "status": "PASS",
+      "sha256": "d393797026f24e3308e323c4c2c2d30144fc0c1e65b3f3bbdbe1ca141cefb282",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0009-c8407938.json",
+      "status": "PASS",
+      "sha256": "06e7a50e66723e79eb0e350e3459f57a3d0b214f20e24bdf2fba55fc0bb74756",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0010-3aea831b.json",
+      "status": "PASS",
+      "sha256": "c873530d996192131c67e1f04895125159103963b53fd1c1617171ead677b79a",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0011-3b68be43.json",
+      "status": "PASS",
+      "sha256": "6dc7eda3798876f22bce196be138c3d6bf24902290f194a8dcced74d87222ec6",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0012-23b14a45.json",
+      "status": "PASS",
+      "sha256": "061a0bb1ec9eeaa25ca8a241a7b6f5794224ca3e07ff697670ac76d0e53c47e2",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0013-a3b1c60d.json",
+      "status": "PASS",
+      "sha256": "04e5f192c0a4ed7494fb4bc8087a2566291f0479fd511c7b39fa060d04b5f9b7",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0014-50db5118.json",
+      "status": "PASS",
+      "sha256": "8acc04b3fa7cf7f30e83659ec993769ea450d4e9ed9a7c639315fd578fa3a6e3",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0015-e5a2ebc6.json",
+      "status": "PASS",
+      "sha256": "37d4671140e8d500dfb0078dcce3473ea4125faa30871d7b23c1450560c789b0",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0016-61c5d51c.json",
+      "status": "PASS",
+      "sha256": "0e7084a02b54ce2971faca65bf963c05ed2d3b36b9de73a30587035115e88e44",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0017-53d1f484.json",
+      "status": "PASS",
+      "sha256": "b4b0bfff8a54ca18cd19dd2887b75b88b871fb79ecc59a5cc6d56bdf9abaafea",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0018-96564a07.json",
+      "status": "PASS",
+      "sha256": "85e140b2993bf2308e1cd6f6a1890b881235bec0068316e3c8b5bb47354545d4",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0019-b90547e5.json",
+      "status": "PASS",
+      "sha256": "0a8e42a036df370744a13dce473372af5f8fcb28bae66fa81ac18d2729e7e106",
+      "correct_tasks": 3
+    },
+    {
+      "path": "model-0020-aa5a3942.json",
+      "status": "PASS",
+      "sha256": "727f9799c0b25db1f2e88d5e4eefd9030c7bf816f17e6d12cb7c07687505d72e",
+      "correct_tasks": 3
+    }
+  ],
+  "completed_models": 21,
+  "completed_24h": false,
+  "expected_end_lisbon": "2026-10-16T00:50:18.204344+01:00"
+}

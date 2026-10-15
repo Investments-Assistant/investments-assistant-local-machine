@@ -1,0 +1,196 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.58kB 0.0s done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#2 ...
+
+#3 [auth] library/python:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#2 DONE 1.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 503B done
+#4 DONE 0.1s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [ 1/16] FROM docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#6 resolve docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#6 resolve docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258 0.1s done
+#6 DONE 0.2s
+
+#5 [internal] load build context
+#5 transferring context: 194.75kB 0.0s done
+#5 DONE 0.1s
+
+#7 [ 2/16] COPY config/build/debian.sources /tmp/ia-debian.sources
+#7 CACHED
+
+#8 [ 3/16] RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/*     && cp /tmp/ia-debian.sources /etc/apt/sources.list.d/debian.sources     && rm /tmp/ia-debian.sources     && apt-get update && apt-get install -y --no-install-recommends     build-essential     ca-certificates     cmake     libopenblas-dev     libpq-dev     libffi-dev     libxml2-dev     libxslt1-dev     libcairo2     libpango-1.0-0     libpangocairo-1.0-0     libgdk-pixbuf-2.0-0     libfontconfig1     pkg-config     shared-mime-info     && apt-get clean && rm -rf /var/lib/apt/lists/*
+#8 0.412 Ign:1 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm InRelease
+#8 0.412 Ign:2 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm-updates InRelease
+#8 0.413 Ign:3 https://snapshot.debian.org/archive/debian-security/20261009T000000Z bookworm-security InRelease
+#8 1.414 Ign:1 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm InRelease
+#8 1.414 Ign:2 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm-updates InRelease
+#8 1.415 Ign:3 https://snapshot.debian.org/archive/debian-security/20261009T000000Z bookworm-security InRelease
+#8 3.415 Ign:1 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm InRelease
+#8 3.415 Ign:2 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm-updates InRelease
+#8 3.416 Ign:3 https://snapshot.debian.org/archive/debian-security/20261009T000000Z bookworm-security InRelease
+#8 7.417 Err:1 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm InRelease
+#8 7.417   Temporary failure resolving 'snapshot.debian.org'
+#8 7.417 Err:2 https://snapshot.debian.org/archive/debian/20261009T000000Z bookworm-updates InRelease
+#8 7.417   Temporary failure resolving 'snapshot.debian.org'
+#8 7.417 Err:3 https://snapshot.debian.org/archive/debian-security/20261009T000000Z bookworm-security InRelease
+#8 7.417   Temporary failure resolving 'snapshot.debian.org'
+#8 7.427 Reading package lists...
+#8 7.443 W: Failed to fetch https://snapshot.debian.org/archive/debian/20261009T000000Z/dists/bookworm/InRelease  Temporary failure resolving 'snapshot.debian.org'
+#8 7.443 W: Failed to fetch https://snapshot.debian.org/archive/debian/20261009T000000Z/dists/bookworm-updates/InRelease  Temporary failure resolving 'snapshot.debian.org'
+#8 7.443 W: Failed to fetch https://snapshot.debian.org/archive/debian-security/20261009T000000Z/dists/bookworm-security/InRelease  Temporary failure resolving 'snapshot.debian.org'
+#8 7.443 W: Some index files failed to download. They have been ignored, or old ones used instead.
+#8 7.458 Reading package lists...
+#8 7.473 Building dependency tree...
+#8 7.474 Reading state information...
+#8 7.479 E: Unable to locate package build-essential
+#8 7.479 E: Unable to locate package cmake
+#8 7.479 E: Unable to locate package libopenblas-dev
+#8 7.479 E: Unable to locate package libpq-dev
+#8 7.479 E: Unable to locate package libffi-dev
+#8 7.479 E: Unable to locate package libxml2-dev
+#8 7.479 E: Unable to locate package libxslt1-dev
+#8 7.479 E: Unable to locate package libcairo2
+#8 7.479 E: Unable to locate package libpango-1.0-0
+#8 7.479 E: Couldn't find any package by glob 'libpango-1.0-0'
+#8 7.479 E: Couldn't find any package by regex 'libpango-1.0-0'
+#8 7.479 E: Unable to locate package libpangocairo-1.0-0
+#8 7.479 E: Couldn't find any package by glob 'libpangocairo-1.0-0'
+#8 7.479 E: Couldn't find any package by regex 'libpangocairo-1.0-0'
+#8 7.479 E: Unable to locate package libgdk-pixbuf-2.0-0
+#8 7.479 E: Couldn't find any package by glob 'libgdk-pixbuf-2.0-0'
+#8 7.479 E: Couldn't find any package by regex 'libgdk-pixbuf-2.0-0'
+#8 7.479 E: Unable to locate package libfontconfig1
+#8 7.479 E: Unable to locate package pkg-config
+#8 7.479 E: Unable to locate package shared-mime-info
+#8 ERROR: process "/bin/sh -c rm -f /etc/apt/sources.list /etc/apt/sources.list.d/*     && cp /tmp/ia-debian.sources /etc/apt/sources.list.d/debian.sources     && rm /tmp/ia-debian.sources     && apt-get update && apt-get install -y --no-install-recommends     build-essential     ca-certificates     cmake     libopenblas-dev     libpq-dev     libffi-dev     libxml2-dev     libxslt1-dev     libcairo2     libpango-1.0-0     libpangocairo-1.0-0     libgdk-pixbuf-2.0-0     libfontconfig1     pkg-config     shared-mime-info     && apt-get clean && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
+------
+ > [ 3/16] RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/*     && cp /tmp/ia-debian.sources /etc/apt/sources.list.d/debian.sources     && rm /tmp/ia-debian.sources     && apt-get update && apt-get install -y --no-install-recommends     build-essential     ca-certificates     cmake     libopenblas-dev     libpq-dev     libffi-dev     libxml2-dev     libxslt1-dev     libcairo2     libpango-1.0-0     libpangocairo-1.0-0     libgdk-pixbuf-2.0-0     libfontconfig1     pkg-config     shared-mime-info     && apt-get clean && rm -rf /var/lib/apt/lists/*:
+7.479 E: Couldn't find any package by regex 'libpango-1.0-0'
+7.479 E: Unable to locate package libpangocairo-1.0-0
+7.479 E: Couldn't find any package by glob 'libpangocairo-1.0-0'
+7.479 E: Couldn't find any package by regex 'libpangocairo-1.0-0'
+7.479 E: Unable to locate package libgdk-pixbuf-2.0-0
+7.479 E: Couldn't find any package by glob 'libgdk-pixbuf-2.0-0'
+7.479 E: Couldn't find any package by regex 'libgdk-pixbuf-2.0-0'
+7.479 E: Unable to locate package libfontconfig1
+7.479 E: Unable to locate package pkg-config
+7.479 E: Unable to locate package shared-mime-info
+------
+Dockerfile:16
+--------------------
+  15 |     COPY config/build/debian.sources /tmp/ia-debian.sources
+  16 | >>> RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/* \
+  17 | >>>     && cp /tmp/ia-debian.sources /etc/apt/sources.list.d/debian.sources \
+  18 | >>>     && rm /tmp/ia-debian.sources \
+  19 | >>>     && apt-get update && apt-get install -y --no-install-recommends \
+  20 | >>>     build-essential \
+  21 | >>>     ca-certificates \
+  22 | >>>     cmake \
+  23 | >>>     libopenblas-dev \
+  24 | >>>     libpq-dev \
+  25 | >>>     libffi-dev \
+  26 | >>>     libxml2-dev \
+  27 | >>>     libxslt1-dev \
+  28 | >>>     libcairo2 \
+  29 | >>>     libpango-1.0-0 \
+  30 | >>>     libpangocairo-1.0-0 \
+  31 | >>>     libgdk-pixbuf-2.0-0 \
+  32 | >>>     libfontconfig1 \
+  33 | >>>     pkg-config \
+  34 | >>>     shared-mime-info \
+  35 | >>>     && apt-get clean && rm -rf /var/lib/apt/lists/*
+  36 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c rm -f /etc/apt/sources.list /etc/apt/sources.list.d/*     && cp /tmp/ia-debian.sources /etc/apt/sources.list.d/debian.sources     && rm /tmp/ia-debian.sources     && apt-get update && apt-get install -y --no-install-recommends     build-essential     ca-certificates     cmake     libopenblas-dev     libpq-dev     libffi-dev     libxml2-dev     libxslt1-dev     libcairo2     libpango-1.0-0     libpangocairo-1.0-0     libgdk-pixbuf-2.0-0     libfontconfig1     pkg-config     shared-mime-info     && apt-get clean && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
+966482 v0.37.2 /usr/local/lib/docker/cli-plugins/docker-buildx buildx build --pull=false --network none -t investment-assistant:read-followup-20261015 .
+github.com/docker/buildx/commands.runBuildWithOptions
+	github.com/docker/buildx/commands/build.go:506
+github.com/docker/buildx/commands.runBuild
+	github.com/docker/buildx/commands/build.go:421
+github.com/docker/buildx/commands.buildCmd.func1
+	github.com/docker/buildx/commands/build.go:542
+github.com/docker/cli/cli-plugins/plugin.RunPlugin.func1.1.2
+	github.com/docker/cli@v29.7.2+incompatible/cli-plugins/plugin/plugin.go:65
+github.com/spf13/cobra.(*Command).execute
+	github.com/spf13/cobra@v1.10.2/command.go:1015
+github.com/spf13/cobra.(*Command).ExecuteC
+	github.com/spf13/cobra@v1.10.2/command.go:1148
+github.com/spf13/cobra.(*Command).Execute
+	github.com/spf13/cobra@v1.10.2/command.go:1071
+github.com/docker/cli/cli-plugins/plugin.RunPlugin
+	github.com/docker/cli@v29.7.2+incompatible/cli-plugins/plugin/plugin.go:80
+main.runPlugin
+	github.com/docker/buildx/cmd/buildx/main.go:66
+main.run
+	github.com/docker/buildx/cmd/buildx/main.go:80
+main.main
+	github.com/docker/buildx/cmd/buildx/main.go:90
+runtime.main
+	runtime/proc.go:290
+runtime.goexit
+	runtime/asm_amd64.s:1771
+
+119  /usr/local/bin/dockerd --config-file /run/config/docker/daemon.json
+github.com/moby/buildkit/executor/runcexecutor.exitError
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/executor/runcexecutor/executor.go:457
+github.com/moby/buildkit/executor/runcexecutor.(*runcExecutor).Run
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/executor/runcexecutor/executor.go:405
+github.com/moby/buildkit/solver/llbsolver/ops.(*ExecOp).Exec
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/llbsolver/ops/exec.go:528
+github.com/moby/buildkit/solver.(*sharedOp).Exec.func2
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/jobs.go:1254
+github.com/moby/buildkit/util/flightcontrol.(*call[...]).run
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/util/flightcontrol/flightcontrol.go:122
+sync.(*Once).doSlow
+	/usr/local/go/src/sync/once.go:78
+sync.(*Once).Do
+	/usr/local/go/src/sync/once.go:69
+runtime.goexit
+	/usr/local/go/src/runtime/asm_amd64.s:1771
+
+966482 v0.37.2 /usr/local/lib/docker/cli-plugins/docker-buildx buildx build --pull=false --network none -t investment-assistant:read-followup-20261015 .
+google.golang.org/grpc.(*ClientConn).Invoke
+	google.golang.org/grpc@v1.83.2/call.go:35
+github.com/moby/buildkit/api/services/control.(*controlClient).Solve
+	github.com/moby/buildkit@v0.33.1/api/services/control/control_grpc.pb.go:88
+github.com/moby/buildkit/client.(*Client).solve.func2
+	github.com/moby/buildkit@v0.33.1/client/solve.go:339
+golang.org/x/sync/errgroup.(*Group).Go.func1
+	golang.org/x/sync@v0.22.0/errgroup/errgroup.go:93
+runtime.goexit
+	runtime/asm_amd64.s:1771
+
+119  /usr/local/bin/dockerd --config-file /run/config/docker/daemon.json
+github.com/moby/buildkit/solver.(*edge).execOp
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/edge.go:979
+github.com/moby/buildkit/solver/internal/pipe.NewWithFunction[...].func2
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/internal/pipe/pipe.go:78
+runtime.goexit
+	/usr/local/go/src/runtime/asm_amd64.s:1771
+
+966482 v0.37.2 /usr/local/lib/docker/cli-plugins/docker-buildx buildx build --pull=false --network none -t investment-assistant:read-followup-20261015 .
+github.com/moby/buildkit/client.(*Client).solve.func2
+	github.com/moby/buildkit@v0.33.1/client/solve.go:341
+golang.org/x/sync/errgroup.(*Group).Go.func1
+	golang.org/x/sync@v0.22.0/errgroup/errgroup.go:93
+
+119  /usr/local/bin/dockerd --config-file /run/config/docker/daemon.json
+github.com/moby/buildkit/solver/llbsolver/ops.(*ExecOp).Exec
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/llbsolver/ops/exec.go:559
+github.com/moby/buildkit/solver.(*sharedOp).Exec.func2
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/jobs.go:1254
+

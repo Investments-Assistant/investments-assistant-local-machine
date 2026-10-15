@@ -1,0 +1,1807 @@
+diff --git a/.env.example b/.env.example
+index fc3cf12..393121f 100644
+--- a/.env.example
++++ b/.env.example
+@@ -134,6 +134,10 @@ GUARDIAN_API_KEY=
+ # Historical Yahoo/yfinance requests are disabled until the operator reviews
+ # Yahoo's applicable data rights and explicitly authorizes this use.
+ YAHOO_HISTORICAL_DATA_ENABLED=false
++# Scheduled/on-demand Yahoo prices, FX, search and options are also blocked
++# until applicable source/data rights are reviewed and this use is authorized.
++# This is independent of historical research permission; neither enables the other.
++YAHOO_MARKET_DATA_ENABLED=false
+ 
+ # ── Newsletter Email Ingestion (optional IMAP) ───────────────────────────────
+ NEWSLETTER_IMAP_SERVER=imap.gmail.com
+diff --git a/scripts/verify_browser.py b/scripts/verify_browser.py
+index 6764661..ba5183f 100644
+--- a/scripts/verify_browser.py
++++ b/scripts/verify_browser.py
+@@ -83,6 +83,17 @@ def main():
+                     page.get_by_role("button", name="Sign in", exact=True).click()
+                     page.wait_for_url(base + "/")
+                     expect(page).to_have_title("Investment Assistant")
++                    def unavailable_market(route):
++                        route.fulfill(json={"market_overview": {
++                            "available": False,
++                            "error": "YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW",
++                        }})
++
++                    page.route("**/api/market/snapshot", unavailable_market)
++                    page.evaluate("loadSnapshot()")
++                    expect(page.locator("#market-snapshot")).to_contain_text("reviewed and approved for use")
++                    page.unroute("**/api/market/snapshot", unavailable_market)
++                    page.evaluate("loadSnapshot()")
+                     page.get_by_role("button", name="Portfolio", exact=True).click()
+                     expect(page.locator("#portfolio-view")).to_be_visible()
+                     page.get_by_role("button", name="Simulation", exact=True).click()
+@@ -423,6 +434,7 @@ def main():
+                                 "checks": [
+                                     "login",
+                                     "page identity",
++                                    "market snapshot unavailable/source permission (intercepted provider state)",
+                                     "profile persistence, project assignment/reload and owner isolation",
+                                     "disabled encrypted IBKR settings create/edit, "
+                                     "blank-secret preservation, disable and isolation",
+diff --git a/src/agent/clients/llama_cpp_client.py b/src/agent/clients/llama_cpp_client.py
+index c0a2aef..e6e8017 100644
+--- a/src/agent/clients/llama_cpp_client.py
++++ b/src/agent/clients/llama_cpp_client.py
+@@ -273,6 +273,11 @@ def _format_market_overview_result(result_str: str) -> str:
+     if not isinstance(result, dict):
+         return "I could not complete the market overview because the market data was invalid."
+ 
++    if result.get("error") or result.get("available") is False:
++        if result.get("error_code", result.get("error")) == "YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW":
++            return "Market data is unavailable until this source is reviewed and approved for use."
++        return "Market data is unavailable. A verified snapshot could not be collected."
++
+     markets = result.get("markets") if isinstance(result.get("markets"), dict) else {}
+     lines = [
+         "# Market overview",
+@@ -305,6 +310,30 @@ def _format_market_overview_result(result_str: str) -> str:
+     return "\n".join(lines)
+ 
+ 
++def _unavailable_market_answer(results, requests):
++    """An unavailable-only snapshot cannot become model-generated prices."""
++    if set(results) != {"get_market_overview"} or any(name != "get_market_overview" for name, _ in requests):
++        return None
++    raw = results["get_market_overview"]
++    try:
++        result = json.loads(raw)
++    except (TypeError, ValueError):
++        return "Market data is unavailable. A verified snapshot could not be collected."
++    if not isinstance(result, dict):
++        return "Market data is unavailable. A verified snapshot could not be collected."
++    if result.get("error") or result.get("available") is False:
++        return _format_market_overview_result(raw)
++    markets = result.get("markets")
++    if result.get("status") in {"unavailable", "blocked"} or (
++        isinstance(markets, dict) and not any(
++            isinstance(row, dict) and not row.get("error") and row.get("price") is not None
++            for row in markets.values()
++        )
++    ):
++        return "Market data is unavailable. A verified snapshot could not be collected."
++    return None
++
++
+ def _latest_user_message(messages: list[dict[str, Any]]) -> str:
+     """Return the latest user message for deterministic local workflows."""
+     for message in reversed(messages):
+@@ -880,6 +909,12 @@ class LlamaCppClient(BaseLLMClient):
+ 
+         from src.agent.clients.news_analysis import NEWS_TOOLS
+ 
++        unavailable_market = _unavailable_market_answer(evidence_results, requests)
++        if unavailable_market is not None:
++            yield {"type": "final_answer", "text": unavailable_market, "generation": "source_unavailable"}
++            yield {"type": "done"}
++            return
++
+         grounded = await self._financial_response(evidence_results,
+             portuguese="carteira" in _latest_user_message(messages).lower(), max_tokens=max_tokens)
+         if grounded is not None:
+@@ -1047,6 +1082,11 @@ class LlamaCppClient(BaseLLMClient):
+                 )
+ 
+             full_messages.extend(tool_result_messages)
++            unavailable_market = _unavailable_market_answer(evidence_results, requests)
++            if unavailable_market is not None:
++                yield {"type": "final_answer", "text": unavailable_market, "generation": "source_unavailable"}
++                yield {"type": "done"}
++                return
+ 
+         if not completed:
+             logger.warning("Agent stopped after %d tool rounds", max_rounds)
+diff --git a/src/config.py b/src/config.py
+index 9bc2a70..3b0cb94 100644
+--- a/src/config.py
++++ b/src/config.py
+@@ -197,6 +197,9 @@ class Settings(BaseSettings):
+     # until the operator has reviewed the applicable data rights and explicitly
+     # enabled its research use. This is not a license assertion by the app.
+     yahoo_historical_data_enabled: bool = False
++    # Scheduled/on-demand prices, FX, search and options require their own
++    # operator rights review. Neither Yahoo permission flag enables the other.
++    yahoo_market_data_enabled: bool = False
+ 
+     # ── Scheduler ─────────────────────────────────────────────────────────────
+     market_data_refresh_minutes: int = Field(5, ge=1)
+diff --git a/src/news/sources.py b/src/news/sources.py
+index 2b2275a..43be6ee 100644
+--- a/src/news/sources.py
++++ b/src/news/sources.py
+@@ -22,6 +22,7 @@ from src.agent.utils.logger import get_logger
+ from src.operations.workloads import WorkPool
+ 
+ source_work = WorkPool(2, "NEWS_FETCH")
++rss_work = WorkPool(1, "RSS_READ", dedicated=True)
+ 
+ 
+ class ArticleBatch(list):
+@@ -404,7 +405,7 @@ async def fetch_all(days_back: int = 1) -> list[dict[str, Any]]:
+     # loop and fetch the async adapters concurrently so a slow source cannot
+     # stall the chat UI or the scheduler.
+     rss, guardian, scraped = await asyncio.gather(
+-        asyncio.to_thread(fetch_rss),
++        rss_work.arun(fetch_rss, timeout=30),
+         fetch_guardian(days_back=days_back),
+         fetch_scraped(),
+     )
+diff --git a/src/operations/workloads.py b/src/operations/workloads.py
+index a7dd0c3..770f0b1 100644
+--- a/src/operations/workloads.py
++++ b/src/operations/workloads.py
+@@ -4,6 +4,7 @@ import asyncio
+ from functools import partial
+ from threading import BoundedSemaphore
+ from contextvars import copy_context
++from concurrent.futures import ThreadPoolExecutor
+ 
+ 
+ class WorkloadBusy(RuntimeError):
+@@ -11,9 +12,12 @@ class WorkloadBusy(RuntimeError):
+ 
+ 
+ class WorkPool:
+-    def __init__(self, slots: int, name: str):
++    def __init__(self, slots: int, name: str, *, dedicated=False):
+         self._slots = BoundedSemaphore(slots)
+         self.name = name
++        # Slow reads use their own workers instead of filling the event loop's
++        # shared executor. Admission bounds submitted work as well as workers.
++        self._executor = ThreadPoolExecutor(max_workers=slots, thread_name_prefix=name) if dedicated else None
+ 
+     def _acquire(self):
+         if not self._slots.acquire(blocking=False):
+@@ -34,7 +38,7 @@ class WorkPool:
+         context = copy_context()
+         call = partial(context.run, partial(function, *args, **kwargs))
+         try:
+-            future = asyncio.get_running_loop().run_in_executor(None, self._finish, call)
++            future = asyncio.get_running_loop().run_in_executor(self._executor, self._finish, call)
+         except BaseException:
+             self._slots.release()
+             raise
+@@ -47,3 +51,5 @@ class WorkPool:
+ 
+ simulation_work = WorkPool(2, "SIMULATION")
+ pdf_work = WorkPool(1, "PDF")
++market_read_work = WorkPool(4, "MARKET_READ", dedicated=True)
++broker_query_work = WorkPool(2, "BROKER_QUERY", dedicated=True)
+diff --git a/src/scheduler/jobs.py b/src/scheduler/jobs.py
+index 0a36338..66d3f4b 100644
+--- a/src/scheduler/jobs.py
++++ b/src/scheduler/jobs.py
+@@ -15,6 +15,7 @@ from src.news.ingestion import run_ingestion
+ from src.news.email_reader import read_and_ingest_newsletters
+ from src.tools.market_data import get_market_overview
+ from src.agent.utils.logger import get_logger
++from src.operations.workloads import market_read_work
+ 
+ logger = get_logger(__name__)
+ 
+@@ -36,9 +37,9 @@ async def _refresh_market_data() -> None:
+         # yfinance and the RSS reader are synchronous adapters.  Run them in
+         # worker threads so a slow provider cannot stall WebSocket responses.
+         overview, btc_news, stock_news = await asyncio.gather(
+-            asyncio.to_thread(get_market_overview),
+-            asyncio.to_thread(search_market_news, "Bitcoin crypto market", max_articles=5),
+-            asyncio.to_thread(search_market_news, "stock market S&P 500", max_articles=5),
++            market_read_work.arun(get_market_overview, timeout=30),
++            market_read_work.arun(search_market_news, "Bitcoin crypto market", max_articles=5, timeout=30),
++            market_read_work.arun(search_market_news, "stock market S&P 500", max_articles=5, timeout=30),
+         )
+         _latest_snapshot = {
+             "timestamp": datetime.now(UTC).isoformat(),
+@@ -48,7 +49,7 @@ async def _refresh_market_data() -> None:
+         }
+         logger.debug("Market snapshot refreshed")
+     except Exception as exc:
+-        logger.error("Market data refresh failed: %s", exc)
++        logger.error("Market data refresh failed (%s)", type(exc).__name__)
+ 
+ 
+ async def _run_weekly_report() -> None:
+diff --git a/src/tools/brokers/alpaca.py b/src/tools/brokers/alpaca.py
+index 655733d..d801a51 100644
+--- a/src/tools/brokers/alpaca.py
++++ b/src/tools/brokers/alpaca.py
+@@ -4,6 +4,7 @@ from __future__ import annotations
+ 
+ from datetime import UTC, datetime, timedelta
+ 
++from src.security.errors import safe_exception_code
+ from src.agent.utils.logger import get_logger
+ from src.execution.external import disabled_external_write
+ from src.tools.broker_accounts import BrokerAccountConfig
+@@ -27,20 +28,46 @@ def _not_configured(account: BrokerAccountConfig | None = None) -> dict:
+ 
+ 
+ def _get_client(account: BrokerAccountConfig | None = None):
+-    """Lazily create Alpaca trading client."""
++    """Create the locked SDK's client with bounded transport and no read retries.
++
++    alpaca-py 0.43.2's TradingClient exposes no timeout/retry arguments, and
++    RESTClient ignores retry_attempts=0. The compatibility subclass preserves
++    its Session/auth/TLS/response semantics while supplying requests' 5-second
++    connect and 10-second read-inactivity timeouts for each request. These are
++    not a total call deadline and cannot forcibly stop a native worker.
++    Installed-SDK contracts cover _one_request and the zero-retry behavior.
++    """
+     from alpaca.trading.client import TradingClient
+ 
++    class BoundedTradingClient(TradingClient):
++        def _one_request(self, method, url, opts, retry):
++            return super()._one_request(method, url, {**opts, "timeout": (5, 10)}, 0)
++
+     config = _config(account)
+-    return TradingClient(
++    client = BoundedTradingClient(
+         api_key=config["api_key"],
+         secret_key=config["secret_key"],
+         paper=config.get("paper", True),
+     )
++    client._retry = 0
++    return client
++
++
++def _close_client(client):
++    """Close this read's Session without replacing its result or safe failure."""
++    if client is None:
++        return
++    try:
++        client._session.close()
++    except Exception as exc:
++        code = safe_exception_code(exc, fallback="ALPACA_TRANSPORT_CLEANUP_UNAVAILABLE")
++        logger.warning("Alpaca transport cleanup failed: %s", code)
+ 
+ 
+ def get_alpaca_account(account: BrokerAccountConfig | None = None) -> dict:
+     if not _configured(account):
+         return _not_configured(account)
++    client = None
+     try:
+         client = _get_client(account)
+         acc = client.get_account()
+@@ -56,13 +83,17 @@ def get_alpaca_account(account: BrokerAccountConfig | None = None) -> dict:
+             "pattern_day_trader": acc.pattern_day_trader,
+         }
+     except Exception as exc:
+-        logger.error("Alpaca account fetch failed: %s", exc)
+-        return {"broker": "alpaca", "error": str(exc)}
++        code = safe_exception_code(exc, fallback="ALPACA_ACCOUNT_UNAVAILABLE")
++        logger.error("Alpaca account fetch failed: %s", code)
++        return {"broker": "alpaca", "available": False, "error": code, "error_code": code}
++    finally:
++        _close_client(client)
+ 
+ 
+ def get_alpaca_positions(account: BrokerAccountConfig | None = None) -> list[dict]:
+     if not _configured(account):
+         return [_not_configured(account)]
++    client = None
+     try:
+         client = _get_client(account)
+         positions = client.get_all_positions()
+@@ -80,8 +111,11 @@ def get_alpaca_positions(account: BrokerAccountConfig | None = None) -> list[dic
+             for p in positions
+         ]
+     except Exception as exc:
+-        logger.error("Alpaca positions fetch failed: %s", exc)
+-        return [{"error": str(exc)}]
++        code = safe_exception_code(exc, fallback="ALPACA_POSITIONS_UNAVAILABLE")
++        logger.error("Alpaca positions fetch failed: %s", code)
++        return [{"available": False, "error": code, "error_code": code}]
++    finally:
++        _close_client(client)
+ 
+ 
+ def get_alpaca_orders(
+@@ -89,6 +123,7 @@ def get_alpaca_orders(
+ ) -> list[dict]:
+     if not _configured(account):
+         return [_not_configured(account)]
++    client = None
+     try:
+         from alpaca.trading.requests import GetOrdersRequest
+ 
+@@ -113,8 +148,11 @@ def get_alpaca_orders(
+             for o in orders
+         ]
+     except Exception as exc:
+-        logger.error("Alpaca orders fetch failed: %s", exc)
+-        return [{"error": str(exc)}]
++        code = safe_exception_code(exc, fallback="ALPACA_ORDERS_UNAVAILABLE")
++        logger.error("Alpaca orders fetch failed: %s", code)
++        return [{"available": False, "error": code, "error_code": code}]
++    finally:
++        _close_client(client)
+ 
+ 
+ @disabled_external_write
+@@ -181,8 +219,9 @@ def submit_alpaca_order(
+             "status": order.status.value,
+         }
+     except Exception as exc:
+-        logger.error("Alpaca order submission failed: %s", exc)
+-        return {"success": False, "error": str(exc)}
++        code = safe_exception_code(exc, fallback="ALPACA_SUBMISSION_UNAVAILABLE")
++        logger.error("Alpaca order submission failed: %s", code)
++        return {"success": False, "error": code, "error_code": code}
+ 
+ 
+ @disabled_external_write
+@@ -196,4 +235,5 @@ def cancel_alpaca_order(
+         client.cancel_order_by_id(order_id)
+         return {"success": True, "order_id": order_id}
+     except Exception as exc:
+-        return {"success": False, "error": str(exc)}
++        code = safe_exception_code(exc, fallback="ALPACA_CANCELLATION_UNAVAILABLE")
++        return {"success": False, "error": code, "error_code": code}
+diff --git a/src/tools/brokers/binance.py b/src/tools/brokers/binance.py
+index 3bc9c1f..2b6eacd 100644
+--- a/src/tools/brokers/binance.py
++++ b/src/tools/brokers/binance.py
+@@ -2,8 +2,7 @@
+ 
+ from __future__ import annotations
+ 
+-from contextlib import suppress
+-
++from src.security.errors import safe_exception_code
+ from src.agent.utils.logger import get_logger
+ from src.execution.external import disabled_external_write
+ from src.tools.broker_accounts import BrokerAccountConfig
+@@ -62,8 +61,9 @@ def get_binance_account(account: BrokerAccountConfig | None = None) -> dict:
+             "balances": balances,
+         }
+     except Exception as exc:
+-        logger.error("Binance account fetch failed: %s", exc)
+-        return {"broker": "binance", "error": str(exc)}
++        code = safe_exception_code(exc, fallback="BINANCE_ACCOUNT_UNAVAILABLE")
++        logger.error("Binance account fetch failed: %s", code)
++        return {"broker": "binance", "available": False, "error": code, "error_code": code}
+ 
+ 
+ def get_binance_positions(account: BrokerAccountConfig | None = None) -> list[dict]:
+@@ -81,14 +81,19 @@ def get_binance_orders(
+         return [_not_configured(account)]
+     try:
+         client = _get_client(account)
++        errors = []
+         if symbol:
+             orders = client.get_all_orders(symbol=symbol.upper(), limit=100)
+         else:
+             # Binance requires a symbol; fetch BTCUSDT, ETHUSDT as defaults
+             orders = []
+             for sym in ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"]:
+-                with suppress(Exception):
++                try:
+                     orders.extend(client.get_all_orders(symbol=sym, limit=20))
++                except Exception as exc:
++                    code = safe_exception_code(exc, fallback="BINANCE_ORDERS_UNAVAILABLE")
++                    logger.error("Binance orders fetch failed: %s", code)
++                    errors.append({"available": False, "error": code, "error_code": code, "symbol": sym})
+         return [
+             {
+                 "order_id": str(o["orderId"]),
+@@ -102,10 +107,11 @@ def get_binance_orders(
+                 "time": o["time"],
+             }
+             for o in orders[:50]
+-        ]
++        ] + errors
+     except Exception as exc:
+-        logger.error("Binance orders fetch failed: %s", exc)
+-        return [{"error": str(exc)}]
++        code = safe_exception_code(exc, fallback="BINANCE_ORDERS_UNAVAILABLE")
++        logger.error("Binance orders fetch failed: %s", code)
++        return [{"available": False, "error": code, "error_code": code}]
+ 
+ 
+ @disabled_external_write
+@@ -166,8 +172,9 @@ def submit_binance_order(
+             "price": order.get("price"),
+         }
+     except Exception as exc:
+-        logger.error("Binance order submission failed: %s", exc)
+-        return {"success": False, "error": str(exc)}
++        code = safe_exception_code(exc, fallback="BINANCE_SUBMISSION_UNAVAILABLE")
++        logger.error("Binance order submission failed: %s", code)
++        return {"success": False, "error": code, "error_code": code}
+ 
+ 
+ @disabled_external_write
+@@ -183,4 +190,5 @@ def cancel_binance_order(
+         result = client.cancel_order(symbol=symbol.upper(), orderId=int(order_id))
+         return {"success": True, "order_id": order_id, "status": result.get("status")}
+     except Exception as exc:
+-        return {"success": False, "error": str(exc)}
++        code = safe_exception_code(exc, fallback="BINANCE_CANCELLATION_UNAVAILABLE")
++        return {"success": False, "error": code, "error_code": code}
+diff --git a/src/tools/brokers/coinbase.py b/src/tools/brokers/coinbase.py
+index 25ae9cb..b4c787a 100644
+--- a/src/tools/brokers/coinbase.py
++++ b/src/tools/brokers/coinbase.py
+@@ -4,6 +4,7 @@ from __future__ import annotations
+ 
+ from typing import Any
+ 
++from src.security.errors import safe_exception_code
+ from src.agent.utils.logger import get_logger
+ from src.execution.external import disabled_external_write
+ from src.tools.broker_accounts import BrokerAccountConfig
+@@ -54,8 +55,9 @@ def get_coinbase_account(account: BrokerAccountConfig | None = None) -> dict:
+                 )
+         return {"broker": "coinbase", "balances": balances}
+     except Exception as exc:
+-        logger.error("Coinbase account fetch failed: %s", exc)
+-        return {"broker": "coinbase", "error": str(exc)}
++        code = safe_exception_code(exc, fallback="COINBASE_ACCOUNT_UNAVAILABLE")
++        logger.error("Coinbase account fetch failed: %s", code)
++        return {"broker": "coinbase", "available": False, "error": code, "error_code": code}
+ 
+ 
+ def get_coinbase_positions(account: BrokerAccountConfig | None = None) -> list[dict]:
+@@ -87,8 +89,9 @@ def get_coinbase_orders(account: BrokerAccountConfig | None = None) -> list[dict
+             for o in orders[:50]
+         ]
+     except Exception as exc:
+-        logger.error("Coinbase orders fetch failed: %s", exc)
+-        return [{"error": str(exc)}]
++        code = safe_exception_code(exc, fallback="COINBASE_ORDERS_UNAVAILABLE")
++        logger.error("Coinbase orders fetch failed: %s", code)
++        return [{"available": False, "error": code, "error_code": code}]
+ 
+ 
+ @disabled_external_write
+@@ -144,11 +147,12 @@ def submit_coinbase_order(
+             "order_id": resp.get("order_id") or resp.get("success_response", {}).get("order_id"),
+             "product_id": product_id,
+             "side": side,
+-            "error": resp.get("error_response", {}).get("message") if not success else None,
++            "error": "COINBASE_ORDER_REJECTED" if not success else None,
+         }
+     except Exception as exc:
+-        logger.error("Coinbase order submission failed: %s", exc)
+-        return {"success": False, "error": str(exc)}
++        code = safe_exception_code(exc, fallback="COINBASE_SUBMISSION_UNAVAILABLE")
++        logger.error("Coinbase order submission failed: %s", code)
++        return {"success": False, "error": code, "error_code": code}
+ 
+ 
+ @disabled_external_write
+@@ -166,4 +170,5 @@ def cancel_coinbase_order(
+             return {"success": r.get("success", False), "order_id": order_id}
+         return {"success": False, "error": "No result returned"}
+     except Exception as exc:
+-        return {"success": False, "error": str(exc)}
++        code = safe_exception_code(exc, fallback="COINBASE_CANCELLATION_UNAVAILABLE")
++        return {"success": False, "error": code, "error_code": code}
+diff --git a/src/tools/dispatcher.py b/src/tools/dispatcher.py
+index f4e64db..472f7a3 100644
+--- a/src/tools/dispatcher.py
++++ b/src/tools/dispatcher.py
+@@ -30,6 +30,7 @@ from src.tools.brokers import (
+     binance as binance_tool,
+     coinbase,
+ )
++from src.security.errors import safe_exception_code
+ from src.tools.portfolio import get_account_info, get_trade_history, get_portfolio_summary
+ from src.tools.simulator import run_simulation_async
+ from src.tools.market_data import (
+@@ -43,6 +44,7 @@ from src.tools.market_data import (
+ )
+ from src.tools.news_memory import get_latest_news, search_stored_news
+ from src.agent.utils.logger import get_logger
++from src.operations.workloads import WorkloadBusy, market_read_work, broker_query_work
+ from src.tools.broker_accounts import (
+     BrokerAccountConfig,
+     BrokerVaultUnavailable,
+@@ -59,6 +61,7 @@ _pending_trade_proposals: dict[str, dict] = {}
+ _PROPOSAL_TTL_SECONDS = 15 * 60
+ _VALID_BROKERS = {"alpaca", "ibkr", "coinbase", "binance"}
+ _VALID_ORDER_TYPES = {"market", "limit", "stop_limit"}
++_READ_TIMEOUT_SECONDS = 30
+ 
+ 
+ @contextmanager
+@@ -81,7 +84,7 @@ def tool_context(
+ 
+ async def dispatch_tool(tool_name: str, tool_input: dict) -> str:
+     """Call the appropriate tool and return a JSON string result."""
+-    logger.info("Tool call: %s", tool_name)
++    logger.info("Tool call: %s", tool_name if re.fullmatch(r"[a-z_]{1,64}", tool_name) else "invalid")
+     try:
+         if settings.is_production is True and _tool_user_id.get():
+             from src.security.sessions import check_tool_authority
+@@ -89,9 +92,17 @@ async def dispatch_tool(tool_name: str, tool_input: dict) -> str:
+         result = await _dispatch(tool_name, tool_input)
+         if settings.is_production is True and _tool_user_id.get():
+             await check_tool_authority(_tool_user_id.get())
++    except WorkloadBusy as exc:
++        code = safe_exception_code(exc, fallback="TOOL_BUSY", allowed_codes={"MARKET_READ_BUSY", "BROKER_QUERY_BUSY"})
++        logger.warning("Tool admission rejected: %s", code)
++        result = {"available": False, "error": code, "tool": tool_name}
++    except TimeoutError:
++        logger.warning("Tool request deadline exceeded")
++        result = {"available": False, "error": "TOOL_TIMEOUT", "tool": tool_name}
+     except Exception as exc:
+-        logger.exception("Tool %s raised an exception", tool_name)
+-        result = {"error": str(exc), "tool": tool_name}
++        code = safe_exception_code(exc, fallback="TOOL_UNAVAILABLE")
++        logger.error("Tool failed: %s", code)
++        result = {"available": False, "error": code, "tool": tool_name}
+     return json.dumps(result, default=str, ensure_ascii=False)
+ 
+ 
+@@ -127,7 +138,7 @@ async def _dispatch(name: str, inp: dict) -> object:
+         # yfinance, broker SDKs, and PDF generation are synchronous.  Keep
+         # them off FastAPI's event loop so one slow network call cannot freeze
+         # the UI or the scheduler.
+-        return await asyncio.to_thread(_SYNC_DISPATCH[name], inp)  # type: ignore[arg-type]
++        return await market_read_work.arun(_SYNC_DISPATCH[name], inp, timeout=_READ_TIMEOUT_SECONDS)  # type: ignore[arg-type]
+     if name in _ASYNC_DISPATCH:
+         return await _ASYNC_DISPATCH[name](inp)  # type: ignore[operator]
+     if name == "execute_trade":
+@@ -158,7 +169,7 @@ async def _load_current_user_accounts(
+         return None, {
+             "available": False,
+             "capability": "brokerage access",
+-            "error": str(exc),
++            "error": "BROKER_VAULT_UNAVAILABLE",
+         }
+     except Exception as exc:
+         logger.error("Broker account lookup failed (%s)", type(exc).__name__)
+@@ -217,13 +228,14 @@ async def _dispatch_broker_read(name: str, inp: dict) -> object:
+         if error:
+             return error
+         if accounts is None:
+-            return await asyncio.to_thread(get_portfolio_summary, broker=broker)
++            return await broker_query_work.arun(get_portfolio_summary, broker=broker, timeout=_READ_TIMEOUT_SECONDS)
+         if not accounts:
+             return capability_unavailable(broker or "any", "portfolio summary")
+-        return await asyncio.to_thread(
++        return await broker_query_work.arun(
+             get_portfolio_summary,
+             broker=broker,
+             accounts=accounts,
++            timeout=_READ_TIMEOUT_SECONDS,
+         )
+ 
+     if not broker:
+@@ -236,12 +248,15 @@ async def _dispatch_broker_read(name: str, inp: dict) -> object:
+     if error:
+         return error
+     if name == "get_account_info":
+-        return await asyncio.to_thread(get_account_info, broker=broker, account=account)
+-    return await asyncio.to_thread(
++        return await broker_query_work.arun(
++            get_account_info, broker=broker, account=account, timeout=_READ_TIMEOUT_SECONDS,
++        )
++    return await broker_query_work.arun(
+         get_trade_history,
+         broker=broker,
+         days=inp.get("days", 30),
+         account=account,
++        timeout=_READ_TIMEOUT_SECONDS,
+     )
+ 
+ 
+@@ -275,7 +290,7 @@ async def _is_daily_halted() -> bool:
+     except Exception as exc:
+         # A safety control must fail closed.  A temporary database outage must
+         # never turn into permission to trade without a loss-limit check.
+-        logger.error("Failed to check daily halt flag; blocking auto-trading: %s", exc)
++        logger.error("Failed to check daily halt flag; blocking auto-trading (%s)", type(exc).__name__)
+         return True
+ 
+ 
+@@ -313,7 +328,7 @@ async def _check_and_enforce_daily_limit(realized_delta_usd: float) -> None:
+ 
+             await session.commit()
+     except Exception as exc:
+-        logger.warning("Failed to update daily P&L: %s", exc)
++        logger.warning("Failed to update daily P&L (%s)", type(exc).__name__)
+ 
+ 
+ # ── Trade execution ──────────────────────────────────────────────────────────
+@@ -512,7 +527,7 @@ async def _create_trade_intent(trade: dict, mode: str) -> str | None:
+             await session.commit()
+         return intent_id
+     except Exception as exc:
+-        logger.error("Trade intent was not persisted; order was not sent: %s", exc)
++        logger.error("Trade intent was not persisted; order was not sent (%s)", type(exc).__name__)
+         return None
+ 
+ 
+@@ -533,7 +548,7 @@ async def _finalize_trade_intent(intent_id: str, result: dict) -> bool:
+             await session.commit()
+         return True
+     except Exception as exc:
+-        logger.error("Trade %s was sent but audit finalization failed: %s", intent_id, exc)
++        logger.error("Trade audit finalization failed (%s)", type(exc).__name__)
+         return False
+ 
+ 
+@@ -575,8 +590,8 @@ async def _execute_validated_trade(
+         else:
+             result = await asyncio.to_thread(_route_order, *route_args, account=account)
+     except Exception as exc:
+-        logger.exception("Broker route failed for trade intent %s", intent_id)
+-        result = {"error": str(exc)}
++        logger.error("Broker route failed (%s)", type(exc).__name__)
++        result = {"error": "BROKER_ROUTE_UNAVAILABLE"}
+     result["reason"] = trade.get("reason", "")
+     result["audit_intent_id"] = intent_id
+     if not await _finalize_trade_intent(intent_id, result):
+@@ -586,7 +601,7 @@ async def _execute_validated_trade(
+         if realized is not None and math.isfinite(float(realized)):
+             await _check_and_enforce_daily_limit(float(realized))
+     except (TypeError, ValueError):
+-        logger.warning("Ignoring invalid realized P&L returned by broker: %r", realized)
++        logger.warning("Ignoring invalid realized P&L returned by broker")
+     return result
+ 
+ 
+diff --git a/src/tools/forex.py b/src/tools/forex.py
+index 5b7e58b..6dd7a4e 100644
+--- a/src/tools/forex.py
++++ b/src/tools/forex.py
+@@ -5,6 +5,7 @@ from __future__ import annotations
+ from typing import Any
+ from datetime import UTC, datetime
+ 
++from src.tools.market_data import _provider_failure, yahoo_market_data_denial
+ from src.agent.utils.logger import get_logger
+ 
+ logger = get_logger(__name__)
+@@ -93,6 +94,8 @@ def get_forex_data(
+     interval: str = "1d",
+ ) -> dict:
+     """Fetch OHLCV history for forex pairs via Yahoo Finance."""
++    if denied := yahoo_market_data_denial():
++        return denied
+     import yfinance as yf
+ 
+     result: dict[str, object] = {}
+@@ -111,13 +114,14 @@ def get_forex_data(
+                 "candles": _df_to_candles(df),
+             }
+         except Exception as exc:
+-            logger.warning("Failed to fetch forex data for %s: %s", pair, exc)
+-            result[display] = {"error": str(exc)}
++            result[display] = _provider_failure(exc, "FOREX_DATA_UNAVAILABLE")
+     return result
+ 
+ 
+ def get_forex_rates(pairs: list[str] | None = None) -> dict:
+     """Snapshot of current spot rates, daily change %, and pip size."""
++    if denied := yahoo_market_data_denial():
++        return denied
+     import yfinance as yf
+ 
+     targets = [_normalize_pair(p) for p in pairs] if pairs else _DEFAULT_PAIRS
+@@ -141,8 +145,7 @@ def get_forex_rates(pairs: list[str] | None = None) -> dict:
+                 "pip_size": _pip_size(sym),
+             }
+         except Exception as exc:
+-            logger.warning("Failed to fetch rate for %s: %s", sym, exc)
+-            result["rates"][display] = {"error": str(exc)}
++            result["rates"][display] = _provider_failure(exc, "FOREX_RATE_UNAVAILABLE")
+     return result
+ 
+ 
+diff --git a/src/tools/market_data.py b/src/tools/market_data.py
+index 5594b6e..8cd0651 100644
+--- a/src/tools/market_data.py
++++ b/src/tools/market_data.py
+@@ -11,10 +11,26 @@ from typing import Any
+ from datetime import UTC, datetime
+ import contextlib
+ 
++from src.config import get_settings
++from src.security.errors import safe_exception_code
+ from src.agent.utils.logger import get_logger
+ 
+ logger = get_logger(__name__)
+ 
++
++def yahoo_market_data_denial() -> dict | None:
++    """No market/provider import or egress without exact operator opt-in."""
++    if get_settings().yahoo_market_data_enabled is not True:
++        code = "YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW"
++        return {"available": False, "error": code, "error_code": code}
++    return None
++
++
++def _provider_failure(exc, fallback: str) -> dict:
++    code = safe_exception_code(exc, fallback=fallback)
++    logger.warning("Market provider read failed: %s", code)
++    return {"available": False, "error": code, "error_code": code}
++
+ # ── OHLCV Data ─────────────────────────────────────────────────────────────────
+ 
+ 
+@@ -44,6 +60,8 @@ def get_stock_data(
+     period: str = "1mo",
+     interval: str = "1d",
+ ) -> dict:
++    if denied := yahoo_market_data_denial():
++        return denied
+     import yfinance as yf
+ 
+     result: dict[str, object] = {}
+@@ -62,8 +80,7 @@ def get_stock_data(
+                 "candles": _df_to_records(df),
+             }
+         except Exception as exc:
+-            logger.warning("Failed to fetch %s: %s", sym, exc)
+-            result[sym] = {"error": str(exc)}
++            result[sym] = _provider_failure(exc, "MARKET_DATA_UNAVAILABLE")
+     return result
+ 
+ 
+@@ -78,6 +95,8 @@ def get_crypto_data(
+ 
+ def get_market_overview() -> dict:
+     """Snapshot of major indices, VIX, bonds, commodities."""
++    if denied := yahoo_market_data_denial():
++        return denied
+     import yfinance as yf
+ 
+     tickers = {
+@@ -113,7 +132,7 @@ def get_market_overview() -> dict:
+                 "change_pct": change_pct,
+             }
+         except Exception as exc:
+-            result["markets"][name] = {"error": str(exc)}
++            result["markets"][name] = _provider_failure(exc, "MARKET_OVERVIEW_UNAVAILABLE")
+     return result
+ 
+ 
+@@ -151,6 +170,8 @@ def _build_signals(
+ 
+ def get_technical_indicators(symbol: str, period: str = "6mo") -> dict:
+     """Calculate RSI, MACD, Bollinger Bands, EMA 20/50/200, ATR, OBV."""
++    if denied := yahoo_market_data_denial():
++        return denied
+     import ta
+     import yfinance as yf
+ 
+@@ -222,8 +243,7 @@ def get_technical_indicators(symbol: str, period: str = "6mo") -> dict:
+             "signals": signals,
+         }
+     except Exception as exc:
+-        logger.exception("Technical indicators failed for %s", symbol)
+-        return {"error": str(exc)}
++        return _provider_failure(exc, "TECHNICAL_INDICATORS_UNAVAILABLE")
+ 
+ 
+ # ── Options Chain ──────────────────────────────────────────────────────────────
+@@ -262,6 +282,8 @@ def _clean_option_list(lst: list[dict]) -> list[dict]:
+ 
+ def get_options_chain(symbol: str, expiry: str | None = None) -> dict:
+     """Fetch options chain for a stock symbol."""
++    if denied := yahoo_market_data_denial():
++        return denied
+     import yfinance as yf
+ 
+     try:
+@@ -282,8 +304,7 @@ def get_options_chain(symbol: str, expiry: str | None = None) -> dict:
+             }
+         return result
+     except Exception as exc:
+-        logger.exception("Options chain failed for %s", symbol)
+-        return {"error": str(exc)}
++        return _provider_failure(exc, "OPTIONS_CHAIN_UNAVAILABLE")
+ 
+ 
+ # ── Ticker Search ──────────────────────────────────────────────────────────────
+@@ -291,6 +312,8 @@ def get_options_chain(symbol: str, expiry: str | None = None) -> dict:
+ 
+ def search_ticker(query: str) -> dict:
+     """Search Yahoo Finance for matching ticker symbols."""
++    if denied := yahoo_market_data_denial():
++        return denied
+     import yfinance as yf
+ 
+     try:
+@@ -310,7 +333,7 @@ def search_ticker(query: str) -> dict:
+             ],
+         }
+     except Exception as exc:
+-        return {"error": str(exc), "query": query}
++        return _provider_failure(exc, "TICKER_SEARCH_UNAVAILABLE") | {"query": query}
+ 
+ 
+ # ── Earnings Calendar ──────────────────────────────────────────────────────────
+@@ -318,6 +341,8 @@ def search_ticker(query: str) -> dict:
+ 
+ def get_earnings_calendar(days_ahead: int = 7, symbols: list[str] | None = None) -> dict:
+     """Return upcoming earnings via yfinance (best-effort)."""
++    if denied := yahoo_market_data_denial():
++        return denied
+     import yfinance as yf
+ 
+     result: dict[str, Any] = {"days_ahead": days_ahead, "earnings": []}
+@@ -343,5 +368,5 @@ def get_earnings_calendar(days_ahead: int = 7, symbols: list[str] | None = None)
+                         }
+                     )
+         except Exception as exc:
+-            result["earnings"].append({"symbol": sym, "error": str(exc)})  # type: ignore[attr-defined]
++            result["earnings"].append(_provider_failure(exc, "EARNINGS_CALENDAR_UNAVAILABLE") | {"symbol": sym})
+     return result
+diff --git a/src/tools/portfolio.py b/src/tools/portfolio.py
+index 5bbe49e..7f1ea38 100644
+--- a/src/tools/portfolio.py
++++ b/src/tools/portfolio.py
+@@ -10,12 +10,33 @@ from src.tools.brokers import (
+     binance as binance_tool,
+     coinbase,
+ )
++from src.security.errors import safe_exception_code
+ from src.agent.utils.logger import get_logger
+ from src.finance.normalization import usd_decimal_value
+ from src.tools.broker_accounts import BrokerAccountConfig
+ 
+ logger = get_logger(__name__)
+ 
++_SAFE_BROKER_ERRORS = frozenset({
++    "ALPACA_ACCOUNT_UNAVAILABLE", "ALPACA_POSITIONS_UNAVAILABLE", "ALPACA_ORDERS_UNAVAILABLE",
++    "COINBASE_ACCOUNT_UNAVAILABLE", "COINBASE_ORDERS_UNAVAILABLE",
++    "BINANCE_ACCOUNT_UNAVAILABLE", "BINANCE_ORDERS_UNAVAILABLE",
++    "AUTHENTICATED_ACCOUNT_REQUIRED", "IBKR_READ_CONSENT_REQUIRED",
++    "EXPLICIT_BROKER_ACCOUNT_AND_ENVIRONMENT_REQUIRED", "DEDICATED_NONZERO_CLIENT_ID_REQUIRED",
++    "BROKER_ACCOUNT_NOT_MANAGED", "IBKR_CLIENT_BUSY", "IBKR_SYNC_ADAPTER_REQUIRES_WORKER_THREAD",
++    "INCOMPLETE_CONTRACT", "AMBIGUOUS_CONTRACT", "CONTRACT_MISMATCH",
++    "AMBIGUOUS_CONTRACT_DETAILS", "CONTRACT_PRECISION_UNAVAILABLE",
++    "IBKR_SESSION_CONFIGURATION_CHANGED", "IBKR_SESSION_STOPPING", "IBKR_SESSION_NOT_READY",
++    "IBKR_READ_QUEUE_FULL", "IBKR_READ_UNAVAILABLE",
++})
++
++
++def _safe_read_error(value: dict, fallback: str) -> str:
++    return safe_exception_code(
++        RuntimeError(value.get("error_code", value.get("error"))),
++        fallback=fallback, allowed_codes=_SAFE_BROKER_ERRORS,
++    )
++
+ 
+ def _enrich_position(pos: dict, symbol_key: str = "symbol") -> dict:
+     """Add current market price to a position if not already present."""
+@@ -68,7 +89,8 @@ def _collect_broker(
+                 acc["account_name"] = account.display_name
+             result["accounts"].append(acc)
+         else:
+-            result["errors"].append({**context, "error": str(acc["error"])})
++            code = _safe_read_error(acc, "BROKER_ACCOUNT_UNAVAILABLE")
++            result["errors"].append({**context, "error": code, "error_code": code})
+         positions = _call_for_account(positions_fn, account)
+         for p in positions:
+             if "error" not in p:
+@@ -94,17 +116,18 @@ def _collect_broker(
+                         result[exact_target] = str(total)
+                         result[target] = float(total)
+             else:
+-                error = str(p["error"])
++                error = _safe_read_error(p, "BROKER_POSITIONS_UNAVAILABLE")
+                 if not any(
+                     item["broker"] == name
+                     and item.get("account_id") == context["account_id"]
+                     and item["error"] == error
+                     for item in result["errors"]
+                 ):
+-                    result["errors"].append({**context, "error": error})
++                    result["errors"].append({**context, "error": error, "error_code": error})
+     except Exception as exc:
+-        logger.warning("%s portfolio fetch failed: %s", name, exc)
+-        result["errors"].append({**context, "error": str(exc)})
++        code = safe_exception_code(exc, fallback="BROKER_READ_UNAVAILABLE")
++        logger.warning("%s portfolio fetch failed: %s", name, code)
++        result["errors"].append({**context, "error": code, "error_code": code})
+ 
+ 
+ def get_portfolio_summary(
+diff --git a/src/web/routes.py b/src/web/routes.py
+index df8eb98..dae4d26 100644
+--- a/src/web/routes.py
++++ b/src/web/routes.py
+@@ -65,6 +65,7 @@ from src.tools.simulator import run_simulation_async
+ from src.expenses.summary import summarize_currencies
+ from src.agent.utils.logger import get_logger
+ from src.expenses.categories import CATEGORY_TAXONOMY, category_label
++from src.operations.workloads import WorkloadBusy, broker_query_work
+ from src.finance.normalization import (
+     usd_value,
+     portfolio_number as _portfolio_number,
+@@ -876,13 +877,30 @@ async def portfolio_snapshot(request: Request) -> dict:
+     try:
+         ensure_broker_vault()
+         accounts = await load_user_broker_accounts(principal.user_id)
+-        summary = await asyncio.to_thread(get_portfolio_summary, accounts=accounts)
++        summary = await broker_query_work.arun(get_portfolio_summary, accounts=accounts, timeout=30)
++    except WorkloadBusy as exc:
++        raise HTTPException(status_code=503, detail="BROKER_QUERY_BUSY") from exc
++    except TimeoutError as exc:
++        raise HTTPException(status_code=503, detail="BROKER_QUERY_TIMEOUT") from exc
+     except BrokerVaultUnavailable as exc:
+         raise HTTPException(status_code=503, detail=str(exc)) from exc
+     except Exception as exc:
+         logger.error("Could not load portfolio snapshot: %s", type(exc).__name__)
+         raise HTTPException(status_code=503, detail="Portfolio service unavailable") from exc
+ 
++    # A slow native read must not publish private results after session/user
++    # revocation or a selected account/configuration change during the await.
++    try:
++        current_accounts = await load_user_broker_accounts(principal.user_id)
++    except Exception as exc:
++        logger.error("Could not revalidate portfolio account scope (%s)", type(exc).__name__)
++        raise HTTPException(status_code=503, detail="Portfolio service unavailable") from exc
++    current_principal = await require_authenticated(request)
++    if current_principal.user_id != principal.user_id:
++        raise HTTPException(status_code=401, detail="Portfolio authority changed")
++    if {account.id: account for account in current_accounts} != {account.id: account for account in accounts}:
++        raise HTTPException(status_code=503, detail="BROKER_ACCOUNT_SCOPE_CHANGED")
++
+     positions = [_portfolio_position(position) for position in summary.get("positions", [])]
+     account_metrics = [_portfolio_account(account) for account in summary.get("accounts", [])]
+     errors = [
+diff --git a/src/web/static/app.js b/src/web/static/app.js
+index b7f4639..59c0a73 100644
+--- a/src/web/static/app.js
++++ b/src/web/static/app.js
+@@ -330,6 +330,13 @@ async function loadSnapshot() {
+     if (resp.status === 401) { window.location.assign('/login'); return; }
+     const data = await resp.json();
+     if (data.message) { el.textContent = data.message; return; }
++    const overview = data.market_overview || {};
++    if (overview.error || overview.available === false) {
++      el.textContent = (overview.error_code || overview.error) === 'YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW'
++        ? 'Market data is unavailable until this source is reviewed and approved for use.'
++        : 'Market data is unavailable. A verified snapshot could not be collected.';
++      return;
++    }
+     const markets = data.market_overview?.markets || {};
+     let html = '';
+     for (const [name, info] of Object.entries(markets)) {
+diff --git a/tests/unit/agent_workflow_test.py b/tests/unit/agent_workflow_test.py
+index c6f9c54..6f3ebc9 100644
+--- a/tests/unit/agent_workflow_test.py
++++ b/tests/unit/agent_workflow_test.py
+@@ -163,6 +163,59 @@ def test_market_fallback_includes_every_snapshot_asset():
+     assert answer.count("|") >= 39
+ 
+ 
++@pytest.mark.unit
++@pytest.mark.parametrize("error", [
++    "YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW",
++    "fixture-private-token\nFORGED provider error",
++])
++def test_market_fallback_explains_unavailability_without_publishing_error_details(error):
++    answer = _format_market_overview_result(json.dumps({"available": False, "error": error}))
++    assert "market data is unavailable" in answer.lower()
++    assert "Price / yield" not in answer
++    assert "fixture-private-token" not in answer
++    assert "FORGED" not in answer
++    if error.startswith("YAHOO_"):
++        assert "approved" in answer
++
++
++@pytest.mark.unit
++@pytest.mark.parametrize("native", [False, True])
++async def test_unavailable_market_read_cannot_be_replaced_by_model_prices(native):
++    client = llama_cpp_client.LlamaCppClient.__new__(llama_cpp_client.LlamaCppClient)
++    client._inference_lock = asyncio.Lock()
++    calls = 0
++
++    async def fake_stream(_messages, _tools, **kwargs):
++        nonlocal calls
++        calls += 1
++        if native and calls == 1:
++            yield {"choices": [{"delta": {"tool_calls": [{
++                "index": 0, "id": "fixture-market", "type": "function",
++                "function": {"name": "get_market_overview", "arguments": "{}"},
++            }]}, "finish_reason": "tool_calls"}]}
++        else:
++            yield {"choices": [{"delta": {"content": "NASDAQ is 999999 today."}, "finish_reason": "stop"}]}
++
++    client._stream_completion = fake_stream
++    cfg = MagicMock(
++        llm_native_tool_calling=native, trading_mode="recommend", agent_max_tokens=64,
++        agent_max_tool_rounds=2, agent_max_tool_result_chars=5000,
++    )
++    denied = json.dumps({"available": False, "error": "YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW"})
++    with (
++        patch.object(llama_cpp_client, "settings", cfg),
++        patch.object(llama_cpp_client, "dispatch_tool", AsyncMock(return_value=denied)),
++    ):
++        events = [event async for event in client.stream_response(
++            [{"role": "user", "content": "Give me a market overview right now."}], "Test read workflow.",
++        )]
++    answer = events[-2]["text"]
++    assert events[-1]["type"] == "done"
++    assert "unavailable" in answer.lower() and "approved" in answer
++    assert "999999" not in answer
++    assert calls == int(native)
++
++
+ @pytest.mark.unit
+ async def test_length_truncation_uses_complete_market_fallback():
+     client = llama_cpp_client.LlamaCppClient.__new__(llama_cpp_client.LlamaCppClient)
+diff --git a/tests/unit/market_data_test.py b/tests/unit/market_data_test.py
+index 8232a2f..2229781 100644
+--- a/tests/unit/market_data_test.py
++++ b/tests/unit/market_data_test.py
+@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
+ import pandas as pd
+ import pytest
+ 
++from src.config import Settings
+ from src.tools.market_data import (
+     _option_rows,
+     _build_signals,
+@@ -17,6 +18,13 @@ from src.tools.market_data import (
+     get_technical_indicators,
+ )
+ 
++
++@pytest.fixture
++def synthetic_yahoo_permission(monkeypatch):
++    """These selected SDK tests use mocked Yahoo clients, never provider data."""
++    settings = Settings(_env_file=None, yahoo_market_data_enabled=True)
++    monkeypatch.setattr("src.tools.market_data.get_settings", lambda: settings)
++
+ # ---------------------------------------------------------------------------
+ # _build_signals
+ # ---------------------------------------------------------------------------
+@@ -257,6 +265,7 @@ class TestCleanOptionList:
+ 
+ 
+ @pytest.mark.unit
++@pytest.mark.usefixtures("synthetic_yahoo_permission")
+ class TestGetStockData:
+     def _mock_ticker(self):
+         mock = MagicMock()
+@@ -288,6 +297,7 @@ class TestGetStockData:
+ 
+ 
+ @pytest.mark.unit
++@pytest.mark.usefixtures("synthetic_yahoo_permission")
+ class TestGetTechnicalIndicators:
+     def _make_price_df(self, n: int = 60) -> pd.DataFrame:
+         """Create a synthetic OHLCV DataFrame with n rows."""
+@@ -337,6 +347,7 @@ class TestGetTechnicalIndicators:
+ 
+ 
+ @pytest.mark.unit
++@pytest.mark.usefixtures("synthetic_yahoo_permission")
+ class TestGetOptionsChain:
+     def test_no_options_returns_error(self):
+         mock = MagicMock()
+diff --git a/src/security/errors.py b/src/security/errors.py
+new file mode 100644
+index 0000000..91d4701
+--- /dev/null
++++ b/src/security/errors.py
+@@ -0,0 +1,21 @@
++"""Publish only caller-owned error codes, never arbitrary exception text."""
++
++from collections.abc import Collection
++
++
++def safe_exception_code(
++    exc: BaseException, *, fallback: str, allowed_codes: Collection[str] = (),
++) -> str:
++    """Preserve an explicitly permitted complete code, otherwise use the fallback.
++
++    Both the fallback and allowlist must be fixed application definitions. A
++    provider error, account identifier or credentialed URL cannot define them.
++    Avoid even formatting an exception when no message is eligible for reuse.
++    """
++    if not allowed_codes:
++        return fallback
++    try:
++        code = str(exc)
++    except Exception:
++        return fallback
++    return code if code in allowed_codes else fallback
+diff --git a/tests/unit/alpaca_transport_test.py b/tests/unit/alpaca_transport_test.py
+new file mode 100644
+index 0000000..29ab9de
+--- /dev/null
++++ b/tests/unit/alpaca_transport_test.py
+@@ -0,0 +1,149 @@
++"""Installed Alpaca SDK contract with a fake session; never contacts a provider."""
++
++import json
++from types import SimpleNamespace
++from unittest.mock import Mock
++
++import pytest
++from requests import HTTPError, ReadTimeout
++
++from src.tools.brokers import alpaca
++from src.tools.broker_accounts import BrokerAccountConfig
++
++pytestmark = pytest.mark.unit
++
++
++def fixture_account():
++    return BrokerAccountConfig("fixture", "owner", "alpaca", "Fixture", {
++        "api_key": "synthetic-unused-key", "secret_key": "synthetic-unused-secret", "paper": True,
++    })
++
++
++@pytest.fixture
++def fake_transport(monkeypatch):
++    # Install before constructing the real SDK client. Any request in construction
++    # would also hit this mock rather than the network.
++    request = Mock()
++    monkeypatch.setattr("requests.sessions.Session.request", request)
++    return request
++
++
++def test_installed_sdk_read_preserves_session_headers_and_adds_transport_timeouts(fake_transport):
++    client = alpaca._get_client(fixture_account())
++    response = Mock(text='{"fixture": true}')
++    response.json.return_value = {"fixture": True}
++    fake_transport.return_value = response
++
++    assert client.get("/synthetic-contract") == {"fixture": True}
++
++    method, url = fake_transport.call_args.args
++    options = fake_transport.call_args.kwargs
++    assert method == "GET"
++    assert url == "https://paper-api.alpaca.markets/v2/synthetic-contract"
++    assert options["timeout"] == (5, 10)
++    assert options["headers"]["APCA-API-KEY-ID"] == "synthetic-unused-key"
++    assert options["headers"]["APCA-API-SECRET-KEY"] == "synthetic-unused-secret"
++    assert options["allow_redirects"] is False
++    assert "verify" not in options or options["verify"] is True
++    assert fake_transport.call_count == 1
++    client._session.close()
++
++
++def test_rate_limit_has_one_attempt_and_no_retry_sleep(fake_transport, monkeypatch, caplog):
++    message = "synthetic-private-provider-token synthetic-account-7281\nFORGED_PROVIDER_LOG"
++    response = Mock(status_code=429, text=json.dumps({"code": 429, "message": message}))
++    response.raise_for_status.side_effect = HTTPError(message, response=response)
++    fake_transport.return_value = response
++    sleep = Mock(side_effect=AssertionError("Read must not sleep or retry"))
++    monkeypatch.setattr("alpaca.common.rest.time.sleep", sleep)
++
++    result = alpaca.get_alpaca_positions(account=fixture_account())
++
++    assert fake_transport.call_count == 1
++    sleep.assert_not_called()
++    assert result[0]["error"] == "ALPACA_POSITIONS_UNAVAILABLE"
++    assert result[0]["available"] is False
++    assert "synthetic-private-provider-token" not in json.dumps(result) + caplog.text
++    assert "synthetic-account-7281" not in json.dumps(result) + caplog.text
++    assert "FORGED_PROVIDER_LOG" not in json.dumps(result) + caplog.text
++
++
++def test_installed_sdk_position_and_order_reads_keep_response_contract(fake_transport):
++    client = alpaca._get_client(fixture_account())
++    response = Mock(text="[]")
++    response.json.return_value = []
++    fake_transport.return_value = response
++
++    assert client.get_all_positions() == []
++    assert client.get_orders() == []
++    assert fake_transport.call_count == 2
++    assert all(call.kwargs["timeout"] == (5, 10) for call in fake_transport.call_args_list)
++    assert all(call.args[0] == "GET" for call in fake_transport.call_args_list)
++    client._session.close()
++
++
++def test_native_read_timeout_propagates_as_safe_unavailable(fake_transport, caplog):
++    fake_transport.side_effect = ReadTimeout("synthetic-private-timeout-token account=synthetic-account-72")
++
++    result = alpaca.get_alpaca_account(account=fixture_account())
++
++    assert result["error"] == "ALPACA_ACCOUNT_UNAVAILABLE"
++    assert result["available"] is False
++    assert fake_transport.call_count == 1
++    assert fake_transport.call_args.kwargs["timeout"] == (5, 10)
++    assert "synthetic-private-timeout-token" not in json.dumps(result) + caplog.text
++    assert "synthetic-account-72" not in json.dumps(result) + caplog.text
++
++
++@pytest.mark.parametrize("function,method", [
++    ("get_alpaca_account", "get_account"),
++    ("get_alpaca_positions", "get_all_positions"),
++    ("get_alpaca_orders", "get_orders"),
++])
++@pytest.mark.parametrize("failed", [False, True])
++def test_short_lived_read_session_closes_after_success_or_failure(monkeypatch, function, method, failed):
++    client = Mock()
++    if failed:
++        getattr(client, method).side_effect = ReadTimeout("synthetic-private-read-token")
++    elif function == "get_alpaca_account":
++        client.get_account.return_value = SimpleNamespace(
++            status="ACTIVE", cash="100", buying_power="100", portfolio_value="100",
++            equity="100", daytrade_count=0, pattern_day_trader=False,
++        )
++    else:
++        getattr(client, method).return_value = []
++    monkeypatch.setattr(alpaca, "_get_client", Mock(return_value=client))
++
++    result = getattr(alpaca, function)(account=fixture_account())
++
++    client._session.close.assert_called_once_with()
++    if failed:
++        row = result[0] if isinstance(result, list) else result
++        assert row["available"] is False
++        assert row["error"].endswith("_UNAVAILABLE")
++    else:
++        assert result == [] if isinstance(result, list) else result["cash"] == 100
++
++
++@pytest.mark.parametrize("construction_failure", [False, True])
++def test_cleanup_cannot_replace_original_safe_failure(monkeypatch, caplog, construction_failure):
++    client = Mock()
++    client.get_account.side_effect = ReadTimeout("synthetic-private-read-token")
++    client._session.close.side_effect = RuntimeError("synthetic-private-close-token\nFORGED_CLOSE_LOG")
++    factory = Mock(return_value=client)
++    if construction_failure:
++        factory.side_effect = RuntimeError("synthetic-private-constructor-token")
++    monkeypatch.setattr(alpaca, "_get_client", factory)
++
++    result = alpaca.get_alpaca_account(account=fixture_account())
++
++    assert result["error"] == "ALPACA_ACCOUNT_UNAVAILABLE"
++    assert result["available"] is False
++    if construction_failure:
++        client._session.close.assert_not_called()
++    else:
++        client._session.close.assert_called_once_with()
++        assert "ALPACA_TRANSPORT_CLEANUP_UNAVAILABLE" in caplog.text
++    captured = json.dumps(result) + caplog.text
++    assert "synthetic-private" not in captured
++    assert "FORGED_CLOSE_LOG" not in captured
+diff --git a/tests/unit/broker_error_redaction_test.py b/tests/unit/broker_error_redaction_test.py
+new file mode 100644
+index 0000000..6e1cbda
+--- /dev/null
++++ b/tests/unit/broker_error_redaction_test.py
+@@ -0,0 +1,157 @@
++"""SDK failures stay visible without exposing provider text or credentials."""
++
++import json
++from unittest.mock import Mock
++
++import pytest
++
++from src.tools import portfolio
++from src.tools.brokers import alpaca, binance, coinbase
++from src.security.errors import safe_exception_code
++from src.tools.broker_accounts import BrokerAccountConfig
++
++PRIVATE_FAILURE = (
++    "fake-account-48392 fake-token-avoid-leaking "
++    "https://fake-user:fake-password@provider.invalid/path?token=fake-token-avoid-leaking\n"
++    "FORGED_LOG_ENTRY"
++)
++
++
++def fixture_account(module):
++    name = module.__name__.rsplit(".", 1)[-1]
++    return BrokerAccountConfig("fixture", "owner", name, "Fixture", {
++        "api_key": "synthetic-unused-key", "secret_key": "synthetic-unused-secret",
++        "api_secret": "synthetic-unused-secret", "paper": True, "testnet": True,
++    })
++
++
++READS = [
++    (alpaca, "get_alpaca_account", "get_account", {}, "ALPACA_ACCOUNT_UNAVAILABLE"),
++    (alpaca, "get_alpaca_positions", "get_all_positions", {}, "ALPACA_POSITIONS_UNAVAILABLE"),
++    (alpaca, "get_alpaca_orders", "get_orders", {}, "ALPACA_ORDERS_UNAVAILABLE"),
++    (coinbase, "get_coinbase_account", "get_accounts", {}, "COINBASE_ACCOUNT_UNAVAILABLE"),
++    (coinbase, "get_coinbase_positions", "get_accounts", {}, "COINBASE_ACCOUNT_UNAVAILABLE"),
++    (coinbase, "get_coinbase_orders", "list_orders", {}, "COINBASE_ORDERS_UNAVAILABLE"),
++    (binance, "get_binance_account", "get_account", {}, "BINANCE_ACCOUNT_UNAVAILABLE"),
++    (binance, "get_binance_positions", "get_account", {}, "BINANCE_ACCOUNT_UNAVAILABLE"),
++    (binance, "get_binance_orders", "get_all_orders", {"symbol": "FIXTUREUSD"}, "BINANCE_ORDERS_UNAVAILABLE"),
++]
++
++
++@pytest.mark.parametrize("module,function,method,arguments,code", READS)
++@pytest.mark.parametrize("construction_failure", [False, True])
++def test_provider_exception_is_safe_and_still_unavailable(
++    monkeypatch, caplog, module, function, method, arguments, code, construction_failure,
++):
++    client = Mock()
++    getattr(client, method).side_effect = RuntimeError(PRIVATE_FAILURE)
++    factory = Mock(return_value=client)
++    if construction_failure:
++        factory.side_effect = RuntimeError(PRIVATE_FAILURE)
++    monkeypatch.setattr(module, "_get_client", factory)
++
++    result = getattr(module, function)(account=fixture_account(module), **arguments)
++
++    rows = result if isinstance(result, list) else [result]
++    assert rows and rows[0]["error"] == code
++    assert rows[0]["available"] is False
++    captured = json.dumps(result) + caplog.text
++    for private in ("fake-account-48392", "fake-token-avoid-leaking", "fake-password", "FORGED_LOG_ENTRY"):
++        assert private not in captured
++    assert all(record.exc_info is None for record in caplog.records)
++
++
++@pytest.mark.parametrize("failure_path", ["exception", "account_payload", "positions_payload"])
++def test_portfolio_rejects_raw_failure_text_and_invalidates_totals(monkeypatch, caplog, failure_path):
++    account_fn = Mock(return_value={"currency": "USD"})
++    positions_fn = Mock(return_value=[])
++    if failure_path == "exception":
++        account_fn.side_effect = RuntimeError(PRIVATE_FAILURE)
++    elif failure_path == "account_payload":
++        account_fn.return_value = {"error": PRIVATE_FAILURE}
++    else:
++        positions_fn.return_value = [{"error": PRIVATE_FAILURE}]
++    monkeypatch.setattr(portfolio, "_BROKER_FUNNELS", [("alpaca", positions_fn, account_fn)])
++
++    result = portfolio.get_portfolio_summary(accounts=[fixture_account(alpaca)])
++
++    assert result["errors"]
++    assert result["valuation_status"] == "partial"
++    assert result["total_market_value_usd"] is None
++    assert result["total_market_value_usd_exact"] is None
++    assert result["total_unrealized_pnl_usd"] is None
++    assert result["total_unrealized_pnl_usd_exact"] is None
++    assert PRIVATE_FAILURE not in json.dumps(result) + caplog.text
++    assert "fake-token-avoid-leaking" not in json.dumps(result) + caplog.text
++    assert "FORGED_LOG_ENTRY" not in json.dumps(result) + caplog.text
++
++
++@pytest.mark.parametrize("message,expected", [
++    ("FIXTURE_DENIED", "FIXTURE_DENIED"),
++    ("FIXTURE_DENIED\n" + PRIVATE_FAILURE, "FIXTURE_UNAVAILABLE"),
++    (PRIVATE_FAILURE, "FIXTURE_UNAVAILABLE"),
++])
++def test_only_complete_caller_owned_codes_are_preserved(message, expected):
++    assert safe_exception_code(
++        RuntimeError(message), fallback="FIXTURE_UNAVAILABLE", allowed_codes={"FIXTURE_DENIED"},
++    ) == expected
++
++
++def test_exception_formatter_cannot_break_redaction():
++    class BrokenFormatter(RuntimeError):
++        def __str__(self):
++            raise RuntimeError(PRIVATE_FAILURE)
++    assert safe_exception_code(BrokenFormatter(), fallback="FIXTURE_UNAVAILABLE") == "FIXTURE_UNAVAILABLE"
++    assert safe_exception_code(
++        BrokenFormatter(), fallback="FIXTURE_UNAVAILABLE", allowed_codes={"FIXTURE_DENIED"},
++    ) == "FIXTURE_UNAVAILABLE"
++
++
++@pytest.mark.parametrize("module", [alpaca, coinbase, binance])
++def test_external_write_guards_still_prevent_client_creation(monkeypatch, module):
++    factory = Mock(side_effect=AssertionError("SDK client must not be constructed"))
++    monkeypatch.setattr(module, "_get_client", factory)
++    broker = module.__name__.rsplit(".", 1)[-1]
++    submit = getattr(module, f"submit_{broker}_order")("FIXTUREUSD", "buy", 1, account=fixture_account(module))
++    cancel = getattr(module, f"cancel_{broker}_order")("fixture-order", account=fixture_account(module))
++    assert submit["blocked"] is True and cancel["blocked"] is True
++    factory.assert_not_called()
++
++
++def test_portfolio_keeps_stable_adapter_codes_and_deduplicates(monkeypatch):
++    safe = {"error": "ALPACA_ACCOUNT_UNAVAILABLE", "available": False}
++    monkeypatch.setattr(portfolio, "_BROKER_FUNNELS", [
++        ("alpaca", Mock(return_value=[safe]), Mock(return_value=safe)),
++    ])
++    result = portfolio.get_portfolio_summary(accounts=[fixture_account(alpaca)])
++    assert len(result["errors"]) == 1
++    assert result["errors"][0]["error"] == "ALPACA_ACCOUNT_UNAVAILABLE"
++
++
++def synthetic_order(symbol):
++    return {"orderId": 1, "symbol": symbol, "side": "BUY", "type": "LIMIT",
++            "origQty": "1", "executedQty": "1", "price": "10", "status": "FILLED", "time": 1}
++
++
++@pytest.mark.parametrize("all_failed", [False, True])
++def test_binance_default_symbols_do_not_hide_failed_reads(monkeypatch, caplog, all_failed):
++    client = Mock()
++    def fetch(*, symbol, limit):
++        if not all_failed and symbol == "BTCUSDT":
++            return [synthetic_order(symbol)]
++        raise RuntimeError(PRIVATE_FAILURE)
++    client.get_all_orders.side_effect = fetch
++    monkeypatch.setattr(binance, "_get_client", Mock(return_value=client))
++
++    result = binance.get_binance_orders(account=fixture_account(binance))
++
++    errors = [row for row in result if "error" in row]
++    orders = [row for row in result if "error" not in row]
++    assert len(errors) == (4 if all_failed else 3)
++    assert all(row["error"] == "BINANCE_ORDERS_UNAVAILABLE" and row["available"] is False for row in errors)
++    assert len(orders) == (0 if all_failed else 1)
++    if orders:
++        assert orders[0]["symbol"] == "BTCUSDT"
++    assert client.get_all_orders.call_count == 4
++    assert "fake-token-avoid-leaking" not in json.dumps(result) + caplog.text
++    assert "FORGED_LOG_ENTRY" not in json.dumps(result) + caplog.text
+diff --git a/tests/unit/market_provider_safety_test.py b/tests/unit/market_provider_safety_test.py
+new file mode 100644
+index 0000000..23e8b94
+--- /dev/null
++++ b/tests/unit/market_provider_safety_test.py
+@@ -0,0 +1,129 @@
++"""Yahoo permission and safe provider failures, using only synthetic transports."""
++
++import json
++from types import SimpleNamespace
++import builtins
++from unittest.mock import Mock, MagicMock
++
++import pytest
++
++from src.tools import forex, market_data
++from src.config import Settings
++
++pytestmark = pytest.mark.unit
++
++READS = [
++    (market_data.get_stock_data, (["FIXTURE"],), "MARKET_DATA_UNAVAILABLE"),
++    (market_data.get_crypto_data, (["FIXTURE-USD"],), "MARKET_DATA_UNAVAILABLE"),
++    (market_data.get_market_overview, (), "MARKET_OVERVIEW_UNAVAILABLE"),
++    (market_data.get_technical_indicators, ("FIXTURE",), "TECHNICAL_INDICATORS_UNAVAILABLE"),
++    (market_data.get_options_chain, ("FIXTURE",), "OPTIONS_CHAIN_UNAVAILABLE"),
++    (market_data.search_ticker, ("fixture",), "TICKER_SEARCH_UNAVAILABLE"),
++    (market_data.get_earnings_calendar, (), "EARNINGS_CALENDAR_UNAVAILABLE"),
++    (forex.get_forex_data, (["EURUSD"],), "FOREX_DATA_UNAVAILABLE"),
++    (forex.get_forex_rates, (["EURUSD"],), "FOREX_RATE_UNAVAILABLE"),
++]
++
++
++def call_read(function, arguments):
++    if function is market_data.get_earnings_calendar:
++        return function(*arguments, symbols=["FIXTURE"])
++    return function(*arguments)
++
++
++def error_rows(value):
++    if isinstance(value, dict):
++        if "error" in value:
++            yield value
++        for nested in value.values():
++            yield from error_rows(nested)
++    elif isinstance(value, list):
++        for nested in value:
++            yield from error_rows(nested)
++
++
++@pytest.mark.parametrize("function,arguments,code", READS)
++def test_production_default_blocks_before_provider_import(monkeypatch, function, arguments, code):
++    monkeypatch.delenv("YAHOO_MARKET_DATA_ENABLED", raising=False)
++    settings = Settings(_env_file=None, environment="production")
++    monkeypatch.setattr(market_data, "get_settings", lambda: settings, raising=False)
++    original_import = builtins.__import__
++    def restricted_import(name, *args, **kwargs):
++        if name in {"yfinance", "ta"}:
++            pytest.fail("Unapproved Yahoo read imported its provider")
++        return original_import(name, *args, **kwargs)
++    monkeypatch.setattr(builtins, "__import__", restricted_import)
++
++    result = call_read(function, arguments)
++
++    assert result["available"] is False
++    assert result["error"] == "YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW"
++    assert settings.yahoo_market_data_enabled is False
++
++
++@pytest.mark.parametrize("value", [1, "true", None, MagicMock()])
++def test_nonboolean_values_cannot_authorize_provider_work(monkeypatch, value):
++    monkeypatch.setattr(
++        market_data, "get_settings", lambda: SimpleNamespace(yahoo_market_data_enabled=value), raising=False,
++    )
++    factory = Mock(side_effect=AssertionError("Provider must not be used"))
++    monkeypatch.setattr("yfinance.Ticker", factory)
++
++    assert market_data.get_market_overview()["available"] is False
++    assert forex.get_forex_rates(["EURUSD"])["available"] is False
++    factory.assert_not_called()
++
++
++def test_historical_permission_does_not_enable_market_reads(monkeypatch):
++    settings = Settings(_env_file=None, environment="production",
++                        yahoo_historical_data_enabled=True, yahoo_market_data_enabled=False)
++    monkeypatch.setattr(market_data, "get_settings", lambda: settings, raising=False)
++    factory = Mock(side_effect=AssertionError("Market provider must not be used"))
++    monkeypatch.setattr("yfinance.Ticker", factory)
++    assert market_data.get_stock_data(["FIXTURE"])["available"] is False
++    assert forex.get_forex_data(["EURUSD"])["available"] is False
++    factory.assert_not_called()
++
++
++def test_market_permission_does_not_enable_historical_research(monkeypatch):
++    from src.research import history
++
++    settings = Settings(_env_file=None, environment="production",
++                        yahoo_market_data_enabled=True, yahoo_historical_data_enabled=False)
++    monkeypatch.setattr(history, "get_settings", lambda: settings)
++    factory = Mock(side_effect=AssertionError("Historical provider must not be used"))
++    monkeypatch.setattr(history.yf, "Ticker", factory)
++    with pytest.raises(ValueError, match="YAHOO_RESEARCH_SOURCE_DISABLED_PENDING_OPERATOR_REVIEW"):
++        history.load_history(["FIXTURE"], "2025-01-01", "2025-02-01", "USD")
++    factory.assert_not_called()
++
++
++@pytest.mark.parametrize("function,arguments,code", READS)
++def test_internal_provider_failures_never_expose_exception_text(monkeypatch, caplog, function, arguments, code):
++    settings = Settings(_env_file=None, environment="production", yahoo_market_data_enabled=True)
++    monkeypatch.setattr(market_data, "get_settings", lambda: settings, raising=False)
++    private = "fake-market-token fake-account-492 https://fake-user:fake-password@provider.invalid/?token=fake-market-token\nFORGED_MARKET_LOG"
++    ticker = Mock(side_effect=RuntimeError(private))
++    search = Mock(side_effect=RuntimeError(private))
++    monkeypatch.setattr("yfinance.Ticker", ticker)
++    monkeypatch.setattr("yfinance.Search", search)
++
++    result = call_read(function, arguments)
++
++    captured = json.dumps(result) + caplog.text
++    errors = list(error_rows(result))
++    assert errors and all(row["error"] == code and row["available"] is False for row in errors)
++    for item in ("fake-market-token", "fake-account-492", "fake-password", "FORGED_MARKET_LOG"):
++        assert item not in captured
++    assert all(record.exc_info is None for record in caplog.records)
++    assert ticker.called or search.called
++
++
++def test_central_bank_reference_is_available_without_yahoo_permission(monkeypatch):
++    monkeypatch.setattr(
++        market_data, "get_settings", lambda: SimpleNamespace(yahoo_market_data_enabled=False), raising=False,
++    )
++    result = forex.get_central_bank_rates(["EUR", "USD"])
++    assert result["data_quality"] == "static_reference_only"
++    assert result["usable_for_auto_trading"] is False
++    assert set(result["rates"]) == {"EUR", "USD"}
+diff --git a/tests/unit/read_admission_test.py b/tests/unit/read_admission_test.py
+new file mode 100644
+index 0000000..d1da625
+--- /dev/null
++++ b/tests/unit/read_admission_test.py
+@@ -0,0 +1,217 @@
++"""Read admission remains occupied after caller cancellation or timeout."""
++
++import json
++from types import SimpleNamespace
++import asyncio
++from threading import Event
++from unittest.mock import AsyncMock
++from concurrent.futures import ThreadPoolExecutor
++
++import pytest
++
++from src.web import routes
++from src.tools import dispatcher
++from src.operations.workloads import WorkPool
++
++pytestmark = pytest.mark.unit
++
++
++@pytest.fixture(autouse=True)
++def isolated_authority_lookup(monkeypatch):
++    # Exercise production admission without accessing a real session/database.
++    monkeypatch.setattr("src.security.sessions.check_tool_authority", AsyncMock())
++
++
++async def test_cancelled_market_read_rejects_excess_work(monkeypatch):
++    pool = WorkPool(1, "MARKET_READ")
++    monkeypatch.setattr(dispatcher, "market_read_work", pool, raising=False)
++    entered, release = Event(), Event()
++    calls = []
++
++    def blocked(inp):
++        calls.append(inp)
++        entered.set()
++        assert release.wait(5)
++        return {"value": 1}
++
++    monkeypatch.setitem(dispatcher._SYNC_DISPATCH, "get_stock_data", blocked)
++    first = asyncio.create_task(dispatcher.dispatch_tool("get_stock_data", {"symbol": "fixture"}))
++    try:
++        assert await asyncio.to_thread(entered.wait, 1)
++        first.cancel()
++        with pytest.raises(asyncio.CancelledError):
++            await first
++        result = json.loads(await asyncio.wait_for(dispatcher.dispatch_tool("get_stock_data", {}), .2))
++        assert result["error"] == "MARKET_READ_BUSY"
++        assert result["available"] is False
++        assert len(calls) == 1
++    finally:
++        release.set()
++        await asyncio.gather(first, return_exceptions=True)
++
++
++async def test_read_timeout_keeps_capacity_and_owner_context(monkeypatch):
++    pool = WorkPool(1, "BROKER_QUERY")
++    monkeypatch.setattr(dispatcher, "broker_query_work", pool, raising=False)
++    monkeypatch.setattr(dispatcher, "_READ_TIMEOUT_SECONDS", .03, raising=False)
++    monkeypatch.setattr(dispatcher, "_resolve_single_account", AsyncMock(return_value=(object(), None)))
++    entered, release = Event(), Event()
++    owners = []
++
++    def blocked(**kwargs):
++        owners.append(dispatcher._tool_user_id.get())
++        entered.set()
++        assert release.wait(5)
++        return {"available": True}
++
++    monkeypatch.setattr(dispatcher, "get_account_info", blocked)
++    try:
++        with dispatcher.tool_context("fixture-session", "fixture-owner"):
++            result = json.loads(await asyncio.wait_for(
++                dispatcher.dispatch_tool("get_account_info", {"broker": "ibkr"}), .2,
++            ))
++            assert result["error"] == "TOOL_TIMEOUT"
++            assert result["available"] is False
++            result = json.loads(await dispatcher.dispatch_tool("get_account_info", {"broker": "ibkr"}))
++        assert result["error"] == "BROKER_QUERY_BUSY"
++        assert owners == ["fixture-owner"]
++    finally:
++        release.set()
++
++
++async def test_portfolio_http_shares_broker_read_capacity(monkeypatch):
++    pool = WorkPool(1, "BROKER_QUERY")
++    monkeypatch.setattr(dispatcher, "broker_query_work", pool, raising=False)
++    monkeypatch.setattr(routes, "broker_query_work", pool, raising=False)
++    monkeypatch.setattr(
++        routes, "require_authenticated", AsyncMock(return_value=SimpleNamespace(user_id="fixture-owner")),
++    )
++    monkeypatch.setattr(routes, "ensure_broker_vault", lambda: None)
++    monkeypatch.setattr(routes, "load_user_broker_accounts", AsyncMock(return_value=[]))
++    entered, release = Event(), Event()
++
++    def blocked(inp):
++        entered.set()
++        assert release.wait(5)
++
++    first = asyncio.create_task(pool.arun(blocked, {}))
++    try:
++        assert await asyncio.to_thread(entered.wait, 1)
++        with pytest.raises(routes.HTTPException) as failure:
++            await routes.portfolio_snapshot(SimpleNamespace())
++        assert failure.value.status_code == 503
++        assert failure.value.detail == "BROKER_QUERY_BUSY"
++    finally:
++        release.set()
++        await first
++
++
++async def test_dispatch_error_does_not_disclose_provider_exception(monkeypatch, caplog):
++    secret = "fixture-token-123 https://example.test/?token=fixture-token-123\naccount=fixture-account-789"
++    monkeypatch.setattr(dispatcher, "_dispatch", AsyncMock(side_effect=RuntimeError(secret)))
++    result = await dispatcher.dispatch_tool("get_stock_data", {})
++    assert "fixture-token-123" not in result + caplog.text
++    assert "fixture-account-789" not in result + caplog.text
++    assert json.loads(result)["error"] == "TOOL_UNAVAILABLE"
++
++
++async def test_vault_error_does_not_disclose_account_or_secret(monkeypatch, caplog):
++    monkeypatch.setattr(dispatcher, "load_user_broker_accounts", AsyncMock(
++        side_effect=dispatcher.BrokerVaultUnavailable("fixture-secret-123 account=fixture-account-789"),
++    ))
++    with dispatcher.tool_context("fixture-session", "fixture-owner"):
++        result = await dispatcher._dispatch_broker_read("get_portfolio_summary", {})
++    assert result["error"] == "BROKER_VAULT_UNAVAILABLE"
++    assert "fixture-secret-123" not in json.dumps(result) + caplog.text
++    assert "fixture-account-789" not in json.dumps(result) + caplog.text
++
++
++async def test_dedicated_read_workers_do_not_wait_for_shared_executor():
++    release, entered = Event(), Event()
++    loop = asyncio.get_running_loop()
++    executor = ThreadPoolExecutor(max_workers=1)
++    loop.set_default_executor(executor)
++    pool = WorkPool(1, "READ_FIXTURE", dedicated=True)
++
++    def occupy_shared_worker():
++        entered.set()
++        assert release.wait(5)
++
++    blocked = loop.run_in_executor(None, occupy_shared_worker)
++    try:
++        while not entered.is_set():
++            await asyncio.sleep(.001)
++        assert await asyncio.wait_for(pool.arun(lambda: "read completed"), .2) == "read completed"
++    finally:
++        release.set()
++        await blocked
++        pool._executor.shutdown(wait=True)
++
++
++async def test_scheduled_market_refresh_shares_admission(monkeypatch):
++    from src.scheduler import jobs
++
++    pool = WorkPool(1, "MARKET_READ")
++    monkeypatch.setattr(jobs, "market_read_work", pool)
++    monkeypatch.setattr(jobs, "get_market_overview", lambda: pytest.fail("Rejected read must not run"))
++    monkeypatch.setattr(jobs, "search_market_news", lambda *a, **k: pytest.fail("Rejected read must not run"))
++    previous = {"timestamp": "fixture-previous"}
++    monkeypatch.setattr(jobs, "_latest_snapshot", previous)
++    entered, release = Event(), Event()
++
++    def block():
++        entered.set()
++        assert release.wait(5)
++
++    first = asyncio.create_task(pool.arun(block))
++    try:
++        assert await asyncio.to_thread(entered.wait, 1)
++        await jobs._refresh_market_data()
++        assert jobs.get_latest_snapshot() == previous
++    finally:
++        release.set()
++        await first
++
++
++@pytest.mark.parametrize("revocation", ["session", "owner", "account", "config"])
++async def test_portfolio_does_not_publish_after_mid_read_revocation(monkeypatch, revocation):
++    from src.tools.broker_accounts import BrokerAccountConfig
++
++    principal = SimpleNamespace(user_id="fixture-owner")
++    account = BrokerAccountConfig("fixture-id", "fixture-owner", "alpaca", "fixture", {})
++    auth = AsyncMock(
++        side_effect=[principal, routes.HTTPException(status_code=401)] if revocation == "session" else None,
++    )
++    if revocation != "session":
++        auth.return_value = principal
++    if revocation == "owner":
++        auth.side_effect = [principal, SimpleNamespace(user_id="different-owner")]
++    monkeypatch.setattr(routes, "require_authenticated", auth)
++    monkeypatch.setattr(routes, "ensure_broker_vault", lambda: None)
++    accounts = AsyncMock(side_effect=[[account], []] if revocation == "account" else None)
++    if revocation != "account":
++        accounts.return_value = [account]
++    if revocation == "config":
++        changed = BrokerAccountConfig(
++            account.id, account.user_id, account.broker, account.display_name, {"paper": False},
++        )
++        accounts.side_effect = [[account], [changed]]
++    monkeypatch.setattr(routes, "load_user_broker_accounts", accounts)
++    entered, release = Event(), Event()
++
++    def private_read(**kwargs):
++        entered.set()
++        assert release.wait(5)
++        return {"positions": [], "accounts": [], "errors": []}
++
++    monkeypatch.setattr(routes, "get_portfolio_summary", private_read)
++    task = asyncio.create_task(routes.portfolio_snapshot(SimpleNamespace()))
++    try:
++        assert await asyncio.to_thread(entered.wait, 1)
++        release.set()  # The mocked revocation is observed after native work returns.
++        with pytest.raises(routes.HTTPException) as denied:
++            await task
++        assert denied.value.status_code == (401 if revocation in {"session", "owner"} else 503)
++    finally:
++        release.set()
++        await asyncio.gather(task, return_exceptions=True)

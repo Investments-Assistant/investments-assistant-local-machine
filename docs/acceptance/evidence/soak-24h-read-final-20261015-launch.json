@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-14T23:50:17.849042+00:00",
+  "database": "test_soak_read_final_fd14790a88fd",
+  "disposable_marker": "fixture-soak-read-4b6a5e43c3974738901470a85fb420aa",
+  "identity_verified": true,
+  "source_head": "35ef2f4dfc3f85908464b80f2851de8debf1ee0f",
+  "output": ".qa/soak-24h-read-final-20261015",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "scope": "Owned local HTTP/PostgreSQL + synthetic app inference + separate existing CPU model; no broker/provider/order",
+  "status": "RUNNING_VERIFIED",
+  "runner_pid": 984335,
+  "cleanup_verified": false,
+  "code_sha256": "f945c38df60e639a6791976385f4e7a2d4be7f347b89e9852582b6ab15c9ddb6",
+  "command": [
+    "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+    "scripts/soak_acceptance.py",
+    "--hours",
+    "24",
+    "--interval",
+    "30",
+    "--restart-every",
+    "900",
+    "--model",
+    "models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "--output",
+    ".qa/soak-24h-read-final-20261015"
+  ],
+  "verified_at": "2026-10-14T23:50:57.156285+00:00",
+  "initial_cycles": 9,
+  "initial_window_seconds": 9.213153616001364,
+  "initial_failures": []
+}

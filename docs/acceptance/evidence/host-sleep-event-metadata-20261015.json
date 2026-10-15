@@ -1,0 +1,179 @@
+{
+  "at": "2026-10-15T10:20:59.645091+00:00",
+  "scope": "Read-only selected Windows System power-event metadata only; no event messages, identifiers or power changes",
+  "limitations": [
+    "Historical event evidence only; does not validate application recovery after a physical suspend/resume"
+  ],
+  "exit_code": 0,
+  "result": {
+    "status": "QUERY_OK",
+    "lookback_days": 7,
+    "events": [
+      {
+        "at_utc": "2026-10-13T14:10:17.9320152Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-13T14:10:17.8670856Z",
+        "event_id": 1,
+        "provider": "Microsoft-Windows-Power-Troubleshooter"
+      },
+      {
+        "at_utc": "2026-10-13T14:10:17.5188579Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-13T01:42:31.1627113Z",
+        "event_id": 107,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-13T01:42:27.7232764Z",
+        "event_id": 42,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-13T01:42:22.0745596Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-13T01:26:52.2873554Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-13T01:26:52.2851058Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-13T01:25:50.9495603Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-13T01:25:50.9484461Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-13T01:25:46.8995628Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-13T01:25:46.8987757Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-13T01:25:45.2130917Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-12T09:29:43.2914547Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-12T03:27:49.0907059Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-12T03:27:49.0890111Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-12T02:27:42.0960662Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-12T02:27:42.0939660Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-12T01:06:47.2434714Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-12T01:06:47.2241392Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-12T01:06:46.1365639Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-12T01:06:46.1349256Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-12T01:06:45.0381939Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-11T12:59:39.6572468Z",
+        "event_id": 1,
+        "provider": "Microsoft-Windows-Power-Troubleshooter"
+      },
+      {
+        "at_utc": "2026-10-11T12:59:38.8798875Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-11T12:59:38.5893599Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-11T01:15:28.1546493Z",
+        "event_id": 107,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-11T01:15:23.3998209Z",
+        "event_id": 42,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-10T08:12:44.6644187Z",
+        "event_id": 1,
+        "provider": "Microsoft-Windows-Power-Troubleshooter"
+      },
+      {
+        "at_utc": "2026-10-10T08:12:43.8957111Z",
+        "event_id": 507,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-10T08:12:43.6043223Z",
+        "event_id": 506,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-10T00:44:33.4561028Z",
+        "event_id": 107,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      },
+      {
+        "at_utc": "2026-10-10T00:44:27.0059312Z",
+        "event_id": 42,
+        "provider": "Microsoft-Windows-Kernel-Power"
+      }
+    ]
+  }
+}

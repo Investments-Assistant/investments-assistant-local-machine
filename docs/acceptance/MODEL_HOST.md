@@ -17,7 +17,8 @@ VRAM capacity. CPU temperature, fan behavior and sustained throttling are unknow
 
 Read-only `powercfg /query ... STANDBYIDLE` reports zero automatic sleep timeout for
 both AC/DC on the active Balanced plan. Lid-close, hibernation, manual sleep, battery
-exhaustion and actual suspend/resume behavior remain unverified. No power setting
+exhaustion and application recovery after actual suspend/resume remain unverified.
+Historical OS-reported sleep/wake intervals are now recorded below. No power setting
 was changed. Windows time-service status reports no leap warning, stratum5 and a
 successful sync; raw evidence is `host-clock.txt`. This is not a continuous clock
 accuracy guarantee. App logs use local time; evidence timestamps explicitly use UTC.
@@ -302,3 +303,70 @@ throttle reasons0. At11:23:08Z total CPU use was5.36%; the RTX3050Ti reported72C
 at39% utilization/8.97W. These are point-in-time readings; no CPU-package
 association, sustained cooling result or thermal acceptance claim is made.
 Details: `evidence/thermal-telemetry-correlation-20261014.json` and `.txt`.
+
+## Completed host observation — 2026-10-14
+
+The frozen candidate completed the verified24-hour engineering soak:3,060
+control samples,93service restarts and24separateCPU-model runs (72/72small
+structured tasks correct), with no failures. Model load ranged0.821–1.921s,
+peak processRSS1962.10MiB, pooled task p95 2.385s. The187control samples
+overlapping those model processes had p95 33.695ms against250ms. The then-current
+source-matched Docker image also passed actual production-entrypoint model/DB
+readiness and restart recovery. See [review](evidence/soak-24h-ib-async-final-20261013-review.json)
+and [container runtime](evidence/container-runtime-ibasync-new.json).
+
+The preserved [thermal CSV](evidence/thermal-telemetry-series-20261014.csv)
+contains672valid one-minute samples over11h11m51s, ending22:29:34Z. ACPI THM0
+was67.05–95.05C, median75.05C and p95 87.05C; passive limit100 and throttle
+reason0 throughout the sampled series. This is sustained ACPI-zone telemetry
+covering only the latter part of the soak. The available PnP/WMI evidence does
+not map it to CPU/GPU/chassis, so CPU-package cooling remains unverified.
+No GPU-inference, physical-sleep recovery or investment-edge claim follows.
+The measured reliable application profile remains the existingCPU4/1.5BQ4
+profile; no model download, paid call or OS/power change occurred.
+
+The2026-10-15 read/source-safety follow-up changes the application fingerprint;
+the old24h result above remains true only for36ee15eb…. Current same-process
+CPU-model/control benchmark passes1,362overlapping requests, halt p95 52.833ms
+against250ms, peak1979.61MiB. Final image19c1f198 passes actual model readiness
+and restart budgets; see READ_ADMISSION.md. Fresh detached24h output is
+.qa/soak-24h-read-final-20261015 with fingerprintf945c38d…; its initial CPU
+benchmark passes, but no full observation or mapped cooling credit is awarded.
+
+Read-only2026-10-15 checks of root/LibreHardwareMonitor and root/OpenHardwareMonitor
+Sensor interfaces both return unavailable namespace0x8004100e. No installed
+component-specific sensor source was found by those two bounded queries; this
+does not exhaust every possible OEM interface. No installation/service or OS
+change occurred. Evidence:thermal-existing-provider-check-20261015.json.
+
+## Historical host sleep evidence — 2026-10-15
+
+A bounded read-only Windows Power-Troubleshooter query returned three event1
+SleepTime/WakeTime pairs:2026-10-10(7h28m17s),2026-10-11(11h44m16s), and
+2026-10-13(12h27m55s). No event messages, machine/user identifiers or wake-device
+details were retained. Raw numeric state fields remain uninterpreted; the
+SleepDuration field is not used as total suspended duration.
+
+The October13 reported wake14:10:17.543Z precedes the prior continuity-run
+CLOCK_DISCONTINUITY14:10:33.071Z by15.528s. Together with the user's sleep
+confirmation, this supports interruption of observation. It does not demonstrate
+successful post-sleep application reconciliation/recovery or explain the separate
+later clock steps. The current soak was neither suspended nor interrupted by
+these read-only queries. Bounded historical records cannot prove that no other
+sleep events occurred; no absence claim or additional acceptance credit follows.
+
+Raw allowlisted fields and correlation/hash review:
+[evidence](evidence/host-sleep-time-fields-20261015.json),
+[review](evidence/host-sleep-interval-review-20261015.json).
+No power setting, service, configuration or source change was made. Windows'
+[power-management documentation](https://learn.microsoft.com/en-us/windows/win32/power/windows-power-management)
+provides general OS background; actual timestamps above come from this host.
+
+A further read-only metadata query found neither LENOVO_GAMEZONE_DATA nor
+LENOVO_CPU_METHOD in root/WMI (0x80041002). No methods were invoked. Evidence:
+thermal-lenovo-provider-metadata-20261015.json. Together with the already
+absent LibreHardwareMonitor/OpenHardwareMonitor namespaces and the unmapped
+ACPI zone, these tested sources still do not establish CPU-package cooling.
+Do not repeat the same absence checks unless host configuration changes; another
+existing trusted component-specific source or separately approved sensor setup
+is required. This does not prove every possible OEM interface is absent.

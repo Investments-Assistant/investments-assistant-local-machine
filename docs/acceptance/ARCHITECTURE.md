@@ -53,7 +53,8 @@ account evidence remain required before external writes could be considered.
 - [SQLAlchemy transaction isolation in tests](https://docs.sqlalchemy.org/en/20/orm/session_transaction.html)
 - [Playwright installation](https://playwright.dev/python/docs/intro)
 
-No library migration was made. Protocol documentation informs contracts; it is not
-proof that this host has a connected or entitled external account.
+The IBKR client migrated from deprecated ib_insync to ib_async2.1.0 with installed
+API and adapter contract tests, as recorded above. Protocol documentation and those
+tests do not prove this host has a connected or entitled external account.
 
 Financial definitions: [ACCOUNTING.md](ACCOUNTING.md). Adapter boundaries and limitations: [BROKER_CAPABILITIES.md](BROKER_CAPABILITIES.md).

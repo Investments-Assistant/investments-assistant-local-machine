@@ -1,0 +1,82 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.58kB 0.0s done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 503B 0.0s done
+#3 DONE 0.1s
+
+#4 [internal] load build context
+#4 DONE 0.0s
+
+#5 [ 1/16] FROM docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+#5 resolve docker.io/library/python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258 0.1s done
+#5 DONE 0.2s
+
+#4 [internal] load build context
+#4 transferring context: 61.27kB 0.1s done
+#4 DONE 0.1s
+
+#6 [ 2/16] COPY config/build/debian.sources /tmp/ia-debian.sources
+#6 CACHED
+
+#7 [ 3/16] RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/*     && cp /tmp/ia-debian.sources /etc/apt/sources.list.d/debian.sources     && rm /tmp/ia-debian.sources     && apt-get update && apt-get install -y --no-install-recommends     build-essential     ca-certificates     cmake     libopenblas-dev     libpq-dev     libffi-dev     libxml2-dev     libxslt1-dev     libcairo2     libpango-1.0-0     libpangocairo-1.0-0     libgdk-pixbuf-2.0-0     libfontconfig1     pkg-config     shared-mime-info     && apt-get clean && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [ 4/16] WORKDIR /app
+#8 CACHED
+
+#9 [ 5/16] COPY requirements-poetry.txt ./requirements-poetry.txt
+#9 CACHED
+
+#10 [ 6/16] RUN pip install --no-cache-dir --require-hashes --only-binary=:all: -r requirements-poetry.txt
+#10 CACHED
+
+#11 [ 7/16] COPY pyproject.toml poetry.lock ./
+#11 CACHED
+
+#12 [ 8/16] RUN poetry config virtualenvs.create false     && poetry install --only main --no-root --no-interaction
+#12 CACHED
+
+#13 [ 9/16] COPY src/ ./src/
+#13 DONE 0.4s
+
+#14 [10/16] COPY alembic.ini ./alembic.ini
+#14 DONE 0.2s
+
+#15 [11/16] COPY migrations/ ./migrations/
+#15 DONE 0.2s
+
+#16 [12/16] COPY .env.example ./.env.example
+#16 DONE 0.2s
+
+#17 [13/16] RUN mkdir -p /app/scripts
+#17 DONE 0.7s
+
+#18 [14/16] COPY scripts/create_user.py ./scripts/create_user.py
+#18 DONE 0.2s
+
+#19 [15/16] COPY scripts/create_broker_key.py ./scripts/create_broker_key.py
+#19 DONE 0.2s
+
+#20 [16/16] RUN mkdir -p /app/reports /app/models     && useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+#20 DONE 2.2s
+
+#21 exporting to image
+#21 exporting layers
+#21 exporting layers 1.2s done
+#21 exporting manifest sha256:b1a2e0ea0a0d1f3c64e2a88f5b664f42d34e243154742363732910f671684998 0.0s done
+#21 exporting config sha256:25fa82689cfaac4acf69c98b2338227c54045b2ed28cdc6431a6c8305f8e43df 0.0s done
+#21 exporting attestation manifest sha256:9121f06601d6bd101ad4611f8d882287b582f8bd2d71833ccecd7c0ddb8edbd0
+#21 exporting attestation manifest sha256:9121f06601d6bd101ad4611f8d882287b582f8bd2d71833ccecd7c0ddb8edbd0 0.1s done
+#21 exporting manifest list sha256:19c1f19807c99b599e80d5f29dda60618d440f7d86cfcbb2ee11695b528d8753 0.1s done
+#21 naming to docker.io/library/investment-assistant:read-abstention-20261015
+#21 naming to docker.io/library/investment-assistant:read-abstention-20261015 done
+#21 unpacking to docker.io/library/investment-assistant:read-abstention-20261015
+#21 unpacking to docker.io/library/investment-assistant:read-abstention-20261015 0.7s done
+#21 DONE 2.3s

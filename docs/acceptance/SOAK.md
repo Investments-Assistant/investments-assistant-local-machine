@@ -1,7 +1,8 @@
 # Engineering soak
 
-The current candidate completed a verified 24-hour observation on 2026-10-14;
-see the terminal review below. The runner uses only a marked, migrated,
+The earlier frozen candidate completed a verified24-hour observation on2026-10-14;
+see the terminal review below. Subsequent read/source-safety changes have a new
+fingerprint and require their own uninterrupted window. The runner uses only a marked, migrated,
 synthetic PostgreSQL database through the `.qa` socket (or loopback TCP for CI),
 loopback HTTP, and an existing local
 model. It cannot submit broker orders or fetch provider data.
@@ -73,7 +74,8 @@ The final candidate window reached `PASS_24H` and finished at
 An independent read-only review and recomputation from raw samples confirm
 halt p95 28.275 ms (250 ms budget), maximum 60.897 ms, largest sample gap
 30.019 s (60 s budget), and maximum restart 3.118 s (15 s budget).
-The current source fingerprint still matches the frozen candidate.
+That pass belongs to frozen fingerprint36ee15eb9f882cf8845e54733b0fa434df6b0f514e0b8e053414a0b1cba45a82.
+The current read/source-safety candidate differs; this old pass does not verify it.
 
 All 24 separate CPU-model runs passed, with 72/72 small structured tasks correct.
 Control p95 during the 187 samples overlapping those processes was 33.695 ms.
@@ -146,7 +148,7 @@ and apply actual migrations. Metadata-only integration schemas are insufficient
 for application startup. Loopback TCP is supported for the CI PostgreSQL service;
 remote hosts and query-host overrides outside the isolated socket remain denied.
 
-## Current corrected full window — 2026-10-13
+## Historical corrected full window — 2026-10-13
 
 The previous 24-hour run failed at about one hour because the synthetic browser
 fixture mandate expired before the harness's stale-quote check. The runner now
@@ -300,3 +302,41 @@ At `2026-10-14T11:15:03Z`, the live runner PID500853 remained RUNNING at
 45,942.9s (12.76h),1,630 cycles,49 restarts, zero failures, one window, and
 control p95 29.50ms. Fingerprint matched; no broker connections or external
 orders. The full24-hour requirement remains unfulfilled.
+
+## Current frozen read/source-safety window — 2026-10-15
+
+New detached runner984335 started2026-10-14T23:50:18Z after final
+802unit/374PG/browser-v4, source-matched image/runtime and native-control checks.
+It owns marked databasetest_soak_read_final_fd14790a88fd and output.qa/soak-24h-read-final-20261015.
+Fingerprint:f945c38df60e639a6791976385f4e7a2d4be7f347b89e9852582b6ab15c9ddb6. Launch and initial review are in
+evidence/soak-24h-read-final-20261015-launch.json and
+evidence/soak-24h-read-final-20261015-initial-review.json.
+Initial modelPASS and zero failures establish startup only; no24-hour credit.
+Same predeclared30s cadence,900s restarts,250ms/15s budgets and0.25s clock
+divergence bound. The detached process survives Codex token exhaustion; host/WSL
+suspension still invalidates continuity. Keep source frozen. Before any retry,
+inspect checkpoint/PID/fingerprint; never duplicate a live runner.
+
+## Independent current-run prefix review — 2026-10-15
+
+An immutable snapshot preserves the first1,366 completed samples at38,399.601s
+(10.67h). Recomputed halt p95 is26.935ms/max36.675ms, largest monotonic sample
+gap30.0035s, and checkpoint tail0.0626s. All41 recorded restart durations are
+within15s (max1.8022s). Eleven existing CPU-model outputs retain the expected
+GGUF checksum/CPU4/GPU0; all33 JSON answers were independently parsed and
+checked against the original precision/authority/missing-data expectations.
+
+This is RUNNING_PREFIX_VERIFIED, never PASS_24H. Snapshot/hash provenance and
+limits are in [raw review](evidence/soak-read-raw-prefix-review-20261015.json).
+The read-only review adds no inference or service interruption and changes no
+fingerprinted source. Raw wall/monotonic pairs and independent restart process
+traces are unavailable; those checks rely on the runner and its recorded state.
+Preserve this prefix audit; extend review at terminal state rather than repeatedly
+regenerating the same snapshot.
+
+At20:11:22Z on2026-10-15 the same current runner was verified live at20.33h,
+2,599cycles/79restarts/zero failures, one window,halt p9527.527ms. All21 completed
+CPU-model result records pass3/3 with the expected checksum. Current source
+fingerprint still matches. See evidence/soak-read-20h-checkpoint-20261015.json.
+This is still partial observation; acceptance requires terminal full86,400s
+and a final raw-evidence audit. Preserve the existing live run.

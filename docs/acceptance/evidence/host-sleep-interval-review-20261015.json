@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-15T10:22:27.771518+00:00",
+  "raw_sha256": "3724c8d0a943ac27efbec4965887cd67e1d9086f5471171af3c0902557b9cf8c",
+  "intervals": [
+    {
+      "sleep_time_utc": "2026-10-13T01:42:22.0729280Z",
+      "wake_time_utc": "2026-10-13T14:10:17.5430303Z",
+      "wall_interval_seconds": 44875.470102,
+      "target_state_raw": "5",
+      "effective_state_raw": "5"
+    },
+    {
+      "sleep_time_utc": "2026-10-11T01:15:22.9961084Z",
+      "wake_time_utc": "2026-10-11T12:59:38.5864513Z",
+      "wall_interval_seconds": 42255.590343,
+      "target_state_raw": "6",
+      "effective_state_raw": "5"
+    },
+    {
+      "sleep_time_utc": "2026-10-10T00:44:26.5563195Z",
+      "wake_time_utc": "2026-10-10T08:12:43.6050436Z",
+      "wall_interval_seconds": 26897.048724,
+      "target_state_raw": "6",
+      "effective_state_raw": "5"
+    }
+  ],
+  "interpretation": "Historical OS-reported SleepTime/WakeTime intervals; no application recovery or current-soak continuity acceptance from this evidence",
+  "limitations": [
+    "Event queries are bounded, not a proof that every power event was recorded",
+    "SleepDuration/WakeDuration raw fields are not used as total suspended duration",
+    "Numeric state fields are retained without guessing their meaning",
+    "No sleep/resume was induced and no power settings changed"
+  ],
+  "historical_soak_correlation": {
+    "checkpoint": ".qa/soak-24h-continuity-20261013/checkpoint.json",
+    "checkpoint_sha256": "fe94a428282fc1d5294f13ee06eccb170251c2c114d1de0e9d507bb6a2c13a9e",
+    "status": "FAILED",
+    "failure_code": "CLOCK_DISCONTINUITY",
+    "failure_at": "2026-10-13T14:10:33.070537+00:00",
+    "failure_seconds_after_os_wake": 15.527507,
+    "interpretation": "Consistent with the user-confirmed sleep interrupting observation; this does not establish other clock-discontinuity causes or successful application recovery"
+  }
+}

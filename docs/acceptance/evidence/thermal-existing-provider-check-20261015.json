@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-15T10:08:35.518962+00:00",
+  "scope": "Read-only temperature sensors in two explicit optional existing WMI namespaces; no installation or configuration changes",
+  "namespaces": [
+    "root\\LibreHardwareMonitor",
+    "root\\OpenHardwareMonitor"
+  ],
+  "exit_code": 0,
+  "query_results": [
+    {
+      "namespace": "root\\LibreHardwareMonitor",
+      "status": "UNAVAILABLE",
+      "error_code": "HRESULT 0x8004100e,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand"
+    },
+    {
+      "namespace": "root\\OpenHardwareMonitor",
+      "status": "UNAVAILABLE",
+      "error_code": "HRESULT 0x8004100e,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand"
+    }
+  ],
+  "cpu_cooling_accepted": false
+}

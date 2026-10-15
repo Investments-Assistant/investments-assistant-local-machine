@@ -1,0 +1,12 @@
+{
+  "scope": "New marked local test databases only; no broker/provider/production access",
+  "runs": [
+    {
+      "stage": "browser-v2",
+      "database": "test_read_browser-v2_111631b820",
+      "identity_verified": true,
+      "cleanup_verified": true,
+      "exit_code": 0
+    }
+  ]
+}

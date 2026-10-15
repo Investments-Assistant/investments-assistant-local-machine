@@ -6,11 +6,11 @@ The actual amd64 image build passed: `container-build-20261010-ad17fb8e.json`,
 Its source hashes and exported image digest are recorded. This is a local build;
 the remote workflow has not run against the uncommitted checkout.
 
-The current `ib_async==2.1.0` candidate also builds successfully as
+The prior `ib_async==2.1.0` candidate built successfully as
 `investment-assistant:local`; a network-disabled, non-root image smoke confirms
 the package and read-only adapter imports. Evidence:
-`evidence/container-build-ibasync-20261013.txt`. The separate current-candidate
-runtime validation below now also passes.
+`evidence/container-build-ibasync-20261013.txt`. Its separate recorded-candidate
+runtime validation below passed; the final follow-up result is at the end.
 
 At the 2026-10-14 checkpoint Docker Desktop is available and the candidate image
 exists as `sha256:a64ce3a90cee80e7a93cd6e8e83828c583d3d70b37ff99de0c31ed8f27babe95`.
@@ -29,7 +29,7 @@ after the 24-hour CPU soak reached terminal status, avoiding competing load:
   --output docs/acceptance/evidence/container-runtime-ibasync-new.json
 ```
 
-### Current candidate runtime result — 2026-10-14
+### Prior candidate runtime result — 2026-10-14
 
 The command above completed with exit0 and `PASS`. A network-disabled source
 comparison confirmed all178 source/migration and copied configuration files in
@@ -148,3 +148,18 @@ Reproduce with a new output path:
 The approved cd049bf image `investment-assistant:security-cd049bf` built with manifest `5f56ad6fd7a50fb91edd085f55a5ab8d60d25aa8ab2805713128ea710a0eb626`. Native non-root/PDF/CPU-library checks pass. Actual GGUF startup and restart checks pass: app10.954s, database1.615s within the unchanged15s budget, persistent halt denies proposals after both restarts, and owned-resource cleanup is verified. See [runtime evidence](evidence/container-runtime-security.json) and [build provenance](evidence/container-security-review.json).
 
 [Current-image ingress](evidence/container-ingress-security.json) also passes all seven checks with cleanup verified. Windows loopback forwarding still exposes the Docker bridge gateway to the application. This is not LAN/firewall, physical sleep, thermal or24h acceptance. No real broker connection or order occurred.
+
+## Frozen read/source-safety candidate — 2026-10-15
+
+Locked build v4 passed for investment-assistant:read-abstention-20261015,
+image SHA25619c1f19807c99b599e80d5f29dda60618d440f7d86cfcbb2ee11695b528d8753.
+The complete179-file source/config/migration set matches the image, including
+new security/errors.py; no missing or unexpected copied files. See
+[evidence](evidence/read-final-source-match-20261015.json).
+Production entrypoint, real local GGUF and PostgreSQL readiness/migrations,
+persistent halt and application/database restarts pass7.033s/1.104s under15s.
+[Runtime](evidence/read-final-container-runtime-20261015.json) finished exit0;
+[independent label check](evidence/read-final-container-cleanup-20261015.json)
+confirms no owned containers/networks/volumes remain. No host ports, production
+mounts, broker connections, orders or deployment. This is short runtime evidence;
+current-source24h, mapped cooling, physical sleep and external recovery remain open.
