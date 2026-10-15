@@ -330,6 +330,13 @@ async function loadSnapshot() {
     if (resp.status === 401) { window.location.assign('/login'); return; }
     const data = await resp.json();
     if (data.message) { el.textContent = data.message; return; }
+    const overview = data.market_overview || {};
+    if (overview.error || overview.available === false) {
+      el.textContent = (overview.error_code || overview.error) === 'YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW'
+        ? 'Market data is unavailable until this source is reviewed and approved for use.'
+        : 'Market data is unavailable. A verified snapshot could not be collected.';
+      return;
+    }
     const markets = data.market_overview?.markets || {};
     let html = '';
     for (const [name, info] of Object.entries(markets)) {

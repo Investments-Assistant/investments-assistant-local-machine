@@ -22,6 +22,7 @@ from src.agent.utils.logger import get_logger
 from src.operations.workloads import WorkPool
 
 source_work = WorkPool(2, "NEWS_FETCH")
+rss_work = WorkPool(1, "RSS_READ", dedicated=True)
 
 
 class ArticleBatch(list):
@@ -404,7 +405,7 @@ async def fetch_all(days_back: int = 1) -> list[dict[str, Any]]:
     # loop and fetch the async adapters concurrently so a slow source cannot
     # stall the chat UI or the scheduler.
     rss, guardian, scraped = await asyncio.gather(
-        asyncio.to_thread(fetch_rss),
+        rss_work.arun(fetch_rss, timeout=30),
         fetch_guardian(days_back=days_back),
         fetch_scraped(),
     )

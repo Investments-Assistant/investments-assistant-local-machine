@@ -15,6 +15,7 @@ from src.news.ingestion import run_ingestion
 from src.news.email_reader import read_and_ingest_newsletters
 from src.tools.market_data import get_market_overview
 from src.agent.utils.logger import get_logger
+from src.operations.workloads import market_read_work
 
 logger = get_logger(__name__)
 
@@ -36,9 +37,9 @@ async def _refresh_market_data() -> None:
         # yfinance and the RSS reader are synchronous adapters.  Run them in
         # worker threads so a slow provider cannot stall WebSocket responses.
         overview, btc_news, stock_news = await asyncio.gather(
-            asyncio.to_thread(get_market_overview),
-            asyncio.to_thread(search_market_news, "Bitcoin crypto market", max_articles=5),
-            asyncio.to_thread(search_market_news, "stock market S&P 500", max_articles=5),
+            market_read_work.arun(get_market_overview, timeout=30),
+            market_read_work.arun(search_market_news, "Bitcoin crypto market", max_articles=5, timeout=30),
+            market_read_work.arun(search_market_news, "stock market S&P 500", max_articles=5, timeout=30),
         )
         _latest_snapshot = {
             "timestamp": datetime.now(UTC).isoformat(),
@@ -48,7 +49,7 @@ async def _refresh_market_data() -> None:
         }
         logger.debug("Market snapshot refreshed")
     except Exception as exc:
-        logger.error("Market data refresh failed: %s", exc)
+        logger.error("Market data refresh failed (%s)", type(exc).__name__)
 
 
 async def _run_weekly_report() -> None:

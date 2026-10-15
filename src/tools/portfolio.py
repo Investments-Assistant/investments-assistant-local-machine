@@ -10,11 +10,32 @@ from src.tools.brokers import (
     binance as binance_tool,
     coinbase,
 )
+from src.security.errors import safe_exception_code
 from src.agent.utils.logger import get_logger
 from src.finance.normalization import usd_decimal_value
 from src.tools.broker_accounts import BrokerAccountConfig
 
 logger = get_logger(__name__)
+
+_SAFE_BROKER_ERRORS = frozenset({
+    "ALPACA_ACCOUNT_UNAVAILABLE", "ALPACA_POSITIONS_UNAVAILABLE", "ALPACA_ORDERS_UNAVAILABLE",
+    "COINBASE_ACCOUNT_UNAVAILABLE", "COINBASE_ORDERS_UNAVAILABLE",
+    "BINANCE_ACCOUNT_UNAVAILABLE", "BINANCE_ORDERS_UNAVAILABLE",
+    "AUTHENTICATED_ACCOUNT_REQUIRED", "IBKR_READ_CONSENT_REQUIRED",
+    "EXPLICIT_BROKER_ACCOUNT_AND_ENVIRONMENT_REQUIRED", "DEDICATED_NONZERO_CLIENT_ID_REQUIRED",
+    "BROKER_ACCOUNT_NOT_MANAGED", "IBKR_CLIENT_BUSY", "IBKR_SYNC_ADAPTER_REQUIRES_WORKER_THREAD",
+    "INCOMPLETE_CONTRACT", "AMBIGUOUS_CONTRACT", "CONTRACT_MISMATCH",
+    "AMBIGUOUS_CONTRACT_DETAILS", "CONTRACT_PRECISION_UNAVAILABLE",
+    "IBKR_SESSION_CONFIGURATION_CHANGED", "IBKR_SESSION_STOPPING", "IBKR_SESSION_NOT_READY",
+    "IBKR_READ_QUEUE_FULL", "IBKR_READ_UNAVAILABLE",
+})
+
+
+def _safe_read_error(value: dict, fallback: str) -> str:
+    return safe_exception_code(
+        RuntimeError(value.get("error_code", value.get("error"))),
+        fallback=fallback, allowed_codes=_SAFE_BROKER_ERRORS,
+    )
 
 
 def _enrich_position(pos: dict, symbol_key: str = "symbol") -> dict:
@@ -68,7 +89,8 @@ def _collect_broker(
                 acc["account_name"] = account.display_name
             result["accounts"].append(acc)
         else:
-            result["errors"].append({**context, "error": str(acc["error"])})
+            code = _safe_read_error(acc, "BROKER_ACCOUNT_UNAVAILABLE")
+            result["errors"].append({**context, "error": code, "error_code": code})
         positions = _call_for_account(positions_fn, account)
         for p in positions:
             if "error" not in p:
@@ -94,17 +116,18 @@ def _collect_broker(
                         result[exact_target] = str(total)
                         result[target] = float(total)
             else:
-                error = str(p["error"])
+                error = _safe_read_error(p, "BROKER_POSITIONS_UNAVAILABLE")
                 if not any(
                     item["broker"] == name
                     and item.get("account_id") == context["account_id"]
                     and item["error"] == error
                     for item in result["errors"]
                 ):
-                    result["errors"].append({**context, "error": error})
+                    result["errors"].append({**context, "error": error, "error_code": error})
     except Exception as exc:
-        logger.warning("%s portfolio fetch failed: %s", name, exc)
-        result["errors"].append({**context, "error": str(exc)})
+        code = safe_exception_code(exc, fallback="BROKER_READ_UNAVAILABLE")
+        logger.warning("%s portfolio fetch failed: %s", name, code)
+        result["errors"].append({**context, "error": code, "error_code": code})
 
 
 def get_portfolio_summary(

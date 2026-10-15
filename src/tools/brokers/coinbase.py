@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from src.security.errors import safe_exception_code
 from src.agent.utils.logger import get_logger
 from src.execution.external import disabled_external_write
 from src.tools.broker_accounts import BrokerAccountConfig
@@ -54,8 +55,9 @@ def get_coinbase_account(account: BrokerAccountConfig | None = None) -> dict:
                 )
         return {"broker": "coinbase", "balances": balances}
     except Exception as exc:
-        logger.error("Coinbase account fetch failed: %s", exc)
-        return {"broker": "coinbase", "error": str(exc)}
+        code = safe_exception_code(exc, fallback="COINBASE_ACCOUNT_UNAVAILABLE")
+        logger.error("Coinbase account fetch failed: %s", code)
+        return {"broker": "coinbase", "available": False, "error": code, "error_code": code}
 
 
 def get_coinbase_positions(account: BrokerAccountConfig | None = None) -> list[dict]:
@@ -87,8 +89,9 @@ def get_coinbase_orders(account: BrokerAccountConfig | None = None) -> list[dict
             for o in orders[:50]
         ]
     except Exception as exc:
-        logger.error("Coinbase orders fetch failed: %s", exc)
-        return [{"error": str(exc)}]
+        code = safe_exception_code(exc, fallback="COINBASE_ORDERS_UNAVAILABLE")
+        logger.error("Coinbase orders fetch failed: %s", code)
+        return [{"available": False, "error": code, "error_code": code}]
 
 
 @disabled_external_write
@@ -144,11 +147,12 @@ def submit_coinbase_order(
             "order_id": resp.get("order_id") or resp.get("success_response", {}).get("order_id"),
             "product_id": product_id,
             "side": side,
-            "error": resp.get("error_response", {}).get("message") if not success else None,
+            "error": "COINBASE_ORDER_REJECTED" if not success else None,
         }
     except Exception as exc:
-        logger.error("Coinbase order submission failed: %s", exc)
-        return {"success": False, "error": str(exc)}
+        code = safe_exception_code(exc, fallback="COINBASE_SUBMISSION_UNAVAILABLE")
+        logger.error("Coinbase order submission failed: %s", code)
+        return {"success": False, "error": code, "error_code": code}
 
 
 @disabled_external_write
@@ -166,4 +170,5 @@ def cancel_coinbase_order(
             return {"success": r.get("success", False), "order_id": order_id}
         return {"success": False, "error": "No result returned"}
     except Exception as exc:
-        return {"success": False, "error": str(exc)}
+        code = safe_exception_code(exc, fallback="COINBASE_CANCELLATION_UNAVAILABLE")
+        return {"success": False, "error": code, "error_code": code}

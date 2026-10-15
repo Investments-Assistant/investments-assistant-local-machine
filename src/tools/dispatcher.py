@@ -30,6 +30,7 @@ from src.tools.brokers import (
     binance as binance_tool,
     coinbase,
 )
+from src.security.errors import safe_exception_code
 from src.tools.portfolio import get_account_info, get_trade_history, get_portfolio_summary
 from src.tools.simulator import run_simulation_async
 from src.tools.market_data import (
@@ -43,6 +44,7 @@ from src.tools.market_data import (
 )
 from src.tools.news_memory import get_latest_news, search_stored_news
 from src.agent.utils.logger import get_logger
+from src.operations.workloads import WorkloadBusy, market_read_work, broker_query_work
 from src.tools.broker_accounts import (
     BrokerAccountConfig,
     BrokerVaultUnavailable,
@@ -59,6 +61,7 @@ _pending_trade_proposals: dict[str, dict] = {}
 _PROPOSAL_TTL_SECONDS = 15 * 60
 _VALID_BROKERS = {"alpaca", "ibkr", "coinbase", "binance"}
 _VALID_ORDER_TYPES = {"market", "limit", "stop_limit"}
+_READ_TIMEOUT_SECONDS = 30
 
 
 @contextmanager
@@ -81,7 +84,7 @@ def tool_context(
 
 async def dispatch_tool(tool_name: str, tool_input: dict) -> str:
     """Call the appropriate tool and return a JSON string result."""
-    logger.info("Tool call: %s", tool_name)
+    logger.info("Tool call: %s", tool_name if re.fullmatch(r"[a-z_]{1,64}", tool_name) else "invalid")
     try:
         if settings.is_production is True and _tool_user_id.get():
             from src.security.sessions import check_tool_authority
@@ -89,9 +92,17 @@ async def dispatch_tool(tool_name: str, tool_input: dict) -> str:
         result = await _dispatch(tool_name, tool_input)
         if settings.is_production is True and _tool_user_id.get():
             await check_tool_authority(_tool_user_id.get())
+    except WorkloadBusy as exc:
+        code = safe_exception_code(exc, fallback="TOOL_BUSY", allowed_codes={"MARKET_READ_BUSY", "BROKER_QUERY_BUSY"})
+        logger.warning("Tool admission rejected: %s", code)
+        result = {"available": False, "error": code, "tool": tool_name}
+    except TimeoutError:
+        logger.warning("Tool request deadline exceeded")
+        result = {"available": False, "error": "TOOL_TIMEOUT", "tool": tool_name}
     except Exception as exc:
-        logger.exception("Tool %s raised an exception", tool_name)
-        result = {"error": str(exc), "tool": tool_name}
+        code = safe_exception_code(exc, fallback="TOOL_UNAVAILABLE")
+        logger.error("Tool failed: %s", code)
+        result = {"available": False, "error": code, "tool": tool_name}
     return json.dumps(result, default=str, ensure_ascii=False)
 
 
@@ -127,7 +138,7 @@ async def _dispatch(name: str, inp: dict) -> object:
         # yfinance, broker SDKs, and PDF generation are synchronous.  Keep
         # them off FastAPI's event loop so one slow network call cannot freeze
         # the UI or the scheduler.
-        return await asyncio.to_thread(_SYNC_DISPATCH[name], inp)  # type: ignore[arg-type]
+        return await market_read_work.arun(_SYNC_DISPATCH[name], inp, timeout=_READ_TIMEOUT_SECONDS)  # type: ignore[arg-type]
     if name in _ASYNC_DISPATCH:
         return await _ASYNC_DISPATCH[name](inp)  # type: ignore[operator]
     if name == "execute_trade":
@@ -158,7 +169,7 @@ async def _load_current_user_accounts(
         return None, {
             "available": False,
             "capability": "brokerage access",
-            "error": str(exc),
+            "error": "BROKER_VAULT_UNAVAILABLE",
         }
     except Exception as exc:
         logger.error("Broker account lookup failed (%s)", type(exc).__name__)
@@ -217,13 +228,14 @@ async def _dispatch_broker_read(name: str, inp: dict) -> object:
         if error:
             return error
         if accounts is None:
-            return await asyncio.to_thread(get_portfolio_summary, broker=broker)
+            return await broker_query_work.arun(get_portfolio_summary, broker=broker, timeout=_READ_TIMEOUT_SECONDS)
         if not accounts:
             return capability_unavailable(broker or "any", "portfolio summary")
-        return await asyncio.to_thread(
+        return await broker_query_work.arun(
             get_portfolio_summary,
             broker=broker,
             accounts=accounts,
+            timeout=_READ_TIMEOUT_SECONDS,
         )
 
     if not broker:
@@ -236,12 +248,15 @@ async def _dispatch_broker_read(name: str, inp: dict) -> object:
     if error:
         return error
     if name == "get_account_info":
-        return await asyncio.to_thread(get_account_info, broker=broker, account=account)
-    return await asyncio.to_thread(
+        return await broker_query_work.arun(
+            get_account_info, broker=broker, account=account, timeout=_READ_TIMEOUT_SECONDS,
+        )
+    return await broker_query_work.arun(
         get_trade_history,
         broker=broker,
         days=inp.get("days", 30),
         account=account,
+        timeout=_READ_TIMEOUT_SECONDS,
     )
 
 
@@ -275,7 +290,7 @@ async def _is_daily_halted() -> bool:
     except Exception as exc:
         # A safety control must fail closed.  A temporary database outage must
         # never turn into permission to trade without a loss-limit check.
-        logger.error("Failed to check daily halt flag; blocking auto-trading: %s", exc)
+        logger.error("Failed to check daily halt flag; blocking auto-trading (%s)", type(exc).__name__)
         return True
 
 
@@ -313,7 +328,7 @@ async def _check_and_enforce_daily_limit(realized_delta_usd: float) -> None:
 
             await session.commit()
     except Exception as exc:
-        logger.warning("Failed to update daily P&L: %s", exc)
+        logger.warning("Failed to update daily P&L (%s)", type(exc).__name__)
 
 
 # ── Trade execution ──────────────────────────────────────────────────────────
@@ -512,7 +527,7 @@ async def _create_trade_intent(trade: dict, mode: str) -> str | None:
             await session.commit()
         return intent_id
     except Exception as exc:
-        logger.error("Trade intent was not persisted; order was not sent: %s", exc)
+        logger.error("Trade intent was not persisted; order was not sent (%s)", type(exc).__name__)
         return None
 
 
@@ -533,7 +548,7 @@ async def _finalize_trade_intent(intent_id: str, result: dict) -> bool:
             await session.commit()
         return True
     except Exception as exc:
-        logger.error("Trade %s was sent but audit finalization failed: %s", intent_id, exc)
+        logger.error("Trade audit finalization failed (%s)", type(exc).__name__)
         return False
 
 
@@ -575,8 +590,8 @@ async def _execute_validated_trade(
         else:
             result = await asyncio.to_thread(_route_order, *route_args, account=account)
     except Exception as exc:
-        logger.exception("Broker route failed for trade intent %s", intent_id)
-        result = {"error": str(exc)}
+        logger.error("Broker route failed (%s)", type(exc).__name__)
+        result = {"error": "BROKER_ROUTE_UNAVAILABLE"}
     result["reason"] = trade.get("reason", "")
     result["audit_intent_id"] = intent_id
     if not await _finalize_trade_intent(intent_id, result):
@@ -586,7 +601,7 @@ async def _execute_validated_trade(
         if realized is not None and math.isfinite(float(realized)):
             await _check_and_enforce_daily_limit(float(realized))
     except (TypeError, ValueError):
-        logger.warning("Ignoring invalid realized P&L returned by broker: %r", realized)
+        logger.warning("Ignoring invalid realized P&L returned by broker")
     return result
 
 

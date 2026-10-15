@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from contextlib import suppress
-
+from src.security.errors import safe_exception_code
 from src.agent.utils.logger import get_logger
 from src.execution.external import disabled_external_write
 from src.tools.broker_accounts import BrokerAccountConfig
@@ -62,8 +61,9 @@ def get_binance_account(account: BrokerAccountConfig | None = None) -> dict:
             "balances": balances,
         }
     except Exception as exc:
-        logger.error("Binance account fetch failed: %s", exc)
-        return {"broker": "binance", "error": str(exc)}
+        code = safe_exception_code(exc, fallback="BINANCE_ACCOUNT_UNAVAILABLE")
+        logger.error("Binance account fetch failed: %s", code)
+        return {"broker": "binance", "available": False, "error": code, "error_code": code}
 
 
 def get_binance_positions(account: BrokerAccountConfig | None = None) -> list[dict]:
@@ -81,14 +81,19 @@ def get_binance_orders(
         return [_not_configured(account)]
     try:
         client = _get_client(account)
+        errors = []
         if symbol:
             orders = client.get_all_orders(symbol=symbol.upper(), limit=100)
         else:
             # Binance requires a symbol; fetch BTCUSDT, ETHUSDT as defaults
             orders = []
             for sym in ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"]:
-                with suppress(Exception):
+                try:
                     orders.extend(client.get_all_orders(symbol=sym, limit=20))
+                except Exception as exc:
+                    code = safe_exception_code(exc, fallback="BINANCE_ORDERS_UNAVAILABLE")
+                    logger.error("Binance orders fetch failed: %s", code)
+                    errors.append({"available": False, "error": code, "error_code": code, "symbol": sym})
         return [
             {
                 "order_id": str(o["orderId"]),
@@ -102,10 +107,11 @@ def get_binance_orders(
                 "time": o["time"],
             }
             for o in orders[:50]
-        ]
+        ] + errors
     except Exception as exc:
-        logger.error("Binance orders fetch failed: %s", exc)
-        return [{"error": str(exc)}]
+        code = safe_exception_code(exc, fallback="BINANCE_ORDERS_UNAVAILABLE")
+        logger.error("Binance orders fetch failed: %s", code)
+        return [{"available": False, "error": code, "error_code": code}]
 
 
 @disabled_external_write
@@ -166,8 +172,9 @@ def submit_binance_order(
             "price": order.get("price"),
         }
     except Exception as exc:
-        logger.error("Binance order submission failed: %s", exc)
-        return {"success": False, "error": str(exc)}
+        code = safe_exception_code(exc, fallback="BINANCE_SUBMISSION_UNAVAILABLE")
+        logger.error("Binance order submission failed: %s", code)
+        return {"success": False, "error": code, "error_code": code}
 
 
 @disabled_external_write
@@ -183,4 +190,5 @@ def cancel_binance_order(
         result = client.cancel_order(symbol=symbol.upper(), orderId=int(order_id))
         return {"success": True, "order_id": order_id, "status": result.get("status")}
     except Exception as exc:
-        return {"success": False, "error": str(exc)}
+        code = safe_exception_code(exc, fallback="BINANCE_CANCELLATION_UNAVAILABLE")
+        return {"success": False, "error": code, "error_code": code}

@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 import pytest
 
+from src.config import Settings
 from src.tools.market_data import (
     _option_rows,
     _build_signals,
@@ -16,6 +17,13 @@ from src.tools.market_data import (
     _clean_option_list,
     get_technical_indicators,
 )
+
+
+@pytest.fixture
+def synthetic_yahoo_permission(monkeypatch):
+    """These selected SDK tests use mocked Yahoo clients, never provider data."""
+    settings = Settings(_env_file=None, yahoo_market_data_enabled=True)
+    monkeypatch.setattr("src.tools.market_data.get_settings", lambda: settings)
 
 # ---------------------------------------------------------------------------
 # _build_signals
@@ -257,6 +265,7 @@ class TestCleanOptionList:
 
 
 @pytest.mark.unit
+@pytest.mark.usefixtures("synthetic_yahoo_permission")
 class TestGetStockData:
     def _mock_ticker(self):
         mock = MagicMock()
@@ -288,6 +297,7 @@ class TestGetStockData:
 
 
 @pytest.mark.unit
+@pytest.mark.usefixtures("synthetic_yahoo_permission")
 class TestGetTechnicalIndicators:
     def _make_price_df(self, n: int = 60) -> pd.DataFrame:
         """Create a synthetic OHLCV DataFrame with n rows."""
@@ -337,6 +347,7 @@ class TestGetTechnicalIndicators:
 
 
 @pytest.mark.unit
+@pytest.mark.usefixtures("synthetic_yahoo_permission")
 class TestGetOptionsChain:
     def test_no_options_returns_error(self):
         mock = MagicMock()

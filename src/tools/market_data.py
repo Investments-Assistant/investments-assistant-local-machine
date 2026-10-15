@@ -11,9 +11,25 @@ from typing import Any
 from datetime import UTC, datetime
 import contextlib
 
+from src.config import get_settings
+from src.security.errors import safe_exception_code
 from src.agent.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+
+def yahoo_market_data_denial() -> dict | None:
+    """No market/provider import or egress without exact operator opt-in."""
+    if get_settings().yahoo_market_data_enabled is not True:
+        code = "YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW"
+        return {"available": False, "error": code, "error_code": code}
+    return None
+
+
+def _provider_failure(exc, fallback: str) -> dict:
+    code = safe_exception_code(exc, fallback=fallback)
+    logger.warning("Market provider read failed: %s", code)
+    return {"available": False, "error": code, "error_code": code}
 
 # ── OHLCV Data ─────────────────────────────────────────────────────────────────
 
@@ -44,6 +60,8 @@ def get_stock_data(
     period: str = "1mo",
     interval: str = "1d",
 ) -> dict:
+    if denied := yahoo_market_data_denial():
+        return denied
     import yfinance as yf
 
     result: dict[str, object] = {}
@@ -62,8 +80,7 @@ def get_stock_data(
                 "candles": _df_to_records(df),
             }
         except Exception as exc:
-            logger.warning("Failed to fetch %s: %s", sym, exc)
-            result[sym] = {"error": str(exc)}
+            result[sym] = _provider_failure(exc, "MARKET_DATA_UNAVAILABLE")
     return result
 
 
@@ -78,6 +95,8 @@ def get_crypto_data(
 
 def get_market_overview() -> dict:
     """Snapshot of major indices, VIX, bonds, commodities."""
+    if denied := yahoo_market_data_denial():
+        return denied
     import yfinance as yf
 
     tickers = {
@@ -113,7 +132,7 @@ def get_market_overview() -> dict:
                 "change_pct": change_pct,
             }
         except Exception as exc:
-            result["markets"][name] = {"error": str(exc)}
+            result["markets"][name] = _provider_failure(exc, "MARKET_OVERVIEW_UNAVAILABLE")
     return result
 
 
@@ -151,6 +170,8 @@ def _build_signals(
 
 def get_technical_indicators(symbol: str, period: str = "6mo") -> dict:
     """Calculate RSI, MACD, Bollinger Bands, EMA 20/50/200, ATR, OBV."""
+    if denied := yahoo_market_data_denial():
+        return denied
     import ta
     import yfinance as yf
 
@@ -222,8 +243,7 @@ def get_technical_indicators(symbol: str, period: str = "6mo") -> dict:
             "signals": signals,
         }
     except Exception as exc:
-        logger.exception("Technical indicators failed for %s", symbol)
-        return {"error": str(exc)}
+        return _provider_failure(exc, "TECHNICAL_INDICATORS_UNAVAILABLE")
 
 
 # ── Options Chain ──────────────────────────────────────────────────────────────
@@ -262,6 +282,8 @@ def _clean_option_list(lst: list[dict]) -> list[dict]:
 
 def get_options_chain(symbol: str, expiry: str | None = None) -> dict:
     """Fetch options chain for a stock symbol."""
+    if denied := yahoo_market_data_denial():
+        return denied
     import yfinance as yf
 
     try:
@@ -282,8 +304,7 @@ def get_options_chain(symbol: str, expiry: str | None = None) -> dict:
             }
         return result
     except Exception as exc:
-        logger.exception("Options chain failed for %s", symbol)
-        return {"error": str(exc)}
+        return _provider_failure(exc, "OPTIONS_CHAIN_UNAVAILABLE")
 
 
 # ── Ticker Search ──────────────────────────────────────────────────────────────
@@ -291,6 +312,8 @@ def get_options_chain(symbol: str, expiry: str | None = None) -> dict:
 
 def search_ticker(query: str) -> dict:
     """Search Yahoo Finance for matching ticker symbols."""
+    if denied := yahoo_market_data_denial():
+        return denied
     import yfinance as yf
 
     try:
@@ -310,7 +333,7 @@ def search_ticker(query: str) -> dict:
             ],
         }
     except Exception as exc:
-        return {"error": str(exc), "query": query}
+        return _provider_failure(exc, "TICKER_SEARCH_UNAVAILABLE") | {"query": query}
 
 
 # ── Earnings Calendar ──────────────────────────────────────────────────────────
@@ -318,6 +341,8 @@ def search_ticker(query: str) -> dict:
 
 def get_earnings_calendar(days_ahead: int = 7, symbols: list[str] | None = None) -> dict:
     """Return upcoming earnings via yfinance (best-effort)."""
+    if denied := yahoo_market_data_denial():
+        return denied
     import yfinance as yf
 
     result: dict[str, Any] = {"days_ahead": days_ahead, "earnings": []}
@@ -343,5 +368,5 @@ def get_earnings_calendar(days_ahead: int = 7, symbols: list[str] | None = None)
                         }
                     )
         except Exception as exc:
-            result["earnings"].append({"symbol": sym, "error": str(exc)})  # type: ignore[attr-defined]
+            result["earnings"].append(_provider_failure(exc, "EARNINGS_CALENDAR_UNAVAILABLE") | {"symbol": sym})
     return result

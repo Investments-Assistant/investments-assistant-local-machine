@@ -273,6 +273,11 @@ def _format_market_overview_result(result_str: str) -> str:
     if not isinstance(result, dict):
         return "I could not complete the market overview because the market data was invalid."
 
+    if result.get("error") or result.get("available") is False:
+        if result.get("error_code", result.get("error")) == "YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW":
+            return "Market data is unavailable until this source is reviewed and approved for use."
+        return "Market data is unavailable. A verified snapshot could not be collected."
+
     markets = result.get("markets") if isinstance(result.get("markets"), dict) else {}
     lines = [
         "# Market overview",
@@ -303,6 +308,30 @@ def _format_market_overview_result(result_str: str) -> str:
         ]
     )
     return "\n".join(lines)
+
+
+def _unavailable_market_answer(results, requests):
+    """An unavailable-only snapshot cannot become model-generated prices."""
+    if set(results) != {"get_market_overview"} or any(name != "get_market_overview" for name, _ in requests):
+        return None
+    raw = results["get_market_overview"]
+    try:
+        result = json.loads(raw)
+    except (TypeError, ValueError):
+        return "Market data is unavailable. A verified snapshot could not be collected."
+    if not isinstance(result, dict):
+        return "Market data is unavailable. A verified snapshot could not be collected."
+    if result.get("error") or result.get("available") is False:
+        return _format_market_overview_result(raw)
+    markets = result.get("markets")
+    if result.get("status") in {"unavailable", "blocked"} or (
+        isinstance(markets, dict) and not any(
+            isinstance(row, dict) and not row.get("error") and row.get("price") is not None
+            for row in markets.values()
+        )
+    ):
+        return "Market data is unavailable. A verified snapshot could not be collected."
+    return None
 
 
 def _latest_user_message(messages: list[dict[str, Any]]) -> str:
@@ -880,6 +909,12 @@ class LlamaCppClient(BaseLLMClient):
 
         from src.agent.clients.news_analysis import NEWS_TOOLS
 
+        unavailable_market = _unavailable_market_answer(evidence_results, requests)
+        if unavailable_market is not None:
+            yield {"type": "final_answer", "text": unavailable_market, "generation": "source_unavailable"}
+            yield {"type": "done"}
+            return
+
         grounded = await self._financial_response(evidence_results,
             portuguese="carteira" in _latest_user_message(messages).lower(), max_tokens=max_tokens)
         if grounded is not None:
@@ -1047,6 +1082,11 @@ class LlamaCppClient(BaseLLMClient):
                 )
 
             full_messages.extend(tool_result_messages)
+            unavailable_market = _unavailable_market_answer(evidence_results, requests)
+            if unavailable_market is not None:
+                yield {"type": "final_answer", "text": unavailable_market, "generation": "source_unavailable"}
+                yield {"type": "done"}
+                return
 
         if not completed:
             logger.warning("Agent stopped after %d tool rounds", max_rounds)

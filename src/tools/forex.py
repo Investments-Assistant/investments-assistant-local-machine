@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 from datetime import UTC, datetime
 
+from src.tools.market_data import _provider_failure, yahoo_market_data_denial
 from src.agent.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -93,6 +94,8 @@ def get_forex_data(
     interval: str = "1d",
 ) -> dict:
     """Fetch OHLCV history for forex pairs via Yahoo Finance."""
+    if denied := yahoo_market_data_denial():
+        return denied
     import yfinance as yf
 
     result: dict[str, object] = {}
@@ -111,13 +114,14 @@ def get_forex_data(
                 "candles": _df_to_candles(df),
             }
         except Exception as exc:
-            logger.warning("Failed to fetch forex data for %s: %s", pair, exc)
-            result[display] = {"error": str(exc)}
+            result[display] = _provider_failure(exc, "FOREX_DATA_UNAVAILABLE")
     return result
 
 
 def get_forex_rates(pairs: list[str] | None = None) -> dict:
     """Snapshot of current spot rates, daily change %, and pip size."""
+    if denied := yahoo_market_data_denial():
+        return denied
     import yfinance as yf
 
     targets = [_normalize_pair(p) for p in pairs] if pairs else _DEFAULT_PAIRS
@@ -141,8 +145,7 @@ def get_forex_rates(pairs: list[str] | None = None) -> dict:
                 "pip_size": _pip_size(sym),
             }
         except Exception as exc:
-            logger.warning("Failed to fetch rate for %s: %s", sym, exc)
-            result["rates"][display] = {"error": str(exc)}
+            result["rates"][display] = _provider_failure(exc, "FOREX_RATE_UNAVAILABLE")
     return result
 
 

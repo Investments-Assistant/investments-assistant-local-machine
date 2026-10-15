@@ -197,6 +197,9 @@ class Settings(BaseSettings):
     # until the operator has reviewed the applicable data rights and explicitly
     # enabled its research use. This is not a license assertion by the app.
     yahoo_historical_data_enabled: bool = False
+    # Scheduled/on-demand prices, FX, search and options require their own
+    # operator rights review. Neither Yahoo permission flag enables the other.
+    yahoo_market_data_enabled: bool = False
 
     # ── Scheduler ─────────────────────────────────────────────────────────────
     market_data_refresh_minutes: int = Field(5, ge=1)

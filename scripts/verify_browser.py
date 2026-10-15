@@ -83,6 +83,17 @@ def main():
                     page.get_by_role("button", name="Sign in", exact=True).click()
                     page.wait_for_url(base + "/")
                     expect(page).to_have_title("Investment Assistant")
+                    def unavailable_market(route):
+                        route.fulfill(json={"market_overview": {
+                            "available": False,
+                            "error": "YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW",
+                        }})
+
+                    page.route("**/api/market/snapshot", unavailable_market)
+                    page.evaluate("loadSnapshot()")
+                    expect(page.locator("#market-snapshot")).to_contain_text("reviewed and approved for use")
+                    page.unroute("**/api/market/snapshot", unavailable_market)
+                    page.evaluate("loadSnapshot()")
                     page.get_by_role("button", name="Portfolio", exact=True).click()
                     expect(page.locator("#portfolio-view")).to_be_visible()
                     page.get_by_role("button", name="Simulation", exact=True).click()
@@ -423,6 +434,7 @@ def main():
                                 "checks": [
                                     "login",
                                     "page identity",
+                                    "market snapshot unavailable/source permission (intercepted provider state)",
                                     "profile persistence, project assignment/reload and owner isolation",
                                     "disabled encrypted IBKR settings create/edit, "
                                     "blank-secret preservation, disable and isolation",

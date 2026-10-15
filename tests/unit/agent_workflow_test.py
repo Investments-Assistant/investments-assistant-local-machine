@@ -164,6 +164,59 @@ def test_market_fallback_includes_every_snapshot_asset():
 
 
 @pytest.mark.unit
+@pytest.mark.parametrize("error", [
+    "YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW",
+    "fixture-private-token\nFORGED provider error",
+])
+def test_market_fallback_explains_unavailability_without_publishing_error_details(error):
+    answer = _format_market_overview_result(json.dumps({"available": False, "error": error}))
+    assert "market data is unavailable" in answer.lower()
+    assert "Price / yield" not in answer
+    assert "fixture-private-token" not in answer
+    assert "FORGED" not in answer
+    if error.startswith("YAHOO_"):
+        assert "approved" in answer
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("native", [False, True])
+async def test_unavailable_market_read_cannot_be_replaced_by_model_prices(native):
+    client = llama_cpp_client.LlamaCppClient.__new__(llama_cpp_client.LlamaCppClient)
+    client._inference_lock = asyncio.Lock()
+    calls = 0
+
+    async def fake_stream(_messages, _tools, **kwargs):
+        nonlocal calls
+        calls += 1
+        if native and calls == 1:
+            yield {"choices": [{"delta": {"tool_calls": [{
+                "index": 0, "id": "fixture-market", "type": "function",
+                "function": {"name": "get_market_overview", "arguments": "{}"},
+            }]}, "finish_reason": "tool_calls"}]}
+        else:
+            yield {"choices": [{"delta": {"content": "NASDAQ is 999999 today."}, "finish_reason": "stop"}]}
+
+    client._stream_completion = fake_stream
+    cfg = MagicMock(
+        llm_native_tool_calling=native, trading_mode="recommend", agent_max_tokens=64,
+        agent_max_tool_rounds=2, agent_max_tool_result_chars=5000,
+    )
+    denied = json.dumps({"available": False, "error": "YAHOO_MARKET_DATA_DISABLED_PENDING_OPERATOR_REVIEW"})
+    with (
+        patch.object(llama_cpp_client, "settings", cfg),
+        patch.object(llama_cpp_client, "dispatch_tool", AsyncMock(return_value=denied)),
+    ):
+        events = [event async for event in client.stream_response(
+            [{"role": "user", "content": "Give me a market overview right now."}], "Test read workflow.",
+        )]
+    answer = events[-2]["text"]
+    assert events[-1]["type"] == "done"
+    assert "unavailable" in answer.lower() and "approved" in answer
+    assert "999999" not in answer
+    assert calls == int(native)
+
+
+@pytest.mark.unit
 async def test_length_truncation_uses_complete_market_fallback():
     client = llama_cpp_client.LlamaCppClient.__new__(llama_cpp_client.LlamaCppClient)
     client._inference_lock = asyncio.Lock()

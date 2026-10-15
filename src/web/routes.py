@@ -65,6 +65,7 @@ from src.tools.simulator import run_simulation_async
 from src.expenses.summary import summarize_currencies
 from src.agent.utils.logger import get_logger
 from src.expenses.categories import CATEGORY_TAXONOMY, category_label
+from src.operations.workloads import WorkloadBusy, broker_query_work
 from src.finance.normalization import (
     usd_value,
     portfolio_number as _portfolio_number,
@@ -876,12 +877,29 @@ async def portfolio_snapshot(request: Request) -> dict:
     try:
         ensure_broker_vault()
         accounts = await load_user_broker_accounts(principal.user_id)
-        summary = await asyncio.to_thread(get_portfolio_summary, accounts=accounts)
+        summary = await broker_query_work.arun(get_portfolio_summary, accounts=accounts, timeout=30)
+    except WorkloadBusy as exc:
+        raise HTTPException(status_code=503, detail="BROKER_QUERY_BUSY") from exc
+    except TimeoutError as exc:
+        raise HTTPException(status_code=503, detail="BROKER_QUERY_TIMEOUT") from exc
     except BrokerVaultUnavailable as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
         logger.error("Could not load portfolio snapshot: %s", type(exc).__name__)
         raise HTTPException(status_code=503, detail="Portfolio service unavailable") from exc
+
+    # A slow native read must not publish private results after session/user
+    # revocation or a selected account/configuration change during the await.
+    try:
+        current_accounts = await load_user_broker_accounts(principal.user_id)
+    except Exception as exc:
+        logger.error("Could not revalidate portfolio account scope (%s)", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="Portfolio service unavailable") from exc
+    current_principal = await require_authenticated(request)
+    if current_principal.user_id != principal.user_id:
+        raise HTTPException(status_code=401, detail="Portfolio authority changed")
+    if {account.id: account for account in current_accounts} != {account.id: account for account in accounts}:
+        raise HTTPException(status_code=503, detail="BROKER_ACCOUNT_SCOPE_CHANGED")
 
     positions = [_portfolio_position(position) for position in summary.get("positions", [])]
     account_metrics = [_portfolio_account(account) for account in summary.get("accounts", [])]
