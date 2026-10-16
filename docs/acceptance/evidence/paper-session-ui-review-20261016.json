@@ -1,0 +1,22 @@
+{
+  "reviewed_at": "2026-10-16T00:52:08.764584+00:00",
+  "source": "User-provided TWS screenshot in this chat; visually inspected by the assistant",
+  "displayed_session": "Paper Trading / simulated",
+  "banner": "THIS IS NOT A BROKERAGE ACCOUNT. THIS IS A PAPER TRADING ACCOUNT FOR SIMULATED TRADING.",
+  "user_reported_setup": {
+    "portal_paper_details_present": true,
+    "tws_installed_and_open": true,
+    "paper_login_selected": true
+  },
+  "private_identifiers_retained": false,
+  "original_image_copied": false,
+  "api_read_only_setting_verified": false,
+  "api_local_only_setting_verified": false,
+  "application_account_binding_verified": false,
+  "application_broker_connection_attempted": false,
+  "application_order_attempted": false,
+  "scope": "Evidence of the displayed UI environment at capture only; not proof of a current API session, selected application account, entitlements, execution or reconciliation",
+  "next_step": "Inspect TWS File > Global Configuration > API > Settings; verify Read-Only API before any application connection",
+  "goal_service_status_observed": "paused",
+  "goal_status_changed_by_this_work": false
+}
