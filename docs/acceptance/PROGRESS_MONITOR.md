@@ -15,10 +15,10 @@ not gate PASS statuses; PLAN.md remains the acceptance matrix.
 | L07 | 6 | 6 |
 | L08 | 5 | 5 |
 | L09 | 6 | 6 |
-| L10 | 6 | 5.875 |
+| L10 | 6 | 6 |
 | L11 | 5 | 5 |
 | L12 | 6 | 6 |
-| L13 | 7 | 6.75 |
+| L13 | 7 | 6.875 |
 | L14 | 7 | 1.875 |
 | L15 | 4 | 0.25 |
 | L16 | 4 | 4 |
@@ -380,3 +380,21 @@ FinalcurrentpublishedCI audit2026-10-15:GOAL PROGRESS89%,delta0pp,raw89.250.
 CI38717676258 all4jobsSUCCESS andSonargatePASS on4e62b88; L11already5/5.
 Current10.42h soak islivewithoutfailures, no24hcredit; Paper/data/mappedcooling
 stillopen. GoalACTIVE/incomplete;fixedweightsandearnedpoints unchanged.
+
+Current-source terminal audit2026-10-16: **GOAL PROGRESS:90% (displayΔ:+1pp;
+raw89.500/100)**. The custom monitor independently verified all27 raw artifact
+hashes,3,060 samples and all72 fixed model answers; one86,400.165s window,
+93 recorded restarts and all fixed control/restart budgets pass. L10 rises
+5.875→6 and L13 6.75→6.875; weights and every other earned value stay unchanged.
+Mapped CPU cooling retains the final0.125 of L13. Verified Paper lifecycle,
+permitted research data/evaluation and external observation remain incomplete;
+no physical sleep, broker recovery or investment-edge claim follows from the soak.
+The guarded exact-owned database identity/state and cleanup subsequently pass,
+without changing the progress score. Final handoff audit remains required.
+
+Final handoff audit2026-10-16: **GOAL PROGRESS:90% (Δ:0pp;raw89.500/100)**.
+The custom monitor confirms terminal review/cleanup and identifies no further
+safe local implementation gap. Remaining L04/L15 Paper provenance/lifecycle,
+L13 mapped cooling and L14 permitted data/evaluation require external input.
+Overall Goal is BLOCKED, not complete. No score credit from elapsed time or
+documentation cleanup; live remains OFF.

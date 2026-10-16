@@ -370,3 +370,28 @@ ACPI zone, these tested sources still do not establish CPU-package cooling.
 Do not repeat the same absence checks unless host configuration changes; another
 existing trusted component-specific source or separately approved sensor setup
 is required. This does not prove every possible OEM interface is absent.
+
+
+## Current-source terminal host/model evidence — 2026-10-16
+
+The frozen read/source-safety candidate now completes its own continuous
+86,400.165s HTTP/PostgreSQL + separate CPU-model observation. Its terminal review
+and independent progress-monitor audit verify3,060 samples,93 recorded service
+restarts,zero failures,24 model runs and72 correct fixed answers. Control p95 is
+29.102ms overall and32.292ms across187 model-overlap samples; restart maximum
+4.046s meets15s. CPU4/GPU0/context4096 and GGUF checksum are unchanged. Maximum
+model-child RSS is1960.469MiB; this is not total host/application memory.
+
+Evidence: [terminal review](evidence/soak-24h-read-final-20261015-terminal-review.json),
+[portable raw archive manifest](evidence/soak-24h-read-final-20261015-archive.json)
+and [owned database cleanup](evidence/soak-24h-read-final-20261015-database-cleanup.json).
+The original runner exited; do not repeat the completed observation or cleanup.
+Same-process native inference and production container readiness/recovery remain
+separately measured in READ_ADMISSION.md rather than inferred from this tier.
+
+L13 remains BLOCKED on component-specific cooling evidence. The historical ACPI
+THM0 series is unmapped; previously checked component namespaces are unavailable.
+Do not relabel it CPU-package telemetry or rerun absence probes without a changed
+host state. A trusted existing component-specific source or separately authorized
+sensor setup is needed. No GPU inference, physical sleep/app recovery, external
+broker recovery or investment edge follows from the soak. No OS settings changed.

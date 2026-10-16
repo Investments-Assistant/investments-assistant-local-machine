@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-15T23:52:58.605410+00:00",
+  "database": "test_soak_read_final_fd14790a88fd",
+  "terminal_review_sha256": "24cdc663ee94530e2c353b0c25b98fa573e4a749f31f9a4848646d5e278142ad",
+  "scope": "Owned marked synthetic database only; no production database or server shutdown",
+  "identity_verified": true,
+  "cleanup_verified": true,
+  "fixture_checks": {
+    "halt_fixture": {
+      "halted": true,
+      "cash_equals_initial": true,
+      "reserved_zero": true,
+      "realized_pnl_zero": true,
+      "order_count": 0
+    },
+    "stale_fixture": {
+      "halted": false,
+      "cash_equals_initial": true,
+      "reserved_zero": true,
+      "realized_pnl_zero": true,
+      "order_count": 0
+    }
+  },
+  "schema_version": "0018_job_lease_clock"
+}

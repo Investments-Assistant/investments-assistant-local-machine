@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-16T00:01:04.078324+00:00",
+  "status": "PASS",
+  "scope": "Documentation-only prerequisite guide and retained evidence integrity; no new Goal acceptance credit",
+  "documents": 30,
+  "local_links_checked": 138,
+  "missing_links": [],
+  "terminal_raw_hashes_unchanged": 27,
+  "archive_hash_unchanged": true,
+  "prior_owned_cleanup_record_verified": true,
+  "primary_sources": [
+    {
+      "url": "https://www.ibkrguides.com/clientportal/papertradingaccount.htm",
+      "verified": "Paper environment and portal menu path; initial page presence is not connection provenance"
+    },
+    {
+      "url": "https://ibkrguides.com/traderworkstation/log-in-to-tws.htm",
+      "verified": "Paper selection in TWS login"
+    },
+    {
+      "url": "https://www.interactivebrokers.com/campus/trading-lessons/installing-configuring-tws-for-the-api/",
+      "verified": "Read-Only API prevents orders; port defaults are configurable"
+    },
+    {
+      "url": "https://www.interactivebrokers.com/docs/tws-api/protobuf/api-settings-config",
+      "verified": "readOnlyApi and allowLocalhostOnly definitions"
+    },
+    {
+      "url": "https://www.ibkrguides.com/releasenotes/prod-2026.htm",
+      "verified": "Version10.45 clears two connection-related settings; verify actual configuration after upgrades"
+    }
+  ],
+  "implementation_sources_reviewed": [
+    "src/research/history.py",
+    "scripts/evaluate_research_fixture.py",
+    "docs/acceptance/REPLAY.md"
+  ],
+  "limitations": [
+    "No general CSV importer claimed",
+    "No broker connection, data acquisition, settings change or new thermal test",
+    "No new test/model/soak run; existing verification reused"
+  ]
+}

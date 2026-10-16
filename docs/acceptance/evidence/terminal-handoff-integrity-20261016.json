@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-15T23:56:12.705412+00:00",
+  "status": "PASS",
+  "markdown_documents": 29,
+  "local_links_checked": 132,
+  "missing_links": [],
+  "rubric_weight": 100,
+  "rubric_earned": 89.5,
+  "terminal_raw_hashes_verified": 27,
+  "archive_files_verified": 31,
+  "cleanup_record_verified": true,
+  "limitations": [
+    "File resolution/integrity checks only; no external-URL check, test rerun or new economic/broker/hardware acceptance"
+  ]
+}

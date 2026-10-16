@@ -96,5 +96,11 @@ There were no broker connections/orders or production deployment. The exact
 23-file source/test bundle was subsequently published with user approval as
 4e62b88; CI38717676258 now passes all four jobs and the combined Sonar gate.
 Remote802unit/374PG/1180combined tests pass; combined browser coverage83.93%.
-See read-published-ci-test-summary-20261015.json and retained rawJUnit/coverage. Live trading remains OFF. The previous24h pass belongs to a different
-source fingerprint; the final candidate requires a fresh uninterrupted observation.
+See read-published-ci-test-summary-20261015.json and retained rawJUnit/coverage.
+Live trading remains OFF. The final candidate now has its own verified continuous
+24-hour window:86,400.165s,3,060 samples,93 restarts,zero failures,halt p9529.102ms
+against250ms and maximum restart4.046s against15s. All72 fixed CPU-model answers
+pass independent parsing. [Terminal review](evidence/soak-24h-read-final-20261015-terminal-review.json)
+and [scope/limitations](SOAK.md) distinguish it from the previous candidate's pass.
+Mapped cooling, verified external Paper lifecycle and permitted research data
+remain incomplete; the engineering soak does not establish investment edge.

@@ -1,8 +1,8 @@
 # Engineering soak
 
-The earlier frozen candidate completed a verified24-hour observation on2026-10-14;
-see the terminal review below. Subsequent read/source-safety changes have a new
-fingerprint and require their own uninterrupted window. The runner uses only a marked, migrated,
+The current read/source-safety candidate completed its own verified 24-hour
+observation on 2026-10-16 Lisbon time. The earlier candidate's separate pass is
+retained below. The runner uses only a marked, migrated,
 synthetic PostgreSQL database through the `.qa` socket (or loopback TCP for CI),
 loopback HTTP, and an existing local
 model. It cannot submit broker orders or fetch provider data.
@@ -303,7 +303,7 @@ At `2026-10-14T11:15:03Z`, the live runner PID500853 remained RUNNING at
 control p95 29.50ms. Fingerprint matched; no broker connections or external
 orders. The full24-hour requirement remains unfulfilled.
 
-## Current frozen read/source-safety window — 2026-10-15
+## Current frozen read/source-safety window — launched 2026-10-15
 
 New detached runner984335 started2026-10-14T23:50:18Z after final
 802unit/374PG/browser-v4, source-matched image/runtime and native-control checks.
@@ -311,7 +311,8 @@ It owns marked databasetest_soak_read_final_fd14790a88fd and output.qa/soak-24h-
 Fingerprint:f945c38df60e639a6791976385f4e7a2d4be7f347b89e9852582b6ab15c9ddb6. Launch and initial review are in
 evidence/soak-24h-read-final-20261015-launch.json and
 evidence/soak-24h-read-final-20261015-initial-review.json.
-Initial modelPASS and zero failures establish startup only; no24-hour credit.
+Initial modelPASS and zero failures established startup only; the terminal result
+and raw review below now establish the complete window.
 Same predeclared30s cadence,900s restarts,250ms/15s budgets and0.25s clock
 divergence bound. The detached process survives Codex token exhaustion; host/WSL
 suspension still invalidates continuity. Keep source frozen. Before any retry,
@@ -339,4 +340,45 @@ At20:11:22Z on2026-10-15 the same current runner was verified live at20.33h,
 CPU-model result records pass3/3 with the expected checksum. Current source
 fingerprint still matches. See evidence/soak-read-20h-checkpoint-20261015.json.
 This is still partial observation; acceptance requires terminal full86,400s
-and a final raw-evidence audit. Preserve the existing live run.
+and a final raw-evidence audit. This historical checkpoint does not itself confer
+acceptance; the completed terminal result follows.
+
+## Current-source terminal result — verified 2026-10-16
+
+The original runner984335 exited after `PASS_24H`, with owned service fields
+cleared. The continuous window lasted **86,400.165 monotonic seconds**, from
+2026-10-14T23:50:18Z to 2026-10-15T23:51:18Z. It contains 3,060 control samples,
+93 intentional service restarts and zero recorded failures. Current source
+fingerprint f945c38d… and all179 image/source file hashes still match. Documentation
+commits did not alter the observed application.
+
+The [terminal raw review](evidence/soak-24h-read-final-20261015-terminal-review.json)
+independently recomputes halt p95 **29.102ms** and maximum58.575ms against250ms;
+the largest intersample gap is30.006s and terminal tail21.508s against60s.
+All93 recorded restart durations meet15s, maximum **4.046s**. All24 separate
+CPU-model runs retain the original GGUF checksum and CPU4/GPU0/context4096 profile;
+all **72/72** fixed JSON answers were independently reparsed and correct.
+Control p95 across187 samples overlapping those model processes is32.292ms.
+
+The [raw archive](evidence/soak-24h-read-final-20261015-raw.tar.gz) preserves31 files:
+checkpoint, raw samples,24 model results, terminal log, launch/image provenance,
+terminal review and its auditor. Its [manifest](evidence/soak-24h-read-final-20261015-archive.json)
+records SHA256 and successful byte-for-byte round-trip verification. No database
+dump or real-account information is included. Keep the raw directory and archive;
+do not restart or resume this completed observation.
+
+This accepts the documented loopback HTTP/PostgreSQL and separate CPU-model
+engineering tier. Raw samples omit per-sample wall timestamps; continuity clock
+checks rely on the fingerprinted runner. Restart durations are runner-recorded,
+without independent process traces. Physical sleep, mapped CPU cooling, remote
+broker recovery, production in-process inference and investment edge are not
+established by this window. Existing in-process and container results remain
+separate evidence. No external broker connection or order occurred in this run.
+
+After terminal evidence and independent progress-monitor verification, the
+[guarded cleanup](evidence/soak-24h-read-final-20261015-database-cleanup.json)
+verified the exact local cluster path/port/database/marker and migration0018.
+Both labelled simulator fixtures retained initial cash, zero reservations/PnL
+and zero orders; the halt fixture remained halted. Only the owned soak database
+was dropped, without FORCE or terminating other sessions. The PostgreSQL server
+and unrelated databases remain available. Do not repeat this completed cleanup.
