@@ -42,7 +42,8 @@ def test_signed_session_preserves_user_identity():
         principal = verify_session(create_session("alice", "user-a"))
 
     assert principal is not None
-    assert principal.username == "alice"
+    # Names are resolved from the authoritative user record, not the cookie.
+    assert principal.username == ""
     assert principal.user_id == "user-a"
 
 

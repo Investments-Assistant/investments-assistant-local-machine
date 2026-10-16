@@ -13,13 +13,13 @@
     <p class="auth-subtitle">Your chats, projects, profile, and broker settings stay private to your account.</p>
     <form id="signup-form" autocomplete="off">
       <label for="username">Username</label>
-      <input id="username" name="username" autocomplete="username" required minlength="3" maxlength="128" pattern="[A-Za-z0-9_.@-]+" />
+      <input id="username" name="username" autocomplete="username" required />
       <label for="display-name">Display name <span class="auth-optional">(optional)</span></label>
       <input id="display-name" name="display_name" maxlength="128" autocomplete="name" />
       <label for="password">Password</label>
-      <input id="password" name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="256" />
+      <input id="password" name="password" type="password" autocomplete="new-password" required />
       <label for="password-confirmation">Confirm password</label>
-      <input id="password-confirmation" name="password_confirmation" type="password" autocomplete="new-password" required minlength="12" maxlength="256" />
+      <input id="password-confirmation" name="password_confirmation" type="password" autocomplete="new-password" required />
       <button type="submit">Create account</button>
       <p id="signup-error" class="auth-error" role="alert" hidden></p>
     </form>

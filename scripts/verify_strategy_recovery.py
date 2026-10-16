@@ -66,7 +66,7 @@ async def main():
             if (
                 database != "test_acceptance_expenses"
                 or token != "fixture-acceptance-20260909"
-                or revision != "0018_job_lease_clock"
+                or revision != "0019_flexible_credentials"
             ):
                 raise SystemExit("Source identity, marker or revision mismatch")
             assert not await session.scalar(text("SELECT 1 FROM pg_database WHERE datname=:name"), {"name": target})
@@ -116,7 +116,9 @@ async def main():
         try:
             async with async_sessionmaker(restored_engine)() as session:
                 assert await session.scalar(text("SELECT current_database()")) == target
-                assert await session.scalar(text("SELECT version_num FROM alembic_version")) == "0018_job_lease_clock"
+                assert await session.scalar(
+                    text("SELECT version_num FROM alembic_version")
+                ) == "0019_flexible_credentials"
                 retained = await session.get(StrategyDecision, decision_id)
                 assert retained.evidence_hash == evidence_hash == digest(retained.evidence)
                 assert retained.evidence["result"]["status"] == "no_trade"
@@ -146,7 +148,7 @@ async def main():
                 json.dumps(
                     {
                         "status": "PASS",
-                        "revision": "0018_job_lease_clock",
+                        "revision": "0019_flexible_credentials",
                         "decision_evidence_hash": evidence_hash,
                         "no_trade_and_original_quote_preserved": True,
                         "cash_flow_hash_and_reconciliation_preserved": True,

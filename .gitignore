@@ -213,3 +213,6 @@ __marimo__/
 
 # Disposable acceptance infrastructure; never production data.
 .qa/
+
+# Private operator validation data and generated keys; separate from fixtures.
+.local-private/

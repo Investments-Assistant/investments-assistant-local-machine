@@ -10,7 +10,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from src.web.auth import hash_password
-from src.db.models import ExpenseTransaction
+from src.db.models import User, ExpenseTransaction
 
 
 def _client() -> TestClient:
@@ -48,11 +48,20 @@ def _user(cfg):
     return user
 
 
-def _db_session(*execute_results):
+def _db_session(login_result, *execute_results):
     session = AsyncMock()
     session.__aenter__ = AsyncMock(return_value=session)
     session.__aexit__ = AsyncMock(return_value=False)
-    session.execute = AsyncMock(side_effect=list(execute_results))
+    domain_results = iter(execute_results)
+
+    async def execute(statement):
+        # Authentication may refresh the same user record before issuing a
+        # cookie. Domain results do not depend on how many such reads occur.
+        if any(item.get("entity") is User for item in getattr(statement, "column_descriptions", [])):
+            return login_result
+        return next(domain_results)
+
+    session.execute = AsyncMock(side_effect=execute)
     session.commit = AsyncMock()
     session.add = MagicMock()
     return session

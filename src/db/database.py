@@ -48,7 +48,7 @@ async def create_all_tables() -> None:
     """Compatibility name: verify the explicit migration, without schema mutation."""
     async with engine.connect() as conn:
         revision = await conn.scalar(text("SELECT version_num FROM alembic_version"))
-        if revision != "0018_job_lease_clock":
+        if revision != "0019_flexible_credentials":
             raise RuntimeError("Database migration required: run alembic upgrade head explicitly")
 
 
@@ -61,14 +61,14 @@ async def _bootstrap_auth_user() -> None:
 
     async with async_session() as session:
         result = await session.execute(
-            select(User).where(User.username == settings.auth_username)
+            select(User).where(User.username_matches(settings.auth_username))
         )
         user = result.scalar_one_or_none()
         if user is None:
             user = User(
                 username=settings.auth_username,
                 password_hash=settings.auth_password_hash,
-                display_name=settings.auth_username,
+                display_name=settings.auth_username[:128],
                 trading_mode=settings.trading_mode,
             )
             session.add(user)

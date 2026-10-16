@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import base64
 from typing import Literal
+import binascii
 from functools import lru_cache
 import ipaddress
 from contextlib import suppress
 
-from pydantic import Field, computed_field
+from pydantic import Field, computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -38,7 +40,10 @@ class Settings(BaseSettings):
     # Browser authentication.  Passwords are stored as scrypt hashes generated
     # by scripts/create_auth_hash.py; the clear-text password is never needed by
     # the application process.
-    auth_username: str = Field("admin", min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_.@-]+$")
+    auth_username: str = "admin"
+    # Optional literal UTF-8 transport for dotenv/Compose. Both parsers support
+    # base64 ASCII, while their quoting/interpolation rules differ for ${...}.
+    auth_username_base64: str | None = Field(None, repr=False, exclude=True)
     auth_password_hash: str = ""
     auth_session_secret: str = ""
     auth_session_ttl_minutes: int = Field(480, ge=5, le=7 * 24 * 60)
@@ -46,6 +51,19 @@ class Settings(BaseSettings):
     auth_cookie_secure: bool = True
     auth_allow_signup: bool = True
     max_chat_message_chars: int = Field(8_000, ge=1_000, le=32_000)
+
+    @model_validator(mode="after")
+    def literal_auth_username(self):
+        if self.auth_username_base64 is not None:
+            try:
+                self.auth_username = base64.b64decode(
+                    self.auth_username_base64, validate=True,
+                ).decode("utf-8")
+            except (binascii.Error, UnicodeError, ValueError) as exc:
+                raise ValueError("AUTH_USERNAME_BASE64 must encode a literal UTF-8 login ID") from exc
+        if not self.auth_username or "\x00" in self.auth_username:
+            raise ValueError("A nonempty login ID without NUL is required")
+        return self
     # Fernet key used to encrypt per-user brokerage credentials at rest.
     # Generate with scripts/create_broker_key.py and keep it outside the DB.
     broker_credentials_key: str = ""

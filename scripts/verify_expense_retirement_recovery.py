@@ -51,7 +51,7 @@ async def main():
                 await session.scalar(text("SELECT current_database()")) != "test_acceptance_expenses"
                 or await session.scalar(text("SELECT token FROM public.ia_disposable_marker"))
                 != "fixture-acceptance-20260909"
-                or await session.scalar(text("SELECT version_num FROM alembic_version")) != "0018_job_lease_clock"
+                or await session.scalar(text("SELECT version_num FROM alembic_version")) != "0019_flexible_credentials"
             ):
                 raise RuntimeError("DISPOSABLE_IDENTITY_REQUIRED")
             if await session.scalar(text("SELECT 1 FROM pg_database WHERE datname=:name"), {"name": args.target}):
@@ -142,7 +142,7 @@ async def main():
                     json.dumps(
                         dict(
                             status="PASS",
-                            revision="0018_job_lease_clock",
+                            revision="0019_flexible_credentials",
                             removed_rows_absent=True,
                             retirement_hashes_preserved=len(removed_ids),
                             pending_resolution_verified=args.pending_resolution,

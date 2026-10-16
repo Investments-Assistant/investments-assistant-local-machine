@@ -10,8 +10,8 @@ written to disk by this script.
 
 from __future__ import annotations
 
-import re
 import sys
+import base64
 import getpass
 from pathlib import Path
 import secrets
@@ -25,15 +25,17 @@ if str(PROJECT_ROOT) not in sys.path:
 from src.web.auth import hash_password  # noqa: E402
 
 
+def username_environment_line(username: str) -> str:
+    """Transport exact text safely across both dotenv and Compose parsers."""
+    return "AUTH_USERNAME_BASE64='" + base64.b64encode(username.encode("utf-8")).decode("ascii") + "'"
+
+
 def main() -> int:
-    username = input("Login ID [admin]: ").strip() or "admin"
-    if not re.fullmatch(r"[A-Za-z0-9_.@-]{1,128}", username):
-        print(
-            "Login ID may contain only letters, numbers, dot, underscore, @, and hyphen.",
-            file=sys.stderr,
-        )
+    username = input("Login ID: ")
+    if not username:
+        print("Enter a login ID.", file=sys.stderr)
         return 1
-    first = getpass.getpass("Password (12+ characters): ")
+    first = getpass.getpass("Password: ")
     second = getpass.getpass("Repeat password: ")
     if first != second:
         print("Passwords do not match.", file=sys.stderr)
@@ -44,7 +46,7 @@ def main() -> int:
         print(str(exc), file=sys.stderr)
         return 1
     print("\nAdd these lines to .env:\n")
-    print(f"AUTH_USERNAME={username}")
+    print(username_environment_line(username))
     # Compose treats `$NAME` as interpolation in unquoted .env values. The
     # scrypt format contains several dollars, so single-quote it for a safe
     # copy/paste into .env. dotenv parsers remove the surrounding quotes.

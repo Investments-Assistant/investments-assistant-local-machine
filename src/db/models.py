@@ -16,17 +16,26 @@ from sqlalchemy import (
     Integer,
     Numeric,
     DateTime,
+    LargeBinary,
+    CheckConstraint,
     UniqueConstraint,
+    and_,
     func,
     text,
+    event,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.db.database import Base
+from src.security.identifiers import username_key as derive_username_key
 
 
 def _now() -> datetime:
     return datetime.now(UTC)
+
+
+def _username_key_default(context):
+    return derive_username_key(context.get_current_parameters()["username"])
 
 
 class ChatMessage(Base):
@@ -86,9 +95,15 @@ class User(Base):
     """A local operator account and its durable UX preferences."""
 
     __tablename__ = "users"
+    __table_args__ = (
+        CheckConstraint("octet_length(username_key) = 32", name="ck_users_username_key_length"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    username: Mapped[str] = mapped_column(String(128), unique=True, index=True)
+    username: Mapped[str] = mapped_column(Text)
+    username_key: Mapped[bytes] = mapped_column(
+        LargeBinary(32), unique=True, index=True, default=_username_key_default,
+    )
     password_hash: Mapped[str] = mapped_column(String(256))
     display_name: Mapped[str] = mapped_column(String(128), default="")
     description: Mapped[str] = mapped_column(Text, default="")
@@ -97,6 +112,21 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
+
+    @classmethod
+    def username_matches(cls, value: str):
+        """An index match never substitutes for exact, case-sensitive identity."""
+        return and_(cls.username_key == derive_username_key(value), cls.username.collate("C") == value)
+
+
+@event.listens_for(User, "before_insert")
+@event.listens_for(User, "before_update")
+def _refresh_username_key(_mapper, _connection, target):
+    # Metadata-only fixtures have no database trigger. The full ORM object is
+    # available here even when an unrelated field (such as is_active) changes.
+    # Explicitly supplied keys are recomputed on ORM inserts as well.
+    # The migrated database independently enforces the same rule for raw SQL.
+    target.username_key = derive_username_key(target.username)
 
 
 class BrokerAccount(Base):

@@ -251,7 +251,7 @@ async def ready() -> dict:
     try:
         async with async_session() as session:
             revision = await session.scalar(text("SELECT version_num FROM alembic_version"))
-        checks["database"] = revision == "0018_job_lease_clock"
+        checks["database"] = revision == "0019_flexible_credentials"
     except Exception as exc:
         logger.warning("Readiness database check failed: %s", type(exc).__name__)
     from src.agent.clients.llama_cpp_client import model_status
@@ -352,14 +352,22 @@ async def login(request: Request) -> JSONResponse:
     if not isinstance(body, dict):
         raise HTTPException(status_code=400, detail="Invalid JSON body")
 
-    username = str(body.get("username", ""))
-    password = str(body.get("password", ""))
+    username = body.get("username")
+    password = body.get("password")
     user = None
-    if len(username) <= 128 and len(password) <= 256 and username and password:
+    usable = isinstance(username, str) and isinstance(password, str) and bool(username) and bool(password)
+    if usable:
+        try:
+            username.encode("utf-8")
+        except UnicodeError:
+            usable = False
+        if "\x00" in username:
+            usable = False
+    if usable:
         try:
             async with async_session() as session:
                 result = await session.execute(
-                    select(User).where(User.username == username, User.is_active.is_(True))
+                    select(User).where(User.username_matches(username), User.is_active.is_(True))
                 )
                 user = result.scalar_one_or_none()
         except Exception as exc:
@@ -368,15 +376,37 @@ async def login(request: Request) -> JSONResponse:
                 status_code=503, detail="Authentication service unavailable"
             ) from exc
 
-    valid = user is not None and verify_password(password, user.password_hash)
-    if not valid:
-        record_login_failure(ip)
-        # Do not distinguish an unknown ID from a bad password.
-        raise HTTPException(status_code=401, detail="Invalid ID or password")
-    assert user is not None
+    from src.web.auth import credential_work
+    from src.operations.workloads import WorkloadBusy
 
-    clear_login_failures(ip)
-    return _authenticated_response(user)
+    verified_hash = user.password_hash if user is not None else None
+    verified_user_id = user.id if user is not None else None
+    try:
+        valid = user is not None and await credential_work.arun(
+            verify_password, password, verified_hash, timeout=30
+        )
+    except (WorkloadBusy, TimeoutError) as exc:
+        raise HTTPException(status_code=503, detail="Authentication service busy") from exc
+    if valid:
+        try:
+            async with async_session() as session:
+                current = (await session.execute(
+                    select(User).where(
+                        User.id == verified_user_id, User.username_matches(username),
+                        User.is_active.is_(True),
+                    ).with_for_update().execution_options(populate_existing=True)
+                )).scalar_one_or_none()
+                if current is not None and current.password_hash == verified_hash:
+                    # Hold the row lock through cookie issuance so a concurrent
+                    # password rotation cannot overtake the freshness check.
+                    clear_login_failures(ip)
+                    return _authenticated_response(current)
+        except Exception as exc:
+            logger.error("User freshness lookup failed during login: %s", type(exc).__name__)
+            raise HTTPException(status_code=503, detail="Authentication service unavailable") from exc
+    record_login_failure(ip)
+    # Do not distinguish an unknown ID from a bad password.
+    raise HTTPException(status_code=401, detail="Invalid ID or password")
 
 
 @router.post("/api/auth/register", dependencies=[Depends(require_allowed_ip)])
@@ -395,32 +425,36 @@ async def register(request: Request) -> JSONResponse:
     if not isinstance(body, dict):
         raise HTTPException(status_code=400, detail="Invalid JSON body")
 
-    username = str(body.get("username", "")).strip()
-    password = str(body.get("password", ""))
-    confirmation = str(body.get("password_confirmation", ""))
+    username = body.get("username")
+    password = body.get("password")
+    confirmation = body.get("password_confirmation")
     display_name = str(body.get("display_name", "")).strip()
-    if not re.fullmatch(r"[A-Za-z0-9_.@-]{3,128}", username):
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Username must be 3-128 characters using letters, numbers, "
-                "dot, underscore, @, or hyphen"
-            ),
-        )
-    if len(password) < 12 or len(password) > 256:
-        raise HTTPException(status_code=400, detail="Password must contain 12-256 characters")
+    if not isinstance(username, str) or not username:
+        raise HTTPException(status_code=400, detail="Username is required")
+    if not isinstance(password, str) or not password:
+        raise HTTPException(status_code=400, detail="Password is required")
+    if not isinstance(confirmation, str):
+        raise HTTPException(status_code=400, detail="Password confirmation is required")
+    try:
+        username.encode("utf-8")
+    except UnicodeError as exc:
+        raise HTTPException(status_code=400, detail="Username must be valid text") from exc
+    if "\x00" in username:
+        raise HTTPException(status_code=400, detail="Username must be valid text")
     if password != confirmation:
         raise HTTPException(status_code=400, detail="Passwords do not match")
     if len(display_name) > 128:
         raise HTTPException(status_code=400, detail="Display name is limited to 128 characters")
     try:
-        password_hash = hash_password(password)
+        from src.web.auth import credential_work
+
+        password_hash = await credential_work.arun(hash_password, password, timeout=30)
         async with async_session() as session:
             user = User(
                 id=str(uuid.uuid4()),
                 username=username,
                 password_hash=password_hash,
-                display_name=display_name or username,
+                display_name=display_name or username[:128],
                 trading_mode=settings.trading_mode,
             )
             session.add(user)
@@ -432,6 +466,8 @@ async def register(request: Request) -> JSONResponse:
             return _authenticated_response(user, status_code=201)
     except HTTPException:
         raise
+    except UnicodeError as exc:
+        raise HTTPException(status_code=400, detail="Password must be valid text") from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
@@ -445,9 +481,24 @@ async def register(request: Request) -> JSONResponse:
 )
 async def auth_me(request: Request) -> dict:
     principal = await require_authenticated(request)
+    if principal.user_id:
+        try:
+            async with async_session() as session:
+                user = (await session.execute(
+                    select(User).where(User.id == principal.user_id, User.is_active.is_(True))
+                )).scalar_one_or_none()
+                if user is None:
+                    raise HTTPException(status_code=401, detail="Authentication required")
+                username = user.username
+        except HTTPException:
+            raise
+        except Exception as exc:
+            raise HTTPException(status_code=503, detail="Authentication service unavailable") from exc
+    else:
+        username = principal.username
     return {
         "authenticated": True,
-        "username": principal.username,
+        "username": username,
         "user_id": principal.user_id,
     }
 

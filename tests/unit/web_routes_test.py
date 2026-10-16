@@ -86,6 +86,9 @@ class TestAuthenticationEndpoints:
     def current_session_store(self):
         # This tier tests route marshalling with mocked persistence. Real account
         # activity/revocation checks run in integration/sessions_test and Chromium.
+        from src.web import auth
+        auth._failed_logins.clear()
+        auth._registration_attempts.clear()
         with patch("src.web.auth.validate_principal", new_callable=AsyncMock):
             yield
 
@@ -178,8 +181,10 @@ class TestAuthenticationEndpoints:
 
             assert response.status_code == 201
             assert response.json()["username"] == "alice"
-            assert client.get("/api/auth/me").json()["username"] == "alice"
             created = session.add.call_args.args[0]
+            session.execute.return_value.scalar_one_or_none.return_value = created
+            created.is_active = True
+            assert client.get("/api/auth/me").json()["username"] == "alice"
             assert created.username == "alice"
             assert created.id
             assert created.password_hash != "a-long-and-private-password"
@@ -287,7 +292,9 @@ class TestAuthenticationEndpoints:
         assert response.json() == {"deleted": True, "id": conversation.id}
         session.delete.assert_awaited_once_with(conversation)
         session.commit.assert_awaited_once()
-        assert session.execute.await_count == 2
+        deletion = session.execute.call_args.args[0]
+        assert deletion.is_delete
+        assert {user.id, conversation.id} <= set(deletion.compile().params.values())
 
     def test_delete_conversation_cannot_cross_user_boundary(self):
         cfg = self._settings()
@@ -343,7 +350,14 @@ class TestAuthenticationEndpoints:
         session = AsyncMock()
         session.__aenter__ = AsyncMock(return_value=session)
         session.__aexit__ = AsyncMock(return_value=False)
-        session.execute = AsyncMock(side_effect=[login_result, history_result])
+        from src.db.models import User
+
+        async def execute(statement):
+            return login_result if any(
+                item.get("entity") is User for item in getattr(statement, "column_descriptions", [])
+            ) else history_result
+
+        session.execute = AsyncMock(side_effect=execute)
         with (
             patch("src.web.routes.settings", cfg),
             patch("src.web.auth.config.settings", cfg),

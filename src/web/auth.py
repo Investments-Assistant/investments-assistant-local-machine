@@ -10,6 +10,7 @@ invalidated by changing ``AUTH_SESSION_SECRET``.
 from __future__ import annotations
 
 import hmac
+import json
 import time
 import base64
 import hashlib
@@ -22,6 +23,7 @@ from fastapi import Request, WebSocket, HTTPException
 
 from src import config
 from src.web.network import trusted_proxy
+from src.operations.workloads import WorkPool
 
 SESSION_COOKIE = "ia_session"
 CSRF_COOKIE = "ia_csrf"
@@ -33,6 +35,7 @@ _failed_logins: dict[str, deque[float]] = defaultdict(deque)
 _REGISTRATION_WINDOW_SECONDS = 15 * 60
 _MAX_REGISTRATIONS = 8
 _registration_attempts: dict[str, deque[float]] = defaultdict(deque)
+credential_work = WorkPool(2, "CREDENTIAL_HASH", dedicated=True)
 
 
 @dataclass(frozen=True)
@@ -51,13 +54,18 @@ def _b64(value: bytes) -> str:
 
 
 def _unb64(value: str) -> bytes:
-    return base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
+    decoded = base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
+    # Revocation fingerprints the exact cookie. Reject alternate spellings
+    # that decode to the same signed bytes but have a different fingerprint.
+    if _b64(decoded) != value:
+        raise ValueError("Noncanonical base64url")
+    return decoded
 
 
 def hash_password(password: str) -> str:
     """Create a portable scrypt password hash for ``.env``."""
-    if not password or len(password) < 12:
-        raise ValueError("Password must contain at least 12 characters")
+    if not isinstance(password, str) or not password:
+        raise ValueError("Password is required")
     salt = secrets.token_bytes(_SALT_BYTES)
     derived = hashlib.scrypt(
         password.encode("utf-8"),
@@ -97,13 +105,13 @@ def _secret() -> bytes:
 
 def create_session(username: str | None = None, user_id: str | None = None) -> str:
     """Create an HMAC-signed session cookie value."""
-    subject = username or config.settings.auth_username
     expires = int(time.time()) + max(5, config.settings.auth_session_ttl_minutes) * 60
     nonce = secrets.token_urlsafe(24)
-    payload = (
-        f"{user_id}|{subject}|{expires}|{nonce}|{time.time_ns() // 1000}"
-        if user_id
-        else f"{subject}|{expires}|{nonce}"
+    # The database is authoritative for the username. Never put arbitrary
+    # operator input into a delimiter-based or potentially oversized cookie.
+    payload = json.dumps(
+        ["v2", user_id, expires, nonce, time.time_ns() // 1000],
+        separators=(",", ":"),
     )
     signature = hmac.new(_secret(), payload.encode(), hashlib.sha256).digest()
     return f"{_b64(payload.encode())}.{_b64(signature)}"
@@ -120,11 +128,27 @@ def verify_session(token: str | None) -> Principal | None:
         expected = hmac.new(_secret(), payload_bytes, hashlib.sha256).digest()
         if not hmac.compare_digest(expected, _unb64(encoded_signature)):
             return None
-        parts = payload_bytes.decode("utf-8").split("|")
-        if len(parts) != 5:
-            return None
-        user_id, username, expires_raw, nonce, issued_raw = parts
-        if not nonce or int(expires_raw) <= int(time.time()) or not user_id:
+        decoded = payload_bytes.decode("utf-8")
+        if decoded.startswith("["):
+            parts = json.loads(decoded)
+            if not isinstance(parts, list) or len(parts) != 5 or parts[0] != "v2":
+                return None
+            _, user_id, expires_raw, nonce, issued_raw = parts
+            username = ""
+            if type(expires_raw) is not int or type(issued_raw) is not int:
+                return None
+        else:
+            # Existing signed cookies and their persisted revocation hashes
+            # retain their meaning until normal expiry.
+            parts = decoded.split("|")
+            if len(parts) != 5:
+                return None
+            user_id, username, expires_raw, nonce, issued_raw = parts
+        if (
+            not isinstance(user_id, str) or not user_id or len(user_id) > 36
+            or not isinstance(nonce, str) or not nonce
+            or int(expires_raw) <= int(time.time())
+        ):
             return None
         return Principal(
             username=username,

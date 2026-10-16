@@ -11,7 +11,6 @@ self-registration is disabled.
 
 from __future__ import annotations
 
-import re
 import sys
 import asyncio
 import getpass
@@ -42,32 +41,29 @@ async def _create_user(username: str, display_name: str, password: str) -> int:
     await create_all_tables()
     encoded = hash_password(password)
     async with async_session() as session:
-        existing = await session.execute(select(User).where(User.username == username))
+        existing = await session.execute(select(User).where(User.username_matches(username)))
         if existing.scalar_one_or_none() is not None:
-            print(f"User already exists: {username}", file=sys.stderr)
+            print("A user with that login ID already exists.", file=sys.stderr)
             return 1
         session.add(
             User(
                 username=username,
                 password_hash=encoded,
-                display_name=display_name.strip()[:128] or username,
+                display_name=display_name.strip()[:128] or username[:128],
             )
         )
         await session.commit()
-    print(f"Created local user: {username}")
+    print("Created local user.")
     return 0
 
 
 def main() -> int:
     args = _parse_args()
-    username = (args.username or input("Login ID: ")).strip()
-    if not re.fullmatch(r"[A-Za-z0-9_.@-]{1,128}", username):
-        print(
-            "Login ID may contain only letters, numbers, dot, underscore, @, and hyphen.",
-            file=sys.stderr,
-        )
+    username = input("Login ID: ") if args.username is None else args.username
+    if not username:
+        print("Enter a login ID.", file=sys.stderr)
         return 1
-    first = getpass.getpass("Password (12+ characters): ")
+    first = getpass.getpass("Password: ")
     second = getpass.getpass("Repeat password: ")
     if first != second:
         print("Passwords do not match.", file=sys.stderr)
@@ -75,7 +71,7 @@ def main() -> int:
     try:
         return asyncio.run(_create_user(username, args.display_name, first))
     except Exception as exc:
-        print(f"Could not create user: {exc}", file=sys.stderr)
+        print(f"Could not create user ({type(exc).__name__}).", file=sys.stderr)
         return 1
 
 
