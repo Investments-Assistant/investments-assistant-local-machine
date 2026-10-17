@@ -9,6 +9,10 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+# Docker's immutable package-source input is reviewed configuration.
+!config/build/
+config/build/*
+!config/build/debian.sources
 develop-eggs/
 dist/
 downloads/
