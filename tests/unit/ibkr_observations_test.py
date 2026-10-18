@@ -50,6 +50,14 @@ class SDK:
         self.orderStatusEvent = Event()
         self.disconnectedEvent = Event()
         self.errorEvent = Event()
+        self.accountValueEvent = Event()
+        self.wrapper = Obj(
+            accountDownloadEnd=lambda _account: None,
+            updateAccountValue=lambda tag, value, currency, account: self.accountValueEvent.emit(
+                Obj(account=account, tag=tag, value=value, currency=currency)
+            ),
+        )
+        self.client = Obj(reqAccountUpdates=lambda _subscribed, _account: None)
         self.failed = False
 
     def reqAllOpenOrders(self):
@@ -64,6 +72,12 @@ class SDK:
     def accountSummary(self, account):
         assert account == "synthetic"
         return []
+
+    def reqAccountUpdates(self, account):
+        assert account == "synthetic"
+        self.client.reqAccountUpdates(True, account)
+        self.wrapper.updateAccountValue("AccountReady", "true", "", account)
+        self.wrapper.accountDownloadEnd(account)
 
     def reqExecutions(self, execution_filter):
         assert execution_filter == "fixture-account-filter"

@@ -163,6 +163,8 @@ def get_ibkr_account(account: BrokerAccountConfig | None = None) -> dict:
 def get_ibkr_positions(account: BrokerAccountConfig | None = None) -> list[dict]:
     try:
         def operation(ib, actual):
+            if getattr(ib, "_ia_primary_portfolio_stale", False) is True:
+                raise RuntimeError("IBKR_SESSION_NOT_READY")
             return [
                 {
                     "symbol": item.contract.symbol,

@@ -197,6 +197,12 @@ def start_server(state, output, env):
     client = httpx.Client(base_url=base, timeout=5, trust_env=False)
     try:
         startup_deadline = time.monotonic() + 15
+
+        def remaining_startup_timeout():
+            remaining = startup_deadline - time.monotonic()
+            require_gate(remaining > 0, "FIXTURE_STARTUP_BUDGET")
+            return min(5, remaining)
+
         while True:
             remaining = startup_deadline - time.monotonic()
             if remaining <= 0:
@@ -215,9 +221,23 @@ def start_server(state, output, env):
         response = client.post(
             "/api/auth/login",
             json={"username": state["user"], "password": "fixture-browser-password"},
+            timeout=remaining_startup_timeout(),
         )
         response.raise_for_status()
         client.headers["X-CSRF-Token"] = client.cookies["ia_csrf"]
+        if "halt_account" in state:
+            # Observe durable state before the next cycle can reassert the halt.
+            snapshot = client.get(
+                f"/api/simulator/accounts/{state['halt_account']}",
+                timeout=remaining_startup_timeout(),
+            )
+            snapshot.raise_for_status()
+            persisted = snapshot.json()
+            require_gate(
+                persisted["halted"] is True and persisted["orders"] == [],
+                "RESTART_HALT_OR_NO_ORDER_INVARIANT_FAILED",
+            )
+        require_gate(time.monotonic() < startup_deadline, "FIXTURE_STARTUP_BUDGET")
         return process, client, base
     except BaseException:
         client.close()

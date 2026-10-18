@@ -139,3 +139,41 @@ def test_snapshot_read_keeps_continuous_subscription_attached(monkeypatch):
     finally:
         assert worker.close(timeout=1)
     assert not sdk.execDetailsEvent.handlers
+
+
+def test_snapshot_unsubscribe_never_relabels_a_persistent_owner_portfolio_cache(monkeypatch):
+    import sys
+    from types import SimpleNamespace
+
+    from tests.unit.ibkr_observations_test import SDK as CallbackSDK
+    from src.tools.brokers.ibkr_observations import collect_ibkr_observations
+
+    class CombinedSDK(CallbackSDK, SDK):
+        def __init__(self):
+            CallbackSDK.__init__(self)
+            SDK.__init__(self)
+
+    selected, sdk = account(), CombinedSDK()
+    selected.config["broker_account_id"] = "synthetic"
+    connections = []
+
+    @contextmanager
+    def connected(_):
+        connections.append("one owned connection")
+        yield sdk, "synthetic"
+
+    sdk.portfolio = lambda **_: pytest.fail("Stopped portfolio cache was accessed")
+    monkeypatch.setitem(sys.modules, "ib_async", SimpleNamespace(ExecutionFilter=lambda **_: "fixture-account-filter"))
+    monkeypatch.setattr(ibkr, "_connection", lambda *_: pytest.fail("Unexpected reconnect"))
+    worker = ReadSessionWorker(selected, connection_factory=connected)
+    worker.register_reads()
+    worker.start()
+    try:
+        assert collect_ibkr_observations(selected)["status"] == "observed"
+        assert sdk._ia_primary_portfolio_stale is True
+        assert ibkr.get_ibkr_positions(selected) == [
+            {"broker": "ibkr", "available": False, "error": "IBKR_SESSION_NOT_READY"}
+        ]
+        assert connections == ["one owned connection"]
+    finally:
+        assert worker.close(timeout=1)
