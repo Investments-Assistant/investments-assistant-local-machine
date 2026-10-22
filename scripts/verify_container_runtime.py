@@ -203,7 +203,7 @@ def run(args):
             "-c",
             "SELECT current_database(),token FROM ia_disposable_marker; SELECT version_num FROM alembic_version;",
         ).stdout
-        if "test_container|" + token not in identity or "0019_flexible_credentials" not in identity:
+        if "test_container|" + token not in identity or "0020_broker_submission" not in identity:
             raise RuntimeError("Database marker/schema lost across restart")
         checks.append("Application and database restart recover readiness and preserve marker/schema")
         if max(result["restart_seconds"].values()) > 15:

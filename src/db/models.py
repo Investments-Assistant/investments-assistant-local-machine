@@ -386,3 +386,10 @@ class BrokerObservation(Base):
     payload: Mapped[dict] = mapped_column(JSON)
     observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.clock_timestamp())
+
+
+# Register the separate durable offline broker-handoff contract tables.
+from src.execution.broker_submission_models import (  # noqa: E402,F401
+    BrokerSubmissionEvent,
+    BrokerSubmissionIntent,
+)

@@ -110,7 +110,7 @@ async def verify_database(url, marker):
                 "DISPOSABLE_MARKER_MISMATCH",
             )
             require_gate(
-                await connection.scalar(text("SELECT version_num FROM alembic_version")) == "0019_flexible_credentials",
+                await connection.scalar(text("SELECT version_num FROM alembic_version")) == "0020_broker_submission",
                 "DISPOSABLE_SCHEMA_REVISION_MISMATCH",
             )
     finally:

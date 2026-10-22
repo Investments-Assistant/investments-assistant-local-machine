@@ -251,7 +251,7 @@ async def ready() -> dict:
     try:
         async with async_session() as session:
             revision = await session.scalar(text("SELECT version_num FROM alembic_version"))
-        checks["database"] = revision == "0019_flexible_credentials"
+        checks["database"] = revision == "0020_broker_submission"
     except Exception as exc:
         logger.warning("Readiness database check failed: %s", type(exc).__name__)
     from src.agent.clients.llama_cpp_client import model_status

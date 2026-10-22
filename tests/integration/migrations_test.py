@@ -68,6 +68,7 @@ async def test_reviewed_schema_upgrades_without_assigning_unknown_owner(integrat
                 "0017_valuation_snapshots.py",
                 "0018_job_lease_clock.py",
                 "0019_flexible_credentials.py",
+                "0020_broker_submission.py",
             ]:
                 if version == "0018_job_lease_clock.py":
                     await connection.execute(text(

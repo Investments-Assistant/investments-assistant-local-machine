@@ -65,6 +65,16 @@ jobs:
           -c "CREATE TABLE ia_disposable_marker(token text NOT NULL);
           INSERT INTO ia_disposable_marker VALUES ('ci-isolated-service');"
 
+      - name: Migrate the marked disposable CI database
+        env:
+          ENVIRONMENT: development
+          DATABASE_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/test_investments"
+          PGPASSWORD: postgres
+        run: |
+          identity=$(psql -h localhost -U postgres -d test_investments -At -v ON_ERROR_STOP=1 -c "SELECT current_database() || '|' || token FROM ia_disposable_marker")
+          test "$identity" = 'test_investments|ci-isolated-service'
+          poetry run alembic upgrade head
+
       - name: Run integration tests with coverage
         env:
           ENVIRONMENT: development
