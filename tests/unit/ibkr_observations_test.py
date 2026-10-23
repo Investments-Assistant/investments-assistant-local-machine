@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
+from src.execution.broker_observations import hash_order_reference
 from src.tools.brokers.ibkr_observations import CallbackWindow
 
 
@@ -130,6 +131,31 @@ def test_capacity_malformed_and_mismatched_commission_fail_closed():
     assert "COMMISSION_EXECUTION_MISMATCH" in window.failures
     window.execution(None, Obj())
     assert "INVALID_BROKER_CALLBACK" in window.failures
+
+
+def test_only_decoded_execution_reference_is_hashed_not_cached_trade_order():
+    window = CallbackWindow("synthetic")
+    observed = fill()
+    observed.execution.orderRef = "a" * 32
+    cached = Obj(order=Obj(orderRef="b" * 32))
+    window.execution(cached, observed)
+    retained, = window.observations
+    assert retained.order_ref_sha256 == hash_order_reference("a" * 32)
+    assert "a" * 32 not in str(retained.model_dump())
+    del observed.execution.orderRef
+    window.execution(cached, observed)
+    assert window.observations[-1].order_ref_sha256 is None
+    assert "order_ref_sha256" not in window.observations[-1].model_dump(exclude_none=True)
+
+
+def test_order_status_cached_reference_cannot_supply_correlation_evidence():
+    window = CallbackWindow("synthetic")
+    trade = Obj(order=Obj(account="synthetic", clientId=7, orderId=1, permId=9, orderRef="c" * 32),
+                orderStatus=Obj(status="Submitted", filled=0, remaining=1))
+    window.order_status(trade)
+    assert len(window.observations) == 1
+    assert "order_ref_sha256" not in window.observations[0].model_dump()
+    assert "c" * 32 not in str(window.observations[0].model_dump())
 
 
 def test_subscription_keeps_late_callbacks_between_bounded_drains_and_final_detach():

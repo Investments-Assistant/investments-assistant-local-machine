@@ -9,7 +9,7 @@ import threading
 from contextlib import contextmanager
 
 from src.execution.policy import PolicyDenied
-from src.execution.broker_observations import OBSERVATION
+from src.execution.broker_observations import OBSERVATION, hash_order_reference
 
 
 class CallbackWindow:
@@ -51,6 +51,7 @@ class CallbackWindow:
                     client_id=execution.clientId,
                     order_id=execution.orderId,
                     permanent_id=execution.permId,
+                    order_ref_sha256=hash_order_reference(getattr(execution, "orderRef", None)),
                     side=execution.side,
                     quantity=str(execution.shares),
                     price=str(execution.price),

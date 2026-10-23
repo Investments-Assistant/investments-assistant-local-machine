@@ -18,7 +18,7 @@ from src.tools import broker_accounts as vault
 from src.db.models import User, BrokerAccount, BrokerObservation
 from src.execution.policy import PolicyDenied
 from src.execution.broker_submission import MAX_OFFLINE_HANDOFFS, TransportReceipt, BrokerSubmissionJournal
-from src.execution.broker_observations import record_observations
+from src.execution.broker_observations import record_observations, hash_order_reference
 from tests.unit.broker_submission_test import request_values
 from src.execution.broker_submission_models import BrokerSubmissionEvent, BrokerSubmissionIntent
 from tests.integration.broker_observations_test import seed, execution, commission, fixture_key  # noqa: F401
@@ -64,7 +64,7 @@ class AcceptedTransport:
     def __init__(self, factory):
         self.factory, self.calls = factory, 0
 
-    async def submit(self, request, *, intent_id, attempt_id):
+    async def submit(self, request, *, intent_id, attempt_id, order_ref):
         self.calls += 1
         # A distinct session/connection sees both committed intent and attempt.
         async with self.factory() as independent:
@@ -74,6 +74,8 @@ class AcceptedTransport:
             ))
             assert intent.state == "handoff_started" and intent.attempt_id == attempt_id
             assert event.payload["request_sha256"] == intent.request_sha256
+            assert order_ref == uuid.UUID(attempt_id).hex and len(order_ref) == 32
+            assert event.payload["order_ref_sha256"] == hash_order_reference(order_ref)
         return TransportReceipt(status="acknowledged", client_id=request.client_id,
                                 order_id=request.order_id, permanent_id=9)
 
@@ -499,3 +501,243 @@ async def test_correction_family_quantities_are_not_summed_as_fresh_fills(submis
     assert comparison["observed_execution_quantity"] is None
     assert "SUBMISSION_EXECUTION_QUANTITY_UNRESOLVED" in comparison["reason_codes"]
     assert "SUBMISSION_QUANTITY_EXCEEDED" not in comparison["reason_codes"]
+
+
+class LostAcknowledgement(AcceptedTransport):
+    async def submit(self, request, **kwargs):
+        await super().submit(request, **kwargs)
+        self.order_ref = kwargs["order_ref"]
+        raise TimeoutError("synthetic acceptance with lost acknowledgement")
+
+
+async def lost_acknowledgement(fixture):
+    intent = await stage(fixture)
+    transport = LostAcknowledgement(fixture[1])
+    result = await fixture[0].dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
+    assert result["state"] == "uncertain" and transport.calls == 1
+    return intent, transport
+
+
+def echoed_execution(transport, **changes):
+    return execution(security_type="STK", multiplier="1",
+                     order_ref_sha256=hash_order_reference(transport.order_ref)) | changes
+
+
+async def test_lost_acknowledgement_reload_late_execution_correlates_without_resend_or_authority(submission_fixture):
+    fixture = submission_fixture
+    intent, transport = await lost_acknowledgement(fixture)
+    row, = await retain(fixture, [echoed_execution(transport)])
+    restarted = BrokerSubmissionJournal(fixture[1])
+    result = await restarted.resolve_identity(**args(fixture, intent))
+    assert result["state"] == "uncertain" and result["identity_review"]["status"] == "correlated_evidence_only"
+    assert result["identity_review"]["permanent_id"] == "9"
+    assert result["execution_authority"] == "none" and result["environment_verified"] is None
+    assert not result["retry_allowed"] and not result["complete_reconciliation"]
+    assert (await restarted.review_intent(**args(fixture, intent)))["linked_observations"] == 0
+    await restarted.attach_observation(**args(fixture, intent), observation_id=row.id)
+    review = await BrokerSubmissionJournal(fixture[1]).review_intent(**args(fixture, intent))
+    assert review["linked_observations"] == 1 and review["state"] == "uncertain"
+    assert review["current_broker_state"] == review["strategy_order_ownership"] == "not_established"
+    await restarted.dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
+    assert transport.calls == 1
+    async with fixture[1]() as independent:
+        stored = await independent.get(BrokerSubmissionIntent, intent["intent_id"])
+        assert stored.permanent_id == "9" and stored.state == "uncertain"
+        events = (await independent.scalars(select(BrokerSubmissionEvent).where(
+            BrokerSubmissionEvent.intent_id == stored.id))).all()
+        assert [event.kind for event in events].count("identity_correlated") == 1
+        assert transport.order_ref not in str([event.payload for event in events])
+
+
+async def test_duplicate_and_concurrent_resolution_append_one_binding_event(submission_fixture):
+    fixture = submission_fixture
+    intent, transport = await lost_acknowledgement(fixture)
+    observation = echoed_execution(transport)
+    rows = await retain(fixture, [observation, observation])
+    assert len(rows) == 1
+    results = await asyncio.gather(*(BrokerSubmissionJournal(fixture[1]).resolve_identity(**args(fixture, intent))
+                                     for _ in range(2)))
+    assert all(result["identity_review"]["permanent_id"] == "9" for result in results)
+    async with fixture[1]() as session:
+        events = (await session.scalars(select(BrokerSubmissionEvent).where(
+            BrokerSubmissionEvent.intent_id == intent["intent_id"]))).all()
+        assert [event.kind for event in events].count("identity_review_started") == 1
+        assert [event.kind for event in events].count("identity_correlated") == 1
+
+
+@pytest.mark.parametrize("changes,reason", [
+    ({"order_ref_sha256": "a" * 64}, "SUBMISSION_IDENTITY_REFERENCE_CONFLICT"),
+    ({"client_id": 78}, "SUBMISSION_IDENTITY_ORDER_CONFLICT"),
+    ({"order_id": 2}, "SUBMISSION_IDENTITY_ORDER_CONFLICT"),
+    ({"con_id": 456}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
+    ({"currency": "USD"}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
+    ({"security_type": "OPT", "multiplier": "100"}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
+    ({"security_type": None, "multiplier": None}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
+    ({"side": "SLD"}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
+    ({"permanent_id": 0}, "SUBMISSION_IDENTITY_PERMANENT_ID_UNAVAILABLE"),
+])
+async def test_echoed_reference_does_not_authorize_mismatched_callback_identity(submission_fixture, changes, reason):
+    fixture = submission_fixture
+    intent, transport = await lost_acknowledgement(fixture)
+    await retain(fixture, [echoed_execution(transport, **changes)])
+    result = await fixture[0].resolve_identity(**args(fixture, intent))
+    assert result["identity_review"]["status"] == "sticky_unresolved"
+    assert reason in result["identity_review"]["reason_codes"]
+    assert result["identity_review"]["permanent_id"] is None and result["state"] == "uncertain"
+
+
+async def test_missing_reference_and_status_cache_cannot_bootstrap_resolution(submission_fixture):
+    fixture = submission_fixture
+    intent, _ = await lost_acknowledgement(fixture)
+    await retain(fixture, [execution(security_type="STK", multiplier="1"), order_status()])
+    result = await fixture[0].resolve_identity(**args(fixture, intent))
+    assert result["identity_review"]["status"] == "unresolved"
+    assert result["identity_review"]["permanent_id"] is None
+    assert (await fixture[0].review_intent(**args(fixture, intent)))["linked_observations"] == 0
+
+
+@pytest.mark.parametrize("late_change", [
+    {"permanent_id": 10}, {"order_ref_sha256": "f" * 64},
+    {"con_id": 456}, {"security_type": "OPT", "multiplier": "100"},
+])
+async def test_later_contradiction_invalidates_binding_and_stays_sticky(submission_fixture, late_change):
+    fixture = submission_fixture
+    intent, transport = await lost_acknowledgement(fixture)
+    row, = await retain(fixture, [echoed_execution(transport)])
+    await fixture[0].resolve_identity(**args(fixture, intent))
+    await fixture[0].attach_observation(**args(fixture, intent), observation_id=row.id)
+    # A later version/correction is retained, never silently replaces the first.
+    rows = await retain(fixture, [echoed_execution(transport, event_id="fixture.execution.2", **late_change)])
+    review = await BrokerSubmissionJournal(fixture[1]).review_intent(**args(fixture, intent))
+    assert review["identity_review"]["status"] == "sticky_unresolved"
+    assert review["identity_review"]["permanent_id"] is None
+    assert review["linked_observations"] == 1 and review["state"] == "uncertain"
+    blocked = await fixture[0].attach_observation(**args(fixture, intent), observation_id=rows[-1].id)
+    assert blocked["blocked"] and blocked["reason_code"] == "SUBMISSION_IDENTITY_UNRESOLVED"
+    await retain(fixture, [echoed_execution(transport, event_id="fixture.later.1")])
+    again = await fixture[0].resolve_identity(**args(fixture, intent))
+    assert again["identity_review"]["status"] == "sticky_unresolved"
+    assert "SUBMISSION_IDENTITY_STICKY_CONFLICT" in again["identity_review"]["reason_codes"]
+    assert again["identity_review"]["permanent_id"] is None
+    await fixture[0].dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
+    assert transport.calls == 1
+
+
+async def test_conflicting_candidates_present_before_first_review_never_choose_first(submission_fixture):
+    fixture = submission_fixture
+    intent, transport = await lost_acknowledgement(fixture)
+    await retain(fixture, [echoed_execution(transport), echoed_execution(transport, permanent_id=10)])
+    result = await fixture[0].resolve_identity(**args(fixture, intent))
+    assert result["identity_review"]["permanent_id"] is None
+    assert "SUBMISSION_IDENTITY_PERMANENT_ID_CONFLICT" in result["identity_review"]["reason_codes"]
+    async with fixture[1]() as session:
+        assert not await session.scalar(select(BrokerSubmissionEvent.id).where(
+            BrokerSubmissionEvent.intent_id == intent["intent_id"],
+            BrokerSubmissionEvent.kind == "identity_correlated"))
+
+
+async def test_existing_permanent_identity_cannot_be_assigned_to_second_intent(submission_fixture):
+    fixture = submission_fixture
+    journal, factory, user, account = fixture
+    other = await journal.stage_intent(user_id=user, account_id=account, idempotency_key="other-order",
+                                       request=request_values(order_id=2))
+    await journal.dispatch_once(**args(fixture, other), transport=AcceptedTransport(factory), timeout_seconds=5)
+    intent, transport = await lost_acknowledgement(fixture)
+    await retain(fixture, [echoed_execution(transport)])
+    result = await journal.resolve_identity(**args(fixture, intent))
+    assert "SUBMISSION_IDENTITY_PERMANENT_ID_RESERVED" in result["identity_review"]["reason_codes"]
+    assert result["identity_review"]["permanent_id"] is None
+
+
+async def test_resolution_history_remains_available_after_read_consent_and_endpoint_revocation(submission_fixture):
+    fixture = submission_fixture
+    intent, transport = await lost_acknowledgement(fixture)
+    await retain(fixture, [echoed_execution(transport)])
+    async with fixture[1].begin() as session:
+        account = await session.get(BrokerAccount, fixture[3])
+        account.is_active = False
+        account.config_encrypted = vault.encrypt_config(vault.decrypt_config(account.config_encrypted) | {
+            "enabled": False, "read_authorized": False, "client_id": 99, "host": "rotated.invalid",
+        })
+    result = await BrokerSubmissionJournal(fixture[1]).resolve_identity(**args(fixture, intent))
+    assert result["identity_review"]["status"] == "correlated_evidence_only"
+    assert result["state"] == "uncertain" and not result["retry_allowed"] and transport.calls == 1
+
+
+@pytest.mark.parametrize("change,code", [
+    ("cross_owner", "SUBMISSION_NOT_OWNED"), ("inactive_owner", "PRINCIPAL_INACTIVE"),
+    ("rebind", "SUBMISSION_ACCOUNT_CHANGED"), ("marker", "OFFLINE_.*DATABASE"),
+])
+async def test_identity_resolution_rechecks_scope_and_actual_fixture(submission_fixture, monkeypatch, change, code):
+    fixture = submission_fixture
+    intent, transport = await lost_acknowledgement(fixture)
+    await retain(fixture, [echoed_execution(transport)])
+    inputs = args(fixture, intent)
+    if change == "cross_owner":
+        inputs["user_id"] = str(uuid.uuid4())
+    elif change == "marker":
+        monkeypatch.delenv("TEST_DATABASE_DISPOSABLE_TOKEN")
+    else:
+        async with fixture[1].begin() as session:
+            if change == "inactive_owner":
+                await session.execute(update(User).where(User.id == fixture[2]).values(is_active=False))
+            else:
+                account = await session.get(BrokerAccount, fixture[3])
+                account.config_encrypted = vault.encrypt_config(vault.decrypt_config(account.config_encrypted)
+                                                                | {"broker_account_id": "OTHER-FIXTURE"})
+    with pytest.raises(PolicyDenied, match=code):
+        await fixture[0].resolve_identity(**inputs)
+    async with fixture[1]() as session:
+        assert (await session.get(BrokerSubmissionIntent, intent["intent_id"])).permanent_id is None
+    assert transport.calls == 1
+
+
+@pytest.mark.parametrize("mode", ["missing", "different"])
+async def test_uncommitted_or_corrupted_reference_cannot_be_retrofitted_to_attempt(submission_fixture, mode):
+    fixture = submission_fixture
+    intent, transport = await lost_acknowledgement(fixture)
+    await retain(fixture, [echoed_execution(transport)])
+    async with fixture[1].begin() as session:
+        handoff = await session.scalar(select(BrokerSubmissionEvent).where(
+            BrokerSubmissionEvent.intent_id == intent["intent_id"], BrokerSubmissionEvent.event_key == "handoff"))
+        # Even a self-consistent event hash cannot change the reference committed
+        # from the original random attempt identity.
+        from src.execution.policy import digest
+        payload = dict(handoff.payload)
+        if mode == "missing":
+            payload.pop("order_ref_sha256")
+        else:
+            payload["order_ref_sha256"] = "a" * 64
+        handoff.payload = payload
+        handoff.payload_sha256 = digest(handoff.payload)
+    result = await fixture[0].resolve_identity(**args(fixture, intent))
+    assert "SUBMISSION_IDENTITY_ATTEMPT_PROOF_INVALID" in result["identity_review"]["reason_codes"]
+    assert result["identity_review"]["permanent_id"] is None
+
+
+async def test_identity_resolution_rejects_invalid_retained_execution_hash(submission_fixture):
+    fixture = submission_fixture
+    intent, transport = await lost_acknowledgement(fixture)
+    row, = await retain(fixture, [echoed_execution(transport)])
+    async with fixture[1].begin() as session:
+        await session.execute(update(BrokerObservation).where(BrokerObservation.id == row.id)
+                              .values(payload_sha256="0" * 64))
+    result = await fixture[0].resolve_identity(**args(fixture, intent))
+    assert "SUBMISSION_IDENTITY_EVIDENCE_INVALID" in result["identity_review"]["reason_codes"]
+    assert result["identity_review"]["permanent_id"] is None
+
+
+@pytest.mark.parametrize("bound", ["rows", "bytes"])
+async def test_identity_resolution_never_selects_from_truncated_evidence(submission_fixture, monkeypatch, bound):
+    import src.execution.broker_submission as module
+
+    fixture = submission_fixture
+    intent, transport = await lost_acknowledgement(fixture)
+    await retain(fixture, [echoed_execution(transport), echoed_execution(transport, event_id="fixture.second.1")])
+    # Exercise the real boundary/extra-row probe with small synthetic fixtures.
+    # Production limits remain1000observations and2MiB.
+    monkeypatch.setattr(module, "MAX_OBSERVATIONS" if bound == "rows" else "READ_PAYLOAD_BUDGET", 1)
+    result = await fixture[0].resolve_identity(**args(fixture, intent))
+    assert "SUBMISSION_IDENTITY_EVIDENCE_TRUNCATED" in result["identity_review"]["reason_codes"]
+    assert result["identity_review"]["status"] == "sticky_unresolved"
+    assert result["identity_review"]["permanent_id"] is None

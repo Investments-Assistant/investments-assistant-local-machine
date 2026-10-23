@@ -8,6 +8,7 @@ import re
 import uuid
 from typing import Literal, Annotated
 from decimal import Decimal, localcontext
+import hashlib
 from datetime import UTC, datetime
 
 from pydantic import Field, BaseModel, ConfigDict, TypeAdapter, field_validator
@@ -20,6 +21,16 @@ from src.tools.broker_accounts import decrypt_config
 from src.execution.broker_balances import BalanceFacts
 
 READ_PAYLOAD_BUDGET = 2 * 1024 * 1024
+
+
+def hash_order_reference(value):
+    """Retain correlation evidence, never raw broker free text or authority.
+
+    Missing/unexpected references must not discard an otherwise valid fill.
+    The SDK execution decoder supplies this field; cached Trade/Order state does
+    not establish that the broker echoed a submitted reference.
+    """
+    return hashlib.sha256(value.encode()).hexdigest() if isinstance(value, str) and value else None
 
 
 class Observation(BaseModel):
@@ -49,6 +60,7 @@ class ExecutionObservation(Observation):
     client_id: int = Field(ge=0, strict=True)
     order_id: int = Field(ge=0, strict=True)
     permanent_id: int = Field(ge=0, strict=True)
+    order_ref_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     side: Literal["BOT", "SLD"]
     quantity: Decimal = Field(gt=0, max_digits=40, decimal_places=20, allow_inf_nan=False)
     price: Decimal = Field(ge=0, max_digits=40, decimal_places=20, allow_inf_nan=False)

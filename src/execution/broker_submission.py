@@ -20,7 +20,7 @@ from pathlib import Path
 from threading import Lock
 
 from pydantic import Field, BaseModel, ConfigDict, field_validator, model_validator
-from sqlalchemy import Text, cast, func, text, select
+from sqlalchemy import Text, or_, and_, cast, func, text, select
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
 
@@ -28,7 +28,7 @@ from src.db.models import BrokerObservation
 from src.execution.policy import PolicyDenied, digest
 from src.execution.external import external_write_denied
 from src.execution.broker_review import review_observations
-from src.execution.broker_observations import READ_PAYLOAD_BUDGET, selected_account
+from src.execution.broker_observations import READ_PAYLOAD_BUDGET, selected_account, hash_order_reference
 from src.execution.broker_submission_models import BrokerSubmissionEvent, BrokerSubmissionIntent
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -118,7 +118,8 @@ class TransportReceipt(BaseModel):
 
 
 class OfflineTransport(Protocol):
-    async def submit(self, request: SubmissionRequest, *, intent_id: str, attempt_id: str) -> TransportReceipt:
+    async def submit(self, request: SubmissionRequest, *, intent_id: str, attempt_id: str,
+                     order_ref: str) -> TransportReceipt:
         """Tests inject finite synthetic behavior. No runtime implementation exists."""
 
 
@@ -134,6 +135,69 @@ def _request(value):
         return SubmissionRequest.model_validate(value)
     except (TypeError, ValueError):
         raise PolicyDenied("INVALID_SUBMISSION_REQUEST") from None
+
+
+def _attempt_reference(attempt_id):
+    """An existing committed UUID4 supplies an opaque32-character reference."""
+    try:
+        value = uuid.UUID(attempt_id)
+        if str(value) != attempt_id or value.version != 4:
+            raise ValueError("Not a canonical random attempt")
+        return value.hex
+    except (TypeError, ValueError, AttributeError):
+        raise PolicyDenied("SUBMISSION_ATTEMPT_REFERENCE_INVALID") from None
+
+
+def _identity_candidates(request, reference_hash, rows, *, bound_permanent=None):
+    """Review fresh execution-field evidence; a reference is not authentication.
+
+    Consider contradictions as well as candidates. Client/order IDs alone never
+    establish identity, and a correction with a different contract cannot erase
+    its predecessor. No execution is manufactured or suppressed here.
+    """
+    reasons, candidates, unreferenced, evidence = set(), set(), set(), []
+    for row in rows:
+        payload = row.payload
+        evidence.append([row.id, row.payload_sha256])
+        if digest(payload) != row.payload_sha256:
+            reasons.add("SUBMISSION_IDENTITY_EVIDENCE_INVALID")
+            continue
+        same_reference = payload.get("order_ref_sha256") == reference_hash
+        same_order = (type(payload.get("client_id")) is int and type(payload.get("order_id")) is int
+                      and payload["client_id"] == request.client_id and payload["order_id"] == request.order_id)
+        if bound_permanent is not None and str(payload.get("permanent_id")) == bound_permanent and not same_order:
+            reasons.add("SUBMISSION_IDENTITY_ORDER_CONFLICT")
+        if not same_reference:
+            # An absent reference proves nothing. A different nonempty reference
+            # on the reserved client/order identity makes attribution ambiguous.
+            if payload.get("order_ref_sha256") is not None and same_order:
+                reasons.add("SUBMISSION_IDENTITY_REFERENCE_CONFLICT")
+            elif same_order and type(payload.get("permanent_id")) is int and payload["permanent_id"] > 0:
+                unreferenced.add(str(payload["permanent_id"]))
+            continue
+        if not same_order:
+            reasons.add("SUBMISSION_IDENTITY_ORDER_CONFLICT")
+            continue
+        try:
+            multiplier = Decimal(payload["multiplier"])
+            contract_matches = (type(payload.get("con_id")) is int and payload["con_id"] == request.con_id
+                                and payload.get("security_type") == request.security_type
+                                and payload.get("currency") == request.currency
+                                and payload.get("side") == ("BOT" if request.side == "buy" else "SLD")
+                                and multiplier.is_finite() and multiplier == request.multiplier)
+        except (KeyError, TypeError, ValueError, ArithmeticError):
+            contract_matches = False
+        if not contract_matches:
+            reasons.add("SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED")
+            continue
+        permanent = payload.get("permanent_id")
+        if type(permanent) is not int or not 0 < permanent <= 2**63 - 1:
+            reasons.add("SUBMISSION_IDENTITY_PERMANENT_ID_UNAVAILABLE")
+            continue
+        candidates.add(str(permanent))
+    if len(candidates) > 1 or (candidates and unreferenced - candidates):
+        reasons.add("SUBMISSION_IDENTITY_PERMANENT_ID_CONFLICT")
+    return candidates, reasons, digest(sorted(evidence))
 
 
 def _view(intent):
@@ -402,6 +466,7 @@ class BrokerSubmissionJournal:
                 intent.state = "handoff_started"
                 self._append(session, intent, "handoff", "handoff_started",
                              {"attempt_id": intent.attempt_id, "request_sha256": intent.request_sha256,
+                              "order_ref_sha256": hash_order_reference(_attempt_reference(intent.attempt_id)),
                               "timeout_seconds": timeout_seconds})
                 attempt = intent.attempt_id
             # Commit before final scope check and handoff. A lost process here
@@ -414,7 +479,8 @@ class BrokerSubmissionJournal:
             args = dict(user_id=user_id, account_id=account_id, intent_id=intent_id, attempt_id=attempt)
 
             async def invoke():
-                return await transport.submit(request, intent_id=intent_id, attempt_id=attempt)
+                return await transport.submit(request, intent_id=intent_id, attempt_id=attempt,
+                                              order_ref=_attempt_reference(attempt))
 
             task = asyncio.create_task(invoke())
             self._track(task, token)
@@ -460,11 +526,126 @@ class BrokerSubmissionJournal:
                              {"reason_code": "HANDOFF_RECOVERY_UNCERTAIN", "attempt_id": intent.attempt_id})
             return _view(intent)
 
+    async def _review_identity(self, session, intent, request, *, start=False):
+        """Under the account/intent locks, correlate retained executions only.
+
+        No status cache, supplied identity claim, broker call or negative-history
+        inference is accepted. A later contradiction invalidates correlation and
+        leaves an append-only sticky conflict. Previously linked raw facts stay.
+        """
+        events = (await session.scalars(select(BrokerSubmissionEvent).where(
+            BrokerSubmissionEvent.intent_id == intent.id,
+            BrokerSubmissionEvent.event_key.in_(("identity-review", "identity-correlated", "identity-conflict")),
+        ))).all()
+        if not start and not events:
+            return None
+        if intent.attempt_id is None or (not events and intent.state not in {"handoff_started", "uncertain"}):
+            raise PolicyDenied("SUBMISSION_UNCERTAIN_ATTEMPT_REQUIRED")
+        reference_hash = hash_order_reference(_attempt_reference(intent.attempt_id))
+        if not events:
+            self._append(session, intent, "identity-review", "identity_review_started",
+                         {"attempt_id": intent.attempt_id, "order_ref_sha256": reference_hash})
+        reasons = set()
+        handoff = await session.scalar(select(BrokerSubmissionEvent).where(
+            BrokerSubmissionEvent.intent_id == intent.id, BrokerSubmissionEvent.event_key == "handoff",
+        ))
+        if (handoff is None or digest(handoff.payload) != handoff.payload_sha256
+                or handoff.payload.get("attempt_id") != intent.attempt_id
+                or handoff.payload.get("request_sha256") != intent.request_sha256
+                or handoff.payload.get("order_ref_sha256") != reference_hash):
+            reasons.add("SUBMISSION_IDENTITY_ATTEMPT_PROOF_INVALID")
+        sticky = next((event for event in events if event.event_key == "identity-conflict"), None)
+        for event in events:
+            if (digest(event.payload) != event.payload_sha256
+                    or event.payload.get("attempt_id") != intent.attempt_id
+                    or event.payload.get("order_ref_sha256") != reference_hash):
+                reasons.add("SUBMISSION_IDENTITY_EVIDENCE_INVALID")
+        if sticky:
+            reasons.update(sticky.payload.get("reason_codes", []))
+            reasons.add("SUBMISSION_IDENTITY_STICKY_CONFLICT")
+        payload = BrokerObservation.payload
+        matches = [payload["order_ref_sha256"].as_string() == reference_hash,
+                   and_(payload["client_id"].as_string() == str(request.client_id),
+                        payload["order_id"].as_string() == str(request.order_id))]
+        if intent.permanent_id is not None:
+            matches.append(payload["permanent_id"].as_string() == intent.permanent_id)
+        filters = (BrokerObservation.user_id == intent.user_id, BrokerObservation.account_id == intent.account_id,
+                   BrokerObservation.account_binding == intent.account_binding, BrokerObservation.kind == "execution",
+                   or_(*matches))
+        metadata = (await session.execute(select(
+            BrokerObservation.id, func.octet_length(cast(payload, Text)),
+        ).where(*filters).order_by(BrokerObservation.recorded_at, BrokerObservation.id)
+            .limit(MAX_OBSERVATIONS + 1))).all()
+        chosen, size = [], 0
+        for identity, count in metadata[:MAX_OBSERVATIONS]:
+            if size + count > READ_PAYLOAD_BUDGET:
+                break
+            chosen.append(identity)
+            size += count
+        if len(chosen) != len(metadata):
+            reasons.add("SUBMISSION_IDENTITY_EVIDENCE_TRUNCATED")
+        rows = (await session.scalars(select(BrokerObservation).where(
+            *filters, BrokerObservation.id.in_(chosen),
+        ))).all() if chosen else []
+        candidates, contradictions, evidence_hash = _identity_candidates(
+            request, reference_hash, rows, bound_permanent=intent.permanent_id,
+        )
+        reasons.update(contradictions)
+        if intent.permanent_id is not None and candidates and candidates != {intent.permanent_id}:
+            reasons.add("SUBMISSION_IDENTITY_PERMANENT_ID_CONFLICT")
+        if len(candidates) == 1 and not reasons:
+            permanent, = candidates
+            collision = await session.scalar(select(BrokerSubmissionIntent.id).where(
+                BrokerSubmissionIntent.account_id == intent.account_id,
+                BrokerSubmissionIntent.account_binding == intent.account_binding,
+                BrokerSubmissionIntent.permanent_id == permanent, BrokerSubmissionIntent.id != intent.id,
+            ))
+            if collision:
+                reasons.add("SUBMISSION_IDENTITY_PERMANENT_ID_RESERVED")
+        intent.state = "uncertain"
+        if reasons:
+            intent.permanent_id = None
+            if sticky is None:
+                self._append(session, intent, "identity-conflict", "identity_conflict",
+                             {"attempt_id": intent.attempt_id, "order_ref_sha256": reference_hash,
+                              "reason_codes": sorted(reasons), "evidence_sha256": evidence_hash})
+            status = "sticky_unresolved"
+        elif len(candidates) == 1:
+            intent.permanent_id, = candidates
+            if not any(event.event_key == "identity-correlated" for event in events):
+                self._append(session, intent, "identity-correlated", "identity_correlated",
+                             {"attempt_id": intent.attempt_id, "order_ref_sha256": reference_hash,
+                              "permanent_id": intent.permanent_id, "evidence_sha256": evidence_hash})
+            status = "correlated_evidence_only"
+        else:
+            intent.permanent_id = None
+            status = "unresolved"
+            reasons.add("SUBMISSION_IDENTITY_REFERENCE_NOT_OBSERVED")
+        return {"status": status, "permanent_id": intent.permanent_id, "reason_codes": sorted(reasons),
+                "evidence_sha256": evidence_hash, "observations_reviewed": len(rows), "payload_bytes": size,
+                "scope": "retained_execution_correlation_not_authentication_or_ownership",
+                "complete_reconciliation": False, "retry_allowed": False, "execution_authority": "none"}
+
+    async def resolve_identity(self, *, user_id, account_id, intent_id):
+        """Offline evidence resolution after lost acknowledgement; never resends."""
+        await self._fixture()
+        async with self.sessions.begin() as session:
+            intent, request = await self._load(session, user_id=user_id, account_id=account_id,
+                                               intent_id=intent_id, dispatch=False)
+            identity = await self._review_identity(session, intent, request, start=True)
+            return dict(_view(intent), identity_review=identity)
+
     async def attach_observation(self, *, user_id, account_id, intent_id, observation_id):
         await self._fixture()
         async with self.sessions.begin() as session:
             intent, request = await self._load(session, user_id=user_id, account_id=account_id,
                                                intent_id=intent_id, dispatch=False)
+            identity = await self._review_identity(session, intent, request)
+            if identity is not None and identity["status"] != "correlated_evidence_only":
+                # Return after commit so a discovered sticky conflict survives.
+                # This is a refused evidence link, never transport authority.
+                return dict(_view(intent), blocked=True, reason_code="SUBMISSION_IDENTITY_UNRESOLVED",
+                            identity_review=identity)
             size = await session.scalar(select(func.octet_length(cast(BrokerObservation.payload, Text))).where(
                 BrokerObservation.id == _id(observation_id), BrokerObservation.user_id == user_id,
                 BrokerObservation.account_id == account_id, BrokerObservation.account_binding == intent.account_binding,
@@ -509,6 +690,7 @@ class BrokerSubmissionJournal:
         async with self.sessions.begin() as session:
             intent, request = await self._load(session, user_id=user_id, account_id=account_id,
                                           intent_id=intent_id, dispatch=False)
+            identity = await self._review_identity(session, intent, request)
             filters = (
                 BrokerSubmissionEvent.intent_id == intent.id, BrokerObservation.user_id == user_id,
                 BrokerObservation.account_id == account_id, BrokerObservation.account_binding == intent.account_binding,
@@ -519,10 +701,10 @@ class BrokerSubmissionJournal:
                 .where(*filters).order_by(BrokerObservation.recorded_at, BrokerObservation.id)
                 .limit(MAX_OBSERVATIONS + 1))).all()
             chosen, size = [], 0
-            for identity, count in metadata[:MAX_OBSERVATIONS]:
+            for observation_id, count in metadata[:MAX_OBSERVATIONS]:
                 if size + count > READ_PAYLOAD_BUDGET:
                     break
-                chosen.append(identity)
+                chosen.append(observation_id)
                 size += count
             rows = (await session.scalars(select(BrokerObservation).where(
                 BrokerObservation.id.in_(chosen), BrokerObservation.user_id == user_id,
@@ -535,8 +717,11 @@ class BrokerSubmissionJournal:
             comparison = _compare_request(request, observations, review)
             review["request_comparison"] = comparison
             review["reason_codes"] = sorted(set(review["reason_codes"]) | set(comparison["reason_codes"]))
+            if identity is not None:
+                review["reason_codes"] = sorted(set(review["reason_codes"]) | set(identity["reason_codes"]))
             if review["reason_codes"]:
                 review["status"] = "needs_review"
             review["evidence_sha256"] = digest(review)
             return dict(_view(intent), review=review, linked_observations=len(rows), payload_bytes=size,
+                        identity_review=identity,
                         strategy_order_ownership="not_established", current_broker_state="not_established")
