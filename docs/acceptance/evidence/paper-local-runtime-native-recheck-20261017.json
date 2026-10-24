@@ -1,0 +1,35 @@
+{
+  "status": "EXISTING_PRIVATE_APP_RUNNING_VERIFIED_NATIVE_CONTEXT",
+  "verified_at": "2026-10-16T23:38:15.500136+00:00",
+  "app_pid": 75642,
+  "app_start_ticks": 1501712,
+  "postgres_pid": 41103,
+  "postgres_start_ticks": 895671,
+  "exact_owned_process_metadata_verified": true,
+  "pg_ctl_status_exit": 0,
+  "tls_verification": "Reviewed certificate; normal validation, no override",
+  "http": {
+    "ready": 200,
+    "signup": 200,
+    "anonymous_auth_me": 401
+  },
+  "database_and_model_ready": true,
+  "operator_registration": "User confirms app opened after own registration; no credential content requested",
+  "sandbox_limit": "Restricted /proc, sockets and pg_ctl visibility did not prove native process absence. Earlier stopped-service/PID-reuse interpretation withdrawn.",
+  "resume_attempts": [
+    {
+      "helper": "v2",
+      "result": "REFUSED_BEFORE_SERVICE_MUTATION: recorded process present"
+    },
+    {
+      "helper": "v3",
+      "result": "REFUSED_BEFORE_SERVICE_MUTATION: exact owned live process found"
+    }
+  ],
+  "restarted": false,
+  "database_initialized_or_migrated": false,
+  "keys_replaced": false,
+  "broker_connection_attempted": false,
+  "orders_attempted": false,
+  "live_enabled": false
+}

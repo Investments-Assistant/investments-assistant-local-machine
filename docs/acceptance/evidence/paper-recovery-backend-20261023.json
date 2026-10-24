@@ -1,0 +1,133 @@
+{
+  "status": "BACKEND_DISTINCT_CASES_PASS_WITH_RETAINED_CLOCK_RETRY",
+  "at": "2026-10-23T15:45:05.797714+00:00",
+  "base_commit": "a2b2f42da7610dd4b4feadafd4fce13d9acc78bc",
+  "source_fingerprint": "13aa112ff9960830e715dc80e7df76a206842d681f1c04ace3ca57892d94f7a5",
+  "tests_fingerprint": "12dbb43ee20b58f7d8bb938e26f8e278611a880d4db6c956f60faa9036d1a62c",
+  "file_sha256": {
+    "src/execution/broker_submission.py": "db7543fe0cdff01b4fe186eb0a1d803a26a48a7a45849142386f8f8920accf9a",
+    "src/execution/broker_observations.py": "f4985f68e6003a16ff9080f3aabde2ffa986943c2d2c1ff86bcdda491174410b",
+    "src/tools/brokers/ibkr_observations.py": "a357b0d4d5aacfadfbb9600a8e1f7d8011ee2ff9fb77c525d549fbd8cf5f6708",
+    "tests/unit/broker_submission_test.py": "5bd961d0d763df3d41a3b1da662fa4386bf03dc0b573c2db54c1289f64a638dd",
+    "tests/unit/ibkr_observations_test.py": "0e25b4e404d3ba9b0ddaebecde0c8d61e7c2ab38db3685b1b764f69656db139e",
+    "tests/integration/broker_submission_journal_test.py": "851f72cdb2ea196838cbf2d6fac95e0b68f7b058e1f08750140346a986a6f8f5"
+  },
+  "unit": {
+    "tests": 920,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+  "full_postgresql_run": {
+    "tests": 459,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "exit_code": 1,
+    "clean_full_tier_pass": false
+  },
+  "affected_retry": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "case": [
+      "tests.integration.soak_guard_test",
+      "test_soak_cli_exit_matches_observed_acceptance[5-SMOKE_PASS-0]"
+    ],
+    "seconds": "13.867"
+  },
+  "distinct_postgresql_cases_with_passing_execution": 459,
+  "distinct_backend_cases_with_passing_execution": 1379,
+  "focused_cases_overlap_not_additional": 172,
+  "source_and_tests_unchanged_through_full_tiers": true,
+  "failure_disposition": "Unchanged short soak-CLI test rejected CLOCK_DISCONTINUITY; original failure kept, exactly one test retried without code/clock/OS changes and passed. Not a clean single full PostgreSQL tier. No long soak or hardware validation.",
+  "public_junits": [
+    {
+      "path": "docs/acceptance/evidence/paper-recovery-backend-20261023-unit.xml",
+      "sha256": "e5462470e8351d3f425aabd0e69cbd45c296e2b37741a9bd70f8b307934c6b40"
+    },
+    {
+      "path": "docs/acceptance/evidence/paper-recovery-backend-20261023-integration.xml",
+      "sha256": "e17cb3b8e67b0ab25d66c607ef37d8af28cb28bb50c8852ee442c0e15978cf5d"
+    },
+    {
+      "path": "docs/acceptance/evidence/paper-recovery-backend-20261023-clock-case-retry-once.xml",
+      "sha256": "11ac85ad1b35bf872b3e7834caae3b7dad75efcd809c34c5419bcebc7f224a71"
+    }
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/plan-backend-validation.json",
+      "sha256": "4781ba12c10cbe6939d8fe37424fee8bed9f18bbcdc8de8bd2da71d762ddea95"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/frozen-review.json",
+      "sha256": "ca3c25a90676836c2a94f1337944f3c767626586a4a37c1de4b1eb9d0a25bb1b"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/unit-execution.json",
+      "sha256": "acbd9d3d43293fdf578899bd38f03b9f6d1e719a4c639bb0d55cb186138c9b85"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/unit-result.json",
+      "sha256": "03dc834301ea16c4ba36b7b26514e79ebcbcb06077d8e0b4c96e8d3f2ff68ee5"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/unit.log",
+      "sha256": "fc5945e850423815b584c63025ad070f772c65132e3b5fe4422eb68f4828a9d5"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/unit.xml",
+      "sha256": "e5462470e8351d3f425aabd0e69cbd45c296e2b37741a9bd70f8b307934c6b40"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/unit-coverage.xml",
+      "sha256": "7f29bba99348f2c795b7975d13d3d212b1bc2efd63194330efafca87a0692f04"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/integration-execution.json",
+      "sha256": "6e0a4f104e44c37f25a892ba69da23e29bb3fb6fde58d8b18bcc565fa2009b7f"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/integration-result.json",
+      "sha256": "1fe958d155dbcc3ec06e0abea5ede3c442e63f400864aabd1e37f6838a0d093e"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/integration.log",
+      "sha256": "b231b41a07edad783d3b27ce4ce8d68362511d618ad545cc244fa62d7b6ff2c1"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/integration.xml",
+      "sha256": "e17cb3b8e67b0ab25d66c607ef37d8af28cb28bb50c8852ee442c0e15978cf5d"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/integration-coverage.xml",
+      "sha256": "1096a8b88bebf87c8bc67373f9d26f1e2e5561e6f15b708cc39cec0c08db53e1"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/clock-case-retry-once-execution.json",
+      "sha256": "1d4b6cc5b9ea95e0fd29499ab5f6ef2a43780e185c10b4fbb568ea20ba9d433c"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/clock-case-retry-once-result.json",
+      "sha256": "48da4a0b46c1ad19646085a55c985608f64694468cf835466f98ed895fc4e087"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/clock-case-retry-once.log",
+      "sha256": "3f9f5d8809a887dce3d126be8480a4f28987d2fd02a63dd05a3a04e48654742f"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/clock-case-retry-once.xml",
+      "sha256": "11ac85ad1b35bf872b3e7834caae3b7dad75efcd809c34c5419bcebc7f224a71"
+    }
+  ],
+  "limits": [
+    "Synthetic and marked disposable local fixtures only, no actual broker/provider call or financial authority",
+    "Candidate image/build and publication/remoteCI still pending",
+    "No model/runtime/24h/thermal/clock repair performed; earlier a2b model/deployment evidence considered only for byte-unchanged surfaces",
+    "Second independent code review unavailable due usage limit; root source review and actual tests are recorded separately"
+  ]
+}

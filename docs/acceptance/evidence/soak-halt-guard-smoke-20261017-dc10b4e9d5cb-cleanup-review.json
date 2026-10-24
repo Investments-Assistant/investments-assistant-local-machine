@@ -1,0 +1,51 @@
+{
+  "status": "INDEPENDENT_NEW_SMOKE_CLUSTER_CLEANUP_VERIFIED",
+  "at": "2026-10-17T15:49:17.963194+00:00",
+  "run_id": "dc10b4e9d5cb",
+  "cleanup_exit_code": 0,
+  "owned_postgres_identity": {
+    "pid": 131320,
+    "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+    "pid_namespace": "pid:[4026532221]",
+    "start_ticks": 2418023,
+    "state": "S",
+    "command_sha256": "147b0c1c4a7dfa9c6bf36e3f0c5bfb06a42e123d989b52a08f870fbf3bcf0afe"
+  },
+  "owned_postgres_absent": true,
+  "postmaster_pid_absent": true,
+  "owned_pgdata_retained": true,
+  "raw_smoke_checkpoint_unchanged": true,
+  "exact_cleanup_helper_sha256": "955c2504b5145d35fbc6ef47b0a0a69498a9609470c1c0a879d2eec10c890ad3",
+  "guarded_database_marker_and_zero_clients_checked_by_helper": true,
+  "force_drop_used": false,
+  "old53a8_pg_and_operator_identities_unchanged": {
+    "119236": {
+      "pid": 119236,
+      "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+      "pid_namespace": "pid:[4026532221]",
+      "start_ticks": 2221876,
+      "state": "S",
+      "command_sha256": "3e78c191649ac656e92013009ab2c82133f272519f41b18d412c6b9fc56671db"
+    },
+    "18796": {
+      "pid": 18796,
+      "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+      "pid_namespace": "pid:[4026532221]",
+      "start_ticks": 285583,
+      "state": "S",
+      "command_sha256": "b123ded4b507303464f6b85c34f5b32def7f8539133d43c0733ba92bc59826bb"
+    },
+    "19934": {
+      "pid": 19934,
+      "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+      "pid_namespace": "pid:[4026532221]",
+      "start_ticks": 300403,
+      "state": "S",
+      "command_sha256": "84f4ac0f32a6e2f8902d13884a69ff603a2a9828075516b0d7b3bd11ad1dd350"
+    }
+  },
+  "retention_review_sha256": "d8c05e13f2309aaa5189e9749a3383ca9e69b506f9dfa3062b27ce76226a0e64",
+  "cleanup_receipt_sha256": "26d2b5bf47e45c30e30bd0ca1058e4ecb22579015df77d06941fb63ec326c006",
+  "command_result_sha256": "645d9021f148181003354f869a1ec00e839dafc46f0f418f11d6b7c9d4ae0b10",
+  "observed_24h": false
+}

@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "run_id": "ia-runtime-afe3c6039aaf",
+  "image": "investment-assistant:journal-submission-20261023-922d5044b4b3",
+  "checks": [
+    "New isolated database and ownership marker verified",
+    "Built image explicitly upgrades empty disposable database",
+    "Existing GGUF copied only to new owned volume, checksum verified and mounted read-only in non-root app",
+    "Production application starts with migrated DB and actual local GGUF loaded",
+    "Persisted operator halt denies proposals after app and database restart",
+    "Application and database restart recover readiness and preserve marker/schema"
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "limitations": [
+    "No Nginx/LAN ingress, OS sleep or 24-hour observation",
+    "Readiness/model load, not a model answer-quality benchmark"
+  ],
+  "owned_names": {
+    "app": "ia-runtime-afe3c6039aaf-app",
+    "database": "ia-runtime-afe3c6039aaf-db",
+    "network": "ia-runtime-afe3c6039aaf",
+    "volume": "ia-runtime-afe3c6039aaf-data",
+    "model_volume": "ia-runtime-afe3c6039aaf-model-data",
+    "model_stage": "ia-runtime-afe3c6039aaf-model-stage"
+  },
+  "image_id": "sha256:191135d0771de329f6c158e8d23db7f6ca937254e1b784c1a0dce70196a951e1",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "model_mount_read_only": true,
+  "restart_seconds": {
+    "app": 5.215,
+    "database": 1.058
+  },
+  "restart_command_seconds": {
+    "app": 0.765,
+    "database": 0.631
+  },
+  "cleanup_verified": true,
+  "fixture_logs": ".qa/ia-runtime-afe3c6039aaf",
+  "candidate_head": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "source_fingerprint": "b46651e69925c7e56f6ebf4e43816cf781bfa3330f94eef29b03c5e3ac3f0765",
+  "candidate_review_patch_sha256": "6ba408644083ca1055a3c9a146889279fc8e550fa1a8004efe18015439217e4d",
+  "working_candidate_manifest_sha256": "6f8135f3e75703ec3d8fa4b10fcff11a4c417828e819580652c83bdd01d3ce33",
+  "provenance": "Unpublished exact16-file journal candidate atop published e154: source/test fingerprints and complete candidate file hashes include untracked additions. HEAD alone does not contain this candidate. Cached dependency layers permitted; no bit-reproducibility/cold-build claim.",
+  "harness_sha256": "7e52f7397403d4a2e82fce896defb694fe3bb4295d618a11c25f7643b52aefe1",
+  "wrapper_sha256": "cd60f8550011a08232f4f94171479c684ecc6176012977d1ccc577e12bd02192",
+  "exit_code": 0,
+  "source_unchanged": true,
+  "independent_cleanup_evidence": "docs/acceptance/evidence/journal-submission-image-runtime-20261023-922d5044b4b3-cleanup.json"
+}

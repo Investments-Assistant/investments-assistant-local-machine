@@ -1,0 +1,53 @@
+{
+  "status": "EXACT_APPROVED_PATCH_PUBLISHED_CURRENT_CI_AND_SONAR_PASS",
+  "at": "2026-10-23T15:46:39.698137+00:00",
+  "base_commit": "a2b2f42da7610dd4b4feadafd4fce13d9acc78bc",
+  "file_count": 6,
+  "candidate_sha256": {
+    "src/execution/broker_submission.py": "db7543fe0cdff01b4fe186eb0a1d803a26a48a7a45849142386f8f8920accf9a",
+    "src/execution/broker_observations.py": "f4985f68e6003a16ff9080f3aabde2ffa986943c2d2c1ff86bcdda491174410b",
+    "src/tools/brokers/ibkr_observations.py": "a357b0d4d5aacfadfbb9600a8e1f7d8011ee2ff9fb77c525d549fbd8cf5f6708",
+    "tests/unit/broker_submission_test.py": "5bd961d0d763df3d41a3b1da662fa4386bf03dc0b573c2db54c1289f64a638dd",
+    "tests/unit/ibkr_observations_test.py": "0e25b4e404d3ba9b0ddaebecde0c8d61e7c2ab38db3685b1b764f69656db139e",
+    "tests/integration/broker_submission_journal_test.py": "851f72cdb2ea196838cbf2d6fac95e0b68f7b058e1f08750140346a986a6f8f5"
+  },
+  "patch_path": "docs/acceptance/evidence/paper-recovery-publication-review-20261023.patch",
+  "patch_sha256": "b2da0209cb1792c0c1c8a9284c65ad12764f36c45a7caed9c850bc418b64e165",
+  "patch_bytes": 42709,
+  "source_fingerprint": "13aa112ff9960830e715dc80e7df76a206842d681f1c04ace3ca57892d94f7a5",
+  "tests_fingerprint": "12dbb43ee20b58f7d8bb938e26f8e278611a880d4db6c956f60faa9036d1a62c",
+  "problem": "A lost handoff acknowledgement left permanent broker identity unknown, preventing later execution association. Preserve a committed opaque reference hash and correlate strictly scoped retained executions without resending or granting authority.",
+  "validation": {
+    "ruff_ast_diff": "PASS",
+    "focused": 172,
+    "unit": 920,
+    "distinct_postgresql_with_passing_execution": 459,
+    "postgres_full_run": "458PASS/1CLOCK_DISCONTINUITY failure; affected single case passes once on retry, original failure retained",
+    "image": "PASS_BUILD_NETWORK_NONE_READ_ONLY_NONROOT_SMOKE_AND_184_COPIED_BYTES",
+    "remote_ci": "RUN39983987095_ALL_FOUR_JOBS_AND_EXACT_SCM_CONFIGURED_SONAR_PASSED",
+    "evidence": {
+      "paper-recovery-focused-20261023.json": "0d441b9d2d9599de1149b0308d2db3fb2f0f51f3b2eac5451074802d3dbd533d",
+      "paper-recovery-backend-20261023.json": "13d110ba6fe3c46195fd7bd6c8bb4b1e16d1736860476d7d16f6bbbf5a4159c9",
+      "paper-recovery-owned-cleanup-20261023.json": "2fb29e90b38b02a762241a59bfb63f12f105c87837aa652ded90ceb0d564b3e3",
+      "paper-recovery-image-review-20261023.json": "97519158b6dbf242cde54e4aad3a9ea76065bbcd29efff294dc0499fed1ab29b",
+      "paper-recovery-ci-20261023.json": "71ac04b82e2a5cdbffa8c66a62d7b2010f1d8b30fe5eb7ab3c47438f2112a2ac"
+    },
+    "image_id": "sha256:5631759f00daf16f457cb8d844a9ff2f56c9c22f4206e0f61ec1be1d20856dd4",
+    "reuse_scope": "Prior a2b actualmodel/startup/restart evidence only for184unchanged deployment inputs; no new runtime execution claimed",
+    "postgres_clock_failure_scope": "Historical local run458pass/1CLOCK_DISCONTINUITY thenaffectedcasepassesretry; new exact-CI fullPG459/459 and combined1383 pass cleanly, original localfailure retained"
+  },
+  "image_preparation": ".qa/order-reference-image-20261023-795c0c77a61e/preparation-ready-r2.json",
+  "git_index_empty": true,
+  "reverse_apply_check": "PASS",
+  "publication_approval": "APPROVED exactb2da sixfilepatch by owner; committed/pushed d5aa99ec1f2a67e62c929d9bc2dcb1a616af453b",
+  "limits": [
+    "No migration/dependency/config/UI changes in six-file bundle",
+    "No runtime SDK transport or actual connection/order/cancel/provider reads; existing unconditional guards remain closed",
+    "Correlation leaves uncertain/noresend/noownership/noauthority; reference is user-customizable evidence not authentication",
+    "Paper/research OPEN and hardware checks deferred to unknown actual deployment host"
+  ],
+  "image_validation_at": "2026-10-23T16:00:25.483387+00:00",
+  "proposed_commit_subject": "Correlate uncertain offline handoffs with retained execution references",
+  "published_commit": "d5aa99ec1f2a67e62c929d9bc2dcb1a616af453b",
+  "publication_evidence": "docs/acceptance/evidence/paper-recovery-publication-20261023.json"
+}

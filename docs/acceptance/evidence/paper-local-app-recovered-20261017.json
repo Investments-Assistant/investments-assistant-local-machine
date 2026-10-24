@@ -1,0 +1,25 @@
+{
+  "Status": "WINDOWS_NORMAL_HTTPS_VERIFIED",
+  "CustomTLSValidation": false,
+  "Results": [
+    {
+      "Path": "/api/ready",
+      "HttpStatus": 200,
+      "DatabaseReady": true,
+      "ModelReady": true
+    },
+    {
+      "Path": "/signup",
+      "HttpStatus": 200
+    },
+    {
+      "Path": "/api/auth/me",
+      "HttpStatus": 401
+    }
+  ],
+  "verified_at": "2026-10-17T09:51:05.308152+00:00",
+  "native_application_receipt": ".local-private/paper-validation-20261016-7b59cc1e8fd2/application-resume-v1-20261017T095027495504Z.json",
+  "same_existing_account_database_and_keys": true,
+  "broker_retry_performed": false,
+  "read_consent_disable": "PENDING_USER_UI_ACTION"
+}

@@ -1,0 +1,19 @@
+{
+  "verified_at": "2026-10-18T22:18:02.512551+00:00",
+  "status": "PASS_HANDOFF_CHECKS_NO_24H_CREDIT",
+  "head": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "observer_receipt_sha256": "3b33c92ee3a7a9e91e2c5cd11f9f1cb872aee703ed8f96da98abd962c7bcad40",
+  "linked_observer_artifacts_verified": 13,
+  "unique_source_and_candidate_inputs_verified": 160,
+  "original_running_plan_and_auditor_unchanged": true,
+  "source_test_paths_clean": true,
+  "index_empty": true,
+  "diff_whitespace": "PASS",
+  "local_document_links_checked": 183,
+  "missing_links": [],
+  "fixed_rubric_weights_total": 100,
+  "fixed_earned_points": 89.875,
+  "progress_display_percent": 90,
+  "acceptance_credit_added": false,
+  "goal_state_changed": false
+}

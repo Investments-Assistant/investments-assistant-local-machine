@@ -1,0 +1,205 @@
+{
+  "prepared_at": "2026-10-20T11:29:46.466369+00:00",
+  "status": "PREPARED_NATIVE_PREFLIGHT_PASS_NOT_INITIALIZED_NOT_LAUNCHED",
+  "run_id": "078d596f2f79",
+  "work": ".qa/soak-cash-20261020-078d596f2f79",
+  "head": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "source_fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "publication_status": "ALREADY_PUBLISHED_EXACT_E154_SOURCE_CI_IMAGE_BYTES_VERIFIED",
+  "approved_applied_seven_file_patch_sha256": "cfd2612f17d4cf7c41c507fdf0e1178c3b579e132095509b72cc28f3a58871b2",
+  "historical_patch_base_commit": "a4fccdea0c62179eda12a9fad089b74cb1c925b2",
+  "historical_base_is_not_current_head": true,
+  "source_inputs": 156,
+  "applied_publication_files": 7,
+  "unique_current_and_committed_input_paths_verified": 160,
+  "source_input_manifest_sha256": "ccc5bcb0e6067df2ed23a84b97cc74b6e55de15bc557e905e7448ecf50c97e2c",
+  "existing_acceptance_proof_sha256": {
+    "docs/acceptance/evidence/cash-halt-ci-20261018.json": "da803f7eb0f779fe740efa766f00829ca7da6043a3b79a7b4469341f07ebc1d8",
+    "docs/acceptance/evidence/cash-halt-published-bytes-reconciliation-20261018.json": "56fa275b5bb7caa683c3dbdef8e2d221b46b596d6505a2bb10614941107cb7a9",
+    "docs/acceptance/evidence/cash-collector-image-review-20261018-5d8b5cb04c1b.json": "14814ae28503e2cc86e84f1fc1a007191b3bb51f3a062e00518ecdde63b93eb1"
+  },
+  "helper_sha256": {
+    "launch.py": "7e5460aa56e25ddcbe78fcf43c77a3e08f7da8c28bea60b10eda383f4fce41de",
+    "audit_terminal.py": "ba7b4a14b1d008c6a5a6234b07255a9fecc48c16ffe7f779c3e9a548bc1fea07",
+    "process_identity.py": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7",
+    "sitecustomize.py": "4b941a89e907a4a11ea18af9740777642cc1c7b3d92a4272a6573ae94a7245c3",
+    "source-input-manifest.json": "ccc5bcb0e6067df2ed23a84b97cc74b6e55de15bc557e905e7448ecf50c97e2c",
+    "terminal_observer.py": "9709115bbd1f9cea32ef534453228e2880724a68cbd826bfcb69ca1306cc7403",
+    "launch_observer.py": "842e8dbda82496eea0294f832dfe77132851830397036a0995e23dca284d0080",
+    "observer-plan.json": "e2ab65d699e8e0bb713fe568f08697eeaaf58f55efe07d1a55f1b402da2aa9d3",
+    "preflight_once.py": "8f6e8561b909b40c896057e1881f540650bc49c6b24a83516603c5a290e3f7f9"
+  },
+  "plan_sha256": "e938bdb0cbf06e919b8691668a1c42cdf4799b8ef315cc99a6d04e0af2524f6a",
+  "root_review_pins_sha256": "68500053b9ba1bb56a9a6a0facf96df58b9189c5cd26311849a441235bb3a5d2",
+  "old_baseline_sha256_verified_unchanged": {
+    "launch.py": "cb13c7fb96dbf823ae568d65d7e52bd868d1f04ba72e4e8e54bd0acd6d2c34bf",
+    "audit_terminal.py": "edff62ee6e46df6f8cce304e0afd05bf276abec3649f9d762d0af4b03fcd7e03",
+    "sitecustomize.py": "4b941a89e907a4a11ea18af9740777642cc1c7b3d92a4272a6573ae94a7245c3",
+    "process_identity.py": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7",
+    "source-input-manifest.json": "02361ea2492a487ac985fe208fd85a7f35997a01e536360b44ac88454108241c"
+  },
+  "native_context": {
+    "boot_id": "34114b44-668d-4ba2-9480-91423bb4df0f",
+    "pid_namespace": "pid:[4026532221]",
+    "mount_namespace": "mnt:[4026532219]"
+  },
+  "preflight": {
+    "status": "ALL_READ_ONLY_PREPARATION_CHECKS_PASS",
+    "outer_exec_session": 99124,
+    "outer_exit_code": 0,
+    "phases": [
+      {
+        "phase": "launch-preflight",
+        "at": "2026-10-20T11:28:23.864814+00:00",
+        "exit_code": 0,
+        "expected_exit": 0,
+        "output_sha256": "f36dad52c87f9e5f8d63486673f1e39a2408abbfe6cdd8fc14bc84c9eb26cd66"
+      },
+      {
+        "phase": "observer-preflight",
+        "at": "2026-10-20T11:28:24.144537+00:00",
+        "exit_code": 2,
+        "expected_exit": 2,
+        "output_sha256": "50f190e959905927c176e44c6b0beada90acae4eda8210dd0ccf87e1528cea40"
+      },
+      {
+        "phase": "terminal-preflight",
+        "at": "2026-10-20T11:28:24.425224+00:00",
+        "exit_code": 2,
+        "expected_exit": 2,
+        "output_sha256": "6d9db9b061ab49e2fabcf845a895c41a12aa1a1c5a9d48c205230930ea915b50"
+      }
+    ],
+    "no_visible_running_soak": true,
+    "unreadable_native_cmdlines": 0,
+    "process_scan_scope": "Readable native cmdlines only; protected processes are not claimed absent",
+    "memory_available_kib": 27359040,
+    "postgres_versions": {
+      "initdb": "initdb (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+      "pg_ctl": "pg_ctl (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+      "postgres": "postgres (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)"
+    }
+  },
+  "fresh_fixture": {
+    "database": "test_soak_cash_078d596f2f79",
+    "socket": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/s-078d596f",
+    "namespace_port": 55456,
+    "tcp_listener_absent": true,
+    "unix_socket_absent": true,
+    "cluster_initialized": false,
+    "runner_launched": false,
+    "observer_launched": false,
+    "old_cluster_reused": false
+  },
+  "resource_budgets": {
+    "target_hours": 24,
+    "sample_interval_seconds": 30,
+    "restart_every_seconds": 900,
+    "model_cpu_threads": 4,
+    "model_gpu_layers": 0,
+    "model_context": 4096,
+    "minimum_available_memory_gib": 4,
+    "model_timeout_seconds": 180,
+    "service_startup_budget_seconds": 15,
+    "restart_strict_budget_seconds": 15,
+    "halt_p95_strict_budget_ms": 250,
+    "observation_gap_budget_seconds": 60,
+    "clock_divergence_budget_seconds": 0.25
+  },
+  "terminal_gates": "Original raw samples, continuous86400seconds, one window/no failures, strict haltp95<250ms, maxrestart<15s,24CPU4model runs/72independentlyparsed tasks, raw/log/checkpoint agreement; independent raw/performance/model gate code byte-identical to edff62 baseline.",
+  "terminal_guard": "Exact new boot/PID+mount context; missing/RUNNING/stale state cannot pass. Exact published e154 HEAD at launch and audit; any different HEAD refused pending NEW explicit reconciliation. No rebinding of old window artifacts.",
+  "companion": "Prepared only. Validates this new RUNNING_VERIFIED receipt then freezes exact new runner/PG identities+receipt/plan hashes; guarded pidfd ONE finite wait remainingduration+900s(max87300), one immutable auditor(max300s), no signals/restarts/retry/cleanup.",
+  "clean_parent_environment": {
+    "PATH": "/usr/bin:/bin",
+    "LANG": "C.UTF-8",
+    "NEWS_SOURCES": "none",
+    "PYTHONPATH": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-cash-20261020-078d596f2f79:/home/lulu/investments-assistant/investments-assistant-local-machine",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "LD_LIBRARY_PATH": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/postgres-root/usr/lib/x86_64-linux-gnu",
+    "PGPASSFILE": "/dev/null",
+    "PGSERVICEFILE": "/dev/null",
+    "NEWS_SOURCE_POLICIES": "{}",
+    "NEWS_SERVICE_USER_ID": "",
+    "NEWSLETTER_OWNER_USER_ID": "",
+    "NEWSLETTER_EMAIL_USER": "",
+    "NEWSLETTER_EMAIL_PASSWORD": "",
+    "LIVE_TRADING_ENABLED": "false",
+    "IBKR_ENABLED": "false",
+    "BANK_SYNC_ENABLED": "false",
+    "MCP_ENABLED": "false",
+    "AUTONOMOUS_SCANS_ENABLED": "false",
+    "NEWS_API_ADAPTERS_ENABLED": "false",
+    "YAHOO_MARKET_DATA_ENABLED": "false",
+    "YAHOO_HISTORICAL_DATA_ENABLED": "false"
+  },
+  "reviewable_diffs": [
+    ".qa/soak-cash-20261020-078d596f2f79/launch.py.review.diff",
+    ".qa/soak-cash-20261020-078d596f2f79/audit_terminal.py.review.diff",
+    ".qa/soak-cash-20261020-078d596f2f79/terminal_observer.py.review.diff",
+    ".qa/soak-cash-20261020-078d596f2f79/launch_observer.py.review.diff"
+  ],
+  "future_argv_after_root_review": {
+    "launch": [
+      "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+      "-B",
+      "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-cash-20261020-078d596f2f79/launch.py",
+      "--launch-reviewed"
+    ],
+    "companion_after_new_launch_verified": [
+      "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+      "-B",
+      "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-cash-20261020-078d596f2f79/launch_observer.py",
+      "--launch-reviewed"
+    ],
+    "read_only_launcher_preflight": [
+      "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+      "-B",
+      "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-cash-20261020-078d596f2f79/launch.py",
+      "--preflight"
+    ]
+  },
+  "initialized_or_running_processes_created": false,
+  "source_model_git_or_configuration_changed": false,
+  "operator_private_files_read_or_changed": false,
+  "broker_or_provider_connections": 0,
+  "external_orders": 0,
+  "observed_24h": false,
+  "acceptance_credit_added": false,
+  "limitations": [
+    "Preparation only; root must review final hashes and authorize infrastructure separately.",
+    "No operator app recovery/refresh or owner attestation implied.",
+    "No broker read/relay/order/provider/OS/software download/setup permission implied.",
+    "Previous interrupted window remains retained separately and receives no24hcredit.",
+    "Existing CI/image/test evidence reused for unchanged exact bytes; no new suite/build/runtime/thermal/economic acceptance claim."
+  ],
+  "artifact_sha256": {
+    ".qa/soak-cash-20261020-078d596f2f79/audit_terminal.py": "ba7b4a14b1d008c6a5a6234b07255a9fecc48c16ffe7f779c3e9a548bc1fea07",
+    ".qa/soak-cash-20261020-078d596f2f79/audit_terminal.py.review.diff": "17f8256842deb95b8329768166a352950522392265af7d940d8f7b2d4bee1536",
+    ".qa/soak-cash-20261020-078d596f2f79/launch-preflight-execution.json": "011f8e917f2ee380e61f789ee39945ba5b4b9b3fbfeffa5563c26b8269049b1f",
+    ".qa/soak-cash-20261020-078d596f2f79/launch-preflight-result.json": "44a9bb527ce9bccc482c69199947cf1750987cc0026ac099ed70981f52b80b20",
+    ".qa/soak-cash-20261020-078d596f2f79/launch-preflight.log": "f36dad52c87f9e5f8d63486673f1e39a2408abbfe6cdd8fc14bc84c9eb26cd66",
+    ".qa/soak-cash-20261020-078d596f2f79/launch.py": "7e5460aa56e25ddcbe78fcf43c77a3e08f7da8c28bea60b10eda383f4fce41de",
+    ".qa/soak-cash-20261020-078d596f2f79/launch.py.review.diff": "793ae440242701d093e40cf6d5fee0763fa9aacab3cee0aced0e1b1cd6f5d198",
+    ".qa/soak-cash-20261020-078d596f2f79/launch_observer.py": "842e8dbda82496eea0294f832dfe77132851830397036a0995e23dca284d0080",
+    ".qa/soak-cash-20261020-078d596f2f79/launch_observer.py.review.diff": "2b053c54fa21f2dabe6d558f680d29d8a379e4f1fe0ac5716cc4fa85c0b12a24",
+    ".qa/soak-cash-20261020-078d596f2f79/observer-plan.json": "e2ab65d699e8e0bb713fe568f08697eeaaf58f55efe07d1a55f1b402da2aa9d3",
+    ".qa/soak-cash-20261020-078d596f2f79/observer-preflight-execution.json": "9113a167963b98c5f2a14ba9ff441212fb1617c85f5cc6b4ae0920afd138b304",
+    ".qa/soak-cash-20261020-078d596f2f79/observer-preflight-result.json": "f2b88f988ee552466115dc8bbf983763678478b65f94e11868115ce6252e40d3",
+    ".qa/soak-cash-20261020-078d596f2f79/observer-preflight.log": "50f190e959905927c176e44c6b0beada90acae4eda8210dd0ccf87e1528cea40",
+    ".qa/soak-cash-20261020-078d596f2f79/plan.json": "e938bdb0cbf06e919b8691668a1c42cdf4799b8ef315cc99a6d04e0af2524f6a",
+    ".qa/soak-cash-20261020-078d596f2f79/preflight-claim.json": "33f0d85397edf97b5c1ca4da01c9f58ba5ce6f17b8e8f20f11e84013fda32083",
+    ".qa/soak-cash-20261020-078d596f2f79/preflight-result.json": "10684c8690646b6e02e7cc781e35114915013b2661d2ed140256ba457877c7ac",
+    ".qa/soak-cash-20261020-078d596f2f79/preflight_once.py": "8f6e8561b909b40c896057e1881f540650bc49c6b24a83516603c5a290e3f7f9",
+    ".qa/soak-cash-20261020-078d596f2f79/preparation-initial.json": "6f42a0aa47fbc99a2a430e9968b9753eb15892816dc159a3ce59f553f3e8739f",
+    ".qa/soak-cash-20261020-078d596f2f79/process_identity.py": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7",
+    ".qa/soak-cash-20261020-078d596f2f79/root-review-pins.json": "68500053b9ba1bb56a9a6a0facf96df58b9189c5cd26311849a441235bb3a5d2",
+    ".qa/soak-cash-20261020-078d596f2f79/sitecustomize.py": "4b941a89e907a4a11ea18af9740777642cc1c7b3d92a4272a6573ae94a7245c3",
+    ".qa/soak-cash-20261020-078d596f2f79/source-input-manifest.json": "ccc5bcb0e6067df2ed23a84b97cc74b6e55de15bc557e905e7448ecf50c97e2c",
+    ".qa/soak-cash-20261020-078d596f2f79/terminal-preflight-execution.json": "acb7395e1133f670f540c7b6b67965d5ce8eaa5c1784b8d057886e76483dbc0d",
+    ".qa/soak-cash-20261020-078d596f2f79/terminal-preflight-result.json": "702898e146d0a65ee0e3739c76d0b56b4d4c1b43a79018715fcc8b8c1ca2e06c",
+    ".qa/soak-cash-20261020-078d596f2f79/terminal-preflight.log": "6d9db9b061ab49e2fabcf845a895c41a12aa1a1c5a9d48c205230930ea915b50",
+    ".qa/soak-cash-20261020-078d596f2f79/terminal_observer.py": "9709115bbd1f9cea32ef534453228e2880724a68cbd826bfcb69ca1306cc7403",
+    ".qa/soak-cash-20261020-078d596f2f79/terminal_observer.py.review.diff": "36e5532c66792cce32d4c9d797ce0a76b17903f94705d97f45ad5c644abd0745"
+  }
+}

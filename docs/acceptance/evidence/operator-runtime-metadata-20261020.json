@@ -1,0 +1,16 @@
+{
+  "status": "READ_ONLY_NATIVE_RUNTIME_METADATA",
+  "captured_at": "2026-10-20T11:24:49.963022+00:00",
+  "boot_id": "34114b44-668d-4ba2-9480-91423bb4df0f",
+  "pid_namespace": "pid:[4026532221]",
+  "mount_namespace": "mnt:[4026532219]",
+  "matching_private_directory_processes": [],
+  "inaccessible_process_metadata": 41,
+  "private_data_directory_exists": true,
+  "pgdata_directory_exists": true,
+  "limits": [
+    "No matching private-directory cwd was found among readable processes; inaccessible processes prevent an exhaustive absence claim.",
+    "The previous app-only refresh proposal binds an obsolete boot and app identity and must not be executed or treated as database recovery approval.",
+    "No restart, SQL, dotenv/key/account/financial access, TWS, socket probe or configuration change was performed."
+  ]
+}

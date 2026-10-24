@@ -1,0 +1,33 @@
+{
+  "reviewed_at": "2026-10-18T22:58:01.467059+00:00",
+  "status": "APP_ONLY_REFRESH_REVIEW_PASS_AWAITING_EXACT_OWNER_APPROVAL",
+  "head": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "source_fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "helper_sha256": "ee7a91f4c049e17f4c9e0a57d8d71bc372ef3f50c2cfaf4cf0ac09bc6e16420a",
+  "plan_sha256": "a6ffef0505c6488ac5fa54e47236531a8108179656c73342f8f05f8569ec1e4f",
+  "old_app_pid": 19934,
+  "old_app_start_ticks": 300403,
+  "postgres_pid": 18796,
+  "postgres_start_ticks": 285583,
+  "target": "Existing local validation app at https://localhost:18443",
+  "scope": "Gracefully restart only exact app into published e154/source4fd; normal unchanged private configuration and TLS; same PG/data/schema0019; metadata-only private plan PID update on readiness",
+  "owner_read_flags": "Fresh UI attestation both Enabled/Read Authorized OFF required; not independently decrypted/DB-verified",
+  "read_only_preflight": "PASS native metadata/source-only, no network/DB/configsecret access",
+  "missing_approval_guard": "PASS returns1 EXACT_OWNER_APPROVAL_REQUIRED before preflight/mutation",
+  "root_full_review": "Final wrapper, exact plan, historical app-only helper and imported PG helper definitions/metadata SQL reviewed. PG helper main is never called.",
+  "future_failure_behavior": "Preserve exact newPID/receipt/private log reference; no automatic retry, SIGKILL, PostgreSQL restart, source checkout rollback or secret change",
+  "old_loaded_source_basis": "UNKNOWN; no old-code rollback claimed",
+  "broker_read_or_relay_approval": false,
+  "orders_or_live_approval": false,
+  "runtime_changed": false,
+  "artifact_sha256": {
+    ".qa/operator-cash-refresh-20261018-e154a0a/refresh_app.py": "ee7a91f4c049e17f4c9e0a57d8d71bc372ef3f50c2cfaf4cf0ac09bc6e16420a",
+    ".qa/operator-cash-refresh-20261018-e154a0a/refresh-plan.json": "a6ffef0505c6488ac5fa54e47236531a8108179656c73342f8f05f8569ec1e4f",
+    ".qa/operator-cash-refresh-20261018-e154a0a/approval-requirements.json": "ea7595d9a50062d4d1fb68ef74954ef7637e268e1c202312b74baddd2ba63ee4",
+    ".qa/operator-cash-refresh-20261018-e154a0a/preflight-output.json": "a5cf4a13cb94f91c3c693dfb2297ef86208f566ea802b7420d25a0aba130afb1",
+    ".qa/operator-cash-refresh-20261018-e154a0a/preflight-execution.json": "827053268e7f7bde5cd4580af0dda6af404f2fdf607376dad4a6025820fac169",
+    ".qa/operator-cash-refresh-20261018-e154a0a/preflight-result.json": "eab3572ce8c69234a6f674b61c382077d611aadf8380e3ccf8246c5d0cd7b638",
+    ".qa/operator-cash-refresh-20261018-e154a0a/missing-approval-output.log": "87b5e071f86360083e606be3ec42d6af62f660b6e2cbe3f0ca755454ff318f25",
+    ".qa/operator-cash-refresh-20261018-e154a0a/missing-approval-result.json": "bad160f4abb5fc52de9a82f77e9721b6cee9994e06fa6200af9b449ed0266acd"
+  }
+}

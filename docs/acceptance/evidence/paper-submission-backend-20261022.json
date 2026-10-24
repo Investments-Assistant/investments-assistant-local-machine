@@ -1,0 +1,114 @@
+{
+  "recorded_at": "2026-10-22T17:55:40.716245+00:00",
+  "status": "CURRENT_CANDIDATE_BACKEND_PASS",
+  "source_fingerprint": "b46651e69925c7e56f6ebf4e43816cf781bfa3330f94eef29b03c5e3ac3f0765",
+  "tests_fingerprint": "8d0bf60ca1f21d5e9fbe4a0092e85783e19e70e10e03efafffceb644da58728b",
+  "tiers": {
+    "unit": {
+      "counts": {
+        "tests": 907,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "result": {
+        "tier": "unit",
+        "exit_code": 0,
+        "source_fingerprint": "b46651e69925c7e56f6ebf4e43816cf781bfa3330f94eef29b03c5e3ac3f0765",
+        "source_unchanged": true,
+        "tests_fingerprint": "8d0bf60ca1f21d5e9fbe4a0092e85783e19e70e10e03efafffceb644da58728b",
+        "tests_unchanged": true,
+        "child_identity": {
+          "pid": 13643,
+          "boot_id": "efb14149-be2a-4b21-8436-0edbbf61ee67",
+          "pid_namespace": "pid:[4026532221]",
+          "start_ticks": 155252,
+          "state": "R",
+          "command_sha256": "cf7ea5167360d9ad75051375a09576cc64f51c1a0b93122757452e0f2e8cb348"
+        },
+        "finished_at": "2026-10-22T17:52:29.478222+00:00",
+        "command": [
+          "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "tests/unit",
+          "--cov=src",
+          "--cov-report=xml:/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/paper-contract-20261022-c401a8e2f0a0/unit-coverage.xml",
+          "--cov-report=term-missing",
+          "--junitxml=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/paper-contract-20261022-c401a8e2f0a0/unit.xml",
+          "-o",
+          "cache_dir=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/paper-contract-20261022-c401a8e2f0a0/pytest-cache",
+          "-v"
+        ],
+        "log_sha256": "69fa334b0a9596faa05d328ad60bfb3803574e11ba8303e46dbce7dca845c629"
+      },
+      "retained_xml": "docs/acceptance/evidence/paper-submission-backend-20261022-unit.xml",
+      "retained_xml_sha256": "7fe305176a2ec19a7701acf271c206e4d42cb59a9d78b8b6307d1a3e6d7e691a",
+      "coverage_path": ".qa/paper-contract-20261022-c401a8e2f0a0/unit-coverage.xml",
+      "coverage_sha256": "4359a4c4e835df991cb925fffcda33874b1d960d0b29e8179aa674dadc335249",
+      "execution_receipt": ".qa/paper-contract-20261022-c401a8e2f0a0/unit-execution.json"
+    },
+    "integration": {
+      "counts": {
+        "tests": 431,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "result": {
+        "tier": "integration",
+        "exit_code": 0,
+        "source_fingerprint": "b46651e69925c7e56f6ebf4e43816cf781bfa3330f94eef29b03c5e3ac3f0765",
+        "source_unchanged": true,
+        "tests_fingerprint": "8d0bf60ca1f21d5e9fbe4a0092e85783e19e70e10e03efafffceb644da58728b",
+        "tests_unchanged": true,
+        "child_identity": {
+          "pid": 14093,
+          "boot_id": "efb14149-be2a-4b21-8436-0edbbf61ee67",
+          "pid_namespace": "pid:[4026532221]",
+          "start_ticks": 159309,
+          "state": "R",
+          "command_sha256": "f7ac456137f14488fecffd4cb3ab1cb0aa0a04414be867574b69129c66d6821e"
+        },
+        "finished_at": "2026-10-22T17:55:09.140615+00:00",
+        "command": [
+          "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "tests/integration",
+          "--cov=src",
+          "--cov-report=xml:/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/paper-contract-20261022-c401a8e2f0a0/integration-coverage.xml",
+          "--cov-report=term-missing",
+          "--junitxml=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/paper-contract-20261022-c401a8e2f0a0/integration.xml",
+          "-o",
+          "cache_dir=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/paper-contract-20261022-c401a8e2f0a0/pytest-cache",
+          "-v"
+        ],
+        "log_sha256": "1dbbb7166c9a00ab09053c76ec62a3dc7731a6c467542a9f22f0c8c01dcd97c9"
+      },
+      "retained_xml": "docs/acceptance/evidence/paper-submission-backend-20261022-integration.xml",
+      "retained_xml_sha256": "9f479dc6a195b712db2141fc12c4fd7aabe0c2911a3accb2432e592f5cbbc6b6",
+      "coverage_path": ".qa/paper-contract-20261022-c401a8e2f0a0/integration-coverage.xml",
+      "coverage_sha256": "f474348ae14ca4beae333c7c681f94f07682c7437b8be51e1d59e2fb01e9a7b4",
+      "execution_receipt": ".qa/paper-contract-20261022-c401a8e2f0a0/integration-execution.json"
+    }
+  },
+  "total_distinct_cases": 1338,
+  "schema": "0020_broker_submission",
+  "isolated_fixture": {
+    "work": ".qa/paper-contract-20261022-c401a8e2f0a0",
+    "actual_identity_receipt": ".qa/paper-contract-20261022-c401a8e2f0a0/plan.json",
+    "private_env_denial": true,
+    "environment_inherited": false,
+    "tcp_listener": false
+  },
+  "limitations": [
+    "Local unit/PostgreSQL tiers only; no new remote CI/Sonar result",
+    "No current-candidate image/runtime/browser proof",
+    "Offline test transport only; no broker connection or order",
+    "No final-host 24h/thermal tests; deferred by owner"
+  ],
+  "live_trading_enabled": false
+}

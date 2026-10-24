@@ -1,0 +1,52 @@
+{
+  "actual_raw_answers_independently_reparsed": 3,
+  "all_members_roundtrip_verified": true,
+  "archive": "docs/acceptance/evidence/soak-24h-cash-20261020-078d596f2f79-failure-retained.tar.gz",
+  "archive_sha256": "9b2d412bc2488541e807d0daa5973ae403c08a87276cc15c25fa2958060a66a8",
+  "at": "2026-10-20T11:36:56.822702+00:00",
+  "boot_id": "34114b44-668d-4ba2-9480-91423bb4df0f",
+  "cleanup_performed": false,
+  "cycles": 9,
+  "failure": {
+    "at": "2026-10-20T11:31:59.610552+00:00",
+    "code": "CLOCK_DISCONTINUITY"
+  },
+  "guard_worked": "Runner rejected wall/monotonic discontinuity; immutable auditor and observer refused acceptance.",
+  "halt_p95_ms_partial_only": 27.918152999973245,
+  "head": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "input_bytes": 2253552,
+  "limitation": "No per-sample wall deltas retained: clock-jump magnitude/direction/cause cannot be inferred here.",
+  "manifest": "docs/acceptance/evidence/soak-24h-cash-20261020-078d596f2f79-failure-manifest.json",
+  "manifest_sha256": "a7e3943f46e4b607ffda5a7d0b4e009f80de4d1b41dbea5f0ab88e19b50cdf68",
+  "member_count": 233,
+  "model_profile": {
+    "context": 4096,
+    "gpu_layers": 0,
+    "sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+    "structured_output": true,
+    "threads": 4
+  },
+  "no_runner_observer_auditor_retry_or_old_cleanup_executed": true,
+  "observed_24h_accepted": false,
+  "observer_result": {
+    "at": "2026-10-20T11:31:59.982902+00:00",
+    "cleanup_executed": false,
+    "goal_status_changed": false,
+    "reason": "TERMINAL_AUDITOR_REJECTED_1",
+    "run_id": "078d596f2f79",
+    "status": "OBSERVER_NOT_ACCEPTED"
+  },
+  "original_files_unchanged": true,
+  "recorded_broker_connections": 0,
+  "recorded_duration_seconds": 39.74400784499994,
+  "recorded_external_orders": 0,
+  "recorded_max_sample_gap_seconds": 1.0002892620000239,
+  "restart_records": 0,
+  "retention_helper_sha256": "e743789d6864d7d330780990bfc222c4116aafabf8bfee4069613a3b9c718fe8",
+  "reused_io_helper": ".qa/soak-cash-interruption-20261020-79f7ab59792c/retain_interruption.py",
+  "reused_io_helper_sha256": "498bfbc31bce950686685a4769ac369347da1cf4962aa28adf188e625240b016",
+  "run_id": "078d596f2f79",
+  "source_fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "status": "FAILED_CLOCK_DISCONTINUITY_NOT_24H",
+  "terminal_pass": false
+}

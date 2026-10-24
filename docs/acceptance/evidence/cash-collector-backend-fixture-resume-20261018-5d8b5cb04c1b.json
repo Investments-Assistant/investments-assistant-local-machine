@@ -1,0 +1,107 @@
+{
+  "status": "RESUMED_OWNED_MARKED_BACKEND_POSTGRES_VERIFIED_SOURCE_FREEZE_PENDING",
+  "at": "2026-10-18T00:21:32.080243+00:00",
+  "run_id": "5d8b5cb04c1b",
+  "work": ".qa/backend-cash-validation-20261017-5d8b5cb04c1b",
+  "socket": ".qa/b-5d8b5cb0",
+  "data_directory": ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/pgdata",
+  "port_namespace": 55453,
+  "database": "test_cash_5d8b5cb04c1b",
+  "disposable_marker": "09be8c015d52bbea43b71a8fc3c1dd876242c1155f8ce751",
+  "schema": "0019_flexible_credentials",
+  "postgres_identity": {
+    "pid": 134476,
+    "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+    "pid_namespace": "pid:[4026532221]",
+    "start_ticks": 2466803,
+    "state": "S",
+    "command_sha256": "0f7a5d4c5d18e29749681f07d995c1f13db8fbe243bac89dd05ba637a6180fb5"
+  },
+  "postgres_version": "16.15",
+  "postgres_binary_sha256": {
+    "initdb": "df8c50fd508bb31db312a8519a2e7922c63b44f7d963c39d58dc107169078a0d",
+    "pg_ctl": "f311ff51f5a28ff104e43661c733b36d25cc9c5d7a66f0e463611378aafe4590",
+    "postgres": "201d8daff9a5bd9df70b820471b965c39f5a776d677f395232c477d051270722"
+  },
+  "work_and_socket_permissions": "0700",
+  "tcp_listener": false,
+  "identity_marker_schema_verified": true,
+  "environment_inherited": false,
+  "environment_keys": [
+    "AUTONOMOUS_SCANS_ENABLED",
+    "BANK_SYNC_ENABLED",
+    "DATABASE_URL",
+    "ENVIRONMENT",
+    "IBKR_ENABLED",
+    "LANG",
+    "LD_LIBRARY_PATH",
+    "LIVE_TRADING_ENABLED",
+    "MCP_ENABLED",
+    "NEWS_API_ADAPTERS_ENABLED",
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "PATH",
+    "PGPASSFILE",
+    "PGSSLMODE",
+    "PYTHONDONTWRITEBYTECODE",
+    "PYTHONPATH",
+    "PYTHONUNBUFFERED",
+    "TEST_DATABASE_DISPOSABLE_TOKEN",
+    "TEST_DATABASE_URL",
+    "YAHOO_HISTORICAL_DATA_ENABLED",
+    "YAHOO_MARKET_DATA_ENABLED"
+  ],
+  "dotenv_compatibility_proof": "DEFAULT_DOTENV_DISABLED_EXPLICIT_SYNTHETIC_DOTENV_ALLOWED_PASS",
+  "tests_started": false,
+  "build_started": false,
+  "source_frozen": false,
+  "protected_existing_processes_unchanged": {
+    "119236": {
+      "pid": 119236,
+      "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+      "pid_namespace": "pid:[4026532221]",
+      "start_ticks": 2221876,
+      "state": "S",
+      "command_sha256": "3e78c191649ac656e92013009ab2c82133f272519f41b18d412c6b9fc56671db"
+    },
+    "18796": {
+      "pid": 18796,
+      "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+      "pid_namespace": "pid:[4026532221]",
+      "start_ticks": 285583,
+      "state": "S",
+      "command_sha256": "b123ded4b507303464f6b85c34f5b32def7f8539133d43c0733ba92bc59826bb"
+    },
+    "19934": {
+      "pid": 19934,
+      "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+      "pid_namespace": "pid:[4026532221]",
+      "start_ticks": 300403,
+      "state": "S",
+      "command_sha256": "84f4ac0f32a6e2f8902d13884a69ff603a2a9828075516b0d7b3bd11ad1dd350"
+    }
+  },
+  "initial_helper_hashes_retained_in_plan": true,
+  "current_helper_sha256": {
+    "sitecustomize.py": "80a0ca25cc57cbc5d843997db204c4daf6ad5d95537e5081422b5d85c3b3b034",
+    "process_identity.py": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7",
+    "fixture.py": "aca201b6420aad63de6cc245553749f6581713bafe38fd5b6f0ec515e8e57b0e",
+    "run_validation.py": "968de6b535382638dddb0baffc2f3195ae1d49339d1338ef15a5180493795f51"
+  },
+  "artifact_sha256": {
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/postgres-setup.log": "2a6326b8b1a66a700f77083fab4b560ccf331e8c0da0f9cda1b4cd2ea9d4d5a8",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/sitecustomize.py": "80a0ca25cc57cbc5d843997db204c4daf6ad5d95537e5081422b5d85c3b3b034",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/plan.json": "eacaa9c14ad6834779bc9ec7b5e9dfb6c79afbe7959eea12433a4f3c33354946",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/test-environment.json": "0f8e6b151080d8b8b64c2708a1024a3d1f90dd1a2b2bc2dba9d2f33d744bdfe4",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/process_identity.py": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/validation-recipe.json": "afc21352d94d42f555326f680bb36b15f31dca21996b777832b14ebdc77be077",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/dotenv-compatibility-proof-20261018.json": "6b4d8f33fa0c4e6b022e44119f4ffdf15159e85c7c63dc308ba1c0d947828ad4",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/postgres.log": "3ac42426906e8023f17aa7f36f9effa876210fb51168d8fdf33f23a309c0ee1e",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/isolation-check.log": "93ef4526d11257f0193f382d8ef9fb20de9d496d681cc6fa522c263e43c7b98f",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/fixture.py": "aca201b6420aad63de6cc245553749f6581713bafe38fd5b6f0ec515e8e57b0e",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/synthetic-settings.env": "cb95b59bea939c745e89cc23c579b70133565693922743ad521ad5fdc8b4bb91",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/docker-readiness.json": "d58ab7274442d3b8f93896ffa7083312c2a0c9b1229feb581c174dcc37e4280c",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/migrations.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/run_validation.py": "968de6b535382638dddb0baffc2f3195ae1d49339d1338ef15a5180493795f51"
+  }
+}

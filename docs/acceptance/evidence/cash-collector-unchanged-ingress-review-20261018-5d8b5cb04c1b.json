@@ -1,0 +1,37 @@
+{
+  "status": "UNCHANGED_INGRESS_UI_SURFACE_EVIDENCE_RECONCILED",
+  "at": "2026-10-18T00:27:58.326736+00:00",
+  "current_source_fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "candidate_review_patch_sha256": "cfd2612f17d4cf7c41c507fdf0e1178c3b579e132095509b72cc28f3a58871b2",
+  "context_file_count": 184,
+  "context_tar_sha256": "59c4c29e2792a845846a767c99298eddab3818f9cf2126af7e992427bd93d4f1",
+  "added_paths": [],
+  "removed_paths": [],
+  "changed_paths": {
+    "src/tools/brokers/ibkr.py": {
+      "prior": "794ba77479bb695b8f0eefc151fc85f0314051810ac8d42c7dad8d755df96a36",
+      "current": "64085986c7a9bdde1c721ab1f99e77464c8ed9c2377e6b3665ddfcfb4334e333"
+    },
+    "src/tools/brokers/ibkr_balances.py": {
+      "prior": "a69725b441ee6ccba69a709cabca80e47b78f425760764f84991df7da143368b",
+      "current": "3fba253871594c56125279395b59a672bb75af25a76ce3f366c20339ad89a9c0"
+    }
+  },
+  "unchanged_context_paths": 182,
+  "all_web_static_routes_dependencies_dockerfile_ignore_and_migrations_context_bytes_unchanged": true,
+  "prior_image_id": "sha256:1525bf203b8effe7675e10b558811d3578196a54eee94052c69e6ebe69371e2d",
+  "prior_ingress_evidence": "docs/acceptance/evidence/flexible-credentials-image-ingress-20261017.json",
+  "prior_ingress_sha256": "f0a6139a87046960345ff1c52419a147ac1510caa2a40e6fd5552eab13439ba0",
+  "prior_ingress_checks": [
+    "Verified TLS, real application and static success/error security headers",
+    "HTTP redirect retains production published port, path and query",
+    "Exact trusted proxy overwrites forged scheme/IP and app uses verified peer",
+    "Authenticated same-origin WSS accepted through container proxy",
+    "Wrong/missing origin, wrong scheme and unauthenticated WSS denied",
+    "Windows loopback TLS verified; actual Docker forwarded source observed",
+    "Separate non-allowlisted container source rejected with HTTPS403"
+  ],
+  "unchanged_ingress_harness_sha256": "edf26270e1070a1aa340c62c8dfa53c0216b8245ec0bbabf0468f52c2832000e",
+  "current_image_ingress_rerun": false,
+  "scope": "Reuse prior ingress/TLS/UI validation only for unchangedsurface; newcashcollector/unit+Postgres/image/runtime evidence required separately. This is contextbytecomparison, not a new ingress run or imagebinaryreproducibility claim."
+}

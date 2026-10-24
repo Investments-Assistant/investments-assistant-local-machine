@@ -1,10 +1,30 @@
 # Operator runbook (work in progress)
 
+## Current direction — 22 October 2026
+
+The owner will deploy on a different computer. This laptop's24h observation,
+component-mapped CPU-temperature checks and clock repair are **DEFERRED to that
+final host**, not passed; the laptop Portable ZIP/download/setup request is
+cancelled. Do not retry old observation helpers or pursue further laptop hardware
+repair. Final-host OS/architecture are unknown; follow the
+[final-host handoff](FINAL_HOST_HANDOFF.md). Research and external Paper gates
+remain explicitly open; portable offline implementation can continue. No new
+broker connection/order, production migration/deployment or OS change is implied.
+Live stays OFF and external SDK writes remain closed.
+
+Historical commands below retain their original host/source/schema scope. Do not
+copy old roles, tokens, ports, clusters, boot/PID values or private data into a new
+installation. Resolve the actual checked-out Alembic head and corresponding
+startup/acceptance guard before any new migration;0019 belongs to the recorded
+e154 baseline, not a promise about future source.
+
 ## Migration and rollback
 
 Startup verifies `alembic_version`; it no longer creates/alters tables, rotates
-bootstrap credentials, or assigns unknown-owner records. No migration was run
-against the application database in this task.
+bootstrap credentials, or assigns unknown-owner records. No production database
+migration was run. The separate operator-validation database was backed up and
+explicitly upgraded to 0019 without replacing its data or keys; see
+[credential validation](FLEXIBLE_CREDENTIALS.md) and [checkpoint](CHECKPOINT.md).
 
 For a **new empty isolated database**, explicitly set DATABASE_URL to that
 instance, then run `.venv/bin/alembic upgrade head`. Create users through the
@@ -22,9 +42,48 @@ already lost by historical floating point storage. Roll back with a verified
 backup and compatible code; automatic precision-reducing downgrades are refused.
 Production upgrade remains approval-gated.
 
-## Isolated local PostgreSQL used for validation
+## Current runtime and observation
 
-PostgreSQL 16 packages are extracted under `/tmp/ia-postgres-root` without system
+The recorded e154 schema head was `0019_flexible_credentials`; startup/readiness
+checked that revision without migrating. New work must resolve and verify its
+checked-out head. Migration 0019 supports exact nonempty Unicode IDs with a fixed-size
+username lookup key plus exact-text comparison. Passwords retain salted hashes;
+both login fields remain required without custom length or character rules. Review the
+[backup/restore and credential evidence](FLEXIBLE_CREDENTIALS.md) before any
+separately authorized existing-instance migration; do not truncate IDs or reuse
+an older migration/start helper.
+
+The private operator app/database are existing user data, not disposable fixtures.
+The owner confirms both Paper Enabled and Read Authorized unchecked and saved;
+no further broker read/order follows from these runbook commands. Inspect the
+latest private plan and [checkpoint](CHECKPOINT.md) for boot ID, PID/start ticks,
+owned paths and last recovery receipt before retrying a failed operation. A
+restricted sandbox can hide native processes, so absence there is not exit proof.
+
+The separate observation `53a8ee46e318` was stopped for a reproduced runner
+validation gap. The local fix passes24affected tests and its90-second smoke.
+Current-source window `79f7ab59792c` and its finite observer were interrupted
+by another kernel restart before24hours; no terminal acceptance was produced.
+Fresh078d596f2f79 then failed CLOCK_DISCONTINUITY after39.744seconds; its finite
+verifier correctly rejected it. A read-only paired-clock probe confirms a311ms
+backward wall step; cause unknown, no OS changes. No observation is currently
+running at that checkpoint. Observation is now deferred to the final host. Follow
+[the observation record](SOAK.md) and inspect terminal
+receipts/retention/cleanup proof in CHECKPOINT.md before any new proposal.
+Do not start a concurrent terminal audit or duplicate/resume historical windows,
+clean or stop a live window. Historical completed or interrupted windows and
+private operator data are not its cleanup targets. All trading restrictions stay
+in force. A kernel restart invalidates a continuous window even if PID namespace
+numbers are reused.
+
+## Historical isolated PostgreSQL example (2026-09-08)
+
+The following paths/targets describe the historical disposable exercise, not the
+current native observation or private operator database. Inspect ownership,
+identity, marker and absence of active clients before any reuse or shutdown;
+never run these commands against the current live instances.
+
+PostgreSQL 16 packages were extracted under `/tmp/ia-postgres-root` without system
 installation. Cluster: `/tmp/ia-acceptance-pgdata`; Unix socket directory:
 `/tmp/ia-acceptance-pgsocket` (mode 0700), port namespace 55439; no TCP listener.
 Only synthetic test data is permitted in this instance. Fixtures require both an
@@ -51,6 +110,14 @@ LD_LIBRARY_PATH=/tmp/ia-postgres-root/usr/lib/x86_64-linux-gnu \
 ```
 
 ## Deployment and incidents
+
+For an explicitly approved **new empty Compose database**, use the
+[fresh-install sequence](../../README.md#setup) and [handoff](FINAL_HOST_HANDOFF.md):
+build, start only its database, wait for health, explicitly migrate to the reviewed
+head, create the local user interactively, then start/wait/probe the application.
+`make local-deploy` never migrates the database. An existing volume is not an empty
+fixture; do not apply this sequence to it without its reviewed backup/migration
+and applicable approval. The generic guide performs no installation or deployment.
 
 The inherited ARM64/Pi automatic deployment is replaced with a manual x86_64 CPU
 image validation workflow. It does not install on a host. Production deployment,
@@ -92,7 +159,8 @@ explicit MCP_USER_ID bound to an active account in addition to its separate toke
 
 ## Private newsletters and observed news history
 
-The news-evidence milestone introduced `0007_news_evidence`; current head is `0018_job_lease_clock`. Apply explicit migrations only after
+The news-evidence milestone introduced `0007_news_evidence`; the recorded e154 head
+was `0019_flexible_credentials`. Resolve the checked-out head and apply explicit migrations only after
 reviewing the target and backup; startup does not mutate schemas. The disposable
 upgrade and full regression suite are recorded in `evidence/suite-news-evidence.txt`.
 Set `NEWSLETTER_OWNER_USER_ID` only to the deliberately selected active application
@@ -105,6 +173,13 @@ historical replay. Current corrections retain their actual observed availability
 prior evidence; `get_news_evidence_as_of` never selects a future revision.
 
 ## Resumable disposable acceptance infrastructure
+
+This section records the old laptop fixture. It is not a final-host bootstrap or
+permission to resume its cluster. `start_acceptance_postgres.sh` hardcodes extracted
+x86_64 binaries, `.qa/pgdata`, `.qa/socket` and port55439, and creates no marked
+database or schema. New final-host fixtures need fresh reviewed paths/identities;
+see [FINAL_HOST_HANDOFF.md](FINAL_HOST_HANDOFF.md). Never run the shutdown example
+against another fixture or the private operator database.
 
 Temporary directories were reset between resumed sessions. Current fixture state is
 under git-ignored `.qa/`, permissions0700, and is never production data. PostgreSQL16
@@ -126,7 +201,8 @@ LD_LIBRARY_PATH="$PWD/.qa/postgres-root/usr/lib/x86_64-linux-gnu" \
 .qa/postgres-root/usr/lib/postgresql/16/bin/pg_ctl -D "$PWD/.qa/pgdata" -m fast -w stop
 ```
 
-Current schema head is `0018_job_lease_clock`; `0011_retention_index` introduced the expense retention index. Category edits are browser-authenticated
+The recorded e154 schema head was `0019_flexible_credentials`; resolve the actual
+checked-out head for new work. `0011_retention_index` introduced the expense retention index. Category edits are browser-authenticated
 and audited without transaction histories. Displayed-page export is explicit JSON; full-period export is bounded NDJSON and
 requires its completion trailer. Neither is a bank connection. Retention decisions
 remain pending.
@@ -145,7 +221,12 @@ Choose a nonconflicting private subnet/address pair if the host already uses thi
 range. Uvicorn header rewriting is disabled so application validation sees the
 actual peer. Nginx overwrites origin-related proxy headers and retains the public
 Host port. The current unit fixtures verify HTTPS WS origin checks from the exact
-peer and rejection from other peers; actual Docker/WSL forwarding remains pending.
+peer and rejection from other peers. Isolated Docker/Nginx TLS/WSS ingress and
+ordinary Windows localhost forwarding now pass for the reviewed image; see
+[image ingress evidence](evidence/flexible-credentials-image-ingress-20261017.json)
+and [published-input reconciliation](evidence/build-input-published-image-reconciliation-20261017.json).
+Those loopback checks do not establish physical LAN/firewall isolation; that
+separate profile remains unverified and requires its own authorized setup.
 
 Offline Compose validation (no daemon or real env-file resolution):
 
@@ -258,7 +339,8 @@ after a computed halt. The scheduler itself was not deployed to production.
 
 ### Broker observation evidence (migration0012)
 
-Migration0012 introduced broker observations; current head is0018_job_lease_clock. Existing production instances
+Migration0012 introduced broker observations; the recorded e154 head was0019_flexible_credentials.
+Resolve the actual checked-out head for new work. Existing production instances
 require separately authorized backup and explicit migration; startup only checks
 this head. The three marked acceptance fixtures were upgraded, while prior
 restore-test databases remain at their original verified versions. Downgrading
@@ -322,7 +404,8 @@ per-source bounds, not an end-to-end report SLA or measured risk-control isolati
 
 ### Durable simulator event order (migration0013)
 
-Startup/readiness now require0018_job_lease_clock; they never perform an
+Startup/readiness at the e154 baseline required0019_flexible_credentials; new
+work must verify the checked-out required revision. They never perform an
 implicit upgrade. Existing production migration still needs separate approval,
 a verified backup and a writer maintenance window. This migration takes an
 exclusive execution_events table lock, preserves payloads/timestamps, and assigns
@@ -446,7 +529,8 @@ list/compare operations remain owner-scoped and bounded. No broker API is called
 
 ## Job clock fencing (0018)
 
-Current startup/readiness revision is0018_job_lease_clock. Reviewed upgrades require
+The recorded e154 startup/readiness revision was0019_flexible_credentials; resolve
+the checked-out head and guard before new work. Reviewed upgrades require
 stopped compatible writers and the usual verified backup; only marked disposable
 fixtures were upgraded here. Migration adds nullable leased_at without fabricating
 acquisition times for existing leases. Existing NULL leases cannot complete. They

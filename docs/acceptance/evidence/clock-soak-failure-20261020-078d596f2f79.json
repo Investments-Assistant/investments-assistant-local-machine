@@ -1,0 +1,45 @@
+{
+  "status": "HOST_CLOCK_DISCONTINUITY_REPRODUCED_READ_ONLY",
+  "reviewed_at": "2026-10-20T11:36:02.764643+00:00",
+  "boot_id": "34114b44-668d-4ba2-9480-91423bb4df0f",
+  "observed_seconds": 45.007361239,
+  "samples": 4369,
+  "events_exceeding_250ms": [
+    {
+      "sample": 1727,
+      "wall_delta_seconds": -0.301069544,
+      "monotonic_delta_seconds": 0.0102346165,
+      "raw_clock_delta_seconds": 0.010032215,
+      "boottime_delta_seconds": 0.010245953,
+      "divergence_seconds": -0.31130416050000004,
+      "paired_read_uncertainty_seconds": 1.00085e-05
+    }
+  ],
+  "root_independent_raw_recomputation": true,
+  "service_metadata": [
+    "Result=success",
+    "ExecMainStartTimestampMonotonic=2493318",
+    "ActiveState=active",
+    "SubState=running"
+  ],
+  "service_state_does_not_establish_causality": true,
+  "clock_guard_seconds_unchanged": 0.25,
+  "raw_path": ".qa/clock-soak-failure-20261020-078d596f2f79/paired-clocks.jsonl",
+  "raw_sha256": "2d2fcea612d12f7c91f0d6d9711e7279a7b8b2d6350e37e94a8cb23b0a01e8a8",
+  "artifacts_sha256": {
+    ".qa/clock-soak-failure-20261020-078d596f2f79/probe.py": "f0d4f681565bf42692f8eff0c0d96791fc2d37db75606b5dda4c3b9d9c0fd857",
+    ".qa/clock-soak-failure-20261020-078d596f2f79/execution.json": "94a6da1707b5afb3443d49a039010617370462700eff510c56431a43c434b6ee",
+    ".qa/clock-soak-failure-20261020-078d596f2f79/paired-clocks.jsonl": "2d2fcea612d12f7c91f0d6d9711e7279a7b8b2d6350e37e94a8cb23b0a01e8a8",
+    ".qa/clock-soak-failure-20261020-078d596f2f79/timesync-service.txt": "9b42bd39223cab9b2fdb91e1d7ff8dd887111f2b00a42afc598f8594045bf846",
+    ".qa/clock-soak-failure-20261020-078d596f2f79/result.json": "59059b98d2e6fd8908b65fba3c8bbf16e5a0a4cbd34db2adbc70955f16e77d64"
+  },
+  "os_or_service_changes": false,
+  "model_or_soak_restarted": false,
+  "original_scope": "45-second post-failure read-only sample, no model load",
+  "limits": [
+    "Confirms a backward wall-clock step relative to three increasing local clocks in this sample, not its cause.",
+    "The45-second observation does not establish long-term stability or physical sleep recovery.",
+    "Prior13Oct temporary service experiment was restored and did not establish disabling NTP as a fix.",
+    "No new authorization to stop/disable/reconfigure time services or repeat the full soak."
+  ]
+}

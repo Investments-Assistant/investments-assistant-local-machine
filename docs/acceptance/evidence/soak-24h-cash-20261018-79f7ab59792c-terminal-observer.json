@@ -1,0 +1,54 @@
+{
+  "verified_at": "2026-10-18T22:16:34.690208+00:00",
+  "status": "ONE_SHOT_OBSERVER_WAITING_NO_TERMINAL_CREDIT",
+  "run_id": "79f7ab59792c",
+  "source_fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "observer_identity": {
+    "pid": 668060,
+    "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+    "pid_namespace": "pid:[4026532221]",
+    "start_ticks": 13397958,
+    "state": "R",
+    "command_sha256": "62f28a15a3f03cff2824a9a87cf4dd5b88ab5576833056d81eef6597556bec71"
+  },
+  "runner_identity": {
+    "pid": 333647,
+    "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+    "pid_namespace": "pid:[4026532221]",
+    "start_ticks": 5593877,
+    "state": "R",
+    "command_sha256": "191e080c92b7df9ea52783273868f9aebcaccb405b6ce27c4377c9dc29916dca"
+  },
+  "postgres_identity": {
+    "pid": 333634,
+    "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+    "pid_namespace": "pid:[4026532221]",
+    "start_ticks": 5593639,
+    "state": "S",
+    "command_sha256": "81256cfe65ca3d255685e5c9b1b07e4c65abd76e2f2d69afc5bff6ab6a22332e"
+  },
+  "current_observed_seconds": 78046.74648974201,
+  "cycles": 2732,
+  "maximum_observer_wait_seconds": 9283.262217267998,
+  "wait_scope": "One kernel pidfd wait for exact existing runner exit; remaining observed duration plus900s grace only for observer",
+  "acceptance_scope": "Immutable original auditor once; requires actual PASS_24H_VERIFIED artifact and exit0. No automatic retries, signals or cleanup.",
+  "progress_or_goal_state_changed": false,
+  "no_scheduled_automation_or_service": true,
+  "broker_connections_or_external_orders_by_observer": 0,
+  "artifact_sha256": {
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/observer.py": "653e74827b21e247fa7619c865fa477ab0c5a0b9102dd64daf2c65521d029712",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/launch_once.py": "db6646ca43b99f5cdfcabd7ae934e2e01bfd64ff02bf215ce64d450839d5a2ce",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/observer-plan.json": "076cd2011d2c0f29fa4fcfe7c38a40e5b6c7aeaf8e26247c5838f5d78f1b805e",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/independent-review.json": "4c584be5c455778e426dafbe08c277463d7b864b4d902d19438667d00192f311",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/preflight-execution.json": "7494869764e3d675e43766311421992d656bc59784323c53912268e8b423bea2",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/preflight-output.log": "5bf352cc6b8af54f1ff9ed4fcc510147687ed323d52aa20c81058dc39673ec1d",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/preflight-r2-execution.json": "f5c1299bae8296e1a2e83fca6389907d71e28cc2f9cb4562aeb680cabd821f9a",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/preflight-r2-output.log": "15551f49278ec6c32365757788702d3de78e415679cb04e1db37f979bae68882",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/root-launch-execution.json": "a4bb0495511bf269801d68c22080d484d2a1280f0c19b6381405ef5f81342e72",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/root-launch-result.json": "9909a9875c515682e7539df8ea47f36e01c985ee102289b44e5014bc23526cc2",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/launch-execution.json": "79d47c50389a7512947d4951bd1f40e356f2361fd50158a67402c5af18d166e3",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/launch-claim.json": "a4295fd67914b0ef28ebce9410b8b33feb9436357882b8d61b5daeef83b45b86",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/observer-start.json": "5dbfba6913c808431a96b183b3f782b93956f65809fc3717f984ef340d6c7ecf"
+  },
+  "resume": "Inspect saved observer/result and original terminal-review artifacts before retrying any operation; preserve same live runner/source/model. A readable pidfd alone is not acceptance."
+}

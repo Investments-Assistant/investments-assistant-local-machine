@@ -1,0 +1,77 @@
+{
+  "status": "TRUST_APPLIED_WINDOWS_HTTPS_VERIFIED",
+  "updated_at": "2026-10-16T15:02:27.796344+00:00",
+  "authorization": "Explicit user Yes to the reviewed Windows CurrentUser/Root certificate addition",
+  "certificate_application": {
+    "started_at": "2026-10-16T14:56:19.395296+00:00",
+    "status": "TRUST_VERIFIED",
+    "user_authorized": true,
+    "certificate_sha256_der": "e5fb752626cdbc12dc3e20b085a9b387450db23563a62b2a6107abcd3228b09f",
+    "script_sha256": "8bed011e96e1a1296a716445732bd0880b20e6f4837d7f4579e966e6a64e26f3",
+    "store": "CurrentUser/Root",
+    "private_key_imported": false,
+    "preexisting_exact_certificate_count": 0,
+    "process_exit_code": 0,
+    "result": {
+      "Status": "TRUST_VERIFIED",
+      "AddedByThisRun": true,
+      "Store": "CurrentUser/Root",
+      "CertificateSHA256": "E5FB752626CDBC12DC3E20B085A9B387450DB23563A62B2A6107ABCD3228B09F"
+    },
+    "finished_at": "2026-10-16T14:56:32.241546+00:00"
+  },
+  "windows_https": {
+    "Status": "WINDOWS_NATIVE_HTTPS_VERIFIED",
+    "CustomTLSValidation": false,
+    "Results": [
+      {
+        "Path": "/api/ready",
+        "HttpStatus": 200,
+        "ExactReviewedServerCertificate": true,
+        "ReadyStatus": "ready",
+        "DatabaseReady": true,
+        "ModelReady": true
+      },
+      {
+        "Path": "/signup",
+        "HttpStatus": 200,
+        "ExactReviewedServerCertificate": true
+      },
+      {
+        "Path": "/api/auth/me",
+        "HttpStatus": 401,
+        "ExactReviewedServerCertificate": true
+      }
+    ],
+    "verified_at": "2026-10-16T15:01:55.998958+00:00",
+    "process_exit_code": 0
+  },
+  "initial_https_failure": {
+    "category": "ConnectFailure",
+    "cause_verified": "Both recorded private app/database processes absent; pg_ctl status3 and Unix socket directory absent",
+    "shutdown_cause": "NOT_ESTABLISHED"
+  },
+  "private_runtime_resume": {
+    "started_at": "2026-10-16T15:00:57.497108+00:00",
+    "status": "PRIVATE_TLS_APP_RESUMED",
+    "prior_app_pid": 1429992,
+    "prior_postgres_pid": 1429959,
+    "prior_processes_absent": true,
+    "initialization_performed": false,
+    "database_recreated": false,
+    "keys_replaced": false,
+    "broker_connection_attempted": false,
+    "postgres_pid": 41103,
+    "private_cluster_identity_verified": true,
+    "schema_version": "0018_job_lease_clock",
+    "app_pid": 41130,
+    "finished_at": "2026-10-16T15:01:02.203977+00:00"
+  },
+  "resume_helper": ".local-private/paper-validation-20261016-7b59cc1e8fd2/resume_private_app.py",
+  "resume_helper_sha256": "62b72a8c7195d6fdf50752fa21b6e399f0d96404e5f02c47eff7961d16f37d8b",
+  "browser_rendering_verified": false,
+  "secure_application_account_binding_verified": false,
+  "broker_connection_attempted": false,
+  "orders_attempted": false,
+  "live_trading_enabled": false
+}

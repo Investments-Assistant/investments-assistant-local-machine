@@ -1,0 +1,29 @@
+{
+  "prepared_at": "2026-10-16T01:26:21.281632+00:00",
+  "status": "TRUST_APPLIED_WINDOWS_HTTPS_VERIFIED",
+  "action": "Add only the existing reviewed public localhost certificate to Windows CurrentUser/Root",
+  "certificate_sha256_der": "e5fb752626cdbc12dc3e20b085a9b387450db23563a62b2a6107abcd3228b09f",
+  "certificate_names": [
+    "localhost",
+    "investmentsassistant.home.arpa",
+    "127.0.0.1"
+  ],
+  "script": ".local-private/paper-validation-20261016-7b59cc1e8fd2/trust_local_certificate.ps1",
+  "script_sha256": "8bed011e96e1a1296a716445732bd0880b20e6f4837d7f4579e966e6a64e26f3",
+  "private_key_imported": false,
+  "trust_store_changed": true,
+  "scope_reason": "Windows certificate trust is outside original checkout-scoped permission",
+  "effect": "The Windows user will trust this certificate authority; its signing key remains private on this machine. This is broader than a one-tab browser exception.",
+  "preexisting_windows_root_match": false,
+  "app_url": "https://localhost:18443/signup",
+  "windows_dry_run": {
+    "ScriptSyntax": "PASS",
+    "CertificateConstruction": "PASS",
+    "TrustStoreChanged": false,
+    "PrivateKeyPresent": false
+  },
+  "updated_at": "2026-10-16T15:02:27.796344+00:00",
+  "authorization": "User explicitly replied Yes to the exact reviewed certificate",
+  "application_evidence": "paper-local-certificate-application-20261016.json",
+  "windows_native_https_verified": true
+}

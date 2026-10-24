@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "scope": "owned synthetic Windows loopback echo only",
+  "broker_connections": 0,
+  "application_database_access": false,
+  "helper_sha256": "3e52f474d023d6593670b00dea76c2ff69e742553a9ffb865d34dae81182c817",
+  "checks": [
+    "fixed loopback bind and destination confirmed",
+    "all256byte values including NUL and nonUTF8 roundtripped exactly",
+    "second simultaneous client immediately rejected",
+    "finite session closes without client action",
+    "next sequential session admitted after actual child cleanup",
+    "SIGTERM cleaned active session/children and released listener",
+    "idle process exits within its configured lease without connecting"
+  ],
+  "ownership": {
+    "echo_interop_pid": 1431456,
+    "echo_windows_pid": 57916,
+    "echo_windows_port": 58250,
+    "created_by_this_test": true,
+    "relay_pid": 1431465,
+    "relay_listen_port": 35285
+  },
+  "binary_roundtrip_bytes": 524288,
+  "session_expiry_observed_seconds": 5.593,
+  "signal_cleanup_seconds": 0.164,
+  "safe_codes": [
+    "SESSION_STARTED",
+    "PARALLEL_CLIENT_REJECTED",
+    "PARALLEL_CLIENT_REJECTED",
+    "SESSION_CLOSED",
+    "SESSION_STARTED",
+    "SESSION_CLOSED",
+    "RELAY_CLOSED"
+  ],
+  "idle_lease_exit_seconds": 1.033,
+  "echo_exit_code": 0,
+  "cleanup": {
+    "relay_exited": true,
+    "owned_echo_exited": true
+  }
+}

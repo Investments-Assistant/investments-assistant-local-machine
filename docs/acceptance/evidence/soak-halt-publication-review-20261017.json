@@ -1,0 +1,94 @@
+{
+  "status": "HARNESS_UNIT_AND_REAL_RESTART_SMOKE_PASS_PUBLICATION_SCOPE_EXPANDING_NOT_APPROVED",
+  "recorded_at": "2026-10-17T15:36:05.561396+00:00",
+  "base_head": "a4fccdea0c62179eda12a9fad089b74cb1c925b2",
+  "changed_files": {
+    "scripts/soak_acceptance.py": "7495f50746b235fa35bcead6996b6f0d1e3ae78a0298cd81e76f6ea9c0d52953",
+    "tests/unit/soak_startup_test.py": "c3963ba57497faa3c1685d16a0651b24e7c95ceedf421a97bb32eb962cb69bfc"
+  },
+  "patch_path": "docs/acceptance/evidence/soak-halt-publication-review-20261017.patch",
+  "patch_sha256": "706eb16df33d994a0690fa539ab345438c731a0d4b9c114fe29eea067330703a",
+  "problem": "Startup could clear a persisted halt; soak reasserted it before inspection, hiding the failure",
+  "fix": "Authenticated pre-mutation account read rejects lost halt/nonempty orders; health/login/read share original15s startup deadline",
+  "old_native_regression": {
+    "status": "OLD_SCRIPT_NATIVE_REGRESSION_REPRODUCED",
+    "completed_at": "2026-10-17T15:31:34.806993+00:00",
+    "command": [
+      "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+      "-m",
+      "pytest",
+      "tests/unit/soak_startup_test.py",
+      "-q",
+      "--junitxml=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-halt-startup-regression-20261017-280d249ef1/old-native-junit.xml"
+    ],
+    "exit_code": 1,
+    "source_sha256_before": "d16e02c13b57becf421b6c219f68fe41090faae44345aa45861f4d5470bfeb32",
+    "source_sha256_after": "d16e02c13b57becf421b6c219f68fe41090faae44345aa45861f4d5470bfeb32",
+    "source_unchanged": true,
+    "tests": 6,
+    "failures": 3,
+    "errors": 0,
+    "failed_cases": [
+      "test_existing_halt_is_observed_before_startup_can_reassert_it[lost-halt]",
+      "test_existing_halt_is_observed_before_startup_can_reassert_it[preserved-halt]",
+      "test_existing_halt_is_observed_before_startup_can_reassert_it[unexpected-order]"
+    ],
+    "log": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-halt-startup-regression-20261017-280d249ef1/old-native.log",
+    "junit": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-halt-startup-regression-20261017-280d249ef1/old-native-junit.xml",
+    "scope": "Synthetic HTTP/process stubs only; native loopback ephemeral bind, no HTTP/database/broker requests or service process"
+  },
+  "fixed_affected_tests": {
+    "status": "FIXED_FOCUSED_TESTS_PASS",
+    "completed_at": "2026-10-17T15:34:58.531543+00:00",
+    "command": [
+      "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+      "-m",
+      "pytest",
+      "tests/unit/soak_startup_test.py",
+      "tests/unit/soak_continuity_test.py",
+      "tests/unit/soak_transport_test.py",
+      "-q",
+      "--junitxml=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-halt-startup-regression-20261017-280d249ef1/fixed-native-junit.xml"
+    ],
+    "exit_code": 0,
+    "file_sha256_before": {
+      "scripts/soak_acceptance.py": "7495f50746b235fa35bcead6996b6f0d1e3ae78a0298cd81e76f6ea9c0d52953",
+      "tests/unit/soak_startup_test.py": "c3963ba57497faa3c1685d16a0651b24e7c95ceedf421a97bb32eb962cb69bfc"
+    },
+    "file_sha256_after": {
+      "scripts/soak_acceptance.py": "7495f50746b235fa35bcead6996b6f0d1e3ae78a0298cd81e76f6ea9c0d52953",
+      "tests/unit/soak_startup_test.py": "c3963ba57497faa3c1685d16a0651b24e7c95ceedf421a97bb32eb962cb69bfc"
+    },
+    "files_unchanged_during_test": true,
+    "tests": 24,
+    "failures": 0,
+    "errors": 0,
+    "failed_cases": [],
+    "log": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-halt-startup-regression-20261017-280d249ef1/fixed-native.log",
+    "junit": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/soak-halt-startup-regression-20261017-280d249ef1/fixed-native-junit.xml",
+    "scope": "Synthetic HTTP/process and continuity/transport unit tests only; no service, database or broker requests"
+  },
+  "image_context_bytes_checked_unchanged": 185,
+  "docker_copies_harness_script": false,
+  "image_rebuild_required_for_this_two_file_change": false,
+  "source_fingerprint_now": "fe94d676c22592bf20187ecf41f96c27588ecd2e92ea7d3cf88dedbe53b0f3d0",
+  "runtime_app_source_changed": false,
+  "publication_authority": "PENDING separate exact-bundle approval; earlier approvals cover other exact patches",
+  "broker_or_os_actions": false,
+  "retained_public_junit": {
+    "docs/acceptance/evidence/soak-halt-old-native-20261017.xml": "1fef13ba9808a1c53d24a78c8798335927e57a475511a213f6830c57b5a0aadc",
+    "docs/acceptance/evidence/soak-halt-fixed-native-20261017.xml": "47181488ddd32f110b7483999a9347e1ce840876fbfb8ab86410efe8137e6e78"
+  },
+  "real_restart_smoke": {
+    "path": "docs/acceptance/evidence/soak-halt-guard-smoke-20261017-dc10b4e9d5cb-review.json",
+    "sha256": "19dc369e446c8cd85a0ec06112504327573767d888e6f0ad374fa7ba7c9eba88",
+    "seconds": 90.21446416300023,
+    "cycles": 87,
+    "restarts": 5,
+    "maximum_restart_seconds": 1.4838366190015222,
+    "halt_p95_ms": 27.709849000530085,
+    "get_before_halt_post_verified": true,
+    "observed_24h": false
+  },
+  "publication_note": "No approval requested for this2filepatch; preserve review as harness-only milestone. A separately confirmed cash-collector omission will be fixed/tested before preparing final combined exact publication bundle."
+}

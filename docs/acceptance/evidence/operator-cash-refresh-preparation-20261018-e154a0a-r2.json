@@ -1,0 +1,61 @@
+{
+  "status": "APP_ONLY_REFRESH_PROPOSAL_PREPARED_NOT_EXECUTED_NOT_APPROVED",
+  "at": "2026-10-18T22:55:29.549169+00:00",
+  "work": ".qa/operator-cash-refresh-20261018-e154a0a",
+  "helper": ".qa/operator-cash-refresh-20261018-e154a0a/refresh_app.py",
+  "helper_sha256": "ee7a91f4c049e17f4c9e0a57d8d71bc372ef3f50c2cfaf4cf0ac09bc6e16420a",
+  "plan_sha256": "a6ffef0505c6488ac5fa54e47236531a8108179656c73342f8f05f8569ec1e4f",
+  "approval_requirements_sha256": "ea7595d9a50062d4d1fb68ef74954ef7637e268e1c202312b74baddd2ba63ee4",
+  "syntax": "PASS",
+  "head": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "source_fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "old_app_identity": {
+    "pid": 19934,
+    "start_ticks": 300403,
+    "cwd": "/home/lulu/investments-assistant/investments-assistant-local-machine/.local-private/paper-validation-20261016-7b59cc1e8fd2",
+    "executable": "/usr/bin/python3.12",
+    "command_sha256": "84f4ac0f32a6e2f8902d13884a69ff603a2a9828075516b0d7b3bd11ad1dd350"
+  },
+  "postgres_identity": {
+    "pid": 18796,
+    "start_ticks": 285583,
+    "cwd": "/home/lulu/investments-assistant/investments-assistant-local-machine/.local-private/paper-validation-20261016-7b59cc1e8fd2/pgdata",
+    "executable": "/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/postgres-root/usr/lib/postgresql/16/bin/postgres",
+    "command_sha256": "b123ded4b507303464f6b85c34f5b32def7f8539133d43c0733ba92bc59826bb"
+  },
+  "loaded_old_source_basis": "UNKNOWN",
+  "preflight_not_run": true,
+  "approval_file_exists": false,
+  "privatefiles_or_services_changed": false,
+  "no_broker_relay_or_provider_action": true,
+  "startup_guard_review": {
+    "source_sha256": {
+      "src/app.py": "592a5e99288d1c92a7198613bf0df954d31ef25b4a6c795740bc626fec098b74",
+      "src/operations/runner.py": "889badb0906471f99329a94cc27794f327a7bceb067ff31ac2853c0dfc7e6c6a",
+      "src/scheduler/jobs.py": "51d0b34cbdc5b32b292cffddc039b625fee530ce1eefbcef705380fcd847eae7",
+      "src/execution/broker_capture_control.py": "9c2fdd0a62eefac0583378058ceebf08da04b70d9b35c79a07aeebcfbaec4b9d"
+    },
+    "capture": "CaptureController creates no task onimport/startup; start requires explicit scoped consent; app shutdown closescontroller.",
+    "monitoring": "monitoring_users/run_scoped require current monitoring_enabled optin; approvedexecution refusesnonzerooptins.",
+    "global_external": "All8flags forcedfalse; newsletterownersunset/news policiesempty; normal scheduler preserved.",
+    "encrypted_account_flags": "OwnerUIattestationonly; no configciphertextselected/decrypted."
+  },
+  "readonly_preflight_argv": [
+    "/usr/bin/env",
+    "-i",
+    "PATH=/usr/bin:/bin",
+    "LANG=C.UTF-8",
+    ".venv/bin/python",
+    "-B",
+    ".qa/operator-cash-refresh-20261018-e154a0a/refresh_app.py",
+    "--preflight"
+  ],
+  "future_restart_requires": "Root fullreview+explicit freshownerOFFattestation/exactapp-onlyapproval.json, then --restart-reviewed; notauthorized bythispreparation.",
+  "rollback_limit": "No verifiedold loaded-codebasis; no automaticoldcode/sourcecheckout rollback, SIGKILL, PGrestart or retries. PreservePID/private-logref/receipts onfailure; guardedmanualrecoveryneeded.",
+  "existing_helper_review": {
+    "resume_private_application_v1.py": "5a24bd5933ea706a5550f881a6559709684a0bdd4070a9e3c453f087e809cb2c",
+    "resume_private_postgres_v5.py": "b1800a6e327462d2185e7b75ab74fd10f5c6df4852b05e68e3e5adb1cdc0b72f"
+  },
+  "preparation_revision": "Finalr2 adds secretfilemetadata rechecks immediately before SIGTERM/Popen as well as afterready; initialdraft code/plan/receipt retained.",
+  "initial_preparation_sha256": "9bd340ef6d9ef6784f8018d17ccdb2d6051cf78681c85329fd95adff4110ade9"
+}

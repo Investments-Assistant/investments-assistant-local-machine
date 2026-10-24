@@ -1,0 +1,1465 @@
+diff --git a/.github/workflows/e2e-tests.yml b/.github/workflows/e2e-tests.yml
+index 7b54834..997ff26 100644
+--- a/.github/workflows/e2e-tests.yml
++++ b/.github/workflows/e2e-tests.yml
+@@ -85,6 +85,16 @@ jobs:
+           -c "CREATE TABLE ia_disposable_marker(token text NOT NULL);
+           INSERT INTO ia_disposable_marker VALUES ('ci-isolated-service');"
+ 
++      - name: Migrate the marked disposable CI database
++        env:
++          ENVIRONMENT: development
++          DATABASE_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/test_investments"
++          PGPASSWORD: postgres
++        run: |
++          identity=$(psql -h localhost -U postgres -d test_investments -At -v ON_ERROR_STOP=1 -c "SELECT current_database() || '|' || token FROM ia_disposable_marker")
++          test "$identity" = 'test_investments|ci-isolated-service'
++          poetry run alembic upgrade head
++
+       - name: Run all tests together with combined coverage
+         env:
+           ENVIRONMENT: development
+diff --git a/.github/workflows/integration-tests.yml b/.github/workflows/integration-tests.yml
+index 2f62e43..8d600f2 100644
+--- a/.github/workflows/integration-tests.yml
++++ b/.github/workflows/integration-tests.yml
+@@ -65,6 +65,16 @@ jobs:
+           -c "CREATE TABLE ia_disposable_marker(token text NOT NULL);
+           INSERT INTO ia_disposable_marker VALUES ('ci-isolated-service');"
+ 
++      - name: Migrate the marked disposable CI database
++        env:
++          ENVIRONMENT: development
++          DATABASE_URL: "postgresql+asyncpg://postgres:postgres@localhost:5432/test_investments"
++          PGPASSWORD: postgres
++        run: |
++          identity=$(psql -h localhost -U postgres -d test_investments -At -v ON_ERROR_STOP=1 -c "SELECT current_database() || '|' || token FROM ia_disposable_marker")
++          test "$identity" = 'test_investments|ci-isolated-service'
++          poetry run alembic upgrade head
++
+       - name: Run integration tests with coverage
+         env:
+           ENVIRONMENT: development
+diff --git a/migrations/versions/0020_broker_submission.py b/migrations/versions/0020_broker_submission.py
+new file mode 100644
+index 0000000..f52390d
+--- /dev/null
++++ b/migrations/versions/0020_broker_submission.py
+@@ -0,0 +1,52 @@
++"""Retain offline submission intent and append-only handoff evidence."""
++
++from alembic import op
++import sqlalchemy as sa
++
++revision = "0020_broker_submission"
++down_revision = "0019_flexible_credentials"
++branch_labels = None
++depends_on = None
++
++
++def upgrade():
++    op.create_table(
++        "broker_submission_intents",
++        sa.Column("id", sa.String(36), primary_key=True),
++        sa.Column("user_id", sa.String(36), sa.ForeignKey("users.id"), nullable=False),
++        sa.Column("account_id", sa.String(36), sa.ForeignKey("broker_accounts.id"), nullable=False),
++        sa.Column("account_binding", sa.String(64), nullable=False),
++        sa.Column("configuration_sha256", sa.String(64), nullable=False),
++        sa.Column("idempotency_key", sa.String(64), nullable=False),
++        sa.Column("broker_order_key", sa.String(64), nullable=False),
++        sa.Column("request", sa.JSON(), nullable=False),
++        sa.Column("request_sha256", sa.String(64), nullable=False),
++        sa.Column("state", sa.String(32), nullable=False),
++        sa.Column("attempt_id", sa.String(36), nullable=True),
++        sa.Column("permanent_id", sa.String(32), nullable=True),
++        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
++        sa.UniqueConstraint("account_id", "account_binding", "idempotency_key", name="uq_broker_submission_key"),
++        sa.UniqueConstraint("account_id", "account_binding", "broker_order_key", name="uq_broker_submission_order"),
++        sa.UniqueConstraint("account_id", "account_binding", "permanent_id", name="uq_broker_submission_permanent"),
++    )
++    op.create_index("ix_broker_submission_owner_account", "broker_submission_intents", ["user_id", "account_id"])
++    op.create_table(
++        "broker_submission_events",
++        sa.Column("id", sa.String(36), primary_key=True),
++        sa.Column("intent_id", sa.String(36), sa.ForeignKey("broker_submission_intents.id"), nullable=False),
++        sa.Column("event_key", sa.String(128), nullable=False),
++        sa.Column("kind", sa.String(32), nullable=False),
++        sa.Column("payload", sa.JSON(), nullable=False),
++        sa.Column("payload_sha256", sa.String(64), nullable=False),
++        sa.Column("observation_id", sa.String(36), sa.ForeignKey("broker_observations.id"), nullable=True),
++        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
++        sa.UniqueConstraint("intent_id", "event_key", name="uq_broker_submission_event"),
++        sa.UniqueConstraint("intent_id", "observation_id", name="uq_broker_submission_observation"),
++    )
++    op.create_index("ix_broker_submission_event_intent", "broker_submission_events", ["intent_id", "created_at"])
++
++
++def downgrade():
++    raise RuntimeError(
++        "Broker handoff evidence rollback requires a reviewed backup; uncertain attempts must not be lost"
++    )
+diff --git a/scripts/soak_acceptance.py b/scripts/soak_acceptance.py
+index 726b366..f1525a8 100644
+--- a/scripts/soak_acceptance.py
++++ b/scripts/soak_acceptance.py
+@@ -110,7 +110,7 @@ async def verify_database(url, marker):
+                 "DISPOSABLE_MARKER_MISMATCH",
+             )
+             require_gate(
+-                await connection.scalar(text("SELECT version_num FROM alembic_version")) == "0019_flexible_credentials",
++                await connection.scalar(text("SELECT version_num FROM alembic_version")) == "0020_broker_submission",
+                 "DISPOSABLE_SCHEMA_REVISION_MISMATCH",
+             )
+     finally:
+diff --git a/scripts/verify_container_runtime.py b/scripts/verify_container_runtime.py
+index 98a9587..11a65de 100644
+--- a/scripts/verify_container_runtime.py
++++ b/scripts/verify_container_runtime.py
+@@ -203,7 +203,7 @@ def run(args):
+             "-c",
+             "SELECT current_database(),token FROM ia_disposable_marker; SELECT version_num FROM alembic_version;",
+         ).stdout
+-        if "test_container|" + token not in identity or "0019_flexible_credentials" not in identity:
++        if "test_container|" + token not in identity or "0020_broker_submission" not in identity:
+             raise RuntimeError("Database marker/schema lost across restart")
+         checks.append("Application and database restart recover readiness and preserve marker/schema")
+         if max(result["restart_seconds"].values()) > 15:
+diff --git a/scripts/verify_expense_retirement_recovery.py b/scripts/verify_expense_retirement_recovery.py
+index 5a6e6e7..e27310c 100644
+--- a/scripts/verify_expense_retirement_recovery.py
++++ b/scripts/verify_expense_retirement_recovery.py
+@@ -51,7 +51,7 @@ async def main():
+                 await session.scalar(text("SELECT current_database()")) != "test_acceptance_expenses"
+                 or await session.scalar(text("SELECT token FROM public.ia_disposable_marker"))
+                 != "fixture-acceptance-20260909"
+-                or await session.scalar(text("SELECT version_num FROM alembic_version")) != "0019_flexible_credentials"
++                or await session.scalar(text("SELECT version_num FROM alembic_version")) != "0020_broker_submission"
+             ):
+                 raise RuntimeError("DISPOSABLE_IDENTITY_REQUIRED")
+             if await session.scalar(text("SELECT 1 FROM pg_database WHERE datname=:name"), {"name": args.target}):
+@@ -142,7 +142,7 @@ async def main():
+                     json.dumps(
+                         dict(
+                             status="PASS",
+-                            revision="0019_flexible_credentials",
++                            revision="0020_broker_submission",
+                             removed_rows_absent=True,
+                             retirement_hashes_preserved=len(removed_ids),
+                             pending_resolution_verified=args.pending_resolution,
+diff --git a/scripts/verify_split_recovery.py b/scripts/verify_split_recovery.py
+index 8ae0d20..8f7a9bb 100644
+--- a/scripts/verify_split_recovery.py
++++ b/scripts/verify_split_recovery.py
+@@ -74,7 +74,7 @@ async def main():
+                 await session.scalar(text("SELECT current_database()")) != "test_acceptance_expenses"
+                 or await session.scalar(text("SELECT token FROM public.ia_disposable_marker"))
+                 != "fixture-acceptance-20260909"
+-                or await session.scalar(text("SELECT version_num FROM alembic_version")) != "0019_flexible_credentials"
++                or await session.scalar(text("SELECT version_num FROM alembic_version")) != "0020_broker_submission"
+             ):
+                 raise RuntimeError("DISPOSABLE_IDENTITY_REQUIRED")
+             if await session.scalar(text("SELECT 1 FROM pg_database WHERE datname=:name"), {"name": args.target}):
+@@ -200,7 +200,7 @@ async def main():
+                     json.dumps(
+                         dict(
+                             status="PASS",
+-                            revision="0019_flexible_credentials",
++                            revision="0020_broker_submission",
+                             reconciliation_hash=after["evidence_sha256"],
+                             split_receipt=receipt["event_id"],
+                             dividend_receipt=dividend["event_id"] if dividend else None,
+diff --git a/scripts/verify_strategy_recovery.py b/scripts/verify_strategy_recovery.py
+index 83e94bc..da8788d 100644
+--- a/scripts/verify_strategy_recovery.py
++++ b/scripts/verify_strategy_recovery.py
+@@ -66,7 +66,7 @@ async def main():
+             if (
+                 database != "test_acceptance_expenses"
+                 or token != "fixture-acceptance-20260909"
+-                or revision != "0019_flexible_credentials"
++                or revision != "0020_broker_submission"
+             ):
+                 raise SystemExit("Source identity, marker or revision mismatch")
+             assert not await session.scalar(text("SELECT 1 FROM pg_database WHERE datname=:name"), {"name": target})
+@@ -118,7 +118,7 @@ async def main():
+                 assert await session.scalar(text("SELECT current_database()")) == target
+                 assert await session.scalar(
+                     text("SELECT version_num FROM alembic_version")
+-                ) == "0019_flexible_credentials"
++                ) == "0020_broker_submission"
+                 retained = await session.get(StrategyDecision, decision_id)
+                 assert retained.evidence_hash == evidence_hash == digest(retained.evidence)
+                 assert retained.evidence["result"]["status"] == "no_trade"
+@@ -148,7 +148,7 @@ async def main():
+                 json.dumps(
+                     {
+                         "status": "PASS",
+-                        "revision": "0019_flexible_credentials",
++                        "revision": "0020_broker_submission",
+                         "decision_evidence_hash": evidence_hash,
+                         "no_trade_and_original_quote_preserved": True,
+                         "cash_flow_hash_and_reconciliation_preserved": True,
+diff --git a/src/db/database.py b/src/db/database.py
+index 3ac4556..859e6cc 100644
+--- a/src/db/database.py
++++ b/src/db/database.py
+@@ -48,7 +48,7 @@ async def create_all_tables() -> None:
+     """Compatibility name: verify the explicit migration, without schema mutation."""
+     async with engine.connect() as conn:
+         revision = await conn.scalar(text("SELECT version_num FROM alembic_version"))
+-        if revision != "0019_flexible_credentials":
++        if revision != "0020_broker_submission":
+             raise RuntimeError("Database migration required: run alembic upgrade head explicitly")
+ 
+ 
+diff --git a/src/db/models.py b/src/db/models.py
+index 2c09738..5f36ac9 100644
+--- a/src/db/models.py
++++ b/src/db/models.py
+@@ -386,3 +386,10 @@ class BrokerObservation(Base):
+     payload: Mapped[dict] = mapped_column(JSON)
+     observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+     recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.clock_timestamp())
++
++
++# Register the separate durable offline broker-handoff contract tables.
++from src.execution.broker_submission_models import (  # noqa: E402,F401
++    BrokerSubmissionEvent,
++    BrokerSubmissionIntent,
++)
+diff --git a/src/execution/broker_submission.py b/src/execution/broker_submission.py
+new file mode 100644
+index 0000000..33ed3fb
+--- /dev/null
++++ b/src/execution/broker_submission.py
+@@ -0,0 +1,542 @@
++"""Durable OFFLINE submission contract; no SDK, route or execution authority.
++
++The journal owns short sessionmaker transactions. A committed handoff precedes
++any injected call, and an unresolved handoff is never automatically repeated.
++Injected transport is admitted only on a positively marked local test database.
++Its implementation belongs in tests. Ordinary/default dispatch always denies.
++Read consent is rechecked as an account binding safeguard, never as write consent.
++"""
++
++import os
++import re
++import hmac
++import math
++import uuid
++from typing import Literal, Protocol
++import asyncio
++from decimal import Decimal, localcontext
++import inspect
++from pathlib import Path
++from threading import Lock
++
++from pydantic import Field, BaseModel, ConfigDict, field_validator, model_validator
++from sqlalchemy import Text, cast, func, text, select
++from sqlalchemy.engine import make_url
++from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
++
++from src.db.models import BrokerObservation
++from src.execution.policy import PolicyDenied, digest
++from src.execution.external import external_write_denied
++from src.execution.broker_review import review_observations
++from src.execution.broker_observations import READ_PAYLOAD_BUDGET, selected_account
++from src.execution.broker_submission_models import BrokerSubmissionEvent, BrokerSubmissionIntent
++
++ROOT = Path(__file__).resolve().parents[2]
++SCHEMA = "0020_broker_submission"
++MAX_OBSERVATIONS = 1000
++MAX_OFFLINE_HANDOFFS = 4  # Technical resource bound, never a financial mandate.
++_admissions = set()
++_admission_lock = Lock()
++
++
++def _admit():
++    with _admission_lock:
++        if len(_admissions) >= MAX_OFFLINE_HANDOFFS:
++            raise PolicyDenied("OFFLINE_HANDOFF_CAPACITY")
++        token = object()
++        _admissions.add(token)
++        return token
++
++
++def _release(token):
++    with _admission_lock:
++        _admissions.discard(token)
++
++
++class SubmissionRequest(BaseModel):
++    """Frozen contract details, not a quote, risk decision or approval grant."""
++
++    model_config = ConfigDict(extra="forbid", frozen=True, revalidate_instances="always")
++    environment: Literal["paper"]
++    session_id: str = Field(min_length=1, max_length=128)
++    correlation_id: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_.:-]+$")
++    con_id: int = Field(gt=0, strict=True, le=2**63 - 1)
++    client_id: int = Field(gt=0, strict=True, le=2**31 - 1)
++    order_id: int = Field(ge=0, strict=True, le=2**31 - 1)
++    security_type: Literal["STK"]
++    exchange: str = Field(min_length=1, max_length=32, pattern=r"^[A-Z0-9_.-]+$")
++    currency: str = Field(pattern=r"^[A-Z]{3}$")
++    side: Literal["buy", "sell"]
++    order_type: Literal["LMT"]
++    quantity: Decimal
++    limit_price: Decimal
++    tick: Decimal
++    lot: Decimal
++    multiplier: Decimal
++
++    @field_validator("quantity", "limit_price", "tick", "lot", "multiplier", mode="before")
++    @classmethod
++    def exact_input(cls, value):
++        if type(value) not in (str, int, Decimal) or (isinstance(value, str) and len(value) > 128):
++            raise ValueError("Use exact decimal text, Decimal or integer; float/bool is not accepted")
++        return value
++
++    @field_validator("quantity", "limit_price", "tick", "lot", "multiplier")
++    @classmethod
++    def bounded_decimal(cls, value):
++        if not value.is_finite() or not 0 < value < Decimal("1e18"):
++            raise ValueError("Finite positive decimal required")
++        with localcontext() as context:
++            context.prec = 80
++            if value != value.quantize(Decimal("1e-10")):
++                raise ValueError("Unsupported decimal precision")
++            return value.normalize()
++
++    @model_validator(mode="after")
++    def precision(self):
++        with localcontext() as context:
++            context.prec = 80
++            if self.quantity % self.lot or self.limit_price % self.tick:
++                raise ValueError("Lot or tick mismatch")
++        return self
++
++
++class TransportReceipt(BaseModel):
++    """Synthetic handoff acknowledgement/rejection, never a fill."""
++
++    model_config = ConfigDict(extra="forbid", frozen=True, revalidate_instances="always")
++    status: Literal["acknowledged", "rejected"]
++    client_id: int = Field(gt=0, strict=True, le=2**31 - 1)
++    order_id: int = Field(ge=0, strict=True, le=2**31 - 1)
++    permanent_id: int | None = Field(default=None, gt=0, strict=True, le=2**63 - 1)
++
++    @model_validator(mode="after")
++    def acknowledgement_identity(self):
++        if (self.status == "acknowledged") != (self.permanent_id is not None):
++            raise ValueError("Acknowledgement requires a permanent identity; rejection must not supply one")
++        return self
++
++
++class OfflineTransport(Protocol):
++    async def submit(self, request: SubmissionRequest, *, intent_id: str, attempt_id: str) -> TransportReceipt:
++        """Tests inject finite synthetic behavior. No runtime implementation exists."""
++
++
++def _id(value):
++    try:
++        return str(uuid.UUID(value))
++    except (TypeError, ValueError, AttributeError):
++        raise PolicyDenied("INVALID_SUBMISSION_ID") from None
++
++
++def _request(value):
++    try:
++        return SubmissionRequest.model_validate(value)
++    except (TypeError, ValueError):
++        raise PolicyDenied("INVALID_SUBMISSION_REQUEST") from None
++
++
++def _view(intent):
++    return {
++        "intent_id": intent.id,
++        "request_sha256": intent.request_sha256,
++        "state": "uncertain" if intent.state == "handoff_started" else intent.state,
++        "journal_state": intent.state,
++        "attempt_id": intent.attempt_id,
++        "retry_allowed": False,
++        "scope": "offline_contract",
++        "environment_declared": "paper",
++        "environment_verified": None,
++        "execution_authority": "none",
++        "complete_reconciliation": False,
++        "broker_identity_resolution": ("permanent_id_bound" if intent.permanent_id is not None
++                                       else "permanent_id_unknown_no_callback_association"),
++    }
++
++
++def _compare_request(request, observations, review):
++    """Compare retained broker facts with this intent without hiding outliers.
++
++    The existing reducer owns execution-version/correction interpretation. This
++    adds only comparison against the frozen request, never a current-state claim.
++    """
++    reasons, executions, units_match = set(), {}, True
++    with localcontext() as context:
++        context.prec = 160
++        for row in observations:
++            payload = row["payload"]
++            if row["kind"] != "execution" or digest(payload) != row["payload_sha256"]:
++                continue
++            executions[row["identity_sha256"]] = payload
++            if payload.get("security_type") is None or payload.get("multiplier") is None:
++                reasons.add("SUBMISSION_CONTRACT_EVIDENCE_INCOMPLETE")
++                units_match = False
++            try:
++                multiplier = Decimal(payload["multiplier"]) if payload.get("multiplier") is not None else None
++                mismatch = (payload.get("con_id") != request.con_id or payload.get("currency") != request.currency
++                            or payload.get("side") != ("BOT" if request.side == "buy" else "SLD")
++                            or (payload.get("security_type") is not None
++                                and payload["security_type"] != request.security_type)
++                            or (multiplier is not None and multiplier != request.multiplier))
++                if mismatch:
++                    reasons.add("SUBMISSION_EXECUTION_CONTRACT_MISMATCH")
++                    units_match = False
++                price = Decimal(payload["price"])
++                if not price.is_finite():
++                    raise ValueError("Invalid observed price")
++                if payload.get("currency") == request.currency and (
++                    (request.side == "buy" and price > request.limit_price)
++                    or (request.side == "sell" and price < request.limit_price)
++                ):
++                    reasons.add("SUBMISSION_LIMIT_PRICE_BREACH")
++            except (KeyError, TypeError, ValueError, ArithmeticError):
++                reasons.add("SUBMISSION_EXECUTION_EVIDENCE_INVALID")
++                units_match = False
++        counts = review["counts"]
++        ambiguous = any(counts[key] for key in (
++            "conflicting_execution_identities", "execution_correction_families", "invalid_evidence_hashes"))
++        quantity = None
++        if ambiguous:
++            reasons.add("SUBMISSION_EXECUTION_QUANTITY_UNRESOLVED")
++        elif executions and units_match:
++            try:
++                quantities = [Decimal(row["quantity"]) for row in executions.values()]
++                if any(not value.is_finite() or value <= 0 for value in quantities):
++                    raise ValueError("Invalid observed quantity")
++                quantity = sum(quantities, Decimal(0))
++                if quantity > request.quantity:
++                    reasons.add("SUBMISSION_QUANTITY_EXCEEDED")
++            except (KeyError, TypeError, ValueError, ArithmeticError):
++                reasons.add("SUBMISSION_EXECUTION_EVIDENCE_INVALID")
++        for order in review["order_lifecycle"].get("orders", []):
++            if (order["maximum_reported_filled"] is not None
++                    and Decimal(order["maximum_reported_filled"]) > request.quantity):
++                reasons.add("SUBMISSION_QUANTITY_EXCEEDED")
++    return {"status": "needs_review" if reasons else "unverified", "reason_codes": sorted(reasons),
++            "observed_execution_quantity": str(quantity) if quantity is not None else None,
++            "scope": "retained_linked_facts_against_frozen_request_not_complete_reconciliation"}
++
++
++class BrokerSubmissionJournal:
++    def __init__(self, sessions: async_sessionmaker):
++        if not isinstance(sessions, async_sessionmaker) or not isinstance(sessions.kw.get("bind"), AsyncEngine):
++            raise TypeError("A bound async_sessionmaker is required; caller transactions are not accepted")
++        self.sessions = sessions
++        self.engine = sessions.kw["bind"]
++        self._unfinished = set()
++
++    async def _fixture(self):
++        """Prove the actual bound database, not merely a caller/environment label."""
++        configured = os.environ.get("TEST_DATABASE_URL")
++        marker = os.environ.get("TEST_DATABASE_DISPOSABLE_TOKEN")
++        if (not configured or not marker or not 16 <= len(marker) <= 256
++                or self.sessions.kw.get("bind") is not self.engine):
++            raise PolicyDenied("OFFLINE_DISPOSABLE_DATABASE_REQUIRED")
++        try:
++            url = make_url(configured)
++        except Exception:
++            raise PolicyDenied("OFFLINE_DISPOSABLE_DATABASE_REQUIRED") from None
++        if (url != self.engine.url or url.drivername != "postgresql+asyncpg"
++                or not re.fullmatch(r"test_[a-z0-9_]+", url.database or "")):
++            raise PolicyDenied("OFFLINE_DISPOSABLE_DATABASE_REQUIRED")
++        socket = url.query.get("host")
++        local = (isinstance(socket, str) and Path(socket).is_absolute()
++                 and Path(socket).resolve().is_relative_to(ROOT / ".qa")) if socket else (
++                     url.host in {"127.0.0.1", "::1", "localhost"})
++        if not local:
++            raise PolicyDenied("OFFLINE_LOCAL_DATABASE_REQUIRED")
++        try:
++            async with self.engine.connect() as connection, connection.begin():
++                await connection.execute(text("SET LOCAL statement_timeout = '5s'"))
++                actual = await connection.scalar(text("SELECT current_database()"))
++                tokens = (await connection.execute(
++                    text("SELECT token FROM public.ia_disposable_marker"))).scalars().all()
++                revision = await connection.scalar(text("SELECT version_num FROM alembic_version"))
++                version = await connection.scalar(text("SELECT current_setting('server_version_num')::int"))
++            valid = (actual == url.database and len(tokens) == 1 and isinstance(tokens[0], str)
++                     and hmac.compare_digest(tokens[0].encode(), marker.encode()) and revision == SCHEMA
++                     and type(version) is int and version >= 100000)
++        except Exception:
++            raise PolicyDenied("OFFLINE_DATABASE_IDENTITY_UNVERIFIED") from None
++        if not valid:
++            raise PolicyDenied("OFFLINE_DATABASE_IDENTITY_UNVERIFIED")
++
++    async def _scope(self, session, user_id, account_id, request, *, dispatch=True):
++        config, binding = await selected_account(session, user_id=user_id, account_id=account_id,
++                                                require_consent=dispatch)
++        if dispatch and (config.get("environment") != "paper" or type(config.get("client_id")) is not int
++                or config["client_id"] != request.client_id):
++            raise PolicyDenied("SUBMISSION_ACCOUNT_BINDING_MISMATCH")
++        return binding, digest(config)
++
++    @staticmethod
++    def _append(session, intent, key, kind, payload, *, observation_id=None):
++        payload = dict(payload, scope="offline_contract", execution_authority="none")
++        session.add(BrokerSubmissionEvent(
++            intent_id=intent.id, event_key=key, kind=kind, payload=payload,
++            payload_sha256=digest(payload), observation_id=observation_id,
++        ))
++
++    async def _load(self, session, *, user_id, account_id, intent_id, dispatch=True):
++        # Lock order matches the existing principal/account boundary before intent.
++        candidate = await session.scalar(select(BrokerSubmissionIntent).where(
++            BrokerSubmissionIntent.id == _id(intent_id), BrokerSubmissionIntent.user_id == user_id,
++            BrokerSubmissionIntent.account_id == account_id,
++        ))
++        if candidate is None:
++            raise PolicyDenied("SUBMISSION_NOT_OWNED")
++        request = _request(candidate.request)
++        binding, configuration = await self._scope(session, user_id, account_id, request, dispatch=dispatch)
++        intent = await session.scalar(select(BrokerSubmissionIntent).where(
++            BrokerSubmissionIntent.id == candidate.id,
++        ).with_for_update().execution_options(populate_existing=True))
++        if (intent.account_binding != binding or (dispatch and intent.configuration_sha256 != configuration)):
++            raise PolicyDenied("SUBMISSION_ACCOUNT_CHANGED")
++        if (digest(intent.request) != intent.request_sha256
++                or request.model_dump(mode="json") != intent.request
++                or intent.broker_order_key != digest([request.client_id, request.order_id])):
++            raise PolicyDenied("SUBMISSION_REQUEST_CHANGED")
++        if intent.state not in {"staged", "handoff_started", "acknowledged", "rejected", "uncertain", "blocked"}:
++            raise PolicyDenied("SUBMISSION_STATE_INVALID")
++        return intent, request
++
++    async def stage_intent(self, *, user_id, account_id, idempotency_key, request):
++        request = _request(request)
++        if not isinstance(idempotency_key, str) or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,64}", idempotency_key):
++            raise PolicyDenied("INVALID_SUBMISSION_KEY")
++        # Even staging is currently fixture-only. It creates no real-account
++        # proposal, financial policy, approval or executable capability.
++        await self._fixture()
++        payload = request.model_dump(mode="json")
++        async with self.sessions.begin() as session:
++            binding, configuration = await self._scope(session, user_id, account_id, request)
++            existing = await session.scalar(select(BrokerSubmissionIntent).where(
++                BrokerSubmissionIntent.account_id == account_id, BrokerSubmissionIntent.account_binding == binding,
++                BrokerSubmissionIntent.idempotency_key == idempotency_key,
++            ).with_for_update())
++            if existing is not None:
++                intent, _ = await self._load(session, user_id=user_id, account_id=account_id, intent_id=existing.id)
++                if intent.request_sha256 != digest(payload):
++                    raise PolicyDenied("SUBMISSION_IDEMPOTENCY_CONFLICT")
++                return _view(intent)
++            broker_key = digest([request.client_id, request.order_id])
++            if await session.scalar(select(BrokerSubmissionIntent.id).where(
++                BrokerSubmissionIntent.account_id == account_id, BrokerSubmissionIntent.account_binding == binding,
++                BrokerSubmissionIntent.broker_order_key == broker_key,
++            )):
++                raise PolicyDenied("SUBMISSION_BROKER_ID_ALREADY_RESERVED")
++            intent = BrokerSubmissionIntent(
++                id=str(uuid.uuid4()), user_id=user_id, account_id=account_id, account_binding=binding,
++                configuration_sha256=configuration, idempotency_key=idempotency_key, broker_order_key=broker_key,
++                request=payload, request_sha256=digest(payload), state="staged",
++            )
++            session.add(intent)
++            await session.flush()
++            self._append(session, intent, "staged", "staged", {"request_sha256": intent.request_sha256})
++            return _view(intent)
++
++    async def _outcome(self, *, user_id, account_id, intent_id, attempt_id, state, reason, receipt=None):
++        await self._fixture()
++        async with self.sessions.begin() as session:
++            intent, request = await self._load(session, user_id=user_id, account_id=account_id,
++                                               intent_id=intent_id, dispatch=False)
++            if intent.state != "handoff_started" or intent.attempt_id != attempt_id:
++                return _view(intent)
++            try:
++                binding, configuration = await self._scope(session, user_id, account_id, request)
++                if binding != intent.account_binding or configuration != intent.configuration_sha256:
++                    raise PolicyDenied("SUBMISSION_ACCOUNT_CHANGED")
++            except PolicyDenied:
++                # Owned local audit may record uncertainty after consent/config
++                # loss; the stale receipt never becomes an acknowledgement.
++                state, reason, receipt = "uncertain", "SUBMISSION_SCOPE_LOST_DURING_HANDOFF", None
++            if receipt is not None and receipt.permanent_id is not None:
++                permanent = str(receipt.permanent_id)
++                collision = await session.scalar(select(BrokerSubmissionIntent.id).where(
++                    BrokerSubmissionIntent.account_id == account_id,
++                    BrokerSubmissionIntent.account_binding == intent.account_binding,
++                    BrokerSubmissionIntent.permanent_id == permanent,
++                    BrokerSubmissionIntent.id != intent.id,
++                ))
++                if collision:
++                    state, reason, receipt = "uncertain", "BROKER_PERMANENT_ID_CONFLICT", None
++                else:
++                    intent.permanent_id = permanent
++            intent.state = state
++            self._append(session, intent, "outcome:" + attempt_id, state,
++                         {"attempt_id": attempt_id, "reason_code": reason,
++                          "receipt_sha256": digest(receipt.model_dump(mode="json")) if receipt else None})
++            return _view(intent)
++
++    def _track(self, task, token):
++        # Admission remains occupied until actual completion, including when a
++        # synthetic coroutine ignores cancellation. No late result is persisted.
++        self._unfinished.add(task)
++
++        def finished(done):
++            self._unfinished.discard(done)
++            _release(token)
++            if not done.cancelled():
++                done.exception()
++
++        task.add_done_callback(finished)
++
++    async def dispatch_once(self, *, user_id, account_id, intent_id, transport: OfflineTransport | None = None,
++                            timeout_seconds=None):
++        if transport is None:
++            # This path does not even connect to a database or inspect credentials.
++            return dict(external_write_denied("broker submission"), state="blocked", attempt_id=None,
++                        scope="offline_contract", execution_authority="none")
++        if (type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds)
++                or not 0 < timeout_seconds <= 30
++                or not inspect.iscoroutinefunction(getattr(transport, "submit", None))):
++            raise PolicyDenied("INVALID_OFFLINE_TRANSPORT")
++        await self._fixture()
++        token, task = _admit(), None
++        try:
++            async with self.sessions.begin() as session:
++                intent, request = await self._load(session, user_id=user_id, account_id=account_id, intent_id=intent_id)
++                if intent.state != "staged":
++                    return _view(intent)
++                intent.attempt_id = str(uuid.uuid4())
++                intent.state = "handoff_started"
++                self._append(session, intent, "handoff", "handoff_started",
++                             {"attempt_id": intent.attempt_id, "request_sha256": intent.request_sha256,
++                              "timeout_seconds": timeout_seconds})
++                attempt = intent.attempt_id
++            # Commit before final scope check and handoff. A lost process here
++            # leaves durable uncertainty, never an automatically retryable intent.
++            await self._fixture()
++            async with self.sessions.begin() as session:
++                intent, request = await self._load(session, user_id=user_id, account_id=account_id, intent_id=intent_id)
++                if intent.state != "handoff_started" or intent.attempt_id != attempt:
++                    return _view(intent)
++            args = dict(user_id=user_id, account_id=account_id, intent_id=intent_id, attempt_id=attempt)
++
++            async def invoke():
++                return await transport.submit(request, intent_id=intent_id, attempt_id=attempt)
++
++            task = asyncio.create_task(invoke())
++            self._track(task, token)
++            try:
++                done, _ = await asyncio.wait({task}, timeout=timeout_seconds)
++                if not done:
++                    task.cancel()
++                    return await self._outcome(**args, state="uncertain", reason="OFFLINE_HANDOFF_TIMEOUT")
++                try:
++                    receipt = task.result()
++                except Exception:
++                    # Only transport exceptions become uncertain outcomes. A
++                    # persistence failure propagates for inspected recovery; it
++                    # is not silently retried as another outcome write.
++                    return await self._outcome(**args, state="uncertain", reason="OFFLINE_HANDOFF_EXCEPTION")
++                if not isinstance(receipt, TransportReceipt):
++                    return await self._outcome(**args, state="uncertain", reason="OFFLINE_RECEIPT_INVALID")
++                try:
++                    receipt = TransportReceipt.model_validate(receipt)
++                except ValueError:
++                    return await self._outcome(**args, state="uncertain", reason="OFFLINE_RECEIPT_INVALID")
++                if receipt.client_id != request.client_id or receipt.order_id != request.order_id:
++                    return await self._outcome(**args, state="uncertain", reason="OFFLINE_RECEIPT_INVALID")
++                return await self._outcome(**args, state=receipt.status, reason="OFFLINE_TRANSPORT_RECEIPT",
++                                           receipt=receipt)
++            except asyncio.CancelledError:
++                task.cancel()
++                await asyncio.shield(self._outcome(**args, state="uncertain", reason="OFFLINE_HANDOFF_CANCELLED"))
++                raise
++        finally:
++            if task is None:
++                _release(token)
++
++    async def recover_uncertain(self, *, user_id, account_id, intent_id):
++        """Conservatively close a lost handoff; never grants a retry or cancels it."""
++        await self._fixture()
++        async with self.sessions.begin() as session:
++            intent, _ = await self._load(session, user_id=user_id, account_id=account_id,
++                                          intent_id=intent_id, dispatch=False)
++            if intent.state == "handoff_started":
++                intent.state = "uncertain"
++                self._append(session, intent, "recovery:" + intent.attempt_id, "uncertain",
++                             {"reason_code": "HANDOFF_RECOVERY_UNCERTAIN", "attempt_id": intent.attempt_id})
++            return _view(intent)
++
++    async def attach_observation(self, *, user_id, account_id, intent_id, observation_id):
++        await self._fixture()
++        async with self.sessions.begin() as session:
++            intent, request = await self._load(session, user_id=user_id, account_id=account_id,
++                                               intent_id=intent_id, dispatch=False)
++            size = await session.scalar(select(func.octet_length(cast(BrokerObservation.payload, Text))).where(
++                BrokerObservation.id == _id(observation_id), BrokerObservation.user_id == user_id,
++                BrokerObservation.account_id == account_id, BrokerObservation.account_binding == intent.account_binding,
++            ))
++            if size is None or size > READ_PAYLOAD_BUDGET:
++                raise PolicyDenied("SUBMISSION_OBSERVATION_NOT_BOUND")
++            row = await session.scalar(select(BrokerObservation).where(
++                BrokerObservation.id == _id(observation_id), BrokerObservation.user_id == user_id,
++                BrokerObservation.account_id == account_id, BrokerObservation.account_binding == intent.account_binding,
++            ))
++            if row is None or digest(row.payload) != row.payload_sha256:
++                raise PolicyDenied("SUBMISSION_OBSERVATION_NOT_BOUND")
++            payload = row.payload
++            if row.kind in {"execution", "order_status"}:
++                if (intent.permanent_id is None or payload.get("permanent_id") != int(intent.permanent_id)
++                        or payload.get("client_id") != request.client_id
++                        or payload.get("order_id") != request.order_id):
++                    raise PolicyDenied("SUBMISSION_STABLE_BROKER_ID_REQUIRED")
++                # Stable identity associates the evidence, not ownership or
++                # correctness. Contract/price/quantity outliers remain visible
++                # and are flagged by review_intent instead of being discarded.
++            elif row.kind == "commission":
++                linked = await session.scalar(select(BrokerObservation.id).join(
++                    BrokerSubmissionEvent, BrokerSubmissionEvent.observation_id == BrokerObservation.id,
++                ).where(BrokerSubmissionEvent.intent_id == intent.id, BrokerObservation.kind == "execution",
++                        BrokerObservation.identity_sha256 == row.identity_sha256))
++                if linked is None:
++                    raise PolicyDenied("SUBMISSION_LINKED_EXECUTION_REQUIRED")
++            else:
++                raise PolicyDenied("SUBMISSION_OBSERVATION_KIND_UNSUPPORTED")
++            key = "observation:" + row.id
++            if not await session.scalar(select(BrokerSubmissionEvent.id).where(
++                BrokerSubmissionEvent.intent_id == intent.id, BrokerSubmissionEvent.event_key == key,
++            )):
++                self._append(session, intent, key, "observation_linked",
++                             {"payload_sha256": row.payload_sha256, "identity_sha256": row.identity_sha256},
++                             observation_id=row.id)
++            return _view(intent)
++
++    async def review_intent(self, *, user_id, account_id, intent_id):
++        await self._fixture()
++        async with self.sessions.begin() as session:
++            intent, request = await self._load(session, user_id=user_id, account_id=account_id,
++                                          intent_id=intent_id, dispatch=False)
++            filters = (
++                BrokerSubmissionEvent.intent_id == intent.id, BrokerObservation.user_id == user_id,
++                BrokerObservation.account_id == account_id, BrokerObservation.account_binding == intent.account_binding,
++            )
++            metadata = (await session.execute(select(
++                BrokerObservation.id, func.octet_length(cast(BrokerObservation.payload, Text)),
++            ).join(BrokerSubmissionEvent, BrokerSubmissionEvent.observation_id == BrokerObservation.id)
++                .where(*filters).order_by(BrokerObservation.recorded_at, BrokerObservation.id)
++                .limit(MAX_OBSERVATIONS + 1))).all()
++            chosen, size = [], 0
++            for identity, count in metadata[:MAX_OBSERVATIONS]:
++                if size + count > READ_PAYLOAD_BUDGET:
++                    break
++                chosen.append(identity)
++                size += count
++            rows = (await session.scalars(select(BrokerObservation).where(
++                BrokerObservation.id.in_(chosen), BrokerObservation.user_id == user_id,
++                BrokerObservation.account_id == account_id, BrokerObservation.account_binding == intent.account_binding,
++            ).order_by(BrokerObservation.recorded_at, BrokerObservation.id))).all() if chosen else []
++            observations = [{"kind": row.kind, "payload": row.payload, "identity_sha256": row.identity_sha256,
++                             "payload_sha256": row.payload_sha256} for row in rows]
++            review = review_observations(observations, truncated=len(chosen) < len(metadata))
++            review.pop("evidence_sha256")
++            comparison = _compare_request(request, observations, review)
++            review["request_comparison"] = comparison
++            review["reason_codes"] = sorted(set(review["reason_codes"]) | set(comparison["reason_codes"]))
++            if review["reason_codes"]:
++                review["status"] = "needs_review"
++            review["evidence_sha256"] = digest(review)
++            return dict(_view(intent), review=review, linked_observations=len(rows), payload_bytes=size,
++                        strategy_order_ownership="not_established", current_broker_state="not_established")
+diff --git a/src/execution/broker_submission_models.py b/src/execution/broker_submission_models.py
+new file mode 100644
+index 0000000..49f52af
+--- /dev/null
++++ b/src/execution/broker_submission_models.py
+@@ -0,0 +1,61 @@
++"""Durable offline broker handoff evidence, separate from simulator accounting.
++
++These tables confer no external execution authority. Events are append-only via
++the journal service; a handoff record must survive before a transport is called.
++"""
++
++import uuid
++from datetime import UTC, datetime
++
++from sqlalchemy import JSON, Index, String, DateTime, ForeignKey, UniqueConstraint
++from sqlalchemy.orm import Mapped, mapped_column
++
++from src.db.database import Base
++
++
++def identifier():
++    return str(uuid.uuid4())
++
++
++def now():
++    return datetime.now(UTC)
++
++
++class BrokerSubmissionIntent(Base):
++    __tablename__ = "broker_submission_intents"
++    __table_args__ = (
++        UniqueConstraint("account_id", "account_binding", "idempotency_key", name="uq_broker_submission_key"),
++        UniqueConstraint("account_id", "account_binding", "broker_order_key", name="uq_broker_submission_order"),
++        UniqueConstraint("account_id", "account_binding", "permanent_id", name="uq_broker_submission_permanent"),
++        Index("ix_broker_submission_owner_account", "user_id", "account_id"),
++    )
++    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
++    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
++    account_id: Mapped[str] = mapped_column(ForeignKey("broker_accounts.id"), nullable=False)
++    account_binding: Mapped[str] = mapped_column(String(64), nullable=False)
++    configuration_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
++    idempotency_key: Mapped[str] = mapped_column(String(64), nullable=False)
++    broker_order_key: Mapped[str] = mapped_column(String(64), nullable=False)
++    request: Mapped[dict] = mapped_column(JSON, nullable=False)
++    request_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
++    state: Mapped[str] = mapped_column(String(32), nullable=False, default="staged")
++    attempt_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
++    permanent_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
++    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=now)
++
++
++class BrokerSubmissionEvent(Base):
++    __tablename__ = "broker_submission_events"
++    __table_args__ = (
++        UniqueConstraint("intent_id", "event_key", name="uq_broker_submission_event"),
++        UniqueConstraint("intent_id", "observation_id", name="uq_broker_submission_observation"),
++        Index("ix_broker_submission_event_intent", "intent_id", "created_at"),
++    )
++    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=identifier)
++    intent_id: Mapped[str] = mapped_column(ForeignKey("broker_submission_intents.id"), nullable=False)
++    event_key: Mapped[str] = mapped_column(String(128), nullable=False)
++    kind: Mapped[str] = mapped_column(String(32), nullable=False)
++    payload: Mapped[dict] = mapped_column(JSON, nullable=False)
++    payload_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
++    observation_id: Mapped[str | None] = mapped_column(ForeignKey("broker_observations.id"), nullable=True)
++    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=now)
+diff --git a/src/web/routes.py b/src/web/routes.py
+index ada231d..408b104 100644
+--- a/src/web/routes.py
++++ b/src/web/routes.py
+@@ -251,7 +251,7 @@ async def ready() -> dict:
+     try:
+         async with async_session() as session:
+             revision = await session.scalar(text("SELECT version_num FROM alembic_version"))
+-        checks["database"] = revision == "0019_flexible_credentials"
++        checks["database"] = revision == "0020_broker_submission"
+     except Exception as exc:
+         logger.warning("Readiness database check failed: %s", type(exc).__name__)
+     from src.agent.clients.llama_cpp_client import model_status
+diff --git a/tests/integration/broker_submission_journal_test.py b/tests/integration/broker_submission_journal_test.py
+new file mode 100644
+index 0000000..43bb924
+--- /dev/null
++++ b/tests/integration/broker_submission_journal_test.py
+@@ -0,0 +1,501 @@
++"""Committed offline handoffs on a marked PostgreSQL fixture; no SDK/network.
++
++Unlike outer-rollback fixtures, these tests exercise independent transactions so
++the synthetic transport can prove the attempt was durable before it was called.
++"""
++
++import uuid
++import asyncio
++from datetime import UTC, datetime, timedelta
++from contextlib import suppress
++
++import pytest
++from sqlalchemy import delete, select, update
++import pytest_asyncio
++from sqlalchemy.ext.asyncio import async_sessionmaker
++
++from src.tools import broker_accounts as vault
++from src.db.models import User, BrokerAccount, BrokerObservation
++from src.execution.policy import PolicyDenied
++from src.execution.broker_submission import MAX_OFFLINE_HANDOFFS, TransportReceipt, BrokerSubmissionJournal
++from src.execution.broker_observations import record_observations
++from tests.unit.broker_submission_test import request_values
++from src.execution.broker_submission_models import BrokerSubmissionEvent, BrokerSubmissionIntent
++from tests.integration.broker_observations_test import seed, execution, commission, fixture_key  # noqa: F401
++
++pytestmark = pytest.mark.integration
++
++
++@pytest_asyncio.fixture(loop_scope="function")
++async def submission_fixture(integration_engine):
++    factory = async_sessionmaker(integration_engine, expire_on_commit=False)
++    async with factory.begin() as session:
++        user, account = await seed(session)
++    journal = BrokerSubmissionJournal(factory)
++    try:
++        yield journal, factory, user.id, account.id
++    finally:
++        # Only this freshly seeded owner's records; the integration fixture proved
++        # database identity before any schema mutation and never targets .env.
++        if journal._unfinished:
++            await asyncio.wait_for(asyncio.gather(*journal._unfinished, return_exceptions=True), 5)
++        async with factory.begin() as session:
++            ids = select(BrokerSubmissionIntent.id).where(BrokerSubmissionIntent.account_id == account.id)
++            await session.execute(delete(BrokerSubmissionEvent).where(BrokerSubmissionEvent.intent_id.in_(ids)))
++            await session.execute(delete(BrokerSubmissionIntent).where(BrokerSubmissionIntent.account_id == account.id))
++            await session.execute(delete(BrokerObservation).where(BrokerObservation.account_id == account.id))
++            await session.execute(delete(BrokerAccount).where(BrokerAccount.id == account.id))
++            await session.execute(delete(User).where(User.id == user.id))
++
++
++async def stage(fixture, **changes):
++    journal, _, user, account = fixture
++    return await journal.stage_intent(user_id=user, account_id=account, idempotency_key="fixture-order",
++                                      request=request_values(**changes))
++
++
++def args(fixture, intent):
++    return dict(user_id=fixture[2], account_id=fixture[3], intent_id=intent["intent_id"])
++
++
++class AcceptedTransport:
++    """The only transport implementation is synthetic and lives in tests."""
++
++    def __init__(self, factory):
++        self.factory, self.calls = factory, 0
++
++    async def submit(self, request, *, intent_id, attempt_id):
++        self.calls += 1
++        # A distinct session/connection sees both committed intent and attempt.
++        async with self.factory() as independent:
++            intent = await independent.get(BrokerSubmissionIntent, intent_id)
++            event = await independent.scalar(select(BrokerSubmissionEvent).where(
++                BrokerSubmissionEvent.intent_id == intent_id, BrokerSubmissionEvent.kind == "handoff_started",
++            ))
++            assert intent.state == "handoff_started" and intent.attempt_id == attempt_id
++            assert event.payload["request_sha256"] == intent.request_sha256
++        return TransportReceipt(status="acknowledged", client_id=request.client_id,
++                                order_id=request.order_id, permanent_id=9)
++
++
++async def test_committed_handoff_concurrent_claim_and_reload_invoke_transport_once(submission_fixture):
++    fixture = submission_fixture
++    journal, factory, user, account = fixture
++    staged = await asyncio.gather(*(stage(fixture) for _ in range(2)))
++    assert staged[0]["intent_id"] == staged[1]["intent_id"]
++    transport = AcceptedTransport(factory)
++    results = await asyncio.gather(*(journal.dispatch_once(**args(fixture, staged[0]), transport=transport,
++                                                          timeout_seconds=5) for _ in range(2)))
++    assert transport.calls == 1
++    assert all(result["retry_allowed"] is False and result["execution_authority"] == "none" for result in results)
++    restarted = BrokerSubmissionJournal(factory)
++    again = await restarted.dispatch_once(user_id=user, account_id=account, intent_id=staged[0]["intent_id"],
++                                         transport=transport, timeout_seconds=5)
++    assert again["state"] == "acknowledged" and transport.calls == 1
++    assert again["environment_verified"] is None and again["scope"] == "offline_contract"
++
++
++async def test_idempotency_conflict_and_broker_id_reservation_are_persistent(submission_fixture):
++    fixture = submission_fixture
++    journal, _, user, account = fixture
++    await stage(fixture)
++    with pytest.raises(PolicyDenied, match="SUBMISSION_IDEMPOTENCY_CONFLICT"):
++        await stage(fixture, quantity="0.005")
++    with pytest.raises(PolicyDenied, match="SUBMISSION_BROKER_ID_ALREADY_RESERVED"):
++        await journal.stage_intent(user_id=user, account_id=account, idempotency_key="different-intent",
++                                   request=request_values())
++
++
++@pytest.mark.parametrize("key", ["", "x" * 65, "with spaces", True])
++async def test_invalid_keys_never_create_journal_records(submission_fixture, key):
++    journal, factory, user, account = submission_fixture
++    with pytest.raises(PolicyDenied, match="INVALID_SUBMISSION_KEY"):
++        await journal.stage_intent(user_id=user, account_id=account, idempotency_key=key, request=request_values())
++    async with factory() as session:
++        assert not (await session.scalars(select(BrokerSubmissionIntent).where(
++            BrokerSubmissionIntent.account_id == account))).all()
++
++
++async def test_default_dispatch_denies_without_injected_transport(submission_fixture, monkeypatch):
++    fixture = submission_fixture
++    intent = await stage(fixture)
++    monkeypatch.setenv("LIVE_TRADING_ENABLED", "true")
++    monkeypatch.delenv("TEST_DATABASE_DISPOSABLE_TOKEN")
++    result = await fixture[0].dispatch_once(**args(fixture, intent))
++    assert result["state"] == "blocked" and result["attempt_id"] is None
++    async with fixture[1]() as session:
++        events = (await session.scalars(select(BrokerSubmissionEvent).where(
++            BrokerSubmissionEvent.intent_id == intent["intent_id"]))).all()
++        assert [event.kind for event in events] == ["staged"]
++        assert result["reason_code"] == "EXTERNAL_WRITES_NOT_AUTHORIZED"
++
++
++@pytest.mark.parametrize("change", ["absent_marker", "wrong_marker", "different_database"])
++async def test_injected_transport_requires_actual_disposable_database(submission_fixture, monkeypatch, change):
++    fixture = submission_fixture
++    intent = await stage(fixture)
++    transport = AcceptedTransport(fixture[1])
++    if change == "absent_marker":
++        monkeypatch.delenv("TEST_DATABASE_DISPOSABLE_TOKEN")
++    elif change == "wrong_marker":
++        monkeypatch.setenv("TEST_DATABASE_DISPOSABLE_TOKEN", "wrong-fixture-marker-123456789")
++    else:
++        monkeypatch.setenv("TEST_DATABASE_URL", "postgresql+asyncpg://fixture@127.0.0.1:1/test_other")
++    with pytest.raises(PolicyDenied, match="OFFLINE_.*DATABASE"):
++        await fixture[0].dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
++    assert transport.calls == 0
++    async with fixture[1]() as session:
++        assert (await session.get(BrokerSubmissionIntent, intent["intent_id"])).state == "staged"
++
++
++@pytest.mark.parametrize("change,code", [
++    ("owner", "PRINCIPAL_INACTIVE"), ("account", "BROKER_ACCOUNT_INACTIVE"),
++    ("revoke", "IBKR_READ_CONSENT_REQUIRED"), ("binding", "SUBMISSION_ACCOUNT_CHANGED"),
++    ("endpoint", "SUBMISSION_ACCOUNT_CHANGED"),
++])
++async def test_scope_rechecked_before_handoff_and_cross_owner_denied(submission_fixture, change, code):
++    fixture = submission_fixture
++    journal, factory, user, account = fixture
++    intent = await stage(fixture)
++    transport = AcceptedTransport(factory)
++    with pytest.raises(PolicyDenied, match="SUBMISSION_NOT_OWNED"):
++        await journal.dispatch_once(**(args(fixture, intent) | {"user_id": str(uuid.uuid4())}),
++                                     transport=transport, timeout_seconds=5)
++    async with factory.begin() as session:
++        row = await session.get(BrokerAccount, account)
++        if change == "owner":
++            await session.execute(update(User).where(User.id == user).values(is_active=False))
++        elif change == "account":
++            row.is_active = False
++        else:
++            config = vault.decrypt_config(row.config_encrypted)
++            edits = {"revoke": {"read_authorized": False}, "binding": {"broker_account_id": "OTHER-FIXTURE"},
++                     "endpoint": {"host": "different.invalid"}}
++            row.config_encrypted = vault.encrypt_config(config | edits[change])
++    with pytest.raises(PolicyDenied, match=code):
++        await journal.dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
++    assert transport.calls == 0
++
++
++async def test_revocation_after_committed_attempt_is_checked_before_call(submission_fixture, monkeypatch):
++    fixture = submission_fixture
++    journal, factory, _, account = fixture
++    intent = await stage(fixture)
++    verify = journal._fixture
++    passes = 0
++
++    async def revoke_after_claim():
++        nonlocal passes
++        await verify()
++        passes += 1
++        if passes == 2:
++            async with factory.begin() as session:
++                row = await session.get(BrokerAccount, account)
++                row.config_encrypted = vault.encrypt_config(vault.decrypt_config(row.config_encrypted)
++                                                           | {"read_authorized": False})
++
++    monkeypatch.setattr(journal, "_fixture", revoke_after_claim)
++    transport = AcceptedTransport(factory)
++    with pytest.raises(PolicyDenied, match="IBKR_READ_CONSENT_REQUIRED"):
++        await journal.dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
++    assert transport.calls == 0
++    async with factory() as session:
++        assert (await session.get(BrokerSubmissionIntent, intent["intent_id"])).state == "handoff_started"
++
++
++async def test_revocation_during_transport_prevents_late_acknowledgement_persistence(submission_fixture):
++    fixture = submission_fixture
++    journal, factory, user, _ = fixture
++    intent = await stage(fixture)
++
++    class RevokingTransport(AcceptedTransport):
++        async def submit(self, request, **kwargs):
++            receipt = await super().submit(request, **kwargs)
++            async with factory.begin() as session:
++                await session.execute(update(User).where(User.id == user).values(is_active=False))
++            return receipt
++
++    transport = RevokingTransport(factory)
++    with pytest.raises(PolicyDenied, match="PRINCIPAL_INACTIVE"):
++        await journal.dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
++    async with factory() as session:
++        row = await session.get(BrokerSubmissionIntent, intent["intent_id"])
++        assert row.state == "handoff_started" and row.permanent_id is None
++        assert not await session.scalar(select(BrokerSubmissionEvent.id).where(
++            BrokerSubmissionEvent.intent_id == row.id, BrokerSubmissionEvent.kind == "acknowledged"))
++
++
++@pytest.mark.parametrize("mode", ["timeout", "exception", "bad_receipt", "cancel"])
++async def test_uncertain_handoff_survives_restart_without_resubmission(submission_fixture, mode):
++    fixture = submission_fixture
++    journal, factory, _, _ = fixture
++    intent = await stage(fixture)
++    entered = asyncio.Event()
++
++    class UncertainTransport(AcceptedTransport):
++        async def submit(self, request, **kwargs):
++            receipt = await super().submit(request, **kwargs)
++            entered.set()
++            if mode in {"timeout", "cancel"}:
++                await asyncio.Event().wait()
++            if mode == "exception":
++                raise RuntimeError("must-not-be-persisted-secret")
++            return {"success": True} if mode == "bad_receipt" else receipt
++
++    transport = UncertainTransport(factory)
++    if mode == "cancel":
++        task = asyncio.create_task(journal.dispatch_once(**args(fixture, intent), transport=transport,
++                                                        timeout_seconds=5))
++        await asyncio.wait_for(entered.wait(), 5)
++        task.cancel()
++        with pytest.raises(asyncio.CancelledError):
++            await task
++    else:
++        result = await journal.dispatch_once(**args(fixture, intent), transport=transport,
++                                             timeout_seconds=0.05 if mode == "timeout" else 5)
++        assert result["state"] == "uncertain"
++    restarted = BrokerSubmissionJournal(factory)
++    result = await restarted.dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
++    assert result["state"] == "uncertain" and transport.calls == 1
++    async with factory() as session:
++        payloads = (await session.scalars(select(BrokerSubmissionEvent.payload).where(
++            BrokerSubmissionEvent.intent_id == intent["intent_id"]))).all()
++        assert "must-not-be-persisted-secret" not in str(payloads)
++
++
++async def test_explicit_crash_recovery_and_late_result_never_rearm_handoff(submission_fixture):
++    fixture = submission_fixture
++    journal, factory, _, _ = fixture
++    intent = await stage(fixture)
++    entered, release = asyncio.Event(), asyncio.Event()
++
++    class Delayed(AcceptedTransport):
++        async def submit(self, request, **kwargs):
++            receipt = await super().submit(request, **kwargs)
++            entered.set()
++            await release.wait()
++            return receipt
++
++    transport = Delayed(factory)
++    task = asyncio.create_task(journal.dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5))
++    try:
++        await asyncio.wait_for(entered.wait(), 5)
++        restarted = BrokerSubmissionJournal(factory)
++        recovered = await restarted.recover_uncertain(**args(fixture, intent))
++        assert recovered["state"] == "uncertain"
++        release.set()
++        assert (await asyncio.wait_for(task, 5))["state"] == "uncertain"
++        assert (await restarted.dispatch_once(**args(fixture, intent), transport=transport,
++                                             timeout_seconds=5))["state"] == "uncertain"
++        assert transport.calls == 1
++    finally:
++        release.set()
++        await asyncio.gather(task, return_exceptions=True)
++
++
++def order_status(status="Filled", **changes):
++    return dict(kind="order_status", actual_account="SYNTHETIC-ACCOUNT-ONLY", event_id="fixture.status",
++                client_id=77, order_id=1, permanent_id=9, status=status, filled="0.004", remaining="0",
++                observed_at=datetime.now(UTC) - timedelta(seconds=1)) | changes
++
++
++async def retain(fixture, observations):
++    async with fixture[1].begin() as session:
++        await record_observations(session, user_id=fixture[2], account_id=fixture[3], observations=observations)
++    async with fixture[1]() as session:
++        return (await session.scalars(select(BrokerObservation).where(
++            BrokerObservation.account_id == fixture[3]).order_by(BrokerObservation.recorded_at))).all()
++
++
++async def test_callback_links_reuse_existing_review_without_ownership_or_fill_claims(submission_fixture):
++    fixture = submission_fixture
++    journal, factory, _, _ = fixture
++    intent = await stage(fixture)
++    await journal.dispatch_once(**args(fixture, intent), transport=AcceptedTransport(factory), timeout_seconds=5)
++    rows = await retain(fixture, [commission(), execution(), order_status(), order_status("Cancelled")])
++    fee = next(row for row in rows if row.kind == "commission")
++    with pytest.raises(PolicyDenied, match="SUBMISSION_LINKED_EXECUTION_REQUIRED"):
++        await journal.attach_observation(**args(fixture, intent), observation_id=fee.id)
++    for row in [row for row in rows if row.kind != "commission"] + [fee]:
++        await journal.attach_observation(**args(fixture, intent), observation_id=row.id)
++        await journal.attach_observation(**args(fixture, intent), observation_id=row.id)
++    review = await BrokerSubmissionJournal(factory).review_intent(**args(fixture, intent))
++    assert review["linked_observations"] == 4 and review["state"] == "acknowledged"
++    assert "ORDER_TERMINAL_STATUS_CONFLICT" in review["review"]["reason_codes"]
++    assert review["review"]["counts"]["executions_without_commission"] == 0
++    assert review["review"]["order_lifecycle"]["orders"][0]["execution_quantity"] == "0.004"
++    assert review["strategy_order_ownership"] == review["current_broker_state"] == "not_established"
++    assert review["execution_authority"] == "none" and review["complete_reconciliation"] is False
++    assert "SYNTHETIC-ACCOUNT-ONLY" not in str(review)
++    async with factory() as session:
++        linked = (await session.scalars(select(BrokerSubmissionEvent).where(
++            BrokerSubmissionEvent.intent_id == intent["intent_id"],
++            BrokerSubmissionEvent.kind == "observation_linked"))).all()
++        assert len(linked) == 4
++
++
++@pytest.mark.parametrize("change", [{"permanent_id": 10}, {"client_id": 78}, {"order_id": 2}])
++async def test_unrelated_callbacks_cannot_be_assigned_to_intent(submission_fixture, change):
++    fixture = submission_fixture
++    intent = await stage(fixture)
++    await fixture[0].dispatch_once(**args(fixture, intent), transport=AcceptedTransport(fixture[1]), timeout_seconds=5)
++    row, = await retain(fixture, [execution(**change)])
++    with pytest.raises(PolicyDenied, match="SUBMISSION_STABLE_BROKER_ID_REQUIRED"):
++        await fixture[0].attach_observation(**args(fixture, intent), observation_id=row.id)
++
++
++async def test_uncertain_identity_and_corrupted_request_fail_closed(submission_fixture):
++    fixture = submission_fixture
++    intent = await stage(fixture)
++    row, = await retain(fixture, [order_status()])
++    with pytest.raises(PolicyDenied, match="SUBMISSION_STABLE_BROKER_ID_REQUIRED"):
++        await fixture[0].attach_observation(**args(fixture, intent), observation_id=row.id)
++    async with fixture[1].begin() as session:
++        stored = await session.get(BrokerSubmissionIntent, intent["intent_id"])
++        stored.request = stored.request | {"quantity": "0.005"}
++    transport = AcceptedTransport(fixture[1])
++    with pytest.raises(PolicyDenied, match="SUBMISSION_REQUEST_CHANGED"):
++        await fixture[0].dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
++    assert transport.calls == 0
++
++
++async def test_history_remains_available_after_read_revocation_and_configuration_rotation(submission_fixture):
++    fixture = submission_fixture
++    journal, factory, _, account = fixture
++    intent = await stage(fixture)
++
++    class Revoking(AcceptedTransport):
++        async def submit(self, request, **kwargs):
++            receipt = await super().submit(request, **kwargs)
++            async with factory.begin() as session:
++                row = await session.get(BrokerAccount, account)
++                row.config_encrypted = vault.encrypt_config(vault.decrypt_config(row.config_encrypted) | {
++                    "enabled": False, "read_authorized": False, "client_id": 99, "host": "rotated.invalid",
++                })
++            return receipt
++
++    result = await journal.dispatch_once(**args(fixture, intent), transport=Revoking(factory), timeout_seconds=5)
++    assert result["state"] == "uncertain" and result["broker_identity_resolution"].startswith("permanent_id_unknown")
++    recovered = await journal.recover_uncertain(**args(fixture, intent))
++    review = await journal.review_intent(**args(fixture, intent))
++    assert recovered["state"] == review["state"] == "uncertain"
++    assert review["execution_authority"] == "none" and review["linked_observations"] == 0
++    async with factory() as session:
++        row = await session.get(BrokerSubmissionIntent, intent["intent_id"])
++        assert row.permanent_id is None
++        event = await session.scalar(select(BrokerSubmissionEvent).where(
++            BrokerSubmissionEvent.intent_id == row.id, BrokerSubmissionEvent.kind == "uncertain"))
++        assert event.payload["reason_code"] == "SUBMISSION_SCOPE_LOST_DURING_HANDOFF"
++
++
++async def test_timeout_candidate_callback_never_guesses_missing_permanent_identity(submission_fixture):
++    fixture = submission_fixture
++    intent = await stage(fixture)
++
++    class Unknown(AcceptedTransport):
++        async def submit(self, request, **kwargs):
++            await super().submit(request, **kwargs)  # Synthetic broker accepted, client never received its receipt.
++            raise TimeoutError("accepted-but-unknown")
++
++    result = await fixture[0].dispatch_once(**args(fixture, intent), transport=Unknown(fixture[1]), timeout_seconds=5)
++    assert result["state"] == "uncertain"
++    row, = await retain(fixture, [order_status()])
++    with pytest.raises(PolicyDenied, match="SUBMISSION_STABLE_BROKER_ID_REQUIRED"):
++        await fixture[0].attach_observation(**args(fixture, intent), observation_id=row.id)
++    assert (await fixture[0].review_intent(**args(fixture, intent)))["linked_observations"] == 0
++
++
++async def test_stubborn_coroutines_hold_bounded_capacity_without_new_attempts(submission_fixture):
++    fixture = submission_fixture
++    journal, factory, user, account = fixture
++    release = asyncio.Event()
++
++    class Stubborn:
++        calls = 0
++
++        async def submit(self, request, **_):
++            self.calls += 1
++            while not release.is_set():
++                # Reproduces a native-like operation that has not stopped yet.
++                with suppress(asyncio.CancelledError):
++                    await release.wait()
++            return TransportReceipt(status="acknowledged", client_id=request.client_id,
++                                    order_id=request.order_id, permanent_id=9)
++
++    transport = Stubborn()
++    try:
++        for index in range(MAX_OFFLINE_HANDOFFS):
++            intent = await journal.stage_intent(user_id=user, account_id=account, idempotency_key=f"capacity-{index}",
++                                                request=request_values(order_id=index))
++            result = await journal.dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=0.05)
++            assert result["state"] == "uncertain"
++        extra = await journal.stage_intent(user_id=user, account_id=account, idempotency_key="capacity-overflow",
++                                           request=request_values(order_id=MAX_OFFLINE_HANDOFFS))
++        with pytest.raises(PolicyDenied, match="OFFLINE_HANDOFF_CAPACITY"):
++            await BrokerSubmissionJournal(factory).dispatch_once(**args(fixture, extra), transport=transport,
++                                                                 timeout_seconds=5)
++        assert transport.calls == MAX_OFFLINE_HANDOFFS and len(journal._unfinished) == MAX_OFFLINE_HANDOFFS
++        async with factory() as session:
++            stored = await session.get(BrokerSubmissionIntent, extra["intent_id"])
++            assert stored.state == "staged" and stored.attempt_id is None
++    finally:
++        release.set()
++        if journal._unfinished:
++            await asyncio.wait_for(asyncio.gather(*journal._unfinished, return_exceptions=True), 5)
++
++
++@pytest.mark.parametrize("changes,reason", [
++    ({"con_id": 999}, "SUBMISSION_EXECUTION_CONTRACT_MISMATCH"),
++    ({"side": "SLD"}, "SUBMISSION_EXECUTION_CONTRACT_MISMATCH"),
++    ({"currency": "USD"}, "SUBMISSION_EXECUTION_CONTRACT_MISMATCH"),
++    ({"security_type": "OPT", "multiplier": "100"}, "SUBMISSION_EXECUTION_CONTRACT_MISMATCH"),
++    ({"security_type": None, "multiplier": None}, "SUBMISSION_CONTRACT_EVIDENCE_INCOMPLETE"),
++    ({"quantity": "0.005"}, "SUBMISSION_QUANTITY_EXCEEDED"),
++    ({"price": "101"}, "SUBMISSION_LIMIT_PRICE_BREACH"),
++])
++async def test_matching_broker_identity_retains_request_discrepancies(submission_fixture, changes, reason):
++    fixture = submission_fixture
++    intent = await stage(fixture)
++    await fixture[0].dispatch_once(**args(fixture, intent), transport=AcceptedTransport(fixture[1]), timeout_seconds=5)
++    event = execution(**(dict(security_type="STK", multiplier="1") | changes))
++    rows = await retain(fixture, [event, order_status(filled=event["quantity"])])
++    for row in rows:
++        await fixture[0].attach_observation(**args(fixture, intent), observation_id=row.id)
++    result = await fixture[0].review_intent(**args(fixture, intent))
++    assert result["linked_observations"] == 2 and result["review"]["status"] == "needs_review"
++    assert reason in result["review"]["reason_codes"]
++    assert result["review"]["execution_authority"] == "none"
++    assert result["complete_reconciliation"] is False
++
++
++async def test_sell_limit_and_distinct_cumulative_overfills_are_detected(submission_fixture):
++    fixture = submission_fixture
++    intent = await stage(fixture, side="sell")
++    await fixture[0].dispatch_once(**args(fixture, intent), transport=AcceptedTransport(fixture[1]), timeout_seconds=5)
++    first = execution(side="SLD", price="99", quantity="0.003", security_type="STK", multiplier="1",
++                      event_id="fixture.first.1")
++    second = execution(side="SLD", price="100", quantity="0.003", security_type="STK", multiplier="1",
++                       event_id="fixture.second.1")
++    rows = await retain(fixture, [first, first, second, order_status(filled="0.006")])
++    for row in rows:
++        await fixture[0].attach_observation(**args(fixture, intent), observation_id=row.id)
++    result = await fixture[0].review_intent(**args(fixture, intent))
++    assert result["linked_observations"] == 3
++    comparison = result["review"]["request_comparison"]
++    assert comparison["observed_execution_quantity"] == "0.006"
++    assert {"SUBMISSION_QUANTITY_EXCEEDED", "SUBMISSION_LIMIT_PRICE_BREACH"} <= set(comparison["reason_codes"])
++
++
++async def test_correction_family_quantities_are_not_summed_as_fresh_fills(submission_fixture):
++    fixture = submission_fixture
++    intent = await stage(fixture)
++    await fixture[0].dispatch_once(**args(fixture, intent), transport=AcceptedTransport(fixture[1]), timeout_seconds=5)
++    rows = await retain(fixture, [execution(event_id="fixture.correction.1", security_type="STK", multiplier="1"),
++                                  execution(event_id="fixture.correction.2", security_type="STK", multiplier="1"),
++                                  order_status()])
++    for row in rows:
++        await fixture[0].attach_observation(**args(fixture, intent), observation_id=row.id)
++    comparison = (await fixture[0].review_intent(**args(fixture, intent)))["review"]["request_comparison"]
++    assert comparison["observed_execution_quantity"] is None
++    assert "SUBMISSION_EXECUTION_QUANTITY_UNRESOLVED" in comparison["reason_codes"]
++    assert "SUBMISSION_QUANTITY_EXCEEDED" not in comparison["reason_codes"]
+diff --git a/tests/integration/migrations_test.py b/tests/integration/migrations_test.py
+index f260936..95f8a32 100644
+--- a/tests/integration/migrations_test.py
++++ b/tests/integration/migrations_test.py
+@@ -68,6 +68,7 @@ async def test_reviewed_schema_upgrades_without_assigning_unknown_owner(integrat
+                 "0017_valuation_snapshots.py",
+                 "0018_job_lease_clock.py",
+                 "0019_flexible_credentials.py",
++                "0020_broker_submission.py",
+             ]:
+                 if version == "0018_job_lease_clock.py":
+                     await connection.execute(text(
+diff --git a/tests/unit/broker_submission_test.py b/tests/unit/broker_submission_test.py
+new file mode 100644
+index 0000000..d5dd209
+--- /dev/null
++++ b/tests/unit/broker_submission_test.py
+@@ -0,0 +1,83 @@
++"""Pure offline contract validation; no SDK construction or database connection."""
++
++from decimal import Decimal
++import importlib
++
++import pytest
++from pydantic import ValidationError
++
++from src.execution.policy import PolicyDenied, digest
++from src.execution.broker_submission import TransportReceipt, SubmissionRequest, BrokerSubmissionJournal, _request
++
++
++def request_values(**changes):
++    return dict(environment="paper", session_id="fixture-session", correlation_id="fixture-correlation",
++                con_id=123, client_id=77, order_id=1, security_type="STK", exchange="IBIS2", currency="EUR",
++                side="buy", order_type="LMT", quantity="0.004", limit_price="100", tick="0.01", lot="0.001",
++                multiplier="1") | changes
++
++
++def test_exact_decimal_canonicalization_is_immutable_and_hash_stable():
++    first = SubmissionRequest(**request_values())
++    equivalent = SubmissionRequest(**request_values(quantity="0.0040", limit_price="100.00"))
++    assert first.quantity == Decimal("0.004")
++    assert digest(first.model_dump(mode="json")) == digest(equivalent.model_dump(mode="json"))
++    with pytest.raises(ValidationError):
++        first.quantity = Decimal("1")
++
++
++@pytest.mark.parametrize("changes", [
++    {"quantity": "NaN"}, {"limit_price": "Infinity"}, {"quantity": "-1"}, {"quantity": "0"},
++    {"quantity": "0.00000000001"}, {"quantity": "1e18"}, {"quantity": "0.0041"},
++    {"limit_price": "100.001"}, {"tick": "0"}, {"lot": "0"}, {"multiplier": "-1"},
++    {"con_id": True}, {"order_id": -1}, {"client_id": 0}, {"client_id": True},
++    {"environment": "live"}, {"environment_verified": "paper"}, {"approval": True},
++    {"security_type": "OPT"}, {"order_type": "MKT"}, {"currency": "eur"}, {"exchange": ""},
++    {"session_id": "x" * 129}, {"correlation_id": "x" * 65},
++    {"quantity": 0.004}, {"multiplier": True}, {"limit_price": 9007199254740993.0},
++])
++def test_invalid_or_authority_claiming_contracts_are_rejected(changes):
++    with pytest.raises(ValidationError):
++        SubmissionRequest(**request_values(**changes))
++
++
++def test_constructed_model_cannot_skip_service_validation():
++    forged = SubmissionRequest.model_construct(**request_values(quantity=Decimal("NaN")))
++    with pytest.raises(PolicyDenied, match="INVALID_SUBMISSION_REQUEST"):
++        _request(forged)
++
++
++def test_large_exact_decimal_text_does_not_undergo_float_rounding():
++    request = SubmissionRequest(**request_values(limit_price="9007199254740993", tick="1"))
++    assert request.limit_price == Decimal("9007199254740993")
++
++
++@pytest.mark.parametrize("changes", [
++    {"permanent_id": None}, {"permanent_id": 0}, {"permanent_id": True},
++    {"status": "filled"}, {"status": "rejected"}, {"environment_verified": "paper"},
++    {"order_id": True}, {"client_id": 0},
++])
++def test_receipts_cannot_claim_fills_or_verified_environment(changes):
++    with pytest.raises(ValidationError):
++        TransportReceipt(**(dict(status="acknowledged", client_id=77, order_id=1, permanent_id=9) | changes))
++
++
++def test_caller_session_or_unbound_factory_cannot_be_committed_by_service():
++    from sqlalchemy.ext.asyncio import async_sessionmaker
++
++    for value in (object(), async_sessionmaker()):
++        with pytest.raises(TypeError, match="async_sessionmaker"):
++            BrokerSubmissionJournal(value)
++
++
++@pytest.mark.parametrize("broker", ["ibkr", "alpaca", "binance", "coinbase"])
++@pytest.mark.parametrize("operation", ["submit", "cancel"])
++def test_all_real_sdk_write_entrypoints_stay_unconditionally_closed(monkeypatch, broker, operation):
++    # No SDK import is needed by these lazy adapter modules. Even arbitrary
++    # approval/account/verified-environment kwargs never reach the legacy body.
++    monkeypatch.setenv("LIVE_TRADING_ENABLED", "true")
++    module = importlib.import_module("src.tools.brokers." + broker)
++    function = getattr(module, operation + "_" + broker + "_order")
++    result = function(approval=True, environment_verified="paper", account=object())
++    assert result["blocked"] is True and result["success"] is False
++    assert result["reason_code"] == "EXTERNAL_WRITES_NOT_AUTHORIZED"

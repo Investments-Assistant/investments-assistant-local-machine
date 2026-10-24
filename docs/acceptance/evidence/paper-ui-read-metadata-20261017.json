@@ -1,0 +1,62 @@
+{
+  "status": "READ_OBSERVATION_PERSISTED_WITH_INCOMPLETE_BALANCE_EVIDENCE",
+  "audited_at": "2026-10-17T09:47:53.641062+00:00",
+  "scope": "Latest normal-UI-produced account-scoped retained callback metadata only; no new external read",
+  "source_receipt_sha256": "5438cf8e46c259087f9a2f284c660008b3d6526bd385a85b4f95d074d6b41bac",
+  "normal_ui_read_success_reported_by_operator": true,
+  "persisted_observation_count": 1,
+  "kind_counts": {
+    "balance_snapshot": 1,
+    "execution": 0,
+    "commission": 0,
+    "order_status": 0
+  },
+  "unique_active_operator_and_selected_ibkr_record": true,
+  "observation_owner_chain_consistent": true,
+  "distinct_account_binding_count": 1,
+  "stored_hashes_well_formed": true,
+  "stored_payload_hash_recomputed_by_auditor": false,
+  "database_content_idempotency_constraint_present": true,
+  "duplicate_content_group_count": 0,
+  "operator_callback_replay_performed": false,
+  "raw_account_and_event_identifier_keys_absent": true,
+  "environment": {
+    "declared_paper_for_all_observations": true,
+    "independent_environment_verification": false,
+    "stored_environment_verified_null_for_all": true,
+    "operator_current_paper_banner_confirmation": "Reported before the read",
+    "current_encrypted_account_binding_recomputed": false,
+    "actual_account_match_evidence": "Reviewed adapter/persistence enforce configured-account equality; successful scoped persistence, without auditor decrypting actual identifier"
+  },
+  "balance_evidence": {
+    "positions_request_complete": true,
+    "cash_request_complete": false,
+    "snapshot_atomic": false,
+    "balance_reconciliation": "NOT_ESTABLISHED"
+  },
+  "authority": {
+    "all_observations_external_or_unknown_ownership": true,
+    "all_execution_authority_none": true,
+    "order_or_broker_write_performed_by_auditor": false
+  },
+  "refresh": {
+    "status": "observed",
+    "scope_read_only": true,
+    "native_worker_returned": true,
+    "failure_absent": true,
+    "lease_active_at_audit": false,
+    "inserted_count": 1,
+    "review_digest_present": true
+  },
+  "observed_at_utc": "2026-10-17T00:03:57.263466+00:00",
+  "recorded_at_utc": "2026-10-17T00:03:57.334442+00:00",
+  "no_financial_values_credentials_account_identifiers_or_auth_sessions_accessed": true,
+  "consent_disable_state": "PENDING_USER_UI_ACTION_NOT_ASSUMED_DISABLED",
+  "limits": [
+    "Collector status observed describes a returned callback window, not complete balances",
+    "Cash evidence is incomplete; snapshots are sequential and non-atomic",
+    "Paper is operator-declared, not independently verified",
+    "Available callbacks do not prove complete history, reconciliation, ownership or execution permission",
+    "No second read, stream, order, cancel, broker probe, fabricated auth session or configuration mutation was performed by this audit"
+  ]
+}

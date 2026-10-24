@@ -1,0 +1,80 @@
+{
+  "status": "EXACT_OWNER_APPROVED_SIX_FILE_PATCH_COMMITTED_PUSHED_REMOTE_VERIFIED",
+  "at": "2026-10-23T16:07:23.791960+00:00",
+  "head": "d5aa99ec1f2a67e62c929d9bc2dcb1a616af453b",
+  "parent": "a2b2f42da7610dd4b4feadafd4fce13d9acc78bc",
+  "branch": "main",
+  "remote": "origin",
+  "patch_sha256": "b2da0209cb1792c0c1c8a9284c65ad12764f36c45a7caed9c850bc418b64e165",
+  "file_count": 6,
+  "files_sha256": {
+    "src/execution/broker_submission.py": "db7543fe0cdff01b4fe186eb0a1d803a26a48a7a45849142386f8f8920accf9a",
+    "src/execution/broker_observations.py": "f4985f68e6003a16ff9080f3aabde2ffa986943c2d2c1ff86bcdda491174410b",
+    "src/tools/brokers/ibkr_observations.py": "a357b0d4d5aacfadfbb9600a8e1f7d8011ee2ff9fb77c525d549fbd8cf5f6708",
+    "tests/unit/broker_submission_test.py": "5bd961d0d763df3d41a3b1da662fa4386bf03dc0b573c2db54c1289f64a638dd",
+    "tests/unit/ibkr_observations_test.py": "0e25b4e404d3ba9b0ddaebecde0c8d61e7c2ab38db3685b1b764f69656db139e",
+    "tests/integration/broker_submission_journal_test.py": "851f72cdb2ea196838cbf2d6fac95e0b68f7b058e1f08750140346a986a6f8f5"
+  },
+  "staged_and_committed_patch_matches_approved": true,
+  "index_empty": true,
+  "unrelated_dirty_docs_evidence_preserved": true,
+  "force_push": false,
+  "source_fingerprint": "13aa112ff9960830e715dc80e7df76a206842d681f1c04ace3ca57892d94f7a5",
+  "tests_fingerprint": "12dbb43ee20b58f7d8bb938e26f8e278611a880d4db6c956f60faa9036d1a62c",
+  "actual_broker_or_trading_permissions_changed": false,
+  "ci": "PENDING_EXACT_CURRENT_COMMIT",
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-recovery-publication-20261023/plan.json",
+      "sha256": "b8986db8c81b29b001e571d480c444588173804a9215bdeb3df996920eca6a40"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/commit_once.py",
+      "sha256": "dfab217b8f9c2c5975eda1a52e547829ae3b4dbe06db36b6c01740e6c8a95eef"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/commit-claim.json",
+      "sha256": "40d7789c5f19af076082c6179cf56ecf28f6b4d0b7854a2eeb6c506ca3254bf4"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/commit-execution.json",
+      "sha256": "cad49e609266e85846a9eb470e1faa5e26b9b9ee4e804252d43e720495a8b013"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/commit-result.json",
+      "sha256": "c36b88e112fcce0014d9b2dcc860c44a9c4aab5fd301f5ef7f4f22e102eecc48"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/commit.log",
+      "sha256": "c017620db0c93564fa34583188e6a92872d31f233880685c401865dbb803a608"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/staged.patch",
+      "sha256": "b2da0209cb1792c0c1c8a9284c65ad12764f36c45a7caed9c850bc418b64e165"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/push_once.py",
+      "sha256": "3eba5f6fde1a5efd4a14c5f0d048ecdb66c28b9c81229a0a26499e121af63ec5"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/push-claim.json",
+      "sha256": "d5a2553f0d305771fbb7029a1983e35cd2a4d2f2e4aecd914019e0ed50aacda1"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/push-execution.json",
+      "sha256": "c1484693cd82776997a4b76fb36c3ec4d577070b4c139b620189353a73c01632"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/push-result.json",
+      "sha256": "cb84812cb0311efc17996ec41bf87d4a013b46135f751ebee07ffdc31ef9331d"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/push.log",
+      "sha256": "50a9753a1118c5a9df20a8d2d65f806b0d5d63f74f1a8114aff4a2c6d9945845"
+    },
+    {
+      "path": ".qa/paper-recovery-publication-20261023/push-remote-verification.json",
+      "sha256": "7ae47fb6ec1419e3d27f2cbad8b45ebdade91a8572aa08f1f2f2e12f77ba8b4d"
+    }
+  ]
+}

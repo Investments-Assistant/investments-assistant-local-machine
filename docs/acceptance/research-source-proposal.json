@@ -1,0 +1,71 @@
+{
+  "proposal": "private-eodhd-source-check-v1",
+  "reviewed_on": "2026-10-23",
+  "status": "OWNER_APPROVED_MANIFEST_PREPARED_AWAITING_FREE_ALLOWANCE",
+  "owner_approval": {
+    "question_call": "call_74bd452a29e64cecaf97bc2e99810272",
+    "answer": "Approve the free data check"
+  },
+  "owner_has_local_price_history": false,
+  "purpose": "Private noncommercial source qualification only; not a strategy evaluation or L14 pass",
+  "provider": "EODHD",
+  "plan": "Sandbox",
+  "maximum_purchase_cost": "0",
+  "payment_details_or_paid_trial_allowed": false,
+  "proposed_sample": ["SPY.US", "MSFT.US", "AAPL.US"],
+  "sample_is_approved_study_or_trading_universe": false,
+  "interval": "completed daily sessions",
+  "history_scope": "preceding available year; exact dates and identities frozen before any request",
+  "exact_request_manifest": {
+    "path": ".qa/eodhd-private-source-check-20261023/check-20261024/plan.json",
+    "sha256": "ac12e78eff26459452f31ab5d76a2b1c810acc16a382cdad5b2580b43f33ee24",
+    "start_date": "2025-10-25",
+    "end_date": "2026-10-23",
+    "expires_at": "2026-10-25T11:22:15.645432+00:00",
+    "maximum_http_requests": 9,
+    "maximum_API_call_units": 9,
+    "started": false
+  },
+  "limits": {
+    "maximum_http_requests": 12,
+    "maximum_documented_API_call_units": 20,
+    "maximum_requests_per_minute": 20,
+    "also_limited_by_remaining_free_account_allowance": true,
+    "automatic_retry_polling_or_upgrade": false
+  },
+  "allowed_endpoint_categories": ["daily EOD", "dividends JSON", "splits JSON", "up to three instrument identity lookups only if free eligibility and cost verified"],
+  "unknown_cost_endpoint_allowed": false,
+  "storage": "New ignored private local directory, chosen after approval; no Git, public artifacts, chat data extracts, app display or shared access",
+  "account_or_token_provided": true,
+  "account_token_readiness_evidence": "Owner confirms free account ready and key saved locally via call_2934bdcbcb314d608ec359d6f892fe9f; no agent key read",
+  "remaining_free_allowance_confirmed": false,
+  "data_requests_made": 0,
+  "provider_enabled": false,
+  "required_before_request": [
+    "Explicit owner source-check approval",
+    "Owner-controlled eligible free account, applicable terms and remaining free allowance confirmed",
+    "Token provided through an agreed secure local path, never chat",
+    "Frozen exact date/identity/request manifest and verified endpoint costs"
+  ],
+  "qualification_checks": [
+    "Instrument identity, currencies and daily calendar coverage",
+    "Duplicates, missing sessions and response provenance/hashes",
+    "Raw OHLC versus dividend/split-adjusted close and split-adjusted volume",
+    "Split ratios and historical dividend amounts, currencies and available dates",
+    "Coverage against unchanged 120/60/60 engineering split plus ten-session lookback"
+  ],
+  "engineering_fixture_plan_changed": false,
+  "real_strategy_run_allowed": false,
+  "economic_conclusion": "INSUFFICIENT EVIDENCE",
+  "paper_read_or_write_authorized_by_proposal": false,
+  "live_trading_allowed": false,
+  "final_host_checks": "Deferred to actual deployment computer; no laptop 24h or CPU-temperature work",
+  "primary_sources": [
+    "https://eodhd.com/pricing",
+    "https://eodhd.com/financial-apis/terms-conditions",
+    "https://eodhd.com/financial-apis/api-for-historical-data-and-volumes",
+    "https://eodhd.com/financial-apis/api-splits-dividends",
+    "https://app.tiingo.com/tos/",
+    "https://www.interactivebrokers.com/docs/general/market-data-subscriptions/introduction"
+  ]
+}

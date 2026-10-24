@@ -1,9 +1,50 @@
 # Proposed forward observation plan — not approved
 
-Status: proposal only. No observation campaign or external account connection has
-started. This document grants no account, data, order or live authority. The fixed
+Status: proposal only; no forward observation campaign or actual Paper order has
+started. A separate owner-authorized17Oct UI read retained one partial non-atomic
+balance snapshot (positions complete, cash incomplete, SDK-unverified environment),
+not campaign or execution evidence. The owner subsequently saved both read flags
+OFF; no current read permission or retry follows from that historical read. See
+[retained metadata](evidence/paper-ui-read-metadata-20261017.json).
+This document grants no account, data, order or live authority. The fixed
 historical fixture plan remains unchanged; its holdout must not be reused to tune
 this proposal. Research conclusion remains INSUFFICIENT EVIDENCE; live is NO-GO.
+
+On22Oct the owner explicitly kept research and actual Paper L04/L15 OPEN. Laptop
+24h/CPU-temperature/clock work is deferred to the unknown actual deployment host;
+see [handoff](FINAL_HOST_HANDOFF.md). Deferral neither approves this campaign nor
+turns offline fixture evidence into a Paper or economic result.
+
+## Implemented offline foundation — not campaign authority
+
+The [schema0020 submission contract](BROKER_SUBMISSION_CONTRACT.md) now retains
+fixture-only canonical intents, committed attempts before synthetic handoff,
+uncertainty/no automatic resend, bounded unfinished tasks and linked callback
+identity/request-discrepancy review. The publisheda2b foundation passes119focused
+and1338backend checks. Subsequent [six-file recovery patchd5aa](evidence/paper-recovery-publication-20261023.json)
+adds committed attempt-reference/late-execution correlation while retaining
+uncertainty/noresend and sticky contradictions. [172focused checks](evidence/paper-recovery-focused-20261023.json),
+920unit and459distinctPG cases have passing executions; the original fullPG clock
+failure and successful targetedretry are retained. [New image/smoke](evidence/paper-recovery-image-review-20261023.json)
+and [all committed-image bytes](evidence/paper-recovery-published-image-reconciliation-20261023.json)
+pass. [Exactd5aaCI/Sonar39983987095](evidence/paper-recovery-ci-20261023.json) now
+passes920unit/459PG/1383overlappingcombined,24browser/8TLS-WSS and the configured
+primary Sonar gate; the CI PGtier is clean. No actual transport, SDKwrite,
+connected Paper lifecycle or campaign is validated by these offline checks.
+
+Future actual execution still needs separately reviewed SDK transport integration,
+verified selected Paper provenance, independent human approval or approved mandate,
+qualified contract/price/FX evidence, deterministic pretrade risk checks and atomic
+cash/exposure reservations tied to immutable intent. Commission/history/reconnect
+and current broker reconciliation remain required. The new journal creates none
+of those permissions or integrations, and all SDK write entrypoints stay closed.
+An acknowledgement is not a fill. An unknown permanent ID may be correlated only
+from a committed reference hash and strict same-binding fresh execution evidence
+inside the marked offline fixture. Missing/legacy/ambiguous/conflicting evidence
+stays unresolved, and even a match grants no ownership, resend or authority. No
+distributed exactly-once claim is made. Historical simulator, e154 CI/image and0018/0019 backup proofs retain their
+recorded scope; they cannot substitute for current-source/actual-host/actual-Paper
+acceptance or an approved forward plan.
 
 ## Purpose and proposed sample
 

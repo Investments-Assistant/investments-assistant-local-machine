@@ -1,0 +1,128 @@
+{
+  "status": "FOCUSED_OFFLINE_RECOVERY_PASS",
+  "at": "2026-10-23T15:40:15.904177+00:00",
+  "base_commit": "a2b2f42da7610dd4b4feadafd4fce13d9acc78bc",
+  "source_fingerprint": "13aa112ff9960830e715dc80e7df76a206842d681f1c04ace3ca57892d94f7a5",
+  "tests_fingerprint": "12dbb43ee20b58f7d8bb938e26f8e278611a880d4db6c956f60faa9036d1a62c",
+  "file_sha256": {
+    "src/execution/broker_submission.py": "db7543fe0cdff01b4fe186eb0a1d803a26a48a7a45849142386f8f8920accf9a",
+    "src/execution/broker_observations.py": "f4985f68e6003a16ff9080f3aabde2ffa986943c2d2c1ff86bcdda491174410b",
+    "src/tools/brokers/ibkr_observations.py": "a357b0d4d5aacfadfbb9600a8e1f7d8011ee2ff9fb77c525d549fbd8cf5f6708",
+    "tests/unit/broker_submission_test.py": "5bd961d0d763df3d41a3b1da662fa4386bf03dc0b573c2db54c1289f64a638dd",
+    "tests/unit/ibkr_observations_test.py": "0e25b4e404d3ba9b0ddaebecde0c8d61e7c2ab38db3685b1b764f69656db139e",
+    "tests/integration/broker_submission_journal_test.py": "851f72cdb2ea196838cbf2d6fac95e0b68f7b058e1f08750140346a986a6f8f5"
+  },
+  "counts": {
+    "tests": 172,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "command": [
+    "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "tests/unit/broker_submission_test.py",
+    "tests/unit/ibkr_observations_test.py",
+    "tests/unit/broker_accounts_test.py",
+    "tests/unit/ibkr_read_routing_test.py",
+    "tests/integration/broker_submission_journal_test.py",
+    "tests/integration/broker_observations_test.py",
+    "-q",
+    "--junitxml=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/paper-recovery-20261023-6b8403c7e290/recovery-focused-v2.xml",
+    "-o",
+    "cache_dir=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/paper-recovery-20261023-6b8403c7e290/pytest-cache"
+  ],
+  "junit": "docs/acceptance/evidence/paper-recovery-focused-20261023.xml",
+  "junit_sha256": "c729cb0b0415ffcd5c498d524b3e3bcc8bf3cae3641b7b42ad08ed56a2df5a60",
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/frozen-review.json",
+      "sha256": "ca3c25a90676836c2a94f1337944f3c767626586a4a37c1de4b1eb9d0a25bb1b"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/preparation.json",
+      "sha256": "351c69f7034d72c624139064f808bc7435cdc121dcffdbe9c8af174b31959283"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/plan-focused-validation.json",
+      "sha256": "4781ba12c10cbe6939d8fe37424fee8bed9f18bbcdc8de8bd2da71d762ddea95"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/native-boot-guard-review.json",
+      "sha256": "aa1d19299ada55aa11e830fb08f2875a1b0cd55e63055a5122904f05a94d7e55"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/root-initialize-claim.json",
+      "sha256": "ceeef3aecc52b290abdef7469fc324d0521fbbe883e323e75c83cba65df6e2bb"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/root-initialize-execution.json",
+      "sha256": "0b433fe3a0ad8963640b8f6c835784a23883ad8502fcda5b23bc4713d3585ad9"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/root-initialize-result.json",
+      "sha256": "a8993877b73b305c294e556d61b9757efc354d604d95466b66603c88e56f469c"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/root-initialize.log",
+      "sha256": "8a0ae915e684152d549daa36f19357c50abdadaa435b07bbe3966266f0416015"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/migrations.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/isolation-check.log",
+      "sha256": "93ef4526d11257f0193f382d8ef9fb20de9d496d681cc6fa522c263e43c7b98f"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/recovery-focused-v1-execution.json",
+      "sha256": "3bfefa87e9e90fc504b18d3bddd992a611f567922b13b1c531df097c3725000a"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/recovery-focused-v1-result.json",
+      "sha256": "ea3bb703c71daafb6320bd064142ff183a5eb23cf3a8f00d750dd16005471671"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/recovery-focused-v1.log",
+      "sha256": "23dc71f4c2fc8e04847f274d4b5c53bb0e3f356b2ab82a23cab8ba27e7c3a439"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/recovery-focused-v1.xml",
+      "sha256": "2382d0ebcd2a2c1c072e1d206307130d29eebacd5f11600243add36463ac8ebf"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/recovery-focused-v2-execution.json",
+      "sha256": "e2225cc9fe3261b821616b349e0d3f75feeb16ee3331e52805f66863686368d7"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/recovery-focused-v2-result.json",
+      "sha256": "ca17ec567b6a8aff39abc04d4061532b819356e51957d0af27deea96dc0caf0f"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/recovery-focused-v2.log",
+      "sha256": "f23a05f196ab08fba0f67a41d80888fe938235dad6b6a6a62b8e2502c9a8c539"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/recovery-focused-v2.xml",
+      "sha256": "c729cb0b0415ffcd5c498d524b3e3bcc8bf3cae3641b7b42ad08ed56a2df5a60"
+    }
+  ],
+  "fixture": {
+    "work": ".qa/paper-recovery-20261023-6b8403c7e290",
+    "schema": "0020_broker_submission",
+    "fresh_disposable": true,
+    "unix_socket_only": true,
+    "private_dotenv_reads_denied": true,
+    "actual_broker_provider_flags_off": true
+  },
+  "limitations": [
+    "Synthetic transport and broker observations only; no actual broker connection/order or verified environment/ownership/current-state/financial authority",
+    "New journal object reload exercised, not Python application-process or new actual PostgreSQL restart/restore",
+    "First collection attempt ran zero tests due nonexistent paths; retained as failure, not acceptance",
+    "Native stale-boot guard denied before any operation; unused plan then re-bound only after native inspection",
+    "Full unit/integration, image and new publication/CI remain pending"
+  ]
+}

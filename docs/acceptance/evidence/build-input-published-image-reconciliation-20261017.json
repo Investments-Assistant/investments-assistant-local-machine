@@ -1,0 +1,22 @@
+{
+  "status": "ORIGINAL_IMAGE_CONTEXT_RECONCILED_TO_PUBLISHED_HEAD_AND_CI",
+  "head": "a4fccdea0c62179eda12a9fad089b74cb1c925b2",
+  "image_id": "sha256:1525bf203b8effe7675e10b558811d3578196a54eee94052c69e6ebe69371e2d",
+  "original_context_review": {
+    "path": "docs/acceptance/evidence/postpublication-context-review-20261017.json",
+    "sha256": "c9c2ed201241915749552c911171a21a78b3fd2995db4608ec4ab984eff3bada"
+  },
+  "publication": {
+    "path": "docs/acceptance/evidence/build-input-publication-20261017.json",
+    "sha256": "393b0d665a756cbf88b3416ca6f5d35bfce99fe6562d7e8d5aa695e5bb742a6e"
+  },
+  "terminal_ci": {
+    "path": "docs/acceptance/evidence/build-input-ci-20261017.json",
+    "sha256": "8bbade863a00d9c89be4d248d5980d698ce9f25463856f2a6ef33b4205c1c271"
+  },
+  "original_image_provenance_retained": true,
+  "new_image_build_claimed": false,
+  "cold_build_or_bit_identical_reproduction_claimed": false,
+  "scope": "Original exact184file context and packaging overlay bytes match publishedHEAD; image runtime/ingress evidence remains scoped to that built image; published CI all4/configuredSonarPASS",
+  "no_additional_24h_paper_cooling_or_research_claim": true
+}

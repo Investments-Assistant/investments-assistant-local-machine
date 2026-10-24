@@ -32,31 +32,60 @@ simulation tools without any broker credentials.
 - OpenSSL for the local certificate
 - A GGUF model downloaded into `models/`
 
-Docker Desktop, native Linux Docker, and ARM64 Docker hosts are supported in principle. The
-repository cannot validate Docker startup unless Docker is available on the host.
+The final deployment computer's OS and architecture have not been selected. Existing
+runtime evidence covers an amd64 Docker image and a CPU4/context4096/GPU0 model
+profile; it does not validate every Docker host, ARM64 execution or GPU inference.
+Follow the [final-host handoff](docs/acceptance/FINAL_HOST_HANDOFF.md) before deployment.
+On 22 October 2026 the owner deferred this laptop's 24-hour observation, mapped CPU
+temperature checks and clock repair to that final computer. These checks are pending,
+not passed. Research and external Paper gates remain open; the Goal is incomplete.
 
 ## Setup
 
+For a new checkout only, prepare a private configuration using the reviewed Python
+toolchain. Preserve any existing configuration and keys:
+
 ```bash
+# Only when .env does not already exist:
 cp .env.example .env
 python3 scripts/create_auth_hash.py       # copy the generated values into .env
 python3 scripts/create_broker_key.py      # append/copy BROKER_CREDENTIALS_KEY into .env
-python3 scripts/download_model.py --list
-python3 scripts/download_model.py qwen2.5-1.5b --output-dir ./models
 ```
+
+Place an existing, permitted GGUF in `models/` and record its hash. Model acquisition
+and platform installation need their own reviewed source/licence and applicable
+permission; these instructions do not authorize a download or OS change.
 
 Set at least `POSTGRES_PASSWORD`, `AUTH_PASSWORD_HASH`, `AUTH_SESSION_SECRET`,
 `BROKER_CREDENTIALS_KEY`, and `LLM_MODEL_PATH` in `.env`. Keep `AUTH_REQUIRE_LOGIN=true`,
 `ENVIRONMENT=production`, and `LIVE_TRADING_ENABLED=false` while validating. Broker API keys
-are optional and should normally be entered by each user in the authenticated UI. The legacy
-broker variables in `.env` are only a compatibility fallback for system/scheduler calls with
-no authenticated user.
+are optional and must be associated with the authenticated owner's selected account.
+The retained broker adapters deny a global environment-credential fallback; setting
+legacy broker variables does not authorize an ownerless or scheduled broker read.
+Keep both Yahoo historical-data and market-data permissions disabled until their
+respective rights reviews; neither permission grants the other.
 
-Deploy:
+For an **explicitly approved new, empty database only**, after reviewing secrets,
+loopback bindings, subnet/port conflicts and the model path:
 
 ```bash
-make local-deploy
+make local-build
+docker compose up -d postgres
+# Wait until this new PostgreSQL service is healthy before continuing.
+docker compose run --rm --no-deps app alembic upgrade head
+docker compose run --rm --no-deps app python scripts/create_user.py
+make local-up
+make local-wait
+make local-ready
 ```
+
+User creation prompts for the login ID and password; `--username` is optional.
+Resolve the checked-out Alembic head before migration and verify that exact revision
+afterward. `make local-deploy` never migrates a fresh database: use it only once the
+intended database is already at the reviewed revision. Existing data requires the
+[backup, restore and migration procedure](docs/acceptance/RUNBOOK.md), including
+separate applicable migration/deployment approval. Do not apply the new-database
+example to an existing volume or copy this laptop's private database or `.env`.
 
 For WSL2, Docker Desktop must be running. The deployment is split into
 independent Make targets; run `make help` to inspect or rerun individual
@@ -80,7 +109,10 @@ docker compose exec app python scripts/create_user.py \
 The **Simulation** tab runs fake-money historical backtests locally through the
 same simulator used by the agent. It supports buy-and-hold, SMA crossover, RSI
 mean reversion, and momentum strategies. It never submits orders to Alpaca,
-IBKR, Coinbase, or Binance; only the historical market-data download is external.
+IBKR, Coinbase, or Binance. The Yahoo historical-price download is external and
+default-disabled pending rights review. Without permitted input, a missing-data
+result must not be treated as a completed backtest or economic evidence. Other
+provider-backed tools likewise depend on their configured permissions and inputs.
 
 The **Weekly Report** action is an agent workflow rather than a generic prompt:
 it gathers the authenticated user's available broker data, trade audit, saved
@@ -125,4 +157,5 @@ poetry run pytest -q --ignore=tests/integration
 
 The Raspberry Pi/VPN deployment remains documented in the sibling
 `investments-assistant-raspberry-pi-5` repository. This repository is intentionally independent
-and has no Git remote configured by default.
+of that deployment. `scripts/setup.sh` changes OS, VPN and firewall settings and is
+not a generic bootstrap command for an unknown final host.

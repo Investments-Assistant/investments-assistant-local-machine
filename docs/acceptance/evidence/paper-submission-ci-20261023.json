@@ -1,0 +1,157 @@
+{
+  "status": "EXACT_APPROVED_SIXTEEN_FILE_COMMIT_ALL_FOUR_CI_AND_CONFIGURED_SONAR_GATE_PASS",
+  "verified_at": "2026-10-23T00:22:25.151660+00:00",
+  "head": "a2b2f42da7610dd4b4feadafd4fce13d9acc78bc",
+  "run_id": 39875250173,
+  "run_url": "https://github.com/Investments-Assistant/investments-assistant-local-machine/actions/runs/39875250173",
+  "workflow_conclusion": "success",
+  "jobs": [
+    {
+      "id": 120159174665,
+      "name": "Unit Tests / Run Unit Tests",
+      "conclusion": "success"
+    },
+    {
+      "id": 120159471287,
+      "name": "Chromium + PostgreSQL (synthetic model)",
+      "conclusion": "success"
+    },
+    {
+      "id": 120159471305,
+      "name": "Integration Tests / Run Integration Tests",
+      "conclusion": "success"
+    },
+    {
+      "id": 120164384301,
+      "name": "SonarCloud Quality Gate (combined coverage)",
+      "conclusion": "success"
+    }
+  ],
+  "test_tiers": {
+    "unit": {
+      "tests": 907,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "tests": 431,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "combined": {
+      "tests": 1342,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "combined_overlap": "Combined run repeats unit/integration and includes additional e2e tests; execution counts are not added.",
+  "combined_additional_case_count": 4,
+  "browser_flows": 24,
+  "ingress_checks": 8,
+  "combined_measured_line_coverage": {
+    "covered": 10440,
+    "valid": 12387,
+    "reported_rate": "0.8428",
+    "browser_server_coverage_included": true,
+    "measured_browser_line_bit_rows": 131
+  },
+  "sonar": {
+    "project_key": "Investments-Assistant_investments-assistant",
+    "branch": "main",
+    "scm_revision": "a2b2f42da7610dd4b4feadafd4fce13d9acc78bc",
+    "ce_task_id": "AaFmIEfwqdLc5m74YxQS",
+    "exact_report_quality_gate": "PASSED",
+    "metadata_report": ".scannerwork/report-task.txt",
+    "evidence": [
+      "2026-10-23T00:18:31.1512892Z 00:18:31.150 INFO  Project key: Investments-Assistant_investments-assistant",
+      "2026-10-23T00:19:09.7573503Z 00:19:09.710 INFO  SCM revision ID 'a2b2f42da7610dd4b4feadafd4fce13d9acc78bc'",
+      "2026-10-23T00:19:14.1365298Z 00:19:14.136 INFO  ANALYSIS SUCCESSFUL, you can find the results at: https://sonarcloud.io/dashboard?id=Investments-Assistant_investments-assistant&branch=main",
+      "2026-10-23T00:19:14.1370738Z 00:19:14.136 INFO  More about the report processing at https://sonarcloud.io/api/ce/task?id=AaFmIEfwqdLc5m74YxQS",
+      "2026-10-23T00:19:18.8014254Z \u2714 Quality Gate has PASSED."
+    ],
+    "separate_neutral_checks_not_used_as_acceptance": [
+      {
+        "name": "SonarCloud Code Analysis",
+        "conclusion": "neutral",
+        "title": "Quality Gate not computed"
+      }
+    ]
+  },
+  "model_scope": "CI synthetic model/providers; actual PostgreSQL/Chromium/loopback NginxTLS/WSS. Independent actualGGUF image evidence remains separate.",
+  "broker_connections": 0,
+  "external_orders": 0,
+  "workflow_rerun": false,
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-submission-publication-20261023/terminal-run.json",
+      "sha256": "cb002dff9a63bcdffdb39fffb9fe8702f0c57726bff61ce7e77bd1bd80838d0c"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/terminal-jobs.json",
+      "sha256": "cbbdad43923bcea720992f96381f23a9771e68f6f504c5fc3e7897a34e00ac75"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/terminal-artifacts.json",
+      "sha256": "b19422c26eae4a1b8edad02865f94e43cc480da416931d62d1e5ef6c6dc02eee"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/artifacts/junit-unit/junit-unit.xml",
+      "sha256": "437603e7fd9163f4d69f9423a48a864a13758a6a1d2813cb1f31460179cee766"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/artifacts/junit-integration/junit-integration.xml",
+      "sha256": "0ee6154b769149c62fe8f72f6a295a7b330cf9330f49f6f8eac417e20f2e58e7"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/artifacts/junit-e2e/junit-e2e.xml",
+      "sha256": "8ec4422e4743c0aafe8f97dba70e7fbd96da272387a989cc66a5b63a491099b7"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/artifacts/coverage-combined/coverage-combined.xml",
+      "sha256": "4efdd7eefe5d471456f4f61963017383c93252d335d1f01cffb2e1dd8c8cb87a"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/artifacts/browser-synthetic-evidence/docs/acceptance/evidence/browser-ci.txt",
+      "sha256": "2d4964cdca4376cabbfc37eb07108141c4c443a850fd3d7c456eb5ace17726ea"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/artifacts/browser-synthetic-evidence/docs/acceptance/evidence/nginx-ci.json",
+      "sha256": "bd1b8bd2ae730cfa9def2dd32b544f225c32996ed4424b8e9e3a2ebba2b6a373"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/artifacts/coverage-browser/.coverage.browser.runnervm8k3b6.pid6607.XDU2LLRx.H064fZKsswnh",
+      "sha256": "5785c24f4d9c77f5c2e13cc12289ae1ab4472ecd9de9081366b452516057aac6"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/artifacts/coverage-browser/.coverage.browser.runnervm8k3b6.pid6612.Xea7zlWx.H5kJ7WfIVaYh",
+      "sha256": "b483d54b710cf591f1797915f13cf2ab1bef86e777a5d560a860e9a5f3019fc2"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/job-120159174665.log",
+      "sha256": "64d257e6142397cee1ad159c5356268dc71decb337b763252f77eab3ee476155"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/job-120159471287.log",
+      "sha256": "1625cfb8fb49e6923a3b5638cb13ea083d4984ee739f5f05663f98062d56b030"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/job-120159471305.log",
+      "sha256": "d5c73dbeacad75efbd450ac852839c3bbf7c8473e3807c18ef840695fc43139b"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/job-120164384301.log",
+      "sha256": "a5658572bd21e3fc24d2ebadcb66b8bc1ee6224da61b0bb6337da1bfa40afda0"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/ci-watch-execution.json",
+      "sha256": "abe1f45a0bec658d3d7e56caf98fb3859e8022fef6ac3b080e2fc303fe744932"
+    },
+    {
+      "path": ".qa/paper-submission-publication-20261023/artifact-download-execution.json",
+      "sha256": "8b62ec45432fc49e10f14d2af2b148d3eb6950e2ff2bc35d5e1323e0f11c531c"
+    }
+  ]
+}

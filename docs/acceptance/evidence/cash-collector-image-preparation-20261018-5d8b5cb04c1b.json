@@ -1,0 +1,24 @@
+{
+  "status": "IMAGE_HELPERS_PREPARED_WAITING_ROOT_FREEZE_REVIEW",
+  "at": "2026-10-18T00:23:48.705440+00:00",
+  "work": ".qa/cash-collector-image-20261018-5d8b5cb04c1b",
+  "image": "investment-assistant:cash-collector-20261018-5d8b5cb04c1b",
+  "context_created": false,
+  "build_started": false,
+  "docker_readiness_evidence": ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/docker-readiness-20261018.json",
+  "recipe": ".qa/cash-collector-image-20261018-5d8b5cb04c1b/runtime-check-recipe.json",
+  "files_sha256": {
+    "smoke.py": "2f06bf6cae4ad38349a9ecd008e92f6cd81ee86b3a09d56cacabb8269cda13b1",
+    "build.py": "41ee2c12b58790da7b3b22a8c80acd34c30777338117730edaf2226b37c471bd",
+    "plan.json": "f4f3ed6222ce5d30e1615b4edfb883c38fecc52adb6dcf6aa2333b6539f89903",
+    "smoke-vs-reviewed-base.patch": "21a2d6b59bb660b9415199d0320d466780291dafba76016ec98ff158dedff951",
+    "process_identity.py": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7",
+    "prepare_context.py": "499341d7b3a9433361b9addfbb240cba59da19b8aab2fe6bd60139229c1e8b8f",
+    "runtime-check-recipe.json": "5c19632409f5f88f917d5b0dc1de333e57bfa88a05cf45e0e1c4af868a008154"
+  },
+  "notes": [
+    "Only prepare_context.py andbuild.py are new context/build orchestrators;smoke.py carries exact priorcontainercases with output/provenance labelsadapted.",
+    "Both backend andbuild wrappers save childboot/PID/startticks/cmdSHA beforewait andrefuseexistingrunoutputs.",
+    "No source/testfilechanges bythisagent; no package/build/test/runtime action executed."
+  ]
+}

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="6" time="0.568" timestamp="2026-10-17T16:31:33.944305+01:00" hostname="BabaYaga"><testcase classname="tests.unit.soak_startup_test" name="test_startup_uses_full_budget_but_never_extends_it[12]" time="0.293" /><testcase classname="tests.unit.soak_startup_test" name="test_startup_uses_full_budget_but_never_extends_it[16]" time="0.002" /><testcase classname="tests.unit.soak_startup_test" name="test_existing_halt_is_observed_before_startup_can_reassert_it[lost-halt]" time="0.003"><failure message="Failed: DID NOT RAISE &lt;class 'RuntimeError'&gt;">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7572843ce360&gt;
+tmp_path = PosixPath('/tmp/pytest-of-lulu/pytest-1/test_existing_halt_is_observed0')
+persisted_halted = False, persisted_orders = [], rejected = True
+
+    @pytest.mark.parametrize(
+        "persisted_halted, persisted_orders, rejected",
+        [
+            (False, [], True),
+            (True, [], False),
+            (True, [{"status": "filled"}], True),
+        ],
+        ids=["lost-halt", "preserved-halt", "unexpected-order"],
+    )
+    def test_existing_halt_is_observed_before_startup_can_reassert_it(
+        monkeypatch, tmp_path, persisted_halted, persisted_orders, rejected,
+    ):
+        """A healthy restarted service can still have lost durable safety state."""
+        account_path = "/api/simulator/accounts/synthetic-persisted-halt"
+        persisted = {"halted": persisted_halted, "orders": persisted_orders}
+        calls, terminated = [], []
+        process = SimpleNamespace(poll=lambda: None)
+    
+        def response(payload=None):
+            return SimpleNamespace(
+                status_code=200, raise_for_status=lambda: None,
+                json=lambda: dict(payload or {}),
+            )
+    
+        class Client:
+            def __init__(self):
+                self.headers = {}
+                self.cookies = {"ia_csrf": "synthetic"}
+                self.closed = False
+    
+            def get(self, path, **_kwargs):
+                calls.append(("GET", path))
+                if path == "/api/health":
+                    return response()
+                assert path == account_path
+                return response(persisted)
+    
+            def post(self, path, **_kwargs):
+                calls.append(("POST", path))
+                if path == account_path + "/halt":
+                    # This models the masking bug: writing first repairs lost halt.
+                    persisted["halted"] = True
+                    return response(persisted)
+                assert path == "/api/auth/login"
+                return response()
+    
+            def close(self):
+                self.closed = True
+    
+        client = Client()
+        monkeypatch.setattr(soak.subprocess, "Popen", lambda *args, **kwargs: process)
+        monkeypatch.setattr(soak.httpx, "Client", lambda **kwargs: client)
+        monkeypatch.setattr(soak, "terminate", lambda item: terminated.append(item))
+        state = {"user": "fixture", "halt_account": "synthetic-persisted-halt"}
+        if rejected:
+&gt;           with pytest.raises(RuntimeError, match="HALT"):
+E           Failed: DID NOT RAISE &lt;class 'RuntimeError'&gt;
+
+tests/unit/soak_startup_test.py:105: Failed</failure></testcase><testcase classname="tests.unit.soak_startup_test" name="test_existing_halt_is_observed_before_startup_can_reassert_it[preserved-halt]" time="0.002"><failure message="AssertionError: assert [('GET', '/ap.../auth/login')] == [('GET', '/ap...sisted-halt')]&#10;  &#10;  Right contains one more item: ('GET', '/api/simulator/accounts/synthetic-persisted-halt')&#10;  Use -v to get more diff">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7572843cd850&gt;
+tmp_path = PosixPath('/tmp/pytest-of-lulu/pytest-1/test_existing_halt_is_observed1')
+persisted_halted = True, persisted_orders = [], rejected = False
+
+    @pytest.mark.parametrize(
+        "persisted_halted, persisted_orders, rejected",
+        [
+            (False, [], True),
+            (True, [], False),
+            (True, [{"status": "filled"}], True),
+        ],
+        ids=["lost-halt", "preserved-halt", "unexpected-order"],
+    )
+    def test_existing_halt_is_observed_before_startup_can_reassert_it(
+        monkeypatch, tmp_path, persisted_halted, persisted_orders, rejected,
+    ):
+        """A healthy restarted service can still have lost durable safety state."""
+        account_path = "/api/simulator/accounts/synthetic-persisted-halt"
+        persisted = {"halted": persisted_halted, "orders": persisted_orders}
+        calls, terminated = [], []
+        process = SimpleNamespace(poll=lambda: None)
+    
+        def response(payload=None):
+            return SimpleNamespace(
+                status_code=200, raise_for_status=lambda: None,
+                json=lambda: dict(payload or {}),
+            )
+    
+        class Client:
+            def __init__(self):
+                self.headers = {}
+                self.cookies = {"ia_csrf": "synthetic"}
+                self.closed = False
+    
+            def get(self, path, **_kwargs):
+                calls.append(("GET", path))
+                if path == "/api/health":
+                    return response()
+                assert path == account_path
+                return response(persisted)
+    
+            def post(self, path, **_kwargs):
+                calls.append(("POST", path))
+                if path == account_path + "/halt":
+                    # This models the masking bug: writing first repairs lost halt.
+                    persisted["halted"] = True
+                    return response(persisted)
+                assert path == "/api/auth/login"
+                return response()
+    
+            def close(self):
+                self.closed = True
+    
+        client = Client()
+        monkeypatch.setattr(soak.subprocess, "Popen", lambda *args, **kwargs: process)
+        monkeypatch.setattr(soak.httpx, "Client", lambda **kwargs: client)
+        monkeypatch.setattr(soak, "terminate", lambda item: terminated.append(item))
+        state = {"user": "fixture", "halt_account": "synthetic-persisted-halt"}
+        if rejected:
+            with pytest.raises(RuntimeError, match="HALT"):
+                soak.start_server(state, tmp_path, {})
+            assert client.closed and terminated == [process]
+        else:
+            returned_process, returned_client, _base = soak.start_server(state, tmp_path, {})
+            assert returned_process is process and returned_client is client
+            assert not client.closed and terminated == []
+&gt;       assert calls == [
+            ("GET", "/api/health"),
+            ("POST", "/api/auth/login"),
+            ("GET", account_path),
+        ]
+E       AssertionError: assert [('GET', '/ap.../auth/login')] == [('GET', '/ap...sisted-halt')]
+E         
+E         Right contains one more item: ('GET', '/api/simulator/accounts/synthetic-persisted-halt')
+E         Use -v to get more diff
+
+tests/unit/soak_startup_test.py:112: AssertionError</failure></testcase><testcase classname="tests.unit.soak_startup_test" name="test_existing_halt_is_observed_before_startup_can_reassert_it[unexpected-order]" time="0.001"><failure message="Failed: DID NOT RAISE &lt;class 'RuntimeError'&gt;">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7572843d8b00&gt;
+tmp_path = PosixPath('/tmp/pytest-of-lulu/pytest-1/test_existing_halt_is_observed2')
+persisted_halted = True, persisted_orders = [{'status': 'filled'}]
+rejected = True
+
+    @pytest.mark.parametrize(
+        "persisted_halted, persisted_orders, rejected",
+        [
+            (False, [], True),
+            (True, [], False),
+            (True, [{"status": "filled"}], True),
+        ],
+        ids=["lost-halt", "preserved-halt", "unexpected-order"],
+    )
+    def test_existing_halt_is_observed_before_startup_can_reassert_it(
+        monkeypatch, tmp_path, persisted_halted, persisted_orders, rejected,
+    ):
+        """A healthy restarted service can still have lost durable safety state."""
+        account_path = "/api/simulator/accounts/synthetic-persisted-halt"
+        persisted = {"halted": persisted_halted, "orders": persisted_orders}
+        calls, terminated = [], []
+        process = SimpleNamespace(poll=lambda: None)
+    
+        def response(payload=None):
+            return SimpleNamespace(
+                status_code=200, raise_for_status=lambda: None,
+                json=lambda: dict(payload or {}),
+            )
+    
+        class Client:
+            def __init__(self):
+                self.headers = {}
+                self.cookies = {"ia_csrf": "synthetic"}
+                self.closed = False
+    
+            def get(self, path, **_kwargs):
+                calls.append(("GET", path))
+                if path == "/api/health":
+                    return response()
+                assert path == account_path
+                return response(persisted)
+    
+            def post(self, path, **_kwargs):
+                calls.append(("POST", path))
+                if path == account_path + "/halt":
+                    # This models the masking bug: writing first repairs lost halt.
+                    persisted["halted"] = True
+                    return response(persisted)
+                assert path == "/api/auth/login"
+                return response()
+    
+            def close(self):
+                self.closed = True
+    
+        client = Client()
+        monkeypatch.setattr(soak.subprocess, "Popen", lambda *args, **kwargs: process)
+        monkeypatch.setattr(soak.httpx, "Client", lambda **kwargs: client)
+        monkeypatch.setattr(soak, "terminate", lambda item: terminated.append(item))
+        state = {"user": "fixture", "halt_account": "synthetic-persisted-halt"}
+        if rejected:
+&gt;           with pytest.raises(RuntimeError, match="HALT"):
+E           Failed: DID NOT RAISE &lt;class 'RuntimeError'&gt;
+
+tests/unit/soak_startup_test.py:105: Failed</failure></testcase><testcase classname="tests.unit.soak_startup_test" name="test_fresh_start_has_no_existing_halt_to_inspect" time="0.001" /></testsuite></testsuites>

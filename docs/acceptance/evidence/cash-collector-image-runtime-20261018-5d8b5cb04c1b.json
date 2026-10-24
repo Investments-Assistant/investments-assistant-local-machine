@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "run_id": "ia-runtime-123fd870ab54",
+  "image": "investment-assistant:cash-collector-20261018-5d8b5cb04c1b",
+  "checks": [
+    "New isolated database and ownership marker verified",
+    "Built image explicitly upgrades empty disposable database",
+    "Existing GGUF copied only to new owned volume, checksum verified and mounted read-only in non-root app",
+    "Production application starts with migrated DB and actual local GGUF loaded",
+    "Persisted operator halt denies proposals after app and database restart",
+    "Application and database restart recover readiness and preserve marker/schema"
+  ],
+  "broker_connections": 0,
+  "external_orders": 0,
+  "limitations": [
+    "No Nginx/LAN ingress, OS sleep or 24-hour observation",
+    "Readiness/model load, not a model answer-quality benchmark"
+  ],
+  "owned_names": {
+    "app": "ia-runtime-123fd870ab54-app",
+    "database": "ia-runtime-123fd870ab54-db",
+    "network": "ia-runtime-123fd870ab54",
+    "volume": "ia-runtime-123fd870ab54-data",
+    "model_volume": "ia-runtime-123fd870ab54-model-data",
+    "model_stage": "ia-runtime-123fd870ab54-model-stage"
+  },
+  "image_id": "sha256:92eabede31c807461e325d19133a27dfcc52a7aeba9973ecd8af9676804f8701",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "model_mount_read_only": true,
+  "restart_seconds": {
+    "app": 7.167,
+    "database": 1.13
+  },
+  "restart_command_seconds": {
+    "app": 1.065,
+    "database": 0.676
+  },
+  "cleanup_verified": true,
+  "fixture_logs": ".qa/ia-runtime-123fd870ab54",
+  "candidate_head": "a4fccdea0c62179eda12a9fad089b74cb1c925b2",
+  "source_fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "candidate_review_patch_sha256": "cfd2612f17d4cf7c41c507fdf0e1178c3b579e132095509b72cc28f3a58871b2",
+  "working_source_test_diff_sha256": "cfd2612f17d4cf7c41c507fdf0e1178c3b579e132095509b72cc28f3a58871b2",
+  "provenance": "Unpublished dirty source candidate atop a4fccde: bind source fingerprint, exact working src/scripts/tests diffSHA and review patchSHA; HEAD alone does not contain this fix; no bit-reproducibility claim",
+  "harness_sha256": "9c2d83314464beca5bb9046a241c59fd49ca16521f7d4bad2c3966fcd7991041",
+  "wrapper_sha256": "42a90dcc88a3bf90014eab9731dd9b43de8ae3193ef0d899362ea8f384bca018",
+  "exit_code": 0,
+  "source_unchanged": true,
+  "independent_cleanup_evidence": "docs/acceptance/evidence/cash-collector-image-runtime-20261018-5d8b5cb04c1b-cleanup.json"
+}

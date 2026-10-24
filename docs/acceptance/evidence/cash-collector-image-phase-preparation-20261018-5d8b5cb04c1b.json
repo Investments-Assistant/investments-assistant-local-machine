@@ -1,0 +1,104 @@
+{
+  "status": "REVIEWED_PHASE_WRAPPER_AND_COLLECTOR_IMPORT_PREPARED_NOT_RUN",
+  "at": "2026-10-18T00:26:27.017075+00:00",
+  "work": ".qa/cash-collector-image-20261018-5d8b5cb04c1b",
+  "tests_started": false,
+  "context_prepared": false,
+  "build_started": false,
+  "phase_started": false,
+  "source_freeze_required": true,
+  "source_files_modified": false,
+  "scope": "QAorchestrationonly; exact reviewed runtimeharness cases/budgetsunchanged;ingressoptionalexplicitreviewonly",
+  "hashes": {
+    "run_check.py": "42a90dcc88a3bf90014eab9731dd9b43de8ae3193ef0d899362ea8f384bca018",
+    "smoke.py": "a1ad69fd830db3e2917cef89f16267455eedf4f1081c06493eec0785acdd1dab",
+    "runtime-check-recipe.json": "0170d4612f3c427eda0f42b3705e51499b43d119d817b4138b6e61ef047b0f17",
+    "smoke-vs-reviewed-base.patch": "ae96e2a2dc4698fbe2a6cf53a6048146ebc201c41ec84c1ffd512cf9f2941b07",
+    "prepare_context.py": "499341d7b3a9433361b9addfbb240cba59da19b8aab2fe6bd60139229c1e8b8f",
+    "build.py": "41ee2c12b58790da7b3b22a8c80acd34c30777338117730edaf2226b37c471bd"
+  },
+  "preserved_original_preparation_helpers": [
+    "smoke.initial.py.txt",
+    "runtime-check-recipe.initial.json"
+  ],
+  "recipe": {
+    "status": "PREPARED_NOT_EXECUTED_SOURCE_FREEZE_REQUIRED",
+    "at": "2026-10-18T00:23:48.702129+00:00",
+    "image": "investment-assistant:cash-collector-20261018-5d8b5cb04c1b",
+    "no_context_tar_or_build_exists": true,
+    "provenance": "Dirty candidate atop a4fccde; source fingerprint+exact src/scripts/tests diffSHA+review patchSHA. HEAD alone does not containcashfix. Cached dependency layers permitted; no cold-build claim.",
+    "prepare_command": [
+      ".venv/bin/python",
+      "-B",
+      ".qa/cash-collector-image-20261018-5d8b5cb04c1b/prepare_context.py",
+      "FROZEN_SOURCE_FINGERPRINT",
+      "REVIEW_PATCH_PATH",
+      "REVIEW_PATCH_SHA256"
+    ],
+    "build_command": [
+      ".venv/bin/python",
+      "-B",
+      ".qa/cash-collector-image-20261018-5d8b5cb04c1b/build.py",
+      "--build-reviewed-local"
+    ],
+    "smoke_command": [
+      ".venv/bin/python",
+      "-B",
+      ".qa/cash-collector-image-20261018-5d8b5cb04c1b/smoke.py"
+    ],
+    "runtime_command": [
+      ".venv/bin/python",
+      "-B",
+      ".qa/flexible-credentials-image-20261017-b11a6490b12c/verify_runtime_readonly_model.py",
+      "--docker",
+      "/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe",
+      "--image",
+      "investment-assistant:cash-collector-20261018-5d8b5cb04c1b",
+      "--postgres",
+      "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea",
+      "--model",
+      "models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+      "--output",
+      "docs/acceptance/evidence/cash-collector-image-runtime-20261018-5d8b5cb04c1b.json"
+    ],
+    "optional_ingress_command": [
+      ".venv/bin/python",
+      "-B",
+      "scripts/verify_container_ingress.py",
+      "--docker",
+      "/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe",
+      "--image",
+      "investment-assistant:cash-collector-20261018-5d8b5cb04c1b",
+      "--postgres",
+      "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea",
+      "--nginx",
+      "nginx:alpine@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2",
+      "--output",
+      "docs/acceptance/evidence/cash-collector-image-ingress-20261018-5d8b5cb04c1b.json"
+    ],
+    "reviewed_harness_sha256": {
+      ".qa/flexible-credentials-image-20261017-b11a6490b12c/verify_runtime_readonly_model.py": "9c2d83314464beca5bb9046a241c59fd49ca16521f7d4bad2c3966fcd7991041",
+      "scripts/verify_container_ingress.py": "edf26270e1070a1aa340c62c8dfa53c0216b8245ec0bbabf0468f52c2832000e"
+    },
+    "runtime_cases": "Exact unchanged reviewed internalnetwork/newPG16volume/nonrootapp/readonlyexistingGGUFvolume/migration0019/persistedhalt across app+DBrestart/restart<15s/ownedcleanup; no provider/broker calls.",
+    "smoke_cases": "Exact prior networknone readonlyUID1000/complete copiedfiles181/hashcomparison inclsrc/tools/brokers/ibkr.py/credentials/unicode/canonicalcookie/actualPDF/OpenBLAS/ib_async import; no connections.",
+    "no_automatic_phase_launch": true,
+    "cleanup_requirements": "run_check.py captures allvolumeinventorybefore/after, independently checks ownedrunID-labelled containers/networks/volumes absent, preserves logs/exit/execution/cleanup receipts, never performs unrelated cleanup.",
+    "reuse_limits": "UnchangedTLS/UIassetproof maybereused only aftermanifestbytecomparison; newbroker decoder/collector fixture remains required through unit+Postgres suites; oldimageID does not prove currentcandidate.",
+    "runtime_wrapper_command": [
+      ".venv/bin/python",
+      "-B",
+      ".qa/cash-collector-image-20261018-5d8b5cb04c1b/run_check.py",
+      "runtime"
+    ],
+    "optional_ingress_wrapper_command": [
+      ".venv/bin/python",
+      "-B",
+      ".qa/cash-collector-image-20261018-5d8b5cb04c1b/run_check.py",
+      "ingress",
+      "--ingress-reviewed"
+    ],
+    "durable_phase_identity": "STARTING then childPID/boot/nativeNS/startticks/cmdSHA beforewait; preexisting outputs refused; exactreviewedharness hash andimageID verified before launch.",
+    "offline_cash_fixture_scope": "Currentimage importscollect_balances,completecopiedcashfilehashesverified; actual primary/Multi Decodercollectorcasesremain in fullfocusedunittests, avoidingduplicate fragilecaseimplementation."
+  }
+}

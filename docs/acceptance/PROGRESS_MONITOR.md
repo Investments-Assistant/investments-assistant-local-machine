@@ -9,7 +9,7 @@ not gate PASS statuses; PLAN.md remains the acceptance matrix.
 | L01 | 4 | 4 |
 | L02 | 8 | 8 |
 | L03 | 8 | 8 |
-| L04 | 8 | 6.5 |
+| L04 | 8 | 7.375 |
 | L05 | 10 | 10 |
 | L06 | 6 | 6 |
 | L07 | 6 | 6 |
@@ -23,9 +23,16 @@ not gate PASS statuses; PLAN.md remains the acceptance matrix.
 | L15 | 4 | 0.25 |
 | L16 | 4 | 4 |
 
+Current audit:90% displayed (displaydelta0pp), raw90.375/100. Publishedd5aa99e
+CI/Sonar passes; L11=5/5, L04=7.375/8 for verified offline recovery foundations.
+Image bytes reconcile with that commit. Owner approval of a bounded free EODHD
+source check earns no research-result credit; account/token and actual data are
+still absent. FullPaper/research remain open; new24h/mapped cooling are deferred
+to the actual final host. Historical entries below are preserved in order.
+
 Total weight 100. Baseline 53%; next audit 58% (+5 pp) credited persisted
 synthetic cash flows, flow-adjusted risk, collector and migration tests.
-Current audit: 61% (+3 pp from 58%). Full-suite/browser/restore and concurrency
+Early audit: 61% (+3 pp from 58%). Full-suite/browser/restore and concurrency
 evidence credited. L07/L09 remain partial because their broader requirements
 are incomplete; full weight cannot be awarded for partial gate coverage. Preserve reports and rubric
 across context interruptions; do not silently replace with a new estimate.
@@ -398,3 +405,190 @@ safe local implementation gap. Remaining L04/L15 Paper provenance/lifecycle,
 L13 mapped cooling and L14 permitted data/evaluation require external input.
 Overall Goal is BLOCKED, not complete. No score credit from elapsed time or
 documentation cleanup; live remains OFF.
+
+
+Flexible-credential final audit2026-10-16: **GOAL PROGRESS:89% (displaydelta0pp;
+raw89.125/100, rawdelta+0.125pp from the previous89.000 audit)**. The user
+explicitly requires both fields but no length/composition policy.825unit,
+390reconciledPG cases,4focused+24fullbrowser flows and synthetic0019
+dump/restore verify exact Portuguese/long strings, legacy/compact sessions,
+canonical revocation and post-worker identity freshness. L02=8 and L09=6.
+Current private native app is backed up/upgraded/HTTPS-verified, no operator
+account or broker action by the agent. New source3b6942a4 has no fresh image,
+remoteCI or24h proof: L10=5.875,L11=4.875,L13=6.75. Fixed weights unchanged;
+oldf94524h/CI/image evidence remains historical. Paper/data/cooling remain open;
+live staysOFF. Publication requires the new exact bundle approval.
+
+Approved-publication/fresh-observation audit2026-10-17: **GOAL PROGRESS:89%
+(displaydelta0pp;raw89.125/100)**. User approved exact26-file final review;
+26a8d01 is published and remoteSHA verified. User confirms own account opened.
+Native checks confirm original private app/PG are still live; sandbox visibility
+did not prove exit, and both duplicate-start guards refused before mutation.
+Fresh marked native source observation is running with initial0failures/first
+CPUmodelPASS, no24h claim. CI was in progress at audit; no publication/launch
+credit added. Docker engine, verified Paper binding/lifecycle, permitted research
+data/evaluation and mapped CPU cooling remain open. Weights/scores unchanged.
+The completed short custom progress_monitor ran under the independent reviewer
+after the root audit invocation encountered active-agent capacity limits.
+
+Final current-CI audit2026-10-17: **GOAL PROGRESS:89% (displaydelta0pp;
+raw89.250/100,rawdelta+0.125pp)**. Exact26a8d01 remoteCI38982126940 all4jobs
+SUCCESS,825unit/392PG and combined1221tests,24browser/8TLS-WSS checks,83.88%
+measuredlinecoverage. ConfiguredSonarproject investments-assistant matches exact
+SCMrevision and report-task gate explicitlyPASSED; separate neutral local-machine
+project check has different scope. L11 increases4.875→5; allotherfixedscores
+unchanged. Freshnativewindow remains live with no24hcredit; newimage pending
+Dockerengine, Paperbinding/lifecycle/approvedforwardplan, permittedresearch and
+mappedcooling remain incomplete. GoalACTIVE/verifiedwait;liveOFF.
+
+Packaging-discovery/repair audit2026-10-17: **GOAL PROGRESS:89% (delta0pp;
+raw89.250/100)**. DockerServer29.8.2 is available. Required historical Docker
+inputconfig/build/debian.sources was missingfromGit due build/ignore; narrow
+whitelistrepair is local, exactfilebytes/runtimefingerprint unchanged. No image
+pass or newcredit until concretevalidation; later exactpublication needs separate
+approval. Freshnativewindow continues; Paper/data/cooling remainopen;liveOFF.
+
+Local-image audit2026-10-17: **GOAL PROGRESS:89% (displaydelta0pp;
+raw89.375/100,rawdelta+0.125pp)**. L13 increases6.75→6.875 for image1525bf20
+build/181filematch/nonrootsmoke/actualGGUFreadonlymodel+PG0019/persistedhalt,
+app6.979s/DB1.108s restart and7TLS-WSSchecks/independentcleanup. Auditretains
+prospectivepackagingprovenance; userapproval/publication followed separately.
+Otherfixedscores/weightsunchanged. Fresh24h, Paper/research andmappedcooling
+remain incomplete;liveOFF.
+
+Kernel-interruption/Paper-read milestone2026-10-17: customprogress_monitor
+reports90% displayed (delta+1pp), raw89.500/100. L04 increases6.5→6.625
+for one authorized actual callback balance snapshot returned/persisted under
+owner/account/idempotency guards. Positionscomplete, cashincomplete/non-atomic;
+operator-declaredPaper/SDK-unverified/authorityNONE prevents broader credit.
+Current published CI all4/SonarPASS adds no points to fullL11. Interrupted
+source soak earns no24h credit. App recovery ongoing; fixed rubric unchanged.
+
+Final app-recovery handoff audit2026-10-17:90%display/delta0pp/raw89.500,
+fixed weights unchanged. Native+Windows normal HTTPS ready/signup200 and
+anonymous401 verify restored existing app; no extra rubric credit. User read
+consent-disable confirmation remains pending; relayclosed/no retry/noorders.
+Goal service reportsPAUSED; fresh boot-bound windowprepared/notstarted.
+
+Paper-consent closeout2026-10-17: customprogress_monitor90%/delta0pp/raw89.500.
+Owner confirms both Enabled and Read Authorized unchecked/saved; no extra
+criterion credit. GoalPAUSED; external prerequisites/new continuous soak remain.
+
+Fresh native observation launch audit2026-10-17: customprogress_monitor90%,
+delta0pp,raw89.500/100. Exact boot/starttick-bound53a8ee46e318 runner verified
+live;10initialcycles/0failures/firstCPUmodelPASS. Launch earns no24h credit.
+GoalACTIVE; Paper/research/mappedcooling blockers unchanged. Fixedrubric
+unchanged; no source/test changes and priorCI/image proofs remain applicable.
+
+Halt-survival guard local-validation audit2026-10-17: customprogress_monitor
+90%display/delta0pp/raw89.625 (+.125raw), L10=6/6 for pre-mutation persisted
+halt/order check and24affectedPASS with original15sdeadline. No fresh24h,
+remoteCI or publication credit. L11/L13unchanged; gate statuses remain separate
+from weighted credit. Current2fileharnesspatchunpublished; appimage unchanged.
+
+Usage-interruption resumption baseline2026-10-18: customprogress_monitor
+**89% (displaydelta-1pp; raw89.375/100, rawdelta-.250)**. Fixed rubric unchanged;
+L11=4.875/5 and L13=6.75/7 reserve current-source broad backend/image checks
+after the partial cash-collector change. Published-revision CI/image proofs stay
+valid within their scope. L04=6.625/8 receives no untested-fix credit. The real
+90-second halt-guard smoke passed, but no new24h window started; overnight time
+earns nothing. Paper permissions remain owner-disabled, and research/cooling/
+external-paper criteria remain open. GoalACTIVE; safe local implementation resumes.
+
+Preparation safe-boundary audit2026-10-18: customprogress_monitor89%,delta0pp,
+raw89.375 unchanged. OwnedPG/explicitdotenv/Docker readiness and durable process
+receipts pass, but cash source is not frozen or tested. Primary-vs-Multi callback
+provenance and stopped-portfolio-cache freshness are concrete local defects being
+closed; no implementation/validation credit yet. All fixed weights unchanged.
+
+Cash-focused milestone2026-10-18: customprogress_monitor90% (raw89.500/100,
+rawdelta+.125), L04=6.75/8 for110 synthetic cases including installedSDK decoder
+provenance, bounds, native timeout and owner/cache isolation. Subsequent full860
+unit PASS audit remains90%/delta0/raw89.500 while PG/image/remoteCI were pending.
+
+Full backend/current-image milestone2026-10-18: customprogress_monitor90%
+(displaydelta0pp;raw89.750/100,rawdelta+.250). L04=6.875/8 for full392PG PASS;
+L13=6.875/7 for image92eabede/current source4fd1380c, actual readonlyGGUF,
+nonroot runtime, persistent halts, restart budgets and independent cleanup.
+L11=4.875/5 until current-source remoteCI passes. Fixed weights unchanged;
+fullPaper/research, mappedcooling and fresh24h remain open. Exact seven-file
+publication approval is pending; live/read permissions remainOFF.
+
+Final running-window boundary2026-10-18: customprogress_monitor90%,delta0pp,
+raw89.750 unchanged. Fresh source4fd1380c window79f7ab59792c is actually running,
+native PID/starttick/boot verified;9cycles/0failures/firstCPUmodelPASS earn no24h
+credit. Backend/image results remain valid, exact seven-file publication question
+pending, no remoteCI claim. Paper/research/mappedcooling remain open. GoalACTIVE;
+preserve this runner/source and continue at approval or an actual terminal/state
+change, without a polling loop or another implementation change during the soak.
+
+Approved publication milestone2026-10-18: customprogress_monitor90%,delta0pp,
+raw89.750 unchanged. User approved exactcfd261 seven-file bundle; e154a0a is
+published/remoteSHAverified. Independent seven-file/156source/184context/181image
+byte mapping preserves source4fd1380c and running79f7 window; no restart or24h
+credit. CurrentCI39083730719 unit860PASS, otherjobs/quality pending; L11 remains
+4.875/5. Publication permission resolved; Paper/research/mappedcooling remain open.
+
+Usage-gap resumption baseline18Oct22:01UTC: customprogress_monitor90%,delta0pp,
+raw89.750 before terminal-artifact verification. Saved CI watch was terminal0;
+same native79f7 runner remained live after21h25m. No elapsed-time credit added.
+
+Current published-CI evidence milestone18Oct2026: customprogress_monitor90%
+(displaydelta0pp;raw89.875/100,rawdelta+.125), L11=5/5. Exacte154 run39083730719
+allfourjobsSUCCESS; downloaded860unit/392PG/1256overlappingcombined JUnit,
+24browser/8TLS-WSS and83.93%actualcombinedcoverage verified. Configured legacy
+Sonar report-task gate explicitlyPASSED for exactSCM; all17rawartifact hashes
+reverified. Fixed weights unchanged. Partial current soak remains incomplete;
+mappedcooling, permittedresearch and verifiedPaper lifecycle/authority still open.
+
+Finite terminal-observer handoff18Oct22:16UTC: customprogress_monitor90%,delta0pp,
+raw89.875 unchanged. Independently reviewed helper and native preflightPASS;
+one finite observer668060 is verified attached to the same originalrunner333647,
+not a scheduled automation or persistent progress monitor. Current21h41m remains
+partial and earns no24hcredit. Originalsource/model/helpers/window unchanged;
+actual terminal audit, mappedcooling, permitted research and fullPaper remain open.
+GoalACTIVE while the finite operation continues; no Goalstatus/live/read change.
+
+20Oct interrupted-retention milestone custom audit:90%display/Δ0pp/raw89.875. Verified240-member byte roundtrip and69actual answers retain partial evidence only; interrupted80574.770seconds is not24h. Fixed rubric unchanged; fresh window/cooling/research/fullPaper remain open. GoalACTIVE; no trading/OS/runtime authority change.
+
+20Oct fresh078d launch/clock-failure audit:90%display/Δ0/raw89.875. Launch and finiteverifier each succeeded once; runfailedCLOCK_DISCONTINUITY after39.744s, auditor correctlyrejected. No24h credit. Read-only pairedclockdiagnostic pending; no cause/fix inferred. Source/test/CI/image unchanged; external prerequisites/read/live constraints unchanged.
+
+20Oct paired-clock evidence custom audit90%/Δ0/raw89.875:311ms backward step independently confirmed in4369readings; cause unknown. No24h/thermal/economic/Paper credit, no OS/service changes or soak retry. Source/test/CI/image evidence reused; permissions unchanged.
+
+Final20Oct safe-boundary custom audit: GOALPROGRESS90%/Δ0pp/raw89.875. Verifiedfailed-run retention/ownedcleanup do not earn24hcredit. Final128localdoclinks/0missing,16uniquegate rows,gitdiffcheckPASS,HEADe154/source-test-indexunchanged. No activefixture/probe/verifier operation remains; inspect existing durable receipts rather thanretry. GoalACTIVE/incomplete; next meaningful work requires changed hostclock/telemetry or authorized research/Paper inputs. No broker connection/order, readflagslastownerOFF, live/externalwritesOFF; no OS or privateoperatorruntime action.
+
+20Oct first unchangedprerequisite recheck:customaudit90%/Δ0/raw89.875. No materialprogress; exact requestedlocalDownloadsZIP absent, current source/failure/cleanup unchanged, no liveoperation towaiton. GoalACTIVE; externalinputs/authority needed.
+
+22Oct ownerdeferral/scope milestone:customaudit90%/Δ0/raw89.875. Hardwarevalidationmovesfromlaptoptofinalcomputer, notPASS; research/PaperexplicitlyOPEN. Newofflinejournal/migrationunvalidatedandnewcandidateCI/imagepending; nofeaturecredit. Historicalfixedrubricpreservedbecausetargetlocationchanges, notcompletionconditions.
+
+22Oct migration milestone audit: display90%, delta0pp, raw89.875 unchanged after33 focused migration/closed-boundary tests; service was then still unvalidated.
+
+22Oct offline journal milestone audit: display90%, delta0pp, raw90.000/100 (+0.125). L04=7/8 after119 focused cases pass (47 new unit,39 new committed PostgreSQL,2 migration-history,31 closed-SDK). Fixed weights unchanged. Full current-source suite/image/CI remain pending at audit; actual research/Paper/final-host prerequisites remain open. No external broker execution credit.
+
+22Oct full current-backend milestone audit: display90%, delta0pp, raw90.000/100. L04 rises7→7.125/8 for907-unit/431-PG unchanged-source validation (+.125); L11 falls5→4.875/5 because current-candidate remoteCI is pending (-.125), net0. The monitor initially misstated the total as89.875 despite these changes; a separate arithmetic-only correction confirmed90.000. Current image/CI not accepted; research/Paper/final-host remain open.
+
+23Oct journal durability/Docker milestone: customaudit90%, displayΔ0pp, raw90.125/100 (+.125); L04=7.25/8, L11=4.875/5. Actual owned-PG restart/no-resend and complete SQL/hash restore independently verified; no key/Python-process/Paper execution claim. Docker availability resolved; new image/CI still pending. Research/Paper OPEN and final-host physical checks DEFERRED, no100.
+
+23Oct image build/smoke audit:90%, Δ0pp, raw90.125. Current187-file context/184-file strict image comparison and offline default-denial smoke passed; runtime was pending, no added criterion credit.
+
+23Oct current image runtime/cleanup audit:90%, Δ0pp, raw90.125. Actual nonroot model+0020 readiness, persistent halt and app5.215s/DB1.058s restart passed unchanged15s budget; owned cleanup verified. Local software evidence only. New publication/currentCI, permitted research, actual Paper and final-host checks remain; live OFF.
+
+23Oct exact16-file approvedpublication milestone:90%, Δ0pp/raw90.125. Commit a2b2f42 remoteSHA verified; approvalblockresolved. CurrentCI39875250173inprogress, no L11 completioncredit yet. Image/context mapped to committedbytes without rebuild. Paper/researchOPEN; finalhostphysicalchecksDEFERRED; liveOFF.
+
+23Oct exactcommit CI/Sonar milestone:90%, displayΔ0pp/raw90.250 (+.125), L11=5/5. Actual907unit/431PG/1342overlapping combined cases/24Chromium/8TLS-WSS/84.28%coverage and configured exact-SCM gate verified. No external/hardware credit. Subsequent lost-ack correlation candidate is PENDING/unverified and requires affected checks; fixed rubric unchanged.
+
+2026-10-23 focused recovery milestone: customaudit90% Δ0pp/raw90.375, L04=7.375/8 (+0.125) for172actualmarkedPG-backed focused recovery cases. Other fixedweights/subscores unchanged. Fullunit inprogress; fullPG/image/newpublication and actualPaper/research/finalhost gates unfinished.
+
+2026-10-23 fullbackend/Dockerboundary: customaudit90%Δ0/raw90.375.920unitPASS;458/459PGpass initially, CLOCK_DISCONTINUITY case passesoneboundedretry; originalfailure retained, no clean fulltierclaim. Dockerenginepipe missing blocks new image before buildlaunch. Research/Paperinputs unchanged; hardwaredeferred. No new rubric credit.
+
+2026-10-23 final safe-boundary audit: GOALPROGRESS90% Δ0pp/raw90.375. Positive-identity native cleanup/evidence41hashes and187context-byte review complete; no added criterion credit. Newimage unbuilt becauseDockerLinuxenginepipe unavailable, ownerstartrequest pending. Six-file recovery patch ready/locallytested but not approved/published; actualresearch/PaperOPEN, finalhost24h/temperaturesDEFERRED. No long-running operation left and no Goalstatusmutation.
+
+2026-10-23 restoredDocker/newimage milestoneaudit: GOALPROGRESS90% Δ0pp/raw90.375. Actualnewbuild+networknone/read-only/nonroot smokePASS,image5631759f/source13aa;187context/184imagebytes verified, ownedcontainerabsent. Scopedreuse of unchangeda2bmodel/deployment evidence accepted; no freshfullruntime/hostclaim. Publication/newCI pending, originalPG clockfailure retained withpassingtargetedretry; research/PaperOPEN/hardwaredeferred. No rubricchange or newcriterioncredit.
+
+2026-10-23 exactpublication milestoneaudit:90%Δ0/raw90.375. Exactapproved6fileb2da commitd5aa pushed/remoteSHAverified; source13aa/image5631 byteunchanged. ExactcurrentCI39983987095 pending; no newCIpass. PreviousL11 credit remains scoped to its historical verifiedcriterion; currentcandidate acceptance awaits actualnewrun/artifacts. Research/PaperOPEN/hardwaredeferred. No weight change.
+
+2026-10-23 publishedimage/~5min audit:90%Δ0/raw90.250. L11 temporarily4.875/5 (-0.125) pending finalexactd5aa combined/Sonargate; previous5/5 historicala2b is notcurrentcandidate acceptance. Other weights/subscores unchanged; L04=7.375/8. Unit/PG/browser jobs succeeded perwatchlog, no finalartifact proofyet. Reconciliation187/184PASS; no rebuild/rerun. Research/PaperOPEN/finalhostdeferred.
+
+2026-10-23 FINAL exactpublished-CI audit: GOALPROGRESS90% Δ0pp/raw90.375 (+0.125 sincependingCIaudit). L11returns5/5 afteractuald5aa all4CIjobs+configuredexact-SCM SonarPASS; allotherfixedweights/subscores unchanged.920unit/459PG/1383overlappingcombined,24browser/8TLS-WSS,0fail/error/skip. CurrentCIcleanPGdoesnoterase retained localclockfailure. ResearchL14 and fullactualPaperL04/L15OPEN; finalhosthardware/profile/24h/tempDEFERRED. No100/completion/statusmutation.
+
+23 October resumed prerequisite review, baseline and final custom audits:90% Δ0pp/raw90.375. No new acceptance credit. Required offline cancel/fill cases already covered; seven existing passing CI cases verified without running tests. Source/tests/HEAD unchanged; research/Paper inputs still missing, owner price-file question pending, final-host checks deferred. First unchanged-prerequisite continuation after prior CI progress; no Goal status mutation.

@@ -1,0 +1,19 @@
+{
+  "reviewed_at": "2026-10-16T01:31:28.826903+00:00",
+  "evidence_kind": "operator-reported TWS settings and read-only host metadata",
+  "paper_ui_banner_observed": true,
+  "operator_reported_read_only_api": true,
+  "operator_reported_localhost_only": true,
+  "operator_reported_socket_clients_enabled": true,
+  "windows_tws_listener_verified": true,
+  "socket_port": 7497,
+  "wsl_networking_mode": "nat",
+  "source_head": "491361574d11b2465a21f88d3156482099d36193",
+  "application_fingerprint_unchanged": true,
+  "broker_connection_attempted": false,
+  "orders_attempted": false,
+  "private_account_binding_verified": false,
+  "windows_default_https_result": "TrustFailure",
+  "trust_store_changed": false,
+  "goal_service_status_observed": "paused"
+}

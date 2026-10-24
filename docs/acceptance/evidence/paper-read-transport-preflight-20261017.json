@@ -1,0 +1,26 @@
+{
+  "status": "PAPER_TRANSPORT_PREREQUISITE_PENDING",
+  "recorded_at": "2026-10-16T23:57:45.850304+00:00",
+  "relay_helper_sha256": "3e52f474d023d6593670b00dea76c2ff69e742553a9ffb865d34dae81182c817",
+  "existing_synthetic_relay_proof": "docs/acceptance/evidence/paper-local-relay-synthetic-20261016.json",
+  "relay_started": false,
+  "broker_tcp_connection_attempted": false,
+  "windows_7497_listener": "NO_MATCHING_LISTENER in native Windows query; explicit CmdletizationQuery_NotFound",
+  "wsl_17497_listener": false,
+  "native_private_app_ready": "200/database+modeltrue at2026-10-16T23:55:21Z",
+  "bounds": {
+    "localhost_only": true,
+    "active_clients": 1,
+    "buffer_bytes": 65536,
+    "connect_seconds_max": 5,
+    "reviewed_session_seconds_max": 120,
+    "reviewed_process_lease_seconds_max": 3600
+  },
+  "proposed_first_read_lease_seconds": 600,
+  "proposed_first_read_session_seconds": 60,
+  "operator_steps": "Confirm disabled encrypted app record saved/current Paper banner+readonly/socket/local-only settings; reverify Windowslistener before finite relay/read button",
+  "operator_account_details_read": false,
+  "dotenv_or_key_contents_read": false,
+  "orders_attempted": false,
+  "live_enabled": false
+}

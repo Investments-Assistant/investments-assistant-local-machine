@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-23T00:02:48.455827+00:00",
+  "status": "PUBLISHED_CANDIDATE_LOCAL_IMAGE_RUNTIME_AND_RECOVERY_PASS",
+  "published_commit": "a2b2f42da7610dd4b4feadafd4fce13d9acc78bc",
+  "source_fingerprint": "b46651e69925c7e56f6ebf4e43816cf781bfa3330f94eef29b03c5e3ac3f0765",
+  "approved_patch_sha256": "6ba408644083ca1055a3c9a146889279fc8e550fa1a8004efe18015439217e4d",
+  "image_id": "sha256:191135d0771de329f6c158e8d23db7f6ca937254e1b784c1a0dce70196a951e1",
+  "original_build_provenance": "Dirty candidate atop e154, preserved and independently mapped to identical committed a2b bytes; cached dependencies allowed, no cold-build claim",
+  "context_files": 187,
+  "image_copied_files": 184,
+  "all_context_and_image_bytes_match_published_commit": true,
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "model_read_only": true,
+  "runtime_checks": [
+    "New isolated database and ownership marker verified",
+    "Built image explicitly upgrades empty disposable database",
+    "Existing GGUF copied only to new owned volume, checksum verified and mounted read-only in non-root app",
+    "Production application starts with migrated DB and actual local GGUF loaded",
+    "Persisted operator halt denies proposals after app and database restart",
+    "Application and database restart recover readiness and preserve marker/schema"
+  ],
+  "restart_seconds": {
+    "app": 5.215,
+    "database": 1.058
+  },
+  "restart_budget_seconds": 15,
+  "owned_runtime_cleanup_verified": true,
+  "preexisting_volume_inventory_unchanged": true,
+  "independent_file_review": {
+    "path": ".qa/journal-submission-20261023-922d5044b4b3/independent-build-smoke-review.json",
+    "sha256": "55ae1fb57c0408324cb59075d254e9b86c6127a52fc3b377de2f3a7d9c7f61fb"
+  },
+  "publication_image_mapping": {
+    "path": "docs/acceptance/evidence/paper-submission-published-image-reconciliation-20261023.json",
+    "sha256": "71a731a7ef46e7d7656abc07228b366a4ca10e467e3811bc4d699bcc8cf447a0"
+  },
+  "artifact_sha256": {
+    "docs/acceptance/evidence/journal-submission-image-build-20261023-922d5044b4b3.json": "cdf67eed3b27f4adf6c4de38046d5586c16bd1298c6bb7277a427c1790032f6a",
+    "docs/acceptance/evidence/journal-submission-image-smoke-20261023-922d5044b4b3.json": "e259b945b47738fa4c6964683454618b82d57ee256c78745a08d1225138b27d7",
+    "docs/acceptance/evidence/journal-submission-image-runtime-20261023-922d5044b4b3.json": "782ad65b886e8e53487791a6c9e89027463078f02e49ac7849c9b0db6f6214e9",
+    "docs/acceptance/evidence/journal-submission-image-runtime-20261023-922d5044b4b3-cleanup.json": "72c20644da9bdde69d55aab72e70a415c3b3dd4ee11363cf067644c00446233a"
+  },
+  "remote_ci": "Currently running, not accepted yet",
+  "new_browser_ingress_run_in_local_image_phase": false,
+  "prior_browser_ingress_scope": "Prior browser/ingress results remain valid for unchanged UI/auth/proxy surfaces. Current local0020 backend plus terminal image runtime establishes migration/readiness separately. This is scoped reuse, not a fresh browser/ingress execution, current remote CI/Sonar pass or network/firewall revalidation.",
+  "registry_push": false,
+  "private_runtime_deployment": false,
+  "broker_connections_orders": 0,
+  "hardware24h_temperatures": "DEFERRED_TO_FINAL_HOST",
+  "live_enabled": false,
+  "limitations": [
+    "Local amd64 CPU profile only; final-host OS/architecture/model budgets require separate acceptance",
+    "Readiness and model load only, no new model answer-quality benchmark",
+    "No actual Paper execution/reconciliation, research edge,24h or thermal acceptance"
+  ]
+}

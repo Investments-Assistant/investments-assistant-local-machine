@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "at": "2026-10-22T23:49:33.828942+00:00",
+  "phase": "runtime",
+  "run_id": "ia-runtime-afe3c6039aaf",
+  "image_id": "sha256:191135d0771de329f6c158e8d23db7f6ca937254e1b784c1a0dce70196a951e1",
+  "process_exit_code": 0,
+  "independent_labelled_resource_check": {
+    "containers": [],
+    "networks": [],
+    "volumes": []
+  },
+  "independent_all_volume_inventory": {
+    "status": "PASS",
+    "before": [
+      "investments-assistant-k8s_ollama_data",
+      "investments-assistant-k8s_postgres_data",
+      "investments-assistant-k8s_redis_data",
+      "investments-assistant-k8s_reports",
+      "investments-assistant-local-machine_postgres_data",
+      "investments-assistant-local-machine_reports"
+    ],
+    "at": "2026-10-22T23:48:28.611946+00:00",
+    "after": [
+      "investments-assistant-k8s_ollama_data",
+      "investments-assistant-k8s_postgres_data",
+      "investments-assistant-k8s_redis_data",
+      "investments-assistant-k8s_reports",
+      "investments-assistant-local-machine_postgres_data",
+      "investments-assistant-local-machine_reports"
+    ],
+    "process_exit_code": 0,
+    "no_new_volumes_remaining": true,
+    "preexisting_volumes_preserved": true
+  },
+  "only_owned_cleanup_performed_by_reviewed_harness": true,
+  "wrapper_cleanup_actions": false,
+  "source_unchanged": true,
+  "harness_sha256": "7e52f7397403d4a2e82fce896defb694fe3bb4295d618a11c25f7643b52aefe1"
+}

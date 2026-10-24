@@ -1,0 +1,21 @@
+{
+  "reviewed_at": "2026-10-18T22:54:59.112555+00:00",
+  "status": "COOLING_BLOCKED_OWNER_DOWNLOAD_PENDING_NO_OS_SETUP",
+  "owner_report": "No existing CPU-temperature app",
+  "candidate": "HWiNFO64 Portable8.54 as listed by publisher",
+  "official_download": "https://www.hwinfo.com/download/",
+  "official_licensing": "https://www.hwinfo.com/licenses/",
+  "execution_approval": false,
+  "paid_license_approval": false,
+  "package_download": "HTTP403_ZERO_BYTES_NOT_A_PACKAGE",
+  "publisher_listed_mirror_reader": "HTTP403",
+  "download_result_sha256": "37dcf5edfbda51e0b9f5527bfa81c5bf8b786622c23829deba668220fd9011dc",
+  "download_error_sha256": "e85a8cbf6458f846675a9fd218c04399e808ed1f6629e19c4dd964125cd967c9",
+  "binary_signature_verified": false,
+  "cpu_sensor_mapped": false,
+  "temperature_measurement_performed": false,
+  "source_changed": false,
+  "credit_added": false,
+  "proposal": "docs/acceptance/COOLING_REVIEW.md",
+  "next_step": "Owner downloads Portable ZIP in normal browser and provides filename/path without executing; inspect actual signature/hash before requesting any OS/hardware setup approval"
+}

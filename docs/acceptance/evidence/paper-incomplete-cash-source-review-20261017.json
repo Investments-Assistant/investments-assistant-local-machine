@@ -1,0 +1,71 @@
+{
+  "status": "NO_ACTIONABLE_SOURCE_DEFECT_DEMONSTRATED",
+  "recorded_at": "2026-10-17T15:12:28.951485+00:00",
+  "scope": "Source-only assessment of previously persisted incomplete-cash metadata; no new broker read",
+  "observed_metadata": {
+    "balance_snapshot_count": 1,
+    "positions_request_complete": true,
+    "cash_request_complete": false,
+    "atomic_snapshot": false,
+    "declared_environment": "paper",
+    "independently_verified_environment": false,
+    "execution_authority": "none"
+  },
+  "conclusion": "Preserve incomplete cash and the frozen candidate. The suspected missing $LEDGER:ALL request is disproved. Unscoped aggregate cash cannot be attributed to the selected account.",
+  "source_evidence": {
+    "src/tools/brokers/ibkr_balances.py": {
+      "lines": "7-49",
+      "finding": "Requests completed positions/account summary; filters exact selected account and excludes BASE; missing scoped cash stays incomplete, never zero.",
+      "sha256": "a69725b441ee6ccba69a709cabca80e47b78f425760764f84991df7da143368b"
+    },
+    "src/tools/brokers/ibkr_observations.py": {
+      "lines": "145-184",
+      "finding": "observed means callback capture returned without recorded transport/callback failures; coverage and late commissions remain explicitly incomplete.",
+      "sha256": "3961afc20e5b6d032a96a3529c0fd628c9affbe83ee34cda94c87456c87a11a8"
+    },
+    "src/execution/broker_balances.py": {
+      "lines": "94-96",
+      "finding": "Incomplete cash or position request produces needs_review/BALANCE_REQUEST_INCOMPLETE.",
+      "sha256": "7a5f8319d0843a11b5f9e51d93ae337ad9d0c86abdd523531005b9865c362996"
+    },
+    "src/execution/broker_monitor.py": {
+      "lines": "49-73",
+      "finding": "Nested review reasons emit a scoped alert; refresh status describes callback window separately from balance completeness.",
+      "sha256": "69f4fd2fdcea18a8108796e9ba2fee8d88d4f9c06ff40e128892bae511d312c2"
+    },
+    "src/web/static/app.js": {
+      "lines": "815-834",
+      "finding": "UI warns available evidence/history/fees can be incomplete and renders returned nested review; no blanket read succeeded wording.",
+      "sha256": "ae4b9e57933472dae3353318872e245beb1f6a97583140417e98ce7f02fb4c06"
+    },
+    "tests/unit/ibkr_balances_test.py": {
+      "lines": "53-58",
+      "finding": "Existing synthetic regression explicitly requires missing cash to remain incomplete rather than zero.",
+      "sha256": "504ecf8558cd190db7e24624b78605af9db159651f2a6f8bf7b690e23e8e3a3a"
+    },
+    ".venv/lib/python3.12/site-packages/ib_async/ib.py": {
+      "lines": "2244-2261",
+      "finding": "Installed reqAccountSummaryAsync default sends group All and tags including $LEDGER:ALL.",
+      "sha256": "39c585a5b2ca8c3774f79dba08bb428152b2eaaa9df9bd7d5e01add06786aa94"
+    }
+  },
+  "completed_synthetic_check": {
+    "result": "PASS",
+    "method": "Parsed installed ib_async/ib.py with ast; selected only IB.reqAccountSummaryAsync; compiled that single method with postponed annotations; invoked it against an in-memory SimpleNamespace client/wrapper stub; captured request arguments and asserted $LEDGER:ALL in comma-separated tags plus returned request marker.",
+    "captured_group": "All",
+    "requests_LEDGER_ALL": true,
+    "SDK_module_imported": false,
+    "application_imported": false,
+    "network_or_broker_call": false,
+    "files_modified_by_check": false
+  },
+  "checks_reexecuted_for_this_receipt": false,
+  "source_hashes_recorded_without_behavioral_retest": true,
+  "limitations": [
+    "No account configuration, secrets, account identifiers, financial values or raw payload inspected",
+    "The actual cause of missing selected-account cash rows cannot be established from source and allowlisted metadata",
+    "observed describes returned callback capture, not complete balances, account/environment verification or reconciliation",
+    "No source/runtime/configuration changes, new broker requests, probes, replay, or order actions",
+    "This is a source review, not a completed cash/reconciliation acceptance gate"
+  ]
+}

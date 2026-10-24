@@ -1,0 +1,55 @@
+{
+  "recorded_at": "2026-10-22T17:52:03.625050+00:00",
+  "status": "FOCUSED_PASS_NOT_EXTERNAL_PAPER",
+  "counts": {
+    "tests": 119,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "command_receipt": ".qa/paper-contract-20261022-c401a8e2f0a0/submission-v2-execution.json",
+  "result": {
+    "at": "2026-10-22T17:51:08.480397+00:00",
+    "exit_code": 0,
+    "argv": [
+      "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/unit/broker_submission_test.py",
+      "tests/integration/broker_submission_journal_test.py",
+      "tests/integration/migrations_test.py",
+      "tests/unit/acceptance_broker_test.py",
+      "-q",
+      "--junitxml=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/paper-contract-20261022-c401a8e2f0a0/submission-v2.xml",
+      "-o",
+      "cache_dir=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/paper-contract-20261022-c401a8e2f0a0/pytest-cache"
+    ],
+    "log_sha256": "8bffa4e79c5ab52440900dbecd2d18e27a0e84fe54401293de3e82c0a75c977c"
+  },
+  "retained_xml": "docs/acceptance/evidence/paper-submission-focused-20261022.xml",
+  "retained_xml_sha256": "97ec6016265912ec72830f9089498c5a0f163e8e19741e9cbc352a75586f4150",
+  "inputs_sha256": {
+    "src/execution/broker_submission.py": "ed9302d64f064cd6fa476a410a1d0a1840bf372f148d81d2cb27637a6518479b",
+    "src/execution/broker_submission_models.py": "04a34f6023b379e0370c8bc4e69bf2e03efc178493353b0b61a8ce8f10efdef3",
+    "migrations/versions/0020_broker_submission.py": "4c6c9485c0f6095fe17af97115e5c2e3cf01001821e0c8676fdef66e155946d0",
+    "tests/unit/broker_submission_test.py": "e83818be009edba80e24379bb29c92e1e20023dac946cf7c46898d708ce9b542",
+    "tests/integration/broker_submission_journal_test.py": "d534af44c9363082f05a3023d145ab6ec9c66c288b7f787bc69321fa66b55de2",
+    "tests/integration/migrations_test.py": "4c63892a719d6ee99743d8ff15ac66cf6a7476486ceab47f9ff73e31a25b211e",
+    "tests/unit/acceptance_broker_test.py": "2c1383c3f3201d04b2e68611b4860a1618b4a05e993df85f13ec08b67e276020"
+  },
+  "first_attempt": {
+    "exit_code": 2,
+    "reason": "pytest duplicate unit/integration basename collection error; renamed integration module, content unchanged",
+    "result_receipt": ".qa/paper-contract-20261022-c401a8e2f0a0/submission-v1-result.json"
+  },
+  "scope": "47 new unit cases +39 new PostgreSQL journal cases +2 full migration-history cases +31 retained closed broker boundary cases; synthetic injected transport only",
+  "limitations": [
+    "No actual broker SDK transport/connection/order",
+    "No paper-account verification, financial mandate or execution authority",
+    "Not a full current-source suite, image build, browser or remote CI pass",
+    "No 24-hour or thermal measurement; deferred to actual deployment host"
+  ],
+  "current_source_after_import_sort_only": "b46651e69925c7e56f6ebf4e43816cf781bfa3330f94eef29b03c5e3ac3f0765",
+  "live_trading_enabled": false
+}

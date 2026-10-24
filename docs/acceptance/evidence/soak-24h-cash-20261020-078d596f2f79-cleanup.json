@@ -1,0 +1,29 @@
+{
+  "status": "FAILED_NEW_FIXTURE_RETAINED_AND_GUARDED_CLEANUP_VERIFIED",
+  "at": "2026-10-20T11:39:44.531835+00:00",
+  "run_id": "078d596f2f79",
+  "boot_id": "34114b44-668d-4ba2-9480-91423bb4df0f",
+  "database": "test_soak_cash_078d596f2f79",
+  "owned_postgres_status_exit": 3,
+  "runner_postgres_observer_all_not_live_in_matching_native_context": true,
+  "owned_data_directory_preserved": true,
+  "postmaster_pid_absent": true,
+  "cleanup_used_force": false,
+  "source_inputs_unchanged": 160,
+  "scope": "Only marked new078d synthetic database dropped/cluster smart-stopped; old/operator clusters not targeted",
+  "cleanup_receipt": ".qa/soak-cash-20261020-078d596f2f79/cleanup.json",
+  "artifact_sha256": {
+    ".qa/soak-cash-20261020-078d596f2f79/cleanup.json": "77735ce1aa14a4d5bcf399a6339c74b115e17d1e3df81217606e0993274e274f",
+    ".qa/soak-cash-20261020-078d596f2f79/cleanup.log": "ca19178a35ab4153b75b494963b66ce8243e1b94c173107c87b44d09db23652d",
+    ".qa/soak-cash-20261020-078d596f2f79/root-cleanup-claim.json": "0a9abb6af6b8c19e758357e1a4c65fbc719e2592a8ab8d6b73e37dc7b607dc5e",
+    ".qa/soak-cash-20261020-078d596f2f79/root-cleanup-execution.json": "b7bf90a87fe4652596bb473ac07245cb5cfcdbc28d878c606559342c8c796f83",
+    ".qa/soak-cash-20261020-078d596f2f79/root-cleanup-output.log": "8da5bf3f673fc99bb8fbc69b34587f7118f67fd7d411e65b87940195ca77ad46",
+    ".qa/soak-cash-20261020-078d596f2f79/root-cleanup-result.json": "a35ec5937d9371dd5ca96085eed2074ae159725c85331cc6973c4d5d0106fc0c",
+    ".qa/soak-cash-20261020-078d596f2f79/plan.json": "1617843d1ff4e9aeeb9cd6b74303383463c4ffaa22689379c63d304cc9c9fe7b"
+  },
+  "note": "Cleanup updates plan only after233-member raw/plan archive was independently verified; archived running plan remains historical immutable evidence",
+  "soak_pass": false,
+  "broker_or_provider_connections": 0,
+  "external_orders": 0,
+  "os_changes": false
+}

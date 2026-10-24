@@ -1,0 +1,78 @@
+{
+  "status": "PUBLISHED_COMMIT_IMAGE_INPUT_BYTES_RECONCILED",
+  "recorded_at": "2026-10-23T16:11:45.231962+00:00",
+  "published_commit": "d5aa99ec1f2a67e62c929d9bc2dcb1a616af453b",
+  "parent": "a2b2f42da7610dd4b4feadafd4fce13d9acc78bc",
+  "approved_six_file_commit_diff_sha256": "b2da0209cb1792c0c1c8a9284c65ad12764f36c45a7caed9c850bc418b64e165",
+  "commit_has_exactly_approved_six_files": true,
+  "approved_candidate_blob_and_current_file_matches": 6,
+  "source_fingerprint": "13aa112ff9960830e715dc80e7df76a206842d681f1c04ace3ca57892d94f7a5",
+  "tests_fingerprint": "12dbb43ee20b58f7d8bb938e26f8e278611a880d4db6c956f60faa9036d1a62c",
+  "source_and_tests_unchanged_since_validated_candidate": true,
+  "image_id": "sha256:5631759f00daf16f457cb8d844a9ff2f56c9c22f4206e0f61ec1be1d20856dd4",
+  "context": {
+    "files": 187,
+    "all_published_git_blob_tar_saved_manifest_and_current_file_hashes_match": true,
+    "retained_tar_sha256": "5cea2edd88d325f511460bf9041c8f9cce6c2732135701a4e33e8233db0445d1",
+    "copied_image_files": 184,
+    "complete_saved_observed_image_file_hash_set_matches_published_commit": true,
+    "context_only_paths": [
+      ".dockerignore",
+      "Dockerfile",
+      "config/build/debian.sources"
+    ],
+    "distinct_published_paths_read": 190,
+    "full_mapping_sha256": "466022c498be22472e0f09abc2ba197e41603948acd4d36ee2320689cc158c92"
+  },
+  "original_image_provenance": {
+    "build_base_commit": "a2b2f42da7610dd4b4feadafd4fce13d9acc78bc",
+    "build_kind": "dirty candidate atop a2b",
+    "review_patch_sha256": "b2da0209cb1792c0c1c8a9284c65ad12764f36c45a7caed9c850bc418b64e165",
+    "source_fingerprint": "13aa112ff9960830e715dc80e7df76a206842d681f1c04ace3ca57892d94f7a5",
+    "actual_new_commit_now_contains_same_exact_bytes": true,
+    "original_receipts_and_labels_unchanged": true,
+    "new_clean_HEAD_build_or_relabel": false
+  },
+  "independent_readonly_review": {
+    "path": ".qa/paper-recovery-publication-20261023/image-published-review.json",
+    "sha256": "07dda48fddb9f8f009006a0c5286818b5dd11fbeaa665358acbe5255db6bd38b"
+  },
+  "publication_proof": {
+    "path": "docs/acceptance/evidence/paper-recovery-publication-20261023.json",
+    "sha256": "b0a674faee977d4aa06f364da5cb315dadaa4affdbd43d23fc2cfd012b950a16"
+  },
+  "existing_image_proof": {
+    "path": "docs/acceptance/evidence/paper-recovery-image-review-20261023.json",
+    "sha256": "97519158b6dbf242cde54e4aad3a9ea76065bbcd29efff294dc0499fed1ab29b"
+  },
+  "ci": {
+    "run_id": 39983987095,
+    "head": "d5aa99ec1f2a67e62c929d9bc2dcb1a616af453b",
+    "status": "RUNNING_PER_ROOT_HANDOFF_NOT_QUERIED",
+    "pass_claimed": false
+  },
+  "artifact_sha256": {
+    ".qa/order-reference-image-20261023-795c0c77a61e/plan.json": "205cab4f17d1c3645303e361dfaab4c376d6aa758a2c981ed5d668ae3874a5cd",
+    ".qa/order-reference-image-20261023-795c0c77a61e/context.tar": "5cea2edd88d325f511460bf9041c8f9cce6c2732135701a4e33e8233db0445d1",
+    "docs/acceptance/evidence/order-reference-image-build-20261023-795c0c77a61e.json": "f23dba6d812e3726ccb435e648722e300ebf23334d3b95645661418400a9c017",
+    "docs/acceptance/evidence/order-reference-image-smoke-20261023-795c0c77a61e.json": "a561310af21eb8c6af5094be2f4631c764a05e74d129eb1471d0f1a1395b5747",
+    ".qa/order-reference-image-20261023-795c0c77a61e/smoke.log": "5a135e44fa1e5a17bbf56888356ec6360c844afe051183a72ae4fffc708c1747",
+    ".qa/order-reference-image-20261023-795c0c77a61e/smoke-execution.json": "3ed40175dcf62e12634f71a489c5ad7b12379b6f7e27343767a3e06134ac5236",
+    ".qa/order-reference-image-20261023-795c0c77a61e/root-image-review.json": "d41dfe1668f86fb3982dd573c2b5568cecc3a65611c83ef6c8fd2fb400b91151",
+    ".qa/order-reference-image-20261023-795c0c77a61e/runtime-scope-reuse.json": "1f8067751c836e167c62e912d4c335b24a223d41671f5522bc659f3c026bce96",
+    "docs/acceptance/evidence/paper-recovery-image-review-20261023.json": "97519158b6dbf242cde54e4aad3a9ea76065bbcd29efff294dc0499fed1ab29b",
+    "docs/acceptance/evidence/paper-recovery-publication-20261023.json": "b0a674faee977d4aa06f364da5cb315dadaa4affdbd43d23fc2cfd012b950a16",
+    ".qa/paper-recovery-publication-20261023/push-remote-verification.json": "7ae47fb6ec1419e3d27f2cbad8b45ebdade91a8572aa08f1f2f2e12f77ba8b4d",
+    "docs/acceptance/evidence/paper-recovery-publication-review-20261023.patch": "b2da0209cb1792c0c1c8a9284c65ad12764f36c45a7caed9c850bc418b64e165",
+    ".qa/paper-recovery-publication-20261023/staged.patch": "b2da0209cb1792c0c1c8a9284c65ad12764f36c45a7caed9c850bc418b64e165",
+    ".qa/paper-recovery-publication-20261023/ci-plan.json": "94810545e52bc91cdc8793d962662a9d0a4986b6b03fda33ed7145602e5d37c3"
+  },
+  "limitations": [
+    "Read-only Git blob/current public input/tar/retained image-smoke comparison; no new Docker/image inspection, rebuild, relabel, model, PostgreSQL, browser, broker or provider operation.",
+    "Original image was built from dirty candidate atop a2b plus the approved patch; it was not built from clean d5aa. Existing image identity, labels and historical receipts are preserved.",
+    "Old actual model/startup/restart evidence is reused only for unchanged surfaces; no new inference/startup/restart/ingress/24h/thermal execution is claimed.",
+    "Local backend original full PostgreSQL tier retained458passes/1CLOCK_DISCONTINUITY failure; exactly that case passed once on retry,459distinct PostgreSQL cases with passing executions. Not a clean single full tier.",
+    "New exact-commit CI39983987095 is running per root handoff; this review made no API request and claims no CI/Sonar pass.",
+    "Actual Paper, research evidence and final-host gates remain separate; live stays disabled and no actual order/read/cancel permission is created."
+  ]
+}

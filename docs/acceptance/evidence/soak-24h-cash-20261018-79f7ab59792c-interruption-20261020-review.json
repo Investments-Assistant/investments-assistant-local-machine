@@ -1,0 +1,215 @@
+{
+  "all_members_roundtrip_verified": true,
+  "archive": "docs/acceptance/evidence/soak-24h-cash-20261018-79f7ab59792c-interruption-20261020-retained.tar.gz",
+  "archive_bytes": 632877,
+  "archive_sha256": "cc97b81a202fe1d0d457cce799b358b51ab90860fc24966a0c9ef27593e043ab",
+  "at": "2026-10-20T11:26:44.516066+00:00",
+  "candidate_patch_sha256": "cfd2612f17d4cf7c41c507fdf0e1178c3b579e132095509b72cc28f3a58871b2",
+  "cleanup_performed": false,
+  "current_boot_id": "34114b44-668d-4ba2-9480-91423bb4df0f",
+  "current_head": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "execution_pid_namespace": "pid:[4026532490]",
+  "input_bytes": 2625570,
+  "input_members": 240,
+  "limitations": [
+    "Saved RUNNING checkpoint is stale; 24-hour completion and terminal result were not observed.",
+    "Individual wall-clock sample deltas are unavailable; no inferred elapsed time after the final sample.",
+    "No old auditor, observer, retention helper, cleanup, signals, restart or database access was executed.",
+    "Saved broker/order-zero values describe the synthetic recorded tier, not external account validation.",
+    "No GPU, cooling, broker, provider, profitability or live eligibility acceptance follows.",
+    "Only top-level saved CI/publication proofs retained; linked remote raw evidence was not traversed."
+  ],
+  "manifest": "docs/acceptance/evidence/soak-24h-cash-20261018-79f7ab59792c-interruption-20261020-manifest.json",
+  "manifest_sha256": "949eb23ac4151e78e5f0add72464bf07d550ca838e358f09638abc11e480e210",
+  "missing_original_terminal_paths": [
+    "docs/acceptance/evidence/soak-24h-cash-20261018-79f7ab59792c-terminal-review.json",
+    ".qa/soak-cash-terminal-20261018-79f7ab59792c/observer-result.json",
+    ".qa/soak-cash-rootwait-20261018-79f7ab59792c/result.json"
+  ],
+  "native_namespace_not_independently_attested_by_this_file_only_helper": true,
+  "native_namespace_reported_by_parent": "pid:[4026532221]",
+  "observed_24h_accepted": false,
+  "old_boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+  "old_checkpoint_or_helpers_modified": false,
+  "old_process_identity_match": false,
+  "old_tool_session": {
+    "id": 5980,
+    "parent_observed_result": "Unknown process id",
+    "wait_performed_by_this_helper": false
+  },
+  "original_run_id": "79f7ab59792c",
+  "partial_evidence": {
+    "actual_model_answers_reparsed": 69,
+    "checkpoint_status_preserved": "RUNNING",
+    "cleanup_credit": false,
+    "cycles_and_latency_samples": 2824,
+    "first_sample_elapsed_seconds": 1.1509140499983914,
+    "halt_maximum_ms": 83.55385801405646,
+    "halt_p95_budget_ms": 250,
+    "halt_p95_ms_recomputed": 25.698718993226066,
+    "intentional_restart_records": 87,
+    "last_sample_elapsed_seconds": 80574.71405270102,
+    "maximum_recorded_sample_gap_seconds": 30.001658836990828,
+    "maximum_restart_seconds": 1.7956428840116132,
+    "model_answer_reviews": [
+      {
+        "file_sha256": "f8ee74bf3fa7b03af446a9e34d321202fd65059a7dd2863284177594fc5b6aae",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0000-0c21785b.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "fdd6aa0f3decb291ee40c7fdb2e5bff07e681e2d89ead7e3b24ca11380fc17aa",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0001-cb1fd8fe.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "fc1fde3136245e8ec0ddd5ddafa11f49a5288f81db73121bdbd053940e76e96d",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0002-481a3fd3.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "2b0a35b084b2101c68c7fa8c9d8bf11a223c327d24f304e1371d2a147dbed975",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0003-a8d4c9b8.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "b94354b9d7f7a5a290a42064abaf4edf129c4f806bfbe3d86f91c5640c6a7e74",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0004-4810d182.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "fb05ec5af5750834fe079863474e93cb27874492364ad3878de618b0095e3b23",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0005-3658b509.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "5fcd2882dd3303fe3cc0c59ea854a1fedbfda59db4908e25b137ef5f30b888aa",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0006-76424a80.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "a04c7ff59b235834f5951f1e18abbdad2efefd14795f7eb593bc8776987a4bde",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0007-4c5f9e49.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "8f8b93c07593b3f17a634c8a0efe3aaa29e438b249065c58377190344836ec84",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0008-cf5871bc.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "0f6c650352a88f864045b89917cc9334a2c139f990a1a173afe12b62b77cb711",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0009-674284f3.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "c4dd0d0056f59bdea5f8b87ac749a1bb01a7c7e022ece1fccbfe401e71c459fd",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0010-bf44ec9c.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "8deeece4a3d7dc652fb100e1a3a6d3e7f39bf663f77f65c5a64da172d76dbb8e",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0011-2f3df6de.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "2298729e2cbeba0f201a424bda0ef481c4fd8a84d5c4996359177aa4d067764f",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0012-93d34282.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "69224f98ac44b3cada240860570f124292dcfabc8d595e9ea4029b2b76ada0c3",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0013-23ce0042.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "ef8604d113f2fc5f262fb1aaf13d62697de7fc9979c081c2ddb558541fab6cf6",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0014-c24cbb4f.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "ac69242eba02ced1cfa7584595f4d7e4d78d0c552eb253b408f76e5afd5951b8",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0015-9e8093fe.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "12e3b93061e6b0cbe162b715283bb5fd25a4cfc18d059bc02bb114cc23d10219",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0016-8371bfc3.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "4428a7a3aae66ce24340bda13ab42a5bd1f5cc19d0a5c9f794a3258be4efb3e9",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0017-0b3b3a4f.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "afd5124ae2dd5581c0c871a44a7d9724194ecaa0859c95e699b7a60474852249",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0018-77c80acb.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "730e396191ae610c1b9594eba7efce0fc94600d53a5c70aeadf53c6d69416fce",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0019-81300e97.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "913367291ca4b8e20054a13186c8741736a133f1d28ccc70964715e58701455a",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0020-122725e7.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "757b7b5615567410dd83823655ab38ebec66349bf5ed816f1442dc3ad9c80fd3",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0021-7dc064e6.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      },
+      {
+        "file_sha256": "ca10b8d176e2af2b21b7880563dcbffe4aaffa82e9a9ae8a0696012ce9718f44",
+        "path": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0022-9f9df8c6.json",
+        "raw_contract_answers_match": true,
+        "raw_json_answers_independently_reparsed": 3
+      }
+    ],
+    "model_files_completed_recorded": 23,
+    "no_24h_credit": true,
+    "observation_gap_budget_seconds": 60.0,
+    "observation_windows": 1,
+    "observed_24h_accepted": false,
+    "recorded_broker_connections": 0,
+    "recorded_external_orders": 0,
+    "recorded_last_observed_at": "2026-10-18T22:58:29.345553+00:00",
+    "recorded_window_seconds": 80574.769830423,
+    "saved_failure_records": 0,
+    "scope": "SOURCE_BOUND_PARTIAL_RECORDED_WINDOW_ONLY_NO_ACCEPTANCE_PASS",
+    "source_fingerprint_recomputed": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30"
+  },
+  "reason": "KERNEL_BOOT_CHANGED_INVALIDATES_OLD_PROCESS_IDENTITIES",
+  "retention_helper_sha256": "498bfbc31bce950686685a4769ac369347da1cf4962aa28adf188e625240b016",
+  "retention_plan_sha256": "d775b999212bef528324c1b06b1e06b2e0e738edcbed5ae8fd84a09fa31a778b",
+  "soak_pass": false,
+  "source_manifest_sha256": "02361ea2492a487ac985fe208fd85a7f35997a01e536360b44ac88454108241c",
+  "source_sha256": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "status": "INTERRUPTION_KERNEL_BOOT_CHANGED_PARTIAL_ONLY",
+  "unchanged_inputs_verified": true
+}

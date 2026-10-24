@@ -1,0 +1,117 @@
+{
+  "status": "RAW_COLLECTION_COMPLETE_NOT_YET_QUALIFIED",
+  "at": "2026-10-24T11:34:58.293898+00:00",
+  "owner_allowance_evidence": "call_dcb34e6cdf404482a85f68a6c7c58122: never used;0of20dailycalls",
+  "extra_call_balance_authorized": false,
+  "actual_process_exit_code": 0,
+  "tool_session": "572f0b/session33151 -> c76143 terminal0",
+  "attempted_http_requests": 9,
+  "documented_api_call_units": 9,
+  "retained_private_responses": 9,
+  "evidence": [
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/plan.json",
+      "sha256": "ac12e78eff26459452f31ab5d76a2b1c810acc16a382cdad5b2580b43f33ee24"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/started.json",
+      "sha256": "6332bb5948da2442fa32ef433aa8d4d37bb219185a2ec471f13808dd4bfe3f51"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/result.json",
+      "sha256": "928d3f33aa094e8601d3e5dd839ef3e81a0ef28c443be480ca9da6997ceb3115"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/attempt-01.json",
+      "sha256": "f1b3babfa349220f97cf8b64c5e95f2a746e73957726d80c271f79e480c873ab"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/attempt-02.json",
+      "sha256": "69671295b4fefb79b85538365d3354644b46218b413756666e6138ce139a5e7c"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/attempt-03.json",
+      "sha256": "bbb04aa836c5ddeec4e77a01df67bbbe163bd1369fa930617cda449edac64f8f"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/attempt-04.json",
+      "sha256": "cfccb7b11a0f840804d375184fe0acb8cfa15835e406e96009497078334b6a44"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/attempt-05.json",
+      "sha256": "b197b9df1d08eab80631303d0155a9d2e873b2a55091f86899048a094a407d86"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/attempt-06.json",
+      "sha256": "01c13a76987ff2d1f420c3a3f9b2808ef82eec78bf959f8a14ddc83d023bd7c0"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/attempt-07.json",
+      "sha256": "4408c9e40d00f36f8324c00570d6c93998f4e071d4a16723928610b3cb001b1c"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/attempt-08.json",
+      "sha256": "66ab923d543bfd28d45f5ad69707ebf3eccb895f208deee325e646143c638c84"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/attempt-09.json",
+      "sha256": "2a2a047ee0973bdf892f3d683f203102ee31c21c3bd01c0a59cf00929bb1c9fb"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/response-01.json",
+      "sha256": "2005dd0572db56e18c568fe58f433ee9d8ae0ba77557500a7caf6864f1a2886f"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/response-02.json",
+      "sha256": "d508676e9533d6cb134ec79b0b73baa967ad55d0e356fcbf6808421884230a89"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/response-03.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/response-04.json",
+      "sha256": "a1e7d35f47b88e01c40285acec9e1dc8e92765703a466989f2da6a9c73724a88"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/response-05.json",
+      "sha256": "9108017daff89265fec8d92afb5310c6a7566a747ea6d30741520534c1fac881"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/response-06.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/response-07.json",
+      "sha256": "08f0d44d0a398b90b1b0a98828c9830410b9713ae4b636e683f558a87b509e33"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/response-08.json",
+      "sha256": "8987897903ac68c41b78eaae8918e0fec6c8fae301a8d0d8864b75a56bcaafcc"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/response-09.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/collect_once_20261024.py",
+      "sha256": "584ab21f80e4318a31ec143cb8976be1ed27314c20c4a1a134181bea18064661"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/collect-execution-20261024.json",
+      "sha256": "998a35186a92d59f56aa0f52965850f122d2fef72824ba0038b8e69d682e2453"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024-process.log",
+      "sha256": "26e54c21b5bfe86373de48ad7c4f3ec7ac9149ad6600cd80a6e4bf99c6eaf4d1"
+    }
+  ],
+  "actual_strategy_or_economic_run": false,
+  "instrument_identity_currency_calendar_point_in_time": "UNVERIFIED_PENDING_SOURCE_CHECK",
+  "source_app_config_or_tests_changed": false,
+  "broker_connection_order_or_live_action": false,
+  "economic_conclusion": "INSUFFICIENT EVIDENCE",
+  "raw_provider_data_or_research_results_published": false,
+  "next_scope": "Offline qualification and at most three already-approved identity lookups after free eligibility/cost verification; no more than12 totalrequests/20units",
+  "goal_complete": false
+}

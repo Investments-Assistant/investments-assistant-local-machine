@@ -1,0 +1,13 @@
+{
+  "verified_at": "2026-10-18T22:25:11.895935+00:00",
+  "status": "PASS_LIVE_READINESS_REFUSAL_NO_ARCHIVE",
+  "exit_code": 2,
+  "output": {
+    "status": "RETENTION_PENDING",
+    "reason": "BOUND_PROCESSES_STILL_LIVE_runner_identity_observer_identity"
+  },
+  "claim_or_archive_created": false,
+  "script_sha256": "2e75ee29982d6a5fcc6dde70f4169e831cb2716486bc5668b26185f39bcc397f",
+  "plan_sha256": "811ef62e8a83ba2d4b191489eacc50913f3bf4c3af814f8bede3fe028a8a3221",
+  "root_review": "Full final helper reviewed; strict terminal observer/run/proof bindings, explicit path/size bounds, exclusive outputs, all-member round-trip and immutable-source checks. Future retention only after actual terminal result and same identities exited; no cleanup authorized by this helper."
+}

@@ -1,0 +1,16 @@
+{
+  "status": "LOCAL_PACKAGING_REPAIR_PREBUILD",
+  "recorded_at": "2026-10-16T23:54:23.104960+00:00",
+  "head": "26a8d01e80ee1dbb835003981fd3c6d6861a417e",
+  "defect": "Dockerfile COPY requires config/build/debian.sources; broad build/ ignore left file absent from tracked HEAD",
+  "required_file": "config/build/debian.sources",
+  "required_file_sha256": "36f8600e4c543f4afdc810983e0005d2174b4ec6141171360fa52f24bbfe28a3",
+  "file_content_changed": false,
+  "local_fix": "Narrow .gitignore whitelist for this exact reviewed Docker input; other build/private paths remain ignored",
+  "gitignore_sha256": "ae2583a3f65aa471ed7b231cf379e9c627f48c21991f9c6994eb9e037ba25231",
+  "source_runtime_fingerprint": "3b6942a4569d3cf659d353d397dbbc33acd7f1c20ccd57eb80a931bee3f5fcee",
+  "runtime_source_changed": false,
+  "current_image_verified": false,
+  "new_publication_authorized": false,
+  "source_soak_restarted": false
+}

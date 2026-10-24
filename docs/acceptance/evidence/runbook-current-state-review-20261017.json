@@ -1,0 +1,17 @@
+{
+  "status": "CURRENT_SCHEMA_AND_RUNTIME_SCOPE_CORRECTED",
+  "recorded_at": "2026-10-17T15:22:02.726808+00:00",
+  "file": "docs/acceptance/RUNBOOK.md",
+  "before_sha256": "915a90d027f2eb78aac2f1522215a78c5dcce5fef99ff897c434e22576380110",
+  "after_sha256": "780718d1cf098cca04bfa6748d869481a1e2af23e5a51cf68a58149c89a7b6e2",
+  "current_schema_references_updated": 5,
+  "current_revision": "0019_flexible_credentials",
+  "historical_migration_semantics_preserved": true,
+  "historical_tmp_fixture_commands_marked_as_reference_only": true,
+  "current_native_instances_and_live_wait_distinguished": true,
+  "loopback_forwarding_verified_separate_from_unverified_lan_firewall": true,
+  "new_local_links_checked": 10,
+  "missing_links": [],
+  "runtime_source_changed": false,
+  "new_tests_migrations_or_broker_actions": false
+}

@@ -1,0 +1,157 @@
+{
+  "status": "EXACT_PUBLISHED_SEVEN_FILE_COMMIT_ALL_FOUR_CI_AND_CONFIGURED_SONAR_GATE_PASS",
+  "verified_at": "2026-10-18T22:02:21.083488+00:00",
+  "head": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "run_id": 39083730719,
+  "run_url": "https://github.com/Investments-Assistant/investments-assistant-local-machine/actions/runs/39083730719",
+  "workflow_conclusion": "success",
+  "jobs": [
+    {
+      "id": 117545836429,
+      "name": "Unit Tests / Run Unit Tests",
+      "conclusion": "success"
+    },
+    {
+      "id": 117545984299,
+      "name": "Chromium + PostgreSQL (synthetic model)",
+      "conclusion": "success"
+    },
+    {
+      "id": 117545984400,
+      "name": "Integration Tests / Run Integration Tests",
+      "conclusion": "success"
+    },
+    {
+      "id": 117546882696,
+      "name": "SonarCloud Quality Gate (combined coverage)",
+      "conclusion": "success"
+    }
+  ],
+  "test_tiers": {
+    "unit": {
+      "tests": 860,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "tests": 392,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "combined": {
+      "tests": 1256,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "combined_overlap": "Combined run repeats unit/integration and includes additional e2e tests; execution counts are not added.",
+  "combined_additional_case_count": 4,
+  "browser_flows": 24,
+  "ingress_checks": 8,
+  "combined_measured_line_coverage": {
+    "covered": 10063,
+    "valid": 11990,
+    "reported_rate": "0.8393",
+    "browser_server_coverage_included": true,
+    "measured_browser_line_bit_rows": 130
+  },
+  "sonar": {
+    "project_key": "Investments-Assistant_investments-assistant",
+    "branch": "main",
+    "scm_revision": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+    "ce_task_id": "AaFMfrvW2ktK_MXfJ7nQ",
+    "exact_report_quality_gate": "PASSED",
+    "metadata_report": ".scannerwork/report-task.txt",
+    "evidence": [
+      "2026-10-18T00:51:40.6006084Z 00:51:40.597 INFO  Project key: Investments-Assistant_investments-assistant",
+      "2026-10-18T00:52:12.3039397Z 00:52:12.261 INFO  SCM revision ID 'e154a0a365ece2a9fd81657034139c43c8e0abe6'",
+      "2026-10-18T00:52:16.5820208Z 00:52:16.581 INFO  ANALYSIS SUCCESSFUL, you can find the results at: https://sonarcloud.io/dashboard?id=Investments-Assistant_investments-assistant&branch=main",
+      "2026-10-18T00:52:16.5823025Z 00:52:16.582 INFO  More about the report processing at https://sonarcloud.io/api/ce/task?id=AaFMfrvW2ktK_MXfJ7nQ",
+      "2026-10-18T00:52:44.6924489Z \u2714 Quality Gate has PASSED."
+    ],
+    "separate_neutral_checks_not_used_as_acceptance": [
+      {
+        "name": "SonarCloud Code Analysis",
+        "conclusion": "neutral",
+        "title": "Quality Gate not computed"
+      }
+    ]
+  },
+  "model_scope": "CI synthetic model/providers; actual PostgreSQL/Chromium/loopback NginxTLS/WSS. Independent actualGGUF image evidence remains separate.",
+  "broker_connections": 0,
+  "external_orders": 0,
+  "workflow_rerun": false,
+  "raw_evidence": [
+    {
+      "path": ".qa/cash-halt-ci-20261018/terminal-run.json",
+      "sha256": "19d01c50ab1874c5a93f3ecfda3e4893e746b2c7a5856b5ce01caa6513422c2b"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/terminal-jobs.json",
+      "sha256": "446182b8084835b3ae789f0901eb7c725f36547a3dc48b7d38a4d0657a77dd2d"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/terminal-artifacts.json",
+      "sha256": "4625e31003f48486ad172027d087cc60ccb989a822c49c7158b545178bfad57e"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/unit-artifacts/junit-unit.xml",
+      "sha256": "39275dc4d84a0ffe55f944c8d04b8fb35caf90909b53a16e50ffb178b5b23155"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/artifacts/junit-integration/junit-integration.xml",
+      "sha256": "370e34de011f830c1148d11d3c6cb7aa371ccf2e38a60850d7ce2114829d606b"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/artifacts/junit-e2e/junit-e2e.xml",
+      "sha256": "890ded56f1d5ba97f3600812fdaf789f487aa74faf4a4e83c1f5eb10e174b743"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/artifacts/coverage-combined/coverage-combined.xml",
+      "sha256": "3c265738ae8e71f602448547af5d509553aee26f9fa00819704f1e639a250d2f"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/artifacts/browser-synthetic-evidence/docs/acceptance/evidence/browser-ci.txt",
+      "sha256": "ab5806b853e8b1e77afff3548e214723fd6c53e1cbecd9bb5938023e76f7c333"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/artifacts/browser-synthetic-evidence/docs/acceptance/evidence/nginx-ci.json",
+      "sha256": "3f637780d34fd2b5ca8aa566795e7f957add04cafd6d7b319d56f97046d3934a"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/artifacts/coverage-browser/.coverage.browser.runnervm8k3b6.pid5199.XRnLf4dx.H064fZKsswnh",
+      "sha256": "2720cdc967d935f012a6625ff22dbfcda027794e3075323a78bb565ea1ec94f4"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/artifacts/coverage-browser/.coverage.browser.runnervm8k3b6.pid5202.XMaPP0Ox.HG0YmHZrNTeh",
+      "sha256": "3fa0a9cd4205d16a94efe98e5740ae987adb9f34cad2b0faa9492c34758255ca"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/job-117545836429.log",
+      "sha256": "3a3d2af1a59bbcd889678428c17ffd644b446a2bdb080901f1e5c279e6c81bc3"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/job-117545984299.log",
+      "sha256": "a761ef75b0030ed01f4ad1203d1bf7eda3c1ea541a30fd12369771ed5af77e4b"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/job-117545984400.log",
+      "sha256": "bf3c1f71910b28ff2d4eb643a9736513e8a5046d33fc3baa43f4b5298fe0ab24"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/job-117546882696.log",
+      "sha256": "f139d8be9355fdea000f4b35663c14a7de39c5d2dfce97b813ffc29955bbeba6"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/watch-execution.json",
+      "sha256": "170ce15c9f059ec9a01969759633d0c3897a751c870ed4874bdc5e582675b06b"
+    },
+    {
+      "path": ".qa/cash-halt-ci-20261018/artifact-download-execution.json",
+      "sha256": "b7a929c14618b9d3a70d32a2da90b8e80e405d1845a0f57d553cff182cffc740"
+    }
+  ]
+}

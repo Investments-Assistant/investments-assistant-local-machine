@@ -1,0 +1,938 @@
+diff --git a/scripts/soak_acceptance.py b/scripts/soak_acceptance.py
+index 2f94e3e..726b366 100644
+--- a/scripts/soak_acceptance.py
++++ b/scripts/soak_acceptance.py
+@@ -197,6 +197,12 @@ def start_server(state, output, env):
+     client = httpx.Client(base_url=base, timeout=5, trust_env=False)
+     try:
+         startup_deadline = time.monotonic() + 15
++
++        def remaining_startup_timeout():
++            remaining = startup_deadline - time.monotonic()
++            require_gate(remaining > 0, "FIXTURE_STARTUP_BUDGET")
++            return min(5, remaining)
++
+         while True:
+             remaining = startup_deadline - time.monotonic()
+             if remaining <= 0:
+@@ -215,9 +221,23 @@ def start_server(state, output, env):
+         response = client.post(
+             "/api/auth/login",
+             json={"username": state["user"], "password": "fixture-browser-password"},
++            timeout=remaining_startup_timeout(),
+         )
+         response.raise_for_status()
+         client.headers["X-CSRF-Token"] = client.cookies["ia_csrf"]
++        if "halt_account" in state:
++            # Observe durable state before the next cycle can reassert the halt.
++            snapshot = client.get(
++                f"/api/simulator/accounts/{state['halt_account']}",
++                timeout=remaining_startup_timeout(),
++            )
++            snapshot.raise_for_status()
++            persisted = snapshot.json()
++            require_gate(
++                persisted["halted"] is True and persisted["orders"] == [],
++                "RESTART_HALT_OR_NO_ORDER_INVARIANT_FAILED",
++            )
++        require_gate(time.monotonic() < startup_deadline, "FIXTURE_STARTUP_BUDGET")
+         return process, client, base
+     except BaseException:
+         client.close()
+diff --git a/src/tools/brokers/ibkr.py b/src/tools/brokers/ibkr.py
+index 5764213..d39592a 100644
+--- a/src/tools/brokers/ibkr.py
++++ b/src/tools/brokers/ibkr.py
+@@ -163,6 +163,8 @@ def get_ibkr_account(account: BrokerAccountConfig | None = None) -> dict:
+ def get_ibkr_positions(account: BrokerAccountConfig | None = None) -> list[dict]:
+     try:
+         def operation(ib, actual):
++            if getattr(ib, "_ia_primary_portfolio_stale", False) is True:
++                raise RuntimeError("IBKR_SESSION_NOT_READY")
+             return [
+                 {
+                     "symbol": item.contract.symbol,
+diff --git a/src/tools/brokers/ibkr_balances.py b/src/tools/brokers/ibkr_balances.py
+index 4b77245..b523f31 100644
+--- a/src/tools/brokers/ibkr_balances.py
++++ b/src/tools/brokers/ibkr_balances.py
+@@ -3,13 +3,134 @@
+ import uuid
+ from datetime import UTC, datetime
+ 
++from src.execution.broker_balances import CashFact
++
++
++def _fresh_cash(ib, actual):
++    """One owner-thread subscription window, never the SDK's retained cache.
++
++    connect(account=actual, readonly=True) already completed initial sync. End
++    only that account's old read subscription, then request a new initial
++    download. ib_async's blocking call waits for accountDownloadEnd, but its
++    wrapper ignores that callback's account argument. The temporary guard below
++    requires the selected account before allowing the SDK future to complete.
++    Decoder.wrap resolves the wrapper method at dispatch time in pinned 2.1.0.
++    """
++    wrapper, client = ib.wrapper, ib.client
++    original_end = wrapper.accountDownloadEnd
++    original_value = wrapper.updateAccountValue
++    original_request = client.reqAccountUpdates
++    missing = object()
++    restored_attributes = [
++        (wrapper, name, vars(wrapper).get(name, missing))
++        for name in ("updateAccountValue", "accountDownloadEnd")
++    ] + [(client, "reqAccountUpdates", vars(client).get("reqAccountUpdates", missing))]
++    values = {}
++    accepting = completed = ready = invalid = requested = False
++    primary_failure = False
++
++    def account_value(tag, value, currency, account):
++        nonlocal ready, invalid
++        try:
++            original_value(tag, value, currency, account)
++            if not accepting or account != actual:
++                return
++            if tag in {"AccountReady", "accountReady"}:
++                if value == "true":
++                    ready = True
++                else:
++                    invalid = True
++                return
++            if tag not in {"CashBalance", "$LEDGER-CashBalance"} or currency == "BASE":
++                return
++            if invalid:
++                return
++            if not isinstance(value, str) or len(value) > 128:
++                invalid = True
++                return
++            fact = CashFact(currency=currency, amount=value, source_tag=tag)
++            if fact.currency not in values:
++                if len(values) >= 100:
++                    invalid = True
++                    return
++                values[fact.currency] = {}
++            sources = values[fact.currency]
++            # Repeated updates of one key replace its previous exact value.
++            # Different source tags for a currency must agree; never sum them.
++            if any(old.amount != fact.amount for tag, old in sources.items() if tag != fact.source_tag):
++                invalid = True
++                return
++            sources[fact.source_tag] = fact
++        except Exception:
++            # Event handlers must not throw into the SDK logger, whose callback
++            # diagnostics could otherwise include financial values/account IDs.
++            invalid = True
++
++    def account_request(subscribed, account):
++        nonlocal accepting, requested
++        if subscribed is not True or account != actual or requested:
++            raise RuntimeError("BROKER_ACCOUNT_UPDATE_REQUEST_SCOPE")
++        original_request(True, actual)
++        # reqAccountUpdatesAsync sends synchronously before pumping the SDK loop.
++        # Ignore queued callbacks delivered before this exact request was sent.
++        requested = accepting = True
++
++    def account_end(account):
++        nonlocal accepting, completed, invalid
++        if not accepting or account != actual:
++            return
++        accepting = False
++        try:
++            original_end(account)
++            completed = True
++        except Exception:
++            invalid = True
++
++    try:
++        # The SDK portfolio cache stops receiving primary updates on unsubscribe.
++        # Persistent-owner reads must not relabel that cache with a fresh as_of.
++        ib._ia_primary_portfolio_stale = True
++        original_request(False, actual)
++        # Multi-account updates emit accountValueEvent too, even with empty
++        # modelCode. Capture the primary callback channel only, never that event.
++        wrapper.updateAccountValue = account_value
++        wrapper.accountDownloadEnd = account_end
++        client.reqAccountUpdates = account_request
++        ib.reqAccountUpdates(account=actual)
++    except BaseException:
++        primary_failure = True
++        raise
++    finally:
++        accepting = False
++        cleanup_failed = False
++        for target, name, previous in restored_attributes:
++            try:
++                if previous is missing:
++                    if name in vars(target):
++                        delattr(target, name)
++                else:
++                    setattr(target, name, previous)
++            except Exception:
++                cleanup_failed = True
++        try:
++            original_request(False, actual)
++        except Exception:
++            cleanup_failed = True
++        if cleanup_failed and not primary_failure:
++            raise RuntimeError("BROKER_ACCOUNT_UPDATE_CLEANUP_FAILED")
++    if invalid or not completed or not ready or not values:
++        return [], False
++    cash = []
++    for currency, sources in sorted(values.items()):
++        fact = sources.get("$LEDGER-CashBalance") or sources["CashBalance"]
++        cash.append(dict(currency=currency, amount=str(fact.amount), source_tag=fact.source_tag))
++    return cash, True
++
+ 
+ def collect_balances(ib, actual):
+     started = datetime.now(UTC)
+     # Each synchronous call resolves its SDK end marker or raises/ times out.
+     positions = ib.reqPositions()
+-    ib.reqAccountSummary()
+-    values = ib.accountSummary(account=actual)
+     selected_positions = []
+     for position in positions:
+         if position.account != actual:
+@@ -26,16 +147,7 @@ def collect_balances(ib, actual):
+                 average_cost_reported=str(position.avgCost),
+             )
+         )
+-    cash = []
+-    for value in values:
+-        if value.account != actual or value.tag not in {"CashBalance", "$LEDGER-CashBalance"}:
+-            continue
+-        # BASE aggregates are not an original currency and cannot be mixed into cash.
+-        if value.currency == "BASE":
+-            continue
+-        if len(cash) >= 100:
+-            raise ValueError("BROKER_CURRENCY_CAPACITY")
+-        cash.append(dict(currency=value.currency, amount=value.value, source_tag=value.tag))
++    cash, cash_complete = _fresh_cash(ib, actual)
+     return dict(
+         kind="balance_snapshot",
+         actual_account=actual,
+@@ -46,6 +158,6 @@ def collect_balances(ib, actual):
+             positions=sorted(selected_positions, key=lambda row: row["con_id"]),
+             cash=sorted(cash, key=lambda row: row["currency"]),
+             position_request_complete=True,
+-            cash_request_complete=bool(cash),
++            cash_request_complete=cash_complete,
+         ),
+     )
+diff --git a/tests/unit/ibkr_balances_test.py b/tests/unit/ibkr_balances_test.py
+index bb5fb86..65aaf5c 100644
+--- a/tests/unit/ibkr_balances_test.py
++++ b/tests/unit/ibkr_balances_test.py
+@@ -9,6 +9,23 @@ from src.tools.brokers.ibkr_balances import collect_balances
+ from src.execution.broker_observations import OBSERVATION
+ 
+ 
++class Event:
++    def __init__(self):
++        self.handlers = []
++
++    def __iadd__(self, handler):
++        self.handlers.append(handler)
++        return self
++
++    def __isub__(self, handler):
++        self.handlers.remove(handler)
++        return self
++
++    def emit(self, row):
++        for handler in list(self.handlers):
++            handler(row)
++
++
+ class SDK:
+     def __init__(self):
+         self.positions = [
+@@ -27,6 +44,20 @@ class SDK:
+             Obj(account="other", tag="CashBalance", currency="EUR", value="999"),
+         ]
+         self.summary_requested = False
++        self.accountValueEvent = Event()
++        self.wrapper = Obj(
++            accountDownloadEnd=self.account_download_end,
++            updateAccountValue=self.account_value,
++            accountUpdateMulti=self.multi_value,
++        )
++        self.client = Obj(reqAccountUpdates=self.subscription)
++        self.subscription_calls = []
++        self.download_complete = False
++        self.completed_accounts = []
++        self.ready_value = "true"
++        self.end_accounts = ["selected"]
++        self.return_without_end = False
++        self.read_failure = None
+ 
+     def reqPositions(self):
+         return self.positions
+@@ -38,6 +69,38 @@ class SDK:
+         assert account == "selected" and self.summary_requested
+         return self.values
+ 
++    def subscription(self, subscribed, account):
++        assert account == "selected"
++        self.subscription_calls.append((subscribed, account))
++
++    def account_download_end(self, account):
++        # Model the actual SDK wrapper: any account ends its shared future.
++        self.completed_accounts.append(account)
++        self.download_complete = True
++
++    def account_value(self, tag, value, currency, account):
++        self.accountValueEvent.emit(Obj(account=account, tag=tag, value=value, currency=currency))
++
++    def multi_value(self, _request, account, model, tag, value, currency):
++        self.accountValueEvent.emit(
++            Obj(account=account, tag=tag, value=value, currency=currency, modelCode=model)
++        )
++
++    def reqAccountUpdates(self, account):
++        assert account == "selected"
++        self.download_complete = False
++        self.client.reqAccountUpdates(True, account)
++        if self.ready_value is not None:
++            self.wrapper.updateAccountValue("AccountReady", self.ready_value, "", account)
++        for row in self.values:
++            self.wrapper.updateAccountValue(row.tag, row.value, row.currency, row.account)
++        if self.read_failure is not None:
++            raise self.read_failure
++        for ended_account in self.end_accounts:
++            self.wrapper.accountDownloadEnd(ended_account)
++        if not self.download_complete and not self.return_without_end:
++            raise TimeoutError("Synthetic selected-account download did not finish")
++
+ 
+ def test_explicit_snapshot_preserves_fractional_quantity_and_separate_cash_currencies():
+     result = OBSERVATION.validate_python(collect_balances(SDK(), "selected"))
+@@ -58,17 +121,359 @@ def test_empty_positions_are_explicit_but_missing_cash_is_not_zero():
+     assert not result.balances.cash_request_complete and result.balances.cash == []
+ 
+ 
++def test_fresh_selected_account_cash_is_not_lost_to_aggregate_summary():
++    """Summary ledger rows can be All while completed account updates are scoped."""
++    class ScopedSDK(SDK):
++        def __init__(self):
++            super().__init__()
++            self.positions = []
++            self.values = [Obj(account="All", tag="CashBalance", currency="EUR", value="125")]
++            self.accountValueEvent = Event()
++            self.download_complete = False
++            # An SDK cache is not a new observation window. This old currency
++            # must not be promoted to a fresh completed snapshot.
++            self.cached = [Obj(account="selected", tag="CashBalance", currency="GBP", value="777")]
++
++        def reqAccountUpdates(self, account):
++            assert account == "selected"
++            self.client.reqAccountUpdates(True, account)
++            fresh = [
++                Obj(account="selected", tag="AccountReady", currency="", value="true"),
++                Obj(account="selected", tag="$LEDGER-CashBalance", currency="EUR", value="100"),
++                Obj(account="selected", tag="CashBalance", currency="USD", value="25"),
++                Obj(account="selected", tag="CashBalance", currency="BASE", value="125"),
++                Obj(account="other", tag="CashBalance", currency="EUR", value="999"),
++            ]
++            for row in fresh:
++                self.cached.append(row)
++                self.wrapper.updateAccountValue(row.tag, row.value, row.currency, row.account)
++            # The blocking SDK call returns only after accountDownloadEnd.
++            self.wrapper.accountDownloadEnd(account)
++
++        def accountValues(self, account):
++            assert account == "selected" and self.download_complete
++            return [row for row in self.cached if row.account == account]
++
++    sdk = ScopedSDK()
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert [(row.currency, row.amount) for row in result.balances.cash] == [
++        ("EUR", 100), ("USD", 25),
++    ]
++    assert result.balances.cash_request_complete
++    assert sdk.download_complete
++    assert sdk.accountValueEvent.handlers == []
++
++
+ def test_conflicting_currency_or_duplicate_contract_is_not_silently_overwritten():
+     sdk = SDK()
+-    sdk.values.append(Obj(account="selected", tag="CashBalance", currency="EUR", value="200"))
+-    with pytest.raises(ValidationError, match="Ambiguous duplicate currency"):
+-        OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    sdk.values.append(Obj(account="selected", tag="$LEDGER-CashBalance", currency="EUR", value="200"))
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash == [] and not result.balances.cash_request_complete
+     sdk = SDK()
+     sdk.positions.append(sdk.positions[0])
+     with pytest.raises(ValidationError, match="Ambiguous duplicate contract"):
+         OBSERVATION.validate_python(collect_balances(sdk, "selected"))
+ 
+ 
++def test_repeated_key_keeps_latest_exact_value_and_equal_sources_do_not_double_count():
++    sdk = SDK()
++    sdk.values += [
++        Obj(account="selected", tag="CashBalance", currency="EUR", value="100.00000000000000000001"),
++        Obj(account="selected", tag="$LEDGER-CashBalance", currency="EUR", value="100.00000000000000000001"),
++    ]
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert str(result.balances.cash[0].amount) == "100.00000000000000000001"
++    assert len(result.balances.cash) == 2 and result.balances.cash_request_complete
++    assert sdk.subscription_calls == [(False, "selected"), (True, "selected"), (False, "selected")]
++
++
++@pytest.mark.parametrize("ready", [None, "false", "TRUE", "", True])
++def test_missing_or_invalid_readiness_never_promotes_cash(ready):
++    sdk = SDK()
++    sdk.ready_value = ready
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash == [] and not result.balances.cash_request_complete
++    assert not sdk.accountValueEvent.handlers
++
++
++def test_not_ready_and_currency_conflict_are_sticky_for_the_whole_request():
++    for extra in (
++        [Obj(account="selected", tag="AccountReady", currency="", value="false"),
++         Obj(account="selected", tag="AccountReady", currency="", value="true")],
++        [Obj(account="selected", tag="$LEDGER-CashBalance", currency="EUR", value="200"),
++         Obj(account="selected", tag="$LEDGER-CashBalance", currency="EUR", value="100")],
++    ):
++        sdk = SDK()
++        sdk.values += extra
++        result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++        assert result.balances.cash == [] and not result.balances.cash_request_complete
++
++
++def test_foreign_download_end_cannot_complete_the_selected_account_request():
++    sdk = SDK()
++    original = sdk.wrapper.accountDownloadEnd
++    sdk.end_accounts = ["other"]
++    with pytest.raises(TimeoutError):
++        collect_balances(sdk, "selected")
++    assert sdk.completed_accounts == []
++    assert sdk.wrapper.accountDownloadEnd is original
++    assert sdk.accountValueEvent.handlers == []
++    assert sdk.subscription_calls[-1] == (False, "selected")
++
++
++def test_return_without_selected_end_marker_is_still_incomplete():
++    sdk = SDK()
++    sdk.end_accounts, sdk.return_without_end = ["other"], True
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash == [] and not result.balances.cash_request_complete
++
++
++def test_guard_intercepts_real_sdk_decoder_dispatch_without_any_socket():
++    from ib_async.decoder import Decoder
++
++    sdk = SDK()
++    decoder = Decoder(sdk.wrapper, 178)
++    original = sdk.wrapper.accountDownloadEnd
++
++    def request(account):
++        sdk.client.reqAccountUpdates(True, account)
++        decoder.interpret(["73", "1", "99", account, "", "AccountReady", "false", ""])
++        decoder.interpret(["73", "1", "99", account, "", "CashBalance", "777", "GBP"])
++        decoder.interpret(["6", "2", "AccountReady", "true", "", account])
++        decoder.interpret(["6", "2", "CashBalance", "100", "EUR", account])
++        decoder.interpret(["54", "1", "other"])
++        decoder.interpret(["6", "2", "CashBalance", "25", "USD", account])
++        decoder.interpret(["6", "2", "CashBalance", "999", "JPY", "other"])
++        decoder.interpret(["6", "2", "CashBalance", "125", "BASE", account])
++        decoder.interpret(["54", "1", account])
++        # A later periodic update belongs outside this completed download.
++        decoder.interpret(["6", "2", "AccountReady", "false", "", account])
++        decoder.interpret(["6", "2", "CashBalance", "9999", "EUR", account])
++
++    sdk.reqAccountUpdates = request
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash_request_complete
++    assert [(row.currency, row.amount) for row in result.balances.cash] == [("EUR", 100), ("USD", 25)]
++    assert sdk.completed_accounts == ["selected"]
++    assert sdk.wrapper.accountDownloadEnd is original
++
++
++def test_multi_update_cannot_supply_missing_primary_readiness():
++    sdk = SDK()
++    sdk.ready_value = None
++    original = sdk.reqAccountUpdates
++
++    def request(account):
++        # Emit through the same public event after the actual send, but using
++        # the distinct Multi channel the default SDK connection also subscribes.
++        send = sdk.client.reqAccountUpdates
++
++        def with_multi(subscribed, selected):
++            send(subscribed, selected)
++            sdk.wrapper.accountUpdateMulti(99, selected, "", "AccountReady", "true", "")
++
++        sdk.client.reqAccountUpdates = with_multi
++        try:
++            original(account)
++        finally:
++            sdk.client.reqAccountUpdates = send
++
++    sdk.reqAccountUpdates = request
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash == [] and not result.balances.cash_request_complete
++
++
++def test_callbacks_during_send_do_not_become_fresh_download_evidence():
++    sdk = SDK()
++    original = sdk.client.reqAccountUpdates
++
++    def request(subscribed, account):
++        original(subscribed, account)
++        if subscribed:
++            sdk.wrapper.updateAccountValue("AccountReady", "false", "", account)
++            sdk.wrapper.updateAccountValue("CashBalance", "777", "GBP", account)
++            sdk.wrapper.accountDownloadEnd(account)
++
++    sdk.client.reqAccountUpdates = request
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash_request_complete
++    assert [row.currency for row in result.balances.cash] == ["EUR", "USD"]
++    assert sdk.completed_accounts == ["selected"]
++
++
++def test_class_callback_and_client_descriptors_are_restored_without_instance_overrides():
++    sdk = SDK()
++
++    class Wrapper:
++        def updateAccountValue(self, *args):
++            sdk.account_value(*args)
++
++        def accountDownloadEnd(self, account):
++            sdk.account_download_end(account)
++
++    class Client:
++        def reqAccountUpdates(self, subscribed, account):
++            sdk.subscription(subscribed, account)
++
++    sdk.wrapper, sdk.client = Wrapper(), Client()
++    before_wrapper, before_client = dict(vars(sdk.wrapper)), dict(vars(sdk.client))
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash_request_complete
++    assert vars(sdk.wrapper) == before_wrapper and vars(sdk.client) == before_client
++
++
++@pytest.mark.parametrize("value", ["NaN", "Infinity", "not-a-number", "1e99999", "1" * 129])
++def test_malformed_cash_numeric_is_incomplete_and_never_logged(value, caplog):
++    sdk = SDK()
++    sdk.values.append(Obj(account="selected", tag="CashBalance", currency="EUR", value=value))
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash == [] and not result.balances.cash_request_complete
++    assert caplog.records == []
++
++
++def test_initial_unsubscribe_failure_preserves_original_error_and_existing_hooks():
++    sdk = SDK()
++    original_end, original_value = sdk.wrapper.accountDownloadEnd, sdk.wrapper.updateAccountValue
++    error = OSError("Synthetic initial unsubscribe failure")
++    original = sdk.client.reqAccountUpdates
++
++    def request(subscribed, account):
++        original(subscribed, account)
++        if len(sdk.subscription_calls) == 1:
++            raise error
++
++    sdk.client.reqAccountUpdates = request
++    with pytest.raises(OSError) as failure:
++        collect_balances(sdk, "selected")
++    assert failure.value is error
++    assert sdk.wrapper.accountDownloadEnd is original_end
++    assert sdk.wrapper.updateAccountValue is original_value
++    assert sdk.client.reqAccountUpdates is request
++    assert sdk.subscription_calls == [(False, "selected"), (False, "selected")]
++    assert sdk._ia_primary_portfolio_stale is True
++
++
++def test_installed_sdk_native_request_timeout_cleans_up_without_a_socket():
++    import asyncio
++
++    from ib_async import IB
++
++    class WaitingSDK(SDK):
++        RequestTimeout = 0.01
++        reqAccountUpdates = IB.reqAccountUpdates
++        reqAccountUpdatesAsync = IB.reqAccountUpdatesAsync
++        _run = IB._run
++
++    sdk = WaitingSDK()
++    originals = dict(vars(sdk.wrapper))
++    original_subscription = sdk.client.reqAccountUpdates
++    with asyncio.Runner() as runner:
++        loop = runner.get_loop()
++        sdk.wrapper.startReq = lambda _key: loop.create_future()
++
++        def request(subscribed, account):
++            original_subscription(subscribed, account)
++            if subscribed:
++                loop.call_soon(sdk.wrapper.updateAccountValue, "AccountReady", "true", "", account)
++                loop.call_soon(sdk.wrapper.updateAccountValue, "CashBalance", "100", "EUR", account)
++                loop.call_soon(sdk.wrapper.accountDownloadEnd, "other")
++
++        sdk.client.reqAccountUpdates = request
++        with pytest.raises(TimeoutError):
++            collect_balances(sdk, "selected")
++    for name, original in originals.items():
++        assert getattr(sdk.wrapper, name) is original
++    assert sdk.client.reqAccountUpdates is request
++    assert sdk.subscription_calls == [(False, "selected"), (True, "selected"), (False, "selected")]
++    assert sdk.completed_accounts == []
++    assert sdk.RequestTimeout == 0.01
++
++
++@pytest.mark.parametrize("currency_count, complete", [(100, True), (101, False)])
++def test_exact_currency_capacity_and_overflow(currency_count, complete):
++    sdk = SDK()
++    sdk.values = [
++        Obj(account="selected", tag="CashBalance", currency=f"A{chr(65 + i // 26)}{chr(65 + i % 26)}", value="1")
++        for i in range(currency_count)
++    ]
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash_request_complete is complete
++    assert len(result.balances.cash) == (currency_count if complete else 0)
++
++
++def test_original_callback_error_cannot_escape_into_decoder_payload_logging(caplog):
++    from ib_async.decoder import Decoder
++
++    sdk = SDK()
++    decoder = Decoder(sdk.wrapper, 178)
++
++    def broken_value(*_args):
++        raise ValueError("Synthetic private callback failure")
++
++    sdk.wrapper.updateAccountValue = broken_value
++
++    def request(account):
++        sdk.client.reqAccountUpdates(True, account)
++        decoder.interpret(["6", "2", "CashBalance", "100", "EUR", account])
++        decoder.interpret(["54", "1", account])
++
++    sdk.reqAccountUpdates = request
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash == [] and not result.balances.cash_request_complete
++    assert sdk.wrapper.updateAccountValue is broken_value
++    assert caplog.records == []
++
++
++def test_currency_overflow_and_malformed_callbacks_stay_incomplete_without_logging(caplog):
++    sdk = SDK()
++    sdk.values = [
++        Obj(account="selected", tag="CashBalance", currency=f"A{chr(65 + i // 26)}{chr(65 + i % 26)}", value="1")
++        for i in range(101)
++    ]
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash == [] and not result.balances.cash_request_complete
++    sdk = SDK()
++    sdk.values.append(Obj(account="selected", tag="CashBalance", currency="EUR", value=object()))
++    result = OBSERVATION.validate_python(collect_balances(sdk, "selected"))
++    assert result.balances.cash == [] and not result.balances.cash_request_complete
++    assert caplog.records == []
++
++
++def test_cleanup_restores_hooks_and_preserves_original_native_failure():
++    sdk = SDK()
++    original = sdk.wrapper.accountDownloadEnd
++    error = TimeoutError("Synthetic original read failure")
++    sdk.read_failure = error
++    original_subscription = sdk.client.reqAccountUpdates
++
++    def subscription(subscribed, account):
++        original_subscription(subscribed, account)
++        if len(sdk.subscription_calls) == 3:
++            raise ValueError("Synthetic private cleanup error")
++
++    sdk.client.reqAccountUpdates = subscription
++    with pytest.raises(TimeoutError) as failure:
++        collect_balances(sdk, "selected")
++    assert failure.value is error
++    assert sdk.wrapper.accountDownloadEnd is original
++    assert sdk.accountValueEvent.handlers == []
++
++
++def test_cleanup_failure_without_prior_error_is_sanitized():
++    sdk = SDK()
++    original_subscription = sdk.client.reqAccountUpdates
++
++    def subscription(subscribed, account):
++        original_subscription(subscribed, account)
++        if len(sdk.subscription_calls) == 3:
++            raise ValueError("Synthetic private cleanup error")
++
++    sdk.client.reqAccountUpdates = subscription
++    with pytest.raises(RuntimeError, match="^BROKER_ACCOUNT_UPDATE_CLEANUP_FAILED$"):
++        collect_balances(sdk, "selected")
++    assert sdk.accountValueEvent.handlers == []
++
++
+ def snapshot_row(*, minute, quantity="0.004", eur="100", usd="25"):
+     from datetime import UTC, datetime
+ 
+diff --git a/tests/unit/ibkr_observations_test.py b/tests/unit/ibkr_observations_test.py
+index 364ddff..7283438 100644
+--- a/tests/unit/ibkr_observations_test.py
++++ b/tests/unit/ibkr_observations_test.py
+@@ -50,6 +50,14 @@ class SDK:
+         self.orderStatusEvent = Event()
+         self.disconnectedEvent = Event()
+         self.errorEvent = Event()
++        self.accountValueEvent = Event()
++        self.wrapper = Obj(
++            accountDownloadEnd=lambda _account: None,
++            updateAccountValue=lambda tag, value, currency, account: self.accountValueEvent.emit(
++                Obj(account=account, tag=tag, value=value, currency=currency)
++            ),
++        )
++        self.client = Obj(reqAccountUpdates=lambda _subscribed, _account: None)
+         self.failed = False
+ 
+     def reqAllOpenOrders(self):
+@@ -65,6 +73,12 @@ class SDK:
+         assert account == "synthetic"
+         return []
+ 
++    def reqAccountUpdates(self, account):
++        assert account == "synthetic"
++        self.client.reqAccountUpdates(True, account)
++        self.wrapper.updateAccountValue("AccountReady", "true", "", account)
++        self.wrapper.accountDownloadEnd(account)
++
+     def reqExecutions(self, execution_filter):
+         assert execution_filter == "fixture-account-filter"
+         observed = fill()
+diff --git a/tests/unit/ibkr_read_routing_test.py b/tests/unit/ibkr_read_routing_test.py
+index 1737132..1905ea3 100644
+--- a/tests/unit/ibkr_read_routing_test.py
++++ b/tests/unit/ibkr_read_routing_test.py
+@@ -139,3 +139,41 @@ def test_snapshot_read_keeps_continuous_subscription_attached(monkeypatch):
+     finally:
+         assert worker.close(timeout=1)
+     assert not sdk.execDetailsEvent.handlers
++
++
++def test_snapshot_unsubscribe_never_relabels_a_persistent_owner_portfolio_cache(monkeypatch):
++    import sys
++    from types import SimpleNamespace
++
++    from tests.unit.ibkr_observations_test import SDK as CallbackSDK
++    from src.tools.brokers.ibkr_observations import collect_ibkr_observations
++
++    class CombinedSDK(CallbackSDK, SDK):
++        def __init__(self):
++            CallbackSDK.__init__(self)
++            SDK.__init__(self)
++
++    selected, sdk = account(), CombinedSDK()
++    selected.config["broker_account_id"] = "synthetic"
++    connections = []
++
++    @contextmanager
++    def connected(_):
++        connections.append("one owned connection")
++        yield sdk, "synthetic"
++
++    sdk.portfolio = lambda **_: pytest.fail("Stopped portfolio cache was accessed")
++    monkeypatch.setitem(sys.modules, "ib_async", SimpleNamespace(ExecutionFilter=lambda **_: "fixture-account-filter"))
++    monkeypatch.setattr(ibkr, "_connection", lambda *_: pytest.fail("Unexpected reconnect"))
++    worker = ReadSessionWorker(selected, connection_factory=connected)
++    worker.register_reads()
++    worker.start()
++    try:
++        assert collect_ibkr_observations(selected)["status"] == "observed"
++        assert sdk._ia_primary_portfolio_stale is True
++        assert ibkr.get_ibkr_positions(selected) == [
++            {"broker": "ibkr", "available": False, "error": "IBKR_SESSION_NOT_READY"}
++        ]
++        assert connections == ["one owned connection"]
++    finally:
++        assert worker.close(timeout=1)
+diff --git a/tests/unit/soak_startup_test.py b/tests/unit/soak_startup_test.py
+index 5564e59..75c8242 100644
+--- a/tests/unit/soak_startup_test.py
++++ b/tests/unit/soak_startup_test.py
+@@ -45,3 +45,183 @@ def test_startup_uses_full_budget_but_never_extends_it(monkeypatch, tmp_path, re
+         with pytest.raises(RuntimeError, match="FIXTURE_STARTUP_BUDGET"):
+             soak.start_server({"user": "fixture"}, tmp_path, {})
+         assert 15 <= clock[0] < 15.11 and terminated == [process]
++
++
++@pytest.mark.parametrize(
++    "persisted_halted, persisted_orders, rejected",
++    [
++        (False, [], True),
++        (True, [], False),
++        (True, [{"status": "filled"}], True),
++    ],
++    ids=["lost-halt", "preserved-halt", "unexpected-order"],
++)
++def test_existing_halt_is_observed_before_startup_can_reassert_it(
++    monkeypatch, tmp_path, persisted_halted, persisted_orders, rejected,
++):
++    """A healthy restarted service can still have lost durable safety state."""
++    account_path = "/api/simulator/accounts/synthetic-persisted-halt"
++    persisted = {"halted": persisted_halted, "orders": persisted_orders}
++    calls, terminated = [], []
++    process = SimpleNamespace(poll=lambda: None)
++
++    def response(payload=None):
++        return SimpleNamespace(
++            status_code=200, raise_for_status=lambda: None,
++            json=lambda: dict(payload or {}),
++        )
++
++    class Client:
++        def __init__(self):
++            self.headers = {}
++            self.cookies = {"ia_csrf": "synthetic"}
++            self.closed = False
++
++        def get(self, path, **_kwargs):
++            calls.append(("GET", path))
++            if path == "/api/health":
++                return response()
++            assert path == account_path
++            return response(persisted)
++
++        def post(self, path, **_kwargs):
++            calls.append(("POST", path))
++            if path == account_path + "/halt":
++                # This models the masking bug: writing first repairs lost halt.
++                persisted["halted"] = True
++                return response(persisted)
++            assert path == "/api/auth/login"
++            return response()
++
++        def close(self):
++            self.closed = True
++
++    client = Client()
++    monkeypatch.setattr(soak.subprocess, "Popen", lambda *args, **kwargs: process)
++    monkeypatch.setattr(soak.httpx, "Client", lambda **kwargs: client)
++    monkeypatch.setattr(soak, "terminate", lambda item: terminated.append(item))
++    state = {"user": "fixture", "halt_account": "synthetic-persisted-halt"}
++    if rejected:
++        with pytest.raises(RuntimeError, match="HALT"):
++            soak.start_server(state, tmp_path, {})
++        assert client.closed and terminated == [process]
++    else:
++        returned_process, returned_client, _base = soak.start_server(state, tmp_path, {})
++        assert returned_process is process and returned_client is client
++        assert not client.closed and terminated == []
++    assert calls == [
++        ("GET", "/api/health"),
++        ("POST", "/api/auth/login"),
++        ("GET", account_path),
++    ]
++    assert persisted["halted"] is persisted_halted
++
++
++def test_fresh_start_has_no_existing_halt_to_inspect(monkeypatch, tmp_path):
++    """First startup precedes fixture creation; no account read/write is valid."""
++    calls = []
++    process = SimpleNamespace(poll=lambda: None)
++
++    class Client:
++        headers = {}
++        cookies = {"ia_csrf": "synthetic"}
++
++        def get(self, path, **_kwargs):
++            calls.append(("GET", path))
++            assert path == "/api/health"
++            return SimpleNamespace(status_code=200)
++
++        def post(self, path, **_kwargs):
++            calls.append(("POST", path))
++            assert path == "/api/auth/login"
++            return SimpleNamespace(raise_for_status=lambda: None)
++
++        def close(self):
++            raise AssertionError("Successful first startup must retain its client")
++
++    client = Client()
++    monkeypatch.setattr(soak.subprocess, "Popen", lambda *args, **kwargs: process)
++    monkeypatch.setattr(soak.httpx, "Client", lambda **kwargs: client)
++    monkeypatch.setattr(soak, "terminate", lambda item: pytest.fail("Unexpected startup cleanup"))
++    assert soak.start_server({"user": "fixture"}, tmp_path, {})[:2] == (process, client)
++    assert calls == [("GET", "/api/health"), ("POST", "/api/auth/login")]
++
++
++@pytest.mark.parametrize(
++    "login_seconds, guard_seconds, rejected, guard_attempted, finished_at",
++    [
++        (2, 2, True, True, 16),
++        (1, 1, False, True, 14),
++        (3, 0, True, False, 15),
++    ],
++    ids=["guard-completes-too-late", "whole-startup-in-budget", "login-exhausts-budget"],
++)
++def test_login_and_persisted_halt_share_original_startup_deadline(
++    monkeypatch, tmp_path, login_seconds, guard_seconds, rejected, guard_attempted, finished_at,
++):
++    """Health readiness must not grant login or state inspection a fresh budget."""
++    clock = [0.0]
++    calls, terminated = [], []
++    process = SimpleNamespace(poll=lambda: None)
++    account_path = "/api/simulator/accounts/synthetic-persisted-halt"
++
++    def response(payload=None):
++        return SimpleNamespace(
++            status_code=200, raise_for_status=lambda: None,
++            json=lambda: dict(payload or {}),
++        )
++
++    def spend_request_time(seconds, timeout):
++        # Individual HTTP operations are bounded by time still available. An
++        # operation can nonetheless return late, e.g. after a streaming response;
++        # successful HTTP status alone cannot prove total elapsed-time compliance.
++        assert 0 < timeout <= min(5, 15 - clock[0])
++        clock[0] += seconds
++
++    class Client:
++        def __init__(self):
++            self.headers = {}
++            self.cookies = {"ia_csrf": "synthetic"}
++            self.closed = False
++
++        def get(self, path, **kwargs):
++            if path == "/api/health":
++                if clock[0] < 12:
++                    raise httpx.ConnectError("synthetic startup not ready")
++                return response()
++            calls.append(("GET", path))
++            assert path == account_path
++            spend_request_time(guard_seconds, kwargs["timeout"])
++            return response({"halted": True, "orders": []})
++
++        def post(self, path, **kwargs):
++            calls.append(("POST", path))
++            assert path == "/api/auth/login"
++            spend_request_time(login_seconds, kwargs["timeout"])
++            return response()
++
++        def close(self):
++            self.closed = True
++
++    def wait(seconds):
++        clock[0] = round(clock[0] + seconds, 9)
++        return False
++
++    client = Client()
++    monkeypatch.setattr(soak.time, "monotonic", lambda: clock[0])
++    monkeypatch.setattr(soak, "STOP", SimpleNamespace(wait=wait))
++    monkeypatch.setattr(soak.subprocess, "Popen", lambda *args, **kwargs: process)
++    monkeypatch.setattr(soak.httpx, "Client", lambda **kwargs: client)
++    monkeypatch.setattr(soak, "terminate", lambda item: terminated.append(item))
++    state = {"user": "fixture", "halt_account": "synthetic-persisted-halt"}
++    if rejected:
++        with pytest.raises(RuntimeError, match="FIXTURE_STARTUP_BUDGET"):
++            soak.start_server(state, tmp_path, {})
++        assert client.closed and terminated == [process]
++    else:
++        assert soak.start_server(state, tmp_path, {})[:2] == (process, client)
++        assert not client.closed and terminated == []
++    assert clock[0] == finished_at
++    assert calls == [("POST", "/api/auth/login")] + (
++        [("GET", account_path)] if guard_attempted else []
++    )

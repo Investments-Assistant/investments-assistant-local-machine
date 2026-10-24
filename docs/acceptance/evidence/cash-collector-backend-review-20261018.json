@@ -1,0 +1,73 @@
+{
+  "status": "FULL_FROZEN_BACKEND_PASS_OWNED_CLUSTER_CLEANED",
+  "at": "2026-10-18T00:31:34.695758+00:00",
+  "source_fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "patch_sha256": "cfd2612f17d4cf7c41c507fdf0e1178c3b579e132095509b72cc28f3a58871b2",
+  "tiers": {
+    "unit": {
+      "status": "PASS",
+      "tests": 860,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "junit": "docs/acceptance/evidence/cash-collector-unit-20261018.xml",
+      "junit_sha256": "fd44ebd237747aaa66870601593b67a6717fad20f0df9610b641bd75076f3109",
+      "native_result": ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/unit-result.json",
+      "result_sha256": "b739ddb16bebbf1d30f9127a7c28a3ec1ed6b102375ac67cfa88d568169cf578",
+      "log_sha256": "bef2481e51252a776ab8e7a42da56217ab481779364552cd81ab84ec1ee512a3",
+      "source_unchanged": true,
+      "tests_unchanged": true,
+      "command": [
+        "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/unit",
+        "--cov=src",
+        "--cov-report=xml:/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/backend-cash-validation-20261017-5d8b5cb04c1b/unit-coverage.xml",
+        "--cov-report=term-missing",
+        "--junitxml=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/backend-cash-validation-20261017-5d8b5cb04c1b/unit.xml",
+        "-o",
+        "cache_dir=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/backend-cash-validation-20261017-5d8b5cb04c1b/pytest-cache",
+        "-v"
+      ]
+    },
+    "integration": {
+      "status": "PASS",
+      "tests": 392,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "junit": "docs/acceptance/evidence/cash-collector-integration-20261018.xml",
+      "junit_sha256": "a0c6286489a5dcf4dfd0e828b61e3b8242df3c5e142c92d551073220a8bcf67b",
+      "native_result": ".qa/backend-cash-validation-20261017-5d8b5cb04c1b/integration-result.json",
+      "result_sha256": "77eb801e384e8604d0235b052baf5dde978052ecb73f4ae3e9088bdb943eaf9a",
+      "log_sha256": "7527b1ad03435ac835421a8e562ce7b217bfad904486434a4c721500f91c6a9e",
+      "source_unchanged": true,
+      "tests_unchanged": true,
+      "command": [
+        "/home/lulu/investments-assistant/investments-assistant-local-machine/.venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/integration",
+        "--cov=src",
+        "--cov-report=xml:/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/backend-cash-validation-20261017-5d8b5cb04c1b/integration-coverage.xml",
+        "--cov-report=term-missing",
+        "--junitxml=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/backend-cash-validation-20261017-5d8b5cb04c1b/integration.xml",
+        "-o",
+        "cache_dir=/home/lulu/investments-assistant/investments-assistant-local-machine/.qa/backend-cash-validation-20261017-5d8b5cb04c1b/pytest-cache",
+        "-v"
+      ]
+    }
+  },
+  "distinct_junit_identity_total": 1252,
+  "cross_tier_junit_identity_overlap": 0,
+  "focused110_are_subset_of_unit860": true,
+  "owned_database_cleanup": "marker/schema/data/PID guarded, zero clients, no force drop; data directory and raw evidence preserved",
+  "owned_cluster_stopped": true,
+  "actual_broker_connections": 0,
+  "external_orders": 0,
+  "operator_private_files": "blocked by audit hook",
+  "test_fixture_cleanup_plan_sha256": "d90726708869b3d00ae00c6a0a21bd9215eebf844247f677fb8304a3b0e9ab95"
+}

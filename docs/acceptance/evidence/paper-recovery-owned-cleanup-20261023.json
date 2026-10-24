@@ -1,0 +1,46 @@
+{
+  "status": "OWNED_DISPOSABLE_VALIDATION_CLUSTER_STOPPED",
+  "at": "2026-10-23T15:46:39.693395+00:00",
+  "database": "test_paper_recovery_6b8403c7e290",
+  "postgres_identity": {
+    "pid": 15440,
+    "boot_id": "0171451e-0aba-4faa-8685-b96f8f206f3d",
+    "pid_namespace": "pid:[4026532221]",
+    "start_ticks": 151479,
+    "state": "S",
+    "command_sha256": "7a108987bb7da8f060e60446d4d0a4e6f4aa2af9f3af03e5f16c8dc1a186d664"
+  },
+  "force_drop": false,
+  "data_directory_preserved": true,
+  "private_operator_or_old_cluster_changes": false,
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/root_cleanup_once.py",
+      "sha256": "40672488b60a88fabab2dc4e9cd5892e16fda361299f0825d2a69dc0b784fee2"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/root-cleanup-claim.json",
+      "sha256": "095213bfddbcfc6b61982d2a49207b5cbc5301fad161b658c3e68b436f4fa31e"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/root-cleanup-execution.json",
+      "sha256": "8b3c97d2412bbeab2e93e87abc1b7d1eb09c022f467b6196520b1592e908ece9"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/root-cleanup-result.json",
+      "sha256": "44903b7c9819c7ac1673525787e126b1a58d708ea104af5fc24badadaa9b2e5e"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/root-cleanup-output.log",
+      "sha256": "0b93ff8a2932333c35d3b73ae7efb03f7afaa5493b183c8dc08f0b17e37aa4e0"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/plan-before-owned-cleanup.json",
+      "sha256": "4781ba12c10cbe6939d8fe37424fee8bed9f18bbcdc8de8bd2da71d762ddea95"
+    },
+    {
+      "path": ".qa/paper-recovery-20261023-6b8403c7e290/plan.json",
+      "sha256": "b0a06c267405d36d3ac28769d8710c37683c7361cb961577d092b5aa6e0922e2"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "status": "OPERATOR_CONFIRMS_SAME_ACCOUNT_DISABLED_AND_SAVED",
+  "recorded_at": "2026-10-17T15:07:27.480631+00:00",
+  "evidence_source": "Explicit operator reply to authenticated UI step",
+  "operator_reply": "Yes\u2014both unchecked and saved",
+  "selected_record": "Same existing IBKR Paper account",
+  "enabled": false,
+  "read_authorized": false,
+  "verification_scope": "Operator-confirmed UI save; encrypted configuration was not decrypted or independently inspected by the agent",
+  "additional_broker_read_or_order_by_this_action": false,
+  "source_or_runtime_configuration_changed_by_agent": false,
+  "goal_service_status": "PAUSED",
+  "live_trading": "DISABLED"
+}

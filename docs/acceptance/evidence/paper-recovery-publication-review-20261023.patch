@@ -1,0 +1,742 @@
+diff --git a/src/execution/broker_observations.py b/src/execution/broker_observations.py
+index fd782ad4ceb4ed0bd203c459e5ef9cbf69c0632d..0b082df61c54e51457fc60f39a0dc0fb1119d445 100644
+--- a/src/execution/broker_observations.py
++++ b/src/execution/broker_observations.py
+@@ -8,6 +8,7 @@ import re
+ import uuid
+ from typing import Literal, Annotated
+ from decimal import Decimal, localcontext
++import hashlib
+ from datetime import UTC, datetime
+ 
+ from pydantic import Field, BaseModel, ConfigDict, TypeAdapter, field_validator
+@@ -22,6 +23,16 @@ from src.execution.broker_balances import BalanceFacts
+ READ_PAYLOAD_BUDGET = 2 * 1024 * 1024
+ 
+ 
++def hash_order_reference(value):
++    """Retain correlation evidence, never raw broker free text or authority.
++
++    Missing/unexpected references must not discard an otherwise valid fill.
++    The SDK execution decoder supplies this field; cached Trade/Order state does
++    not establish that the broker echoed a submitted reference.
++    """
++    return hashlib.sha256(value.encode()).hexdigest() if isinstance(value, str) and value else None
++
++
+ class Observation(BaseModel):
+     model_config = ConfigDict(extra="forbid", frozen=True)
+     observed_at: datetime
+@@ -49,6 +60,7 @@ class ExecutionObservation(Observation):
+     client_id: int = Field(ge=0, strict=True)
+     order_id: int = Field(ge=0, strict=True)
+     permanent_id: int = Field(ge=0, strict=True)
++    order_ref_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+     side: Literal["BOT", "SLD"]
+     quantity: Decimal = Field(gt=0, max_digits=40, decimal_places=20, allow_inf_nan=False)
+     price: Decimal = Field(ge=0, max_digits=40, decimal_places=20, allow_inf_nan=False)
+diff --git a/src/execution/broker_submission.py b/src/execution/broker_submission.py
+index 33ed3fb8902c91dcc99faf7b5cb73823c63b1c3c..7bdf43fedaf56e86dfe16e671c937b229c015958 100644
+--- a/src/execution/broker_submission.py
++++ b/src/execution/broker_submission.py
+@@ -20,7 +20,7 @@ from pathlib import Path
+ from threading import Lock
+ 
+ from pydantic import Field, BaseModel, ConfigDict, field_validator, model_validator
+-from sqlalchemy import Text, cast, func, text, select
++from sqlalchemy import Text, or_, and_, cast, func, text, select
+ from sqlalchemy.engine import make_url
+ from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
+ 
+@@ -28,7 +28,7 @@ from src.db.models import BrokerObservation
+ from src.execution.policy import PolicyDenied, digest
+ from src.execution.external import external_write_denied
+ from src.execution.broker_review import review_observations
+-from src.execution.broker_observations import READ_PAYLOAD_BUDGET, selected_account
++from src.execution.broker_observations import READ_PAYLOAD_BUDGET, selected_account, hash_order_reference
+ from src.execution.broker_submission_models import BrokerSubmissionEvent, BrokerSubmissionIntent
+ 
+ ROOT = Path(__file__).resolve().parents[2]
+@@ -118,7 +118,8 @@ class TransportReceipt(BaseModel):
+ 
+ 
+ class OfflineTransport(Protocol):
+-    async def submit(self, request: SubmissionRequest, *, intent_id: str, attempt_id: str) -> TransportReceipt:
++    async def submit(self, request: SubmissionRequest, *, intent_id: str, attempt_id: str,
++                     order_ref: str) -> TransportReceipt:
+         """Tests inject finite synthetic behavior. No runtime implementation exists."""
+ 
+ 
+@@ -136,6 +137,69 @@ def _request(value):
+         raise PolicyDenied("INVALID_SUBMISSION_REQUEST") from None
+ 
+ 
++def _attempt_reference(attempt_id):
++    """An existing committed UUID4 supplies an opaque32-character reference."""
++    try:
++        value = uuid.UUID(attempt_id)
++        if str(value) != attempt_id or value.version != 4:
++            raise ValueError("Not a canonical random attempt")
++        return value.hex
++    except (TypeError, ValueError, AttributeError):
++        raise PolicyDenied("SUBMISSION_ATTEMPT_REFERENCE_INVALID") from None
++
++
++def _identity_candidates(request, reference_hash, rows, *, bound_permanent=None):
++    """Review fresh execution-field evidence; a reference is not authentication.
++
++    Consider contradictions as well as candidates. Client/order IDs alone never
++    establish identity, and a correction with a different contract cannot erase
++    its predecessor. No execution is manufactured or suppressed here.
++    """
++    reasons, candidates, unreferenced, evidence = set(), set(), set(), []
++    for row in rows:
++        payload = row.payload
++        evidence.append([row.id, row.payload_sha256])
++        if digest(payload) != row.payload_sha256:
++            reasons.add("SUBMISSION_IDENTITY_EVIDENCE_INVALID")
++            continue
++        same_reference = payload.get("order_ref_sha256") == reference_hash
++        same_order = (type(payload.get("client_id")) is int and type(payload.get("order_id")) is int
++                      and payload["client_id"] == request.client_id and payload["order_id"] == request.order_id)
++        if bound_permanent is not None and str(payload.get("permanent_id")) == bound_permanent and not same_order:
++            reasons.add("SUBMISSION_IDENTITY_ORDER_CONFLICT")
++        if not same_reference:
++            # An absent reference proves nothing. A different nonempty reference
++            # on the reserved client/order identity makes attribution ambiguous.
++            if payload.get("order_ref_sha256") is not None and same_order:
++                reasons.add("SUBMISSION_IDENTITY_REFERENCE_CONFLICT")
++            elif same_order and type(payload.get("permanent_id")) is int and payload["permanent_id"] > 0:
++                unreferenced.add(str(payload["permanent_id"]))
++            continue
++        if not same_order:
++            reasons.add("SUBMISSION_IDENTITY_ORDER_CONFLICT")
++            continue
++        try:
++            multiplier = Decimal(payload["multiplier"])
++            contract_matches = (type(payload.get("con_id")) is int and payload["con_id"] == request.con_id
++                                and payload.get("security_type") == request.security_type
++                                and payload.get("currency") == request.currency
++                                and payload.get("side") == ("BOT" if request.side == "buy" else "SLD")
++                                and multiplier.is_finite() and multiplier == request.multiplier)
++        except (KeyError, TypeError, ValueError, ArithmeticError):
++            contract_matches = False
++        if not contract_matches:
++            reasons.add("SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED")
++            continue
++        permanent = payload.get("permanent_id")
++        if type(permanent) is not int or not 0 < permanent <= 2**63 - 1:
++            reasons.add("SUBMISSION_IDENTITY_PERMANENT_ID_UNAVAILABLE")
++            continue
++        candidates.add(str(permanent))
++    if len(candidates) > 1 or (candidates and unreferenced - candidates):
++        reasons.add("SUBMISSION_IDENTITY_PERMANENT_ID_CONFLICT")
++    return candidates, reasons, digest(sorted(evidence))
++
++
+ def _view(intent):
+     return {
+         "intent_id": intent.id,
+@@ -402,6 +466,7 @@ class BrokerSubmissionJournal:
+                 intent.state = "handoff_started"
+                 self._append(session, intent, "handoff", "handoff_started",
+                              {"attempt_id": intent.attempt_id, "request_sha256": intent.request_sha256,
++                              "order_ref_sha256": hash_order_reference(_attempt_reference(intent.attempt_id)),
+                               "timeout_seconds": timeout_seconds})
+                 attempt = intent.attempt_id
+             # Commit before final scope check and handoff. A lost process here
+@@ -414,7 +479,8 @@ class BrokerSubmissionJournal:
+             args = dict(user_id=user_id, account_id=account_id, intent_id=intent_id, attempt_id=attempt)
+ 
+             async def invoke():
+-                return await transport.submit(request, intent_id=intent_id, attempt_id=attempt)
++                return await transport.submit(request, intent_id=intent_id, attempt_id=attempt,
++                                              order_ref=_attempt_reference(attempt))
+ 
+             task = asyncio.create_task(invoke())
+             self._track(task, token)
+@@ -460,11 +526,126 @@ class BrokerSubmissionJournal:
+                              {"reason_code": "HANDOFF_RECOVERY_UNCERTAIN", "attempt_id": intent.attempt_id})
+             return _view(intent)
+ 
++    async def _review_identity(self, session, intent, request, *, start=False):
++        """Under the account/intent locks, correlate retained executions only.
++
++        No status cache, supplied identity claim, broker call or negative-history
++        inference is accepted. A later contradiction invalidates correlation and
++        leaves an append-only sticky conflict. Previously linked raw facts stay.
++        """
++        events = (await session.scalars(select(BrokerSubmissionEvent).where(
++            BrokerSubmissionEvent.intent_id == intent.id,
++            BrokerSubmissionEvent.event_key.in_(("identity-review", "identity-correlated", "identity-conflict")),
++        ))).all()
++        if not start and not events:
++            return None
++        if intent.attempt_id is None or (not events and intent.state not in {"handoff_started", "uncertain"}):
++            raise PolicyDenied("SUBMISSION_UNCERTAIN_ATTEMPT_REQUIRED")
++        reference_hash = hash_order_reference(_attempt_reference(intent.attempt_id))
++        if not events:
++            self._append(session, intent, "identity-review", "identity_review_started",
++                         {"attempt_id": intent.attempt_id, "order_ref_sha256": reference_hash})
++        reasons = set()
++        handoff = await session.scalar(select(BrokerSubmissionEvent).where(
++            BrokerSubmissionEvent.intent_id == intent.id, BrokerSubmissionEvent.event_key == "handoff",
++        ))
++        if (handoff is None or digest(handoff.payload) != handoff.payload_sha256
++                or handoff.payload.get("attempt_id") != intent.attempt_id
++                or handoff.payload.get("request_sha256") != intent.request_sha256
++                or handoff.payload.get("order_ref_sha256") != reference_hash):
++            reasons.add("SUBMISSION_IDENTITY_ATTEMPT_PROOF_INVALID")
++        sticky = next((event for event in events if event.event_key == "identity-conflict"), None)
++        for event in events:
++            if (digest(event.payload) != event.payload_sha256
++                    or event.payload.get("attempt_id") != intent.attempt_id
++                    or event.payload.get("order_ref_sha256") != reference_hash):
++                reasons.add("SUBMISSION_IDENTITY_EVIDENCE_INVALID")
++        if sticky:
++            reasons.update(sticky.payload.get("reason_codes", []))
++            reasons.add("SUBMISSION_IDENTITY_STICKY_CONFLICT")
++        payload = BrokerObservation.payload
++        matches = [payload["order_ref_sha256"].as_string() == reference_hash,
++                   and_(payload["client_id"].as_string() == str(request.client_id),
++                        payload["order_id"].as_string() == str(request.order_id))]
++        if intent.permanent_id is not None:
++            matches.append(payload["permanent_id"].as_string() == intent.permanent_id)
++        filters = (BrokerObservation.user_id == intent.user_id, BrokerObservation.account_id == intent.account_id,
++                   BrokerObservation.account_binding == intent.account_binding, BrokerObservation.kind == "execution",
++                   or_(*matches))
++        metadata = (await session.execute(select(
++            BrokerObservation.id, func.octet_length(cast(payload, Text)),
++        ).where(*filters).order_by(BrokerObservation.recorded_at, BrokerObservation.id)
++            .limit(MAX_OBSERVATIONS + 1))).all()
++        chosen, size = [], 0
++        for identity, count in metadata[:MAX_OBSERVATIONS]:
++            if size + count > READ_PAYLOAD_BUDGET:
++                break
++            chosen.append(identity)
++            size += count
++        if len(chosen) != len(metadata):
++            reasons.add("SUBMISSION_IDENTITY_EVIDENCE_TRUNCATED")
++        rows = (await session.scalars(select(BrokerObservation).where(
++            *filters, BrokerObservation.id.in_(chosen),
++        ))).all() if chosen else []
++        candidates, contradictions, evidence_hash = _identity_candidates(
++            request, reference_hash, rows, bound_permanent=intent.permanent_id,
++        )
++        reasons.update(contradictions)
++        if intent.permanent_id is not None and candidates and candidates != {intent.permanent_id}:
++            reasons.add("SUBMISSION_IDENTITY_PERMANENT_ID_CONFLICT")
++        if len(candidates) == 1 and not reasons:
++            permanent, = candidates
++            collision = await session.scalar(select(BrokerSubmissionIntent.id).where(
++                BrokerSubmissionIntent.account_id == intent.account_id,
++                BrokerSubmissionIntent.account_binding == intent.account_binding,
++                BrokerSubmissionIntent.permanent_id == permanent, BrokerSubmissionIntent.id != intent.id,
++            ))
++            if collision:
++                reasons.add("SUBMISSION_IDENTITY_PERMANENT_ID_RESERVED")
++        intent.state = "uncertain"
++        if reasons:
++            intent.permanent_id = None
++            if sticky is None:
++                self._append(session, intent, "identity-conflict", "identity_conflict",
++                             {"attempt_id": intent.attempt_id, "order_ref_sha256": reference_hash,
++                              "reason_codes": sorted(reasons), "evidence_sha256": evidence_hash})
++            status = "sticky_unresolved"
++        elif len(candidates) == 1:
++            intent.permanent_id, = candidates
++            if not any(event.event_key == "identity-correlated" for event in events):
++                self._append(session, intent, "identity-correlated", "identity_correlated",
++                             {"attempt_id": intent.attempt_id, "order_ref_sha256": reference_hash,
++                              "permanent_id": intent.permanent_id, "evidence_sha256": evidence_hash})
++            status = "correlated_evidence_only"
++        else:
++            intent.permanent_id = None
++            status = "unresolved"
++            reasons.add("SUBMISSION_IDENTITY_REFERENCE_NOT_OBSERVED")
++        return {"status": status, "permanent_id": intent.permanent_id, "reason_codes": sorted(reasons),
++                "evidence_sha256": evidence_hash, "observations_reviewed": len(rows), "payload_bytes": size,
++                "scope": "retained_execution_correlation_not_authentication_or_ownership",
++                "complete_reconciliation": False, "retry_allowed": False, "execution_authority": "none"}
++
++    async def resolve_identity(self, *, user_id, account_id, intent_id):
++        """Offline evidence resolution after lost acknowledgement; never resends."""
++        await self._fixture()
++        async with self.sessions.begin() as session:
++            intent, request = await self._load(session, user_id=user_id, account_id=account_id,
++                                               intent_id=intent_id, dispatch=False)
++            identity = await self._review_identity(session, intent, request, start=True)
++            return dict(_view(intent), identity_review=identity)
++
+     async def attach_observation(self, *, user_id, account_id, intent_id, observation_id):
+         await self._fixture()
+         async with self.sessions.begin() as session:
+             intent, request = await self._load(session, user_id=user_id, account_id=account_id,
+                                                intent_id=intent_id, dispatch=False)
++            identity = await self._review_identity(session, intent, request)
++            if identity is not None and identity["status"] != "correlated_evidence_only":
++                # Return after commit so a discovered sticky conflict survives.
++                # This is a refused evidence link, never transport authority.
++                return dict(_view(intent), blocked=True, reason_code="SUBMISSION_IDENTITY_UNRESOLVED",
++                            identity_review=identity)
+             size = await session.scalar(select(func.octet_length(cast(BrokerObservation.payload, Text))).where(
+                 BrokerObservation.id == _id(observation_id), BrokerObservation.user_id == user_id,
+                 BrokerObservation.account_id == account_id, BrokerObservation.account_binding == intent.account_binding,
+@@ -509,6 +690,7 @@ class BrokerSubmissionJournal:
+         async with self.sessions.begin() as session:
+             intent, request = await self._load(session, user_id=user_id, account_id=account_id,
+                                           intent_id=intent_id, dispatch=False)
++            identity = await self._review_identity(session, intent, request)
+             filters = (
+                 BrokerSubmissionEvent.intent_id == intent.id, BrokerObservation.user_id == user_id,
+                 BrokerObservation.account_id == account_id, BrokerObservation.account_binding == intent.account_binding,
+@@ -519,10 +701,10 @@ class BrokerSubmissionJournal:
+                 .where(*filters).order_by(BrokerObservation.recorded_at, BrokerObservation.id)
+                 .limit(MAX_OBSERVATIONS + 1))).all()
+             chosen, size = [], 0
+-            for identity, count in metadata[:MAX_OBSERVATIONS]:
++            for observation_id, count in metadata[:MAX_OBSERVATIONS]:
+                 if size + count > READ_PAYLOAD_BUDGET:
+                     break
+-                chosen.append(identity)
++                chosen.append(observation_id)
+                 size += count
+             rows = (await session.scalars(select(BrokerObservation).where(
+                 BrokerObservation.id.in_(chosen), BrokerObservation.user_id == user_id,
+@@ -535,8 +717,11 @@ class BrokerSubmissionJournal:
+             comparison = _compare_request(request, observations, review)
+             review["request_comparison"] = comparison
+             review["reason_codes"] = sorted(set(review["reason_codes"]) | set(comparison["reason_codes"]))
++            if identity is not None:
++                review["reason_codes"] = sorted(set(review["reason_codes"]) | set(identity["reason_codes"]))
+             if review["reason_codes"]:
+                 review["status"] = "needs_review"
+             review["evidence_sha256"] = digest(review)
+             return dict(_view(intent), review=review, linked_observations=len(rows), payload_bytes=size,
++                        identity_review=identity,
+                         strategy_order_ownership="not_established", current_broker_state="not_established")
+diff --git a/src/tools/brokers/ibkr_observations.py b/src/tools/brokers/ibkr_observations.py
+index 5b81606325531d7cef6fd96e94cce3cd5ce2e32c..ac9a2bd5317846abc35bbd191b5d5287b35e9004 100644
+--- a/src/tools/brokers/ibkr_observations.py
++++ b/src/tools/brokers/ibkr_observations.py
+@@ -9,7 +9,7 @@ import threading
+ from contextlib import contextmanager
+ 
+ from src.execution.policy import PolicyDenied
+-from src.execution.broker_observations import OBSERVATION
++from src.execution.broker_observations import OBSERVATION, hash_order_reference
+ 
+ 
+ class CallbackWindow:
+@@ -51,6 +51,7 @@ class CallbackWindow:
+                     client_id=execution.clientId,
+                     order_id=execution.orderId,
+                     permanent_id=execution.permId,
++                    order_ref_sha256=hash_order_reference(getattr(execution, "orderRef", None)),
+                     side=execution.side,
+                     quantity=str(execution.shares),
+                     price=str(execution.price),
+diff --git a/tests/integration/broker_submission_journal_test.py b/tests/integration/broker_submission_journal_test.py
+index 43bb92442a2513b2ac12d75ca4ec26ae60e5f58f..7055dcaea938deaa727bc44ece385fea11a5cc45 100644
+--- a/tests/integration/broker_submission_journal_test.py
++++ b/tests/integration/broker_submission_journal_test.py
+@@ -18,7 +18,7 @@ from src.tools import broker_accounts as vault
+ from src.db.models import User, BrokerAccount, BrokerObservation
+ from src.execution.policy import PolicyDenied
+ from src.execution.broker_submission import MAX_OFFLINE_HANDOFFS, TransportReceipt, BrokerSubmissionJournal
+-from src.execution.broker_observations import record_observations
++from src.execution.broker_observations import record_observations, hash_order_reference
+ from tests.unit.broker_submission_test import request_values
+ from src.execution.broker_submission_models import BrokerSubmissionEvent, BrokerSubmissionIntent
+ from tests.integration.broker_observations_test import seed, execution, commission, fixture_key  # noqa: F401
+@@ -64,7 +64,7 @@ class AcceptedTransport:
+     def __init__(self, factory):
+         self.factory, self.calls = factory, 0
+ 
+-    async def submit(self, request, *, intent_id, attempt_id):
++    async def submit(self, request, *, intent_id, attempt_id, order_ref):
+         self.calls += 1
+         # A distinct session/connection sees both committed intent and attempt.
+         async with self.factory() as independent:
+@@ -74,6 +74,8 @@ class AcceptedTransport:
+             ))
+             assert intent.state == "handoff_started" and intent.attempt_id == attempt_id
+             assert event.payload["request_sha256"] == intent.request_sha256
++            assert order_ref == uuid.UUID(attempt_id).hex and len(order_ref) == 32
++            assert event.payload["order_ref_sha256"] == hash_order_reference(order_ref)
+         return TransportReceipt(status="acknowledged", client_id=request.client_id,
+                                 order_id=request.order_id, permanent_id=9)
+ 
+@@ -499,3 +501,243 @@ async def test_correction_family_quantities_are_not_summed_as_fresh_fills(submis
+     assert comparison["observed_execution_quantity"] is None
+     assert "SUBMISSION_EXECUTION_QUANTITY_UNRESOLVED" in comparison["reason_codes"]
+     assert "SUBMISSION_QUANTITY_EXCEEDED" not in comparison["reason_codes"]
++
++
++class LostAcknowledgement(AcceptedTransport):
++    async def submit(self, request, **kwargs):
++        await super().submit(request, **kwargs)
++        self.order_ref = kwargs["order_ref"]
++        raise TimeoutError("synthetic acceptance with lost acknowledgement")
++
++
++async def lost_acknowledgement(fixture):
++    intent = await stage(fixture)
++    transport = LostAcknowledgement(fixture[1])
++    result = await fixture[0].dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
++    assert result["state"] == "uncertain" and transport.calls == 1
++    return intent, transport
++
++
++def echoed_execution(transport, **changes):
++    return execution(security_type="STK", multiplier="1",
++                     order_ref_sha256=hash_order_reference(transport.order_ref)) | changes
++
++
++async def test_lost_acknowledgement_reload_late_execution_correlates_without_resend_or_authority(submission_fixture):
++    fixture = submission_fixture
++    intent, transport = await lost_acknowledgement(fixture)
++    row, = await retain(fixture, [echoed_execution(transport)])
++    restarted = BrokerSubmissionJournal(fixture[1])
++    result = await restarted.resolve_identity(**args(fixture, intent))
++    assert result["state"] == "uncertain" and result["identity_review"]["status"] == "correlated_evidence_only"
++    assert result["identity_review"]["permanent_id"] == "9"
++    assert result["execution_authority"] == "none" and result["environment_verified"] is None
++    assert not result["retry_allowed"] and not result["complete_reconciliation"]
++    assert (await restarted.review_intent(**args(fixture, intent)))["linked_observations"] == 0
++    await restarted.attach_observation(**args(fixture, intent), observation_id=row.id)
++    review = await BrokerSubmissionJournal(fixture[1]).review_intent(**args(fixture, intent))
++    assert review["linked_observations"] == 1 and review["state"] == "uncertain"
++    assert review["current_broker_state"] == review["strategy_order_ownership"] == "not_established"
++    await restarted.dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
++    assert transport.calls == 1
++    async with fixture[1]() as independent:
++        stored = await independent.get(BrokerSubmissionIntent, intent["intent_id"])
++        assert stored.permanent_id == "9" and stored.state == "uncertain"
++        events = (await independent.scalars(select(BrokerSubmissionEvent).where(
++            BrokerSubmissionEvent.intent_id == stored.id))).all()
++        assert [event.kind for event in events].count("identity_correlated") == 1
++        assert transport.order_ref not in str([event.payload for event in events])
++
++
++async def test_duplicate_and_concurrent_resolution_append_one_binding_event(submission_fixture):
++    fixture = submission_fixture
++    intent, transport = await lost_acknowledgement(fixture)
++    observation = echoed_execution(transport)
++    rows = await retain(fixture, [observation, observation])
++    assert len(rows) == 1
++    results = await asyncio.gather(*(BrokerSubmissionJournal(fixture[1]).resolve_identity(**args(fixture, intent))
++                                     for _ in range(2)))
++    assert all(result["identity_review"]["permanent_id"] == "9" for result in results)
++    async with fixture[1]() as session:
++        events = (await session.scalars(select(BrokerSubmissionEvent).where(
++            BrokerSubmissionEvent.intent_id == intent["intent_id"]))).all()
++        assert [event.kind for event in events].count("identity_review_started") == 1
++        assert [event.kind for event in events].count("identity_correlated") == 1
++
++
++@pytest.mark.parametrize("changes,reason", [
++    ({"order_ref_sha256": "a" * 64}, "SUBMISSION_IDENTITY_REFERENCE_CONFLICT"),
++    ({"client_id": 78}, "SUBMISSION_IDENTITY_ORDER_CONFLICT"),
++    ({"order_id": 2}, "SUBMISSION_IDENTITY_ORDER_CONFLICT"),
++    ({"con_id": 456}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
++    ({"currency": "USD"}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
++    ({"security_type": "OPT", "multiplier": "100"}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
++    ({"security_type": None, "multiplier": None}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
++    ({"side": "SLD"}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
++    ({"permanent_id": 0}, "SUBMISSION_IDENTITY_PERMANENT_ID_UNAVAILABLE"),
++])
++async def test_echoed_reference_does_not_authorize_mismatched_callback_identity(submission_fixture, changes, reason):
++    fixture = submission_fixture
++    intent, transport = await lost_acknowledgement(fixture)
++    await retain(fixture, [echoed_execution(transport, **changes)])
++    result = await fixture[0].resolve_identity(**args(fixture, intent))
++    assert result["identity_review"]["status"] == "sticky_unresolved"
++    assert reason in result["identity_review"]["reason_codes"]
++    assert result["identity_review"]["permanent_id"] is None and result["state"] == "uncertain"
++
++
++async def test_missing_reference_and_status_cache_cannot_bootstrap_resolution(submission_fixture):
++    fixture = submission_fixture
++    intent, _ = await lost_acknowledgement(fixture)
++    await retain(fixture, [execution(security_type="STK", multiplier="1"), order_status()])
++    result = await fixture[0].resolve_identity(**args(fixture, intent))
++    assert result["identity_review"]["status"] == "unresolved"
++    assert result["identity_review"]["permanent_id"] is None
++    assert (await fixture[0].review_intent(**args(fixture, intent)))["linked_observations"] == 0
++
++
++@pytest.mark.parametrize("late_change", [
++    {"permanent_id": 10}, {"order_ref_sha256": "f" * 64},
++    {"con_id": 456}, {"security_type": "OPT", "multiplier": "100"},
++])
++async def test_later_contradiction_invalidates_binding_and_stays_sticky(submission_fixture, late_change):
++    fixture = submission_fixture
++    intent, transport = await lost_acknowledgement(fixture)
++    row, = await retain(fixture, [echoed_execution(transport)])
++    await fixture[0].resolve_identity(**args(fixture, intent))
++    await fixture[0].attach_observation(**args(fixture, intent), observation_id=row.id)
++    # A later version/correction is retained, never silently replaces the first.
++    rows = await retain(fixture, [echoed_execution(transport, event_id="fixture.execution.2", **late_change)])
++    review = await BrokerSubmissionJournal(fixture[1]).review_intent(**args(fixture, intent))
++    assert review["identity_review"]["status"] == "sticky_unresolved"
++    assert review["identity_review"]["permanent_id"] is None
++    assert review["linked_observations"] == 1 and review["state"] == "uncertain"
++    blocked = await fixture[0].attach_observation(**args(fixture, intent), observation_id=rows[-1].id)
++    assert blocked["blocked"] and blocked["reason_code"] == "SUBMISSION_IDENTITY_UNRESOLVED"
++    await retain(fixture, [echoed_execution(transport, event_id="fixture.later.1")])
++    again = await fixture[0].resolve_identity(**args(fixture, intent))
++    assert again["identity_review"]["status"] == "sticky_unresolved"
++    assert "SUBMISSION_IDENTITY_STICKY_CONFLICT" in again["identity_review"]["reason_codes"]
++    assert again["identity_review"]["permanent_id"] is None
++    await fixture[0].dispatch_once(**args(fixture, intent), transport=transport, timeout_seconds=5)
++    assert transport.calls == 1
++
++
++async def test_conflicting_candidates_present_before_first_review_never_choose_first(submission_fixture):
++    fixture = submission_fixture
++    intent, transport = await lost_acknowledgement(fixture)
++    await retain(fixture, [echoed_execution(transport), echoed_execution(transport, permanent_id=10)])
++    result = await fixture[0].resolve_identity(**args(fixture, intent))
++    assert result["identity_review"]["permanent_id"] is None
++    assert "SUBMISSION_IDENTITY_PERMANENT_ID_CONFLICT" in result["identity_review"]["reason_codes"]
++    async with fixture[1]() as session:
++        assert not await session.scalar(select(BrokerSubmissionEvent.id).where(
++            BrokerSubmissionEvent.intent_id == intent["intent_id"],
++            BrokerSubmissionEvent.kind == "identity_correlated"))
++
++
++async def test_existing_permanent_identity_cannot_be_assigned_to_second_intent(submission_fixture):
++    fixture = submission_fixture
++    journal, factory, user, account = fixture
++    other = await journal.stage_intent(user_id=user, account_id=account, idempotency_key="other-order",
++                                       request=request_values(order_id=2))
++    await journal.dispatch_once(**args(fixture, other), transport=AcceptedTransport(factory), timeout_seconds=5)
++    intent, transport = await lost_acknowledgement(fixture)
++    await retain(fixture, [echoed_execution(transport)])
++    result = await journal.resolve_identity(**args(fixture, intent))
++    assert "SUBMISSION_IDENTITY_PERMANENT_ID_RESERVED" in result["identity_review"]["reason_codes"]
++    assert result["identity_review"]["permanent_id"] is None
++
++
++async def test_resolution_history_remains_available_after_read_consent_and_endpoint_revocation(submission_fixture):
++    fixture = submission_fixture
++    intent, transport = await lost_acknowledgement(fixture)
++    await retain(fixture, [echoed_execution(transport)])
++    async with fixture[1].begin() as session:
++        account = await session.get(BrokerAccount, fixture[3])
++        account.is_active = False
++        account.config_encrypted = vault.encrypt_config(vault.decrypt_config(account.config_encrypted) | {
++            "enabled": False, "read_authorized": False, "client_id": 99, "host": "rotated.invalid",
++        })
++    result = await BrokerSubmissionJournal(fixture[1]).resolve_identity(**args(fixture, intent))
++    assert result["identity_review"]["status"] == "correlated_evidence_only"
++    assert result["state"] == "uncertain" and not result["retry_allowed"] and transport.calls == 1
++
++
++@pytest.mark.parametrize("change,code", [
++    ("cross_owner", "SUBMISSION_NOT_OWNED"), ("inactive_owner", "PRINCIPAL_INACTIVE"),
++    ("rebind", "SUBMISSION_ACCOUNT_CHANGED"), ("marker", "OFFLINE_.*DATABASE"),
++])
++async def test_identity_resolution_rechecks_scope_and_actual_fixture(submission_fixture, monkeypatch, change, code):
++    fixture = submission_fixture
++    intent, transport = await lost_acknowledgement(fixture)
++    await retain(fixture, [echoed_execution(transport)])
++    inputs = args(fixture, intent)
++    if change == "cross_owner":
++        inputs["user_id"] = str(uuid.uuid4())
++    elif change == "marker":
++        monkeypatch.delenv("TEST_DATABASE_DISPOSABLE_TOKEN")
++    else:
++        async with fixture[1].begin() as session:
++            if change == "inactive_owner":
++                await session.execute(update(User).where(User.id == fixture[2]).values(is_active=False))
++            else:
++                account = await session.get(BrokerAccount, fixture[3])
++                account.config_encrypted = vault.encrypt_config(vault.decrypt_config(account.config_encrypted)
++                                                                | {"broker_account_id": "OTHER-FIXTURE"})
++    with pytest.raises(PolicyDenied, match=code):
++        await fixture[0].resolve_identity(**inputs)
++    async with fixture[1]() as session:
++        assert (await session.get(BrokerSubmissionIntent, intent["intent_id"])).permanent_id is None
++    assert transport.calls == 1
++
++
++@pytest.mark.parametrize("mode", ["missing", "different"])
++async def test_uncommitted_or_corrupted_reference_cannot_be_retrofitted_to_attempt(submission_fixture, mode):
++    fixture = submission_fixture
++    intent, transport = await lost_acknowledgement(fixture)
++    await retain(fixture, [echoed_execution(transport)])
++    async with fixture[1].begin() as session:
++        handoff = await session.scalar(select(BrokerSubmissionEvent).where(
++            BrokerSubmissionEvent.intent_id == intent["intent_id"], BrokerSubmissionEvent.event_key == "handoff"))
++        # Even a self-consistent event hash cannot change the reference committed
++        # from the original random attempt identity.
++        from src.execution.policy import digest
++        payload = dict(handoff.payload)
++        if mode == "missing":
++            payload.pop("order_ref_sha256")
++        else:
++            payload["order_ref_sha256"] = "a" * 64
++        handoff.payload = payload
++        handoff.payload_sha256 = digest(handoff.payload)
++    result = await fixture[0].resolve_identity(**args(fixture, intent))
++    assert "SUBMISSION_IDENTITY_ATTEMPT_PROOF_INVALID" in result["identity_review"]["reason_codes"]
++    assert result["identity_review"]["permanent_id"] is None
++
++
++async def test_identity_resolution_rejects_invalid_retained_execution_hash(submission_fixture):
++    fixture = submission_fixture
++    intent, transport = await lost_acknowledgement(fixture)
++    row, = await retain(fixture, [echoed_execution(transport)])
++    async with fixture[1].begin() as session:
++        await session.execute(update(BrokerObservation).where(BrokerObservation.id == row.id)
++                              .values(payload_sha256="0" * 64))
++    result = await fixture[0].resolve_identity(**args(fixture, intent))
++    assert "SUBMISSION_IDENTITY_EVIDENCE_INVALID" in result["identity_review"]["reason_codes"]
++    assert result["identity_review"]["permanent_id"] is None
++
++
++@pytest.mark.parametrize("bound", ["rows", "bytes"])
++async def test_identity_resolution_never_selects_from_truncated_evidence(submission_fixture, monkeypatch, bound):
++    import src.execution.broker_submission as module
++
++    fixture = submission_fixture
++    intent, transport = await lost_acknowledgement(fixture)
++    await retain(fixture, [echoed_execution(transport), echoed_execution(transport, event_id="fixture.second.1")])
++    # Exercise the real boundary/extra-row probe with small synthetic fixtures.
++    # Production limits remain1000observations and2MiB.
++    monkeypatch.setattr(module, "MAX_OBSERVATIONS" if bound == "rows" else "READ_PAYLOAD_BUDGET", 1)
++    result = await fixture[0].resolve_identity(**args(fixture, intent))
++    assert "SUBMISSION_IDENTITY_EVIDENCE_TRUNCATED" in result["identity_review"]["reason_codes"]
++    assert result["identity_review"]["status"] == "sticky_unresolved"
++    assert result["identity_review"]["permanent_id"] is None
+diff --git a/tests/unit/broker_submission_test.py b/tests/unit/broker_submission_test.py
+index d5dd209aa3ab0aa3c4ad7f66952e9075e8929f99..6a0df99958e475f4fd794e48326458760deebed5 100644
+--- a/tests/unit/broker_submission_test.py
++++ b/tests/unit/broker_submission_test.py
+@@ -1,5 +1,7 @@
+ """Pure offline contract validation; no SDK construction or database connection."""
+ 
++import uuid
++from types import SimpleNamespace
+ from decimal import Decimal
+ import importlib
+ 
+@@ -7,7 +9,15 @@ import pytest
+ from pydantic import ValidationError
+ 
+ from src.execution.policy import PolicyDenied, digest
+-from src.execution.broker_submission import TransportReceipt, SubmissionRequest, BrokerSubmissionJournal, _request
++from src.execution.broker_submission import (
++    TransportReceipt,
++    SubmissionRequest,
++    BrokerSubmissionJournal,
++    _request,
++    _attempt_reference,
++    _identity_candidates,
++)
++from src.execution.broker_observations import hash_order_reference
+ 
+ 
+ def request_values(**changes):
+@@ -52,6 +62,55 @@ def test_large_exact_decimal_text_does_not_undergo_float_rounding():
+     assert request.limit_price == Decimal("9007199254740993")
+ 
+ 
++def test_attempt_reference_reuses_random_identity_without_changing_request():
++    request = SubmissionRequest(**request_values())
++    before = digest(request.model_dump(mode="json"))
++    attempt = str(uuid.uuid4())
++    reference = _attempt_reference(attempt)
++    assert reference == uuid.UUID(attempt).hex and len(reference) == 32
++    assert hash_order_reference(reference) != reference
++    assert before == digest(request.model_dump(mode="json"))
++    for invalid in (None, "not-an-id", uuid.uuid4().hex, str(uuid.uuid1())):
++        with pytest.raises(PolicyDenied, match="SUBMISSION_ATTEMPT_REFERENCE_INVALID"):
++            _attempt_reference(invalid)
++
++
++@pytest.mark.parametrize("changes,reason", [
++    ({"order_ref_sha256": "a" * 64}, "SUBMISSION_IDENTITY_REFERENCE_CONFLICT"),
++    ({"order_id": 2}, "SUBMISSION_IDENTITY_ORDER_CONFLICT"),
++    ({"client_id": 78}, "SUBMISSION_IDENTITY_ORDER_CONFLICT"),
++    ({"con_id": 456}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
++    ({"security_type": "OPT"}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
++    ({"multiplier": "100"}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
++    ({"currency": "USD"}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
++    ({"side": "SLD"}, "SUBMISSION_IDENTITY_CONTRACT_UNRESOLVED"),
++    ({"permanent_id": 0}, "SUBMISSION_IDENTITY_PERMANENT_ID_UNAVAILABLE"),
++])
++def test_reference_does_not_override_other_identity_or_contract_evidence(changes, reason):
++    reference = hash_order_reference(uuid.uuid4().hex)
++    payload = dict(order_ref_sha256=reference, client_id=77, order_id=1, con_id=123, security_type="STK",
++                   multiplier="1", currency="EUR", side="BOT", permanent_id=9) | changes
++    row = SimpleNamespace(id="synthetic", payload=payload, payload_sha256=digest(payload))
++    candidates, reasons, _ = _identity_candidates(SubmissionRequest(**request_values()), reference, [row])
++    assert reason in reasons
++    assert candidates == set()
++
++
++def test_missing_reference_never_proves_identity_and_conflicting_history_is_not_discarded():
++    reference = hash_order_reference(uuid.uuid4().hex)
++    base = dict(client_id=77, order_id=1, con_id=123, security_type="STK", multiplier="1",
++                currency="EUR", side="BOT", permanent_id=9)
++    def row(identity, **changes):
++        payload = base | changes
++        return SimpleNamespace(id=identity, payload=payload, payload_sha256=digest(payload))
++    request = SubmissionRequest(**request_values())
++    assert _identity_candidates(request, reference, [row("missing")])[0] == set()
++    candidates, reasons, _ = _identity_candidates(request, reference, [
++        row("candidate", order_ref_sha256=reference), row("unreferenced", permanent_id=10),
++    ])
++    assert candidates == {"9"} and "SUBMISSION_IDENTITY_PERMANENT_ID_CONFLICT" in reasons
++
++
+ @pytest.mark.parametrize("changes", [
+     {"permanent_id": None}, {"permanent_id": 0}, {"permanent_id": True},
+     {"status": "filled"}, {"status": "rejected"}, {"environment_verified": "paper"},
+diff --git a/tests/unit/ibkr_observations_test.py b/tests/unit/ibkr_observations_test.py
+index 7283438e39b027a33ff54279310d330b4d08fba4..d40df3f7574e864c42cef5d2c25a2dae83c9677d 100644
+--- a/tests/unit/ibkr_observations_test.py
++++ b/tests/unit/ibkr_observations_test.py
+@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
+ 
+ import pytest
+ 
++from src.execution.broker_observations import hash_order_reference
+ from src.tools.brokers.ibkr_observations import CallbackWindow
+ 
+ 
+@@ -132,6 +133,31 @@ def test_capacity_malformed_and_mismatched_commission_fail_closed():
+     assert "INVALID_BROKER_CALLBACK" in window.failures
+ 
+ 
++def test_only_decoded_execution_reference_is_hashed_not_cached_trade_order():
++    window = CallbackWindow("synthetic")
++    observed = fill()
++    observed.execution.orderRef = "a" * 32
++    cached = Obj(order=Obj(orderRef="b" * 32))
++    window.execution(cached, observed)
++    retained, = window.observations
++    assert retained.order_ref_sha256 == hash_order_reference("a" * 32)
++    assert "a" * 32 not in str(retained.model_dump())
++    del observed.execution.orderRef
++    window.execution(cached, observed)
++    assert window.observations[-1].order_ref_sha256 is None
++    assert "order_ref_sha256" not in window.observations[-1].model_dump(exclude_none=True)
++
++
++def test_order_status_cached_reference_cannot_supply_correlation_evidence():
++    window = CallbackWindow("synthetic")
++    trade = Obj(order=Obj(account="synthetic", clientId=7, orderId=1, permId=9, orderRef="c" * 32),
++                orderStatus=Obj(status="Submitted", filled=0, remaining=1))
++    window.order_status(trade)
++    assert len(window.observations) == 1
++    assert "order_ref_sha256" not in window.observations[0].model_dump()
++    assert "c" * 32 not in str(window.observations[0].model_dump())
++
++
+ def test_subscription_keeps_late_callbacks_between_bounded_drains_and_final_detach():
+     sdk = SDK()
+     window = CallbackWindow("synthetic")

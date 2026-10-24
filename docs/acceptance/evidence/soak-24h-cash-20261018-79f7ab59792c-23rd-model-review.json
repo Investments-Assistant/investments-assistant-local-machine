@@ -1,0 +1,21 @@
+{
+  "verified_at": "2026-10-18T22:39:11.699370+00:00",
+  "status": "PARTIAL_23RD_CPU_MODEL_VERIFIED_NOT_24H",
+  "run_id": "79f7ab59792c",
+  "source_fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "current_checkpoint_seconds": 79406.320855486,
+  "model_run_index": 22,
+  "model_runs_recorded": 23,
+  "new_saved_answers_independently_reparsed": 3,
+  "all_three_correct": true,
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "raw_result": ".qa/soak-cash-20261018-79f7ab59792c/observation/model-0022-9f9df8c6.json",
+  "raw_snapshot": ".qa/soak-cash-rootwait-20261018-79f7ab59792c/model-0022-9f9df8c6.json",
+  "raw_sha256": "ca10b8d176e2af2b21b7880563dcbffe4aaffa82e9a9ae8a0696012ce9718f44",
+  "load_seconds": 1.0033085760078393,
+  "peak_process_rss_mib": 1974.3125,
+  "maximum_task_seconds": 2.1995194330229424,
+  "model_scope": "Existing CPU4/GPU0/context4096/structured fixed synthetic tasks; no broker",
+  "acceptance_credit_added": false,
+  "remaining": "Actual>=86400s,24modelruns/72answers and strictterminalaudit; cooling/research/Paper stayseparate"
+}

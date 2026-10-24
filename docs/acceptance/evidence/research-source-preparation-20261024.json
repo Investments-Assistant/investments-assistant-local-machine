@@ -1,0 +1,66 @@
+{
+  "status": "OFFLINE_SAFETY_PASS_ACTUAL_ACCESS_NOT_STARTED",
+  "at": "2026-10-24T11:25:02.416973+00:00",
+  "head": "d5aa99ec1f2a67e62c929d9bc2dcb1a616af453b",
+  "owner_source_check_approval": "call_74bd452a29e64cecaf97bc2e99810272: Approve the free data check",
+  "owner_free_account_key_readiness": "call_2934bdcbcb314d608ec359d6f892fe9f: Free account ready; key saved locally",
+  "offline_safety_tests": {
+    "passed": 25,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0,
+    "actual_exit_code": 0,
+    "duration_seconds": 0.51,
+    "network": "MockTransport only; DNS/socket access forbidden",
+    "repeated_on_resume": false
+  },
+  "reviewed_files": [
+    {
+      "path": ".qa/research-source-check-20261023/source_check.py",
+      "sha256": "4638d68e012f8f43efede61f03b5f1cc41997e2cc1f5624ed1bc5fd16354c894"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/offline_test.py",
+      "sha256": "112c87bfb8a7889833ed04602404a9c7ac638a0260328a13ad9de8c28d9d287d"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/offline-tests-execution.json",
+      "sha256": "6dc51f0152227f8130c32969695bfb600621d58fc6a927f9dd8b2f082acdfc8e"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/offline-tests.xml",
+      "sha256": "40270339a6f398d7f39eac194a709c7afa53a940918fba49e861e0edfaf3e310"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/offline-tests.log",
+      "sha256": "2b5d35d642196938973ebcf5838a5350b8173414dc9e9038a2de94198da6e315"
+    }
+  ],
+  "root_review": "Read full helper/tests and actual terminal receipt/JUnit; verified hashes and code/test mtimes precede terminal receipt. O_NONBLOCK private reads, fsynced exclusive claim/attempt records, no alternate output directory, strict HTTPS/TLS, no redirect/retry/proxy, raw 1MiB/20s body bound and sanitized failures.",
+  "plan": {
+    "path": ".qa/eodhd-private-source-check-20261023/check-20261024/plan.json",
+    "sha256": "ac12e78eff26459452f31ab5d76a2b1c810acc16a382cdad5b2580b43f33ee24",
+    "dates": [
+      "2025-10-25",
+      "2026-10-23"
+    ],
+    "expires_at": "2026-10-25T11:22:15.645432+00:00",
+    "maximum_http_requests": 9,
+    "maximum_api_call_units": 9,
+    "started": false
+  },
+  "preparation_receipt": {
+    "path": ".qa/research-source-check-20261023/prepare-execution-20261024.json",
+    "sha256": "b62358132b1c682dee17e3066a68d165d96ce704270ea55680358c9049e70fc3"
+  },
+  "remaining_free_allowance_confirmed": false,
+  "provider_requests_made": 0,
+  "agent_owner_token_reads": 0,
+  "dataset_qualified": false,
+  "real_study_or_strategy_run": false,
+  "research_gate_complete": false,
+  "source_tests_index_unchanged": true,
+  "broker_or_live_actions": false,
+  "pending": "Owner confirms at least nine free API calls remain; inspect same unstarted unexpired plan before access",
+  "goal_complete": false
+}

@@ -1,0 +1,36 @@
+{
+  "status": "NATIVE_KERNEL_RESTART_AND_SERVICE_INTERRUPTION_VERIFIED",
+  "verified_at": "2026-10-17T09:42:42.525230+00:00",
+  "prior_boot_metadata": ".local-private/paper-validation-20261016-7b59cc1e8fd2/resume-v3-preflight-20261016T233754730981Z.json",
+  "prior_boot_id": "4b8f4e3e-af67-4439-83a8-a9d88b9c7154",
+  "current_boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+  "current_native_pid_namespace": "pid:[4026532221]",
+  "native_pid_namespace_inode_reused_across_boot": true,
+  "old_native_processes_absent": [
+    75642,
+    41103,
+    195400,
+    195385,
+    239972
+  ],
+  "native_https": "ready and signup ConnectionRefusedError",
+  "windows_https": "ordinary TLS request WebExceptionConnectFailure; not verified TLS error",
+  "private_postgres_version_file_exists": true,
+  "private_postgres_version": "16",
+  "saved_soak_status_is_stale": true,
+  "saved_soak": {
+    "status": "RUNNING",
+    "cycles": 73,
+    "restarts": 2,
+    "current_window_seconds": 1929.7004582880036,
+    "last_observed_at": "2026-10-17T00:09:27.949224+00:00",
+    "finished_at": null,
+    "failures": []
+  },
+  "observed_24h": false,
+  "original_soak_checkpoint_modified": false,
+  "interruption_cause_beyond_kernel_restart": "NOT_ESTABLISHED",
+  "recovery_attempted_by_this_check": false,
+  "broker_read_user_report": "Read succeeded before app became unavailable; persisted metadata not yet audited",
+  "secret_account_data_included": false
+}

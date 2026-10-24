@@ -1,8 +1,105 @@
 # Engineering soak
 
-The current read/source-safety candidate completed its own verified 24-hour
-observation on 2026-10-16 Lisbon time. The earlier candidate's separate pass is
-retained below. The runner uses only a marked, migrated,
+## Current direction — 22 October 2026
+
+The application will deploy on a different computer. The owner deferred this
+laptop's24h observation, mapped CPU-temperature checks and clock repair to the
+actual final host. Stop pursuing those laptop checks; the pending laptop Portable
+ZIP download/setup request is cancelled. These gates are **DEFERRED, not PASS**.
+Final-host OS/architecture/hardware are unknown; follow the
+[handoff](FINAL_HOST_HANDOFF.md) for fresh fixtures, compatible profile, provenance
+and independent terminal acceptance. Do not resume any historical window or reuse
+its launch/observer/auditor/cleanup helper. Research and Paper gates explicitly
+remain open, external SDK writes stay closed and live trading stays OFF.
+
+All results below are historical evidence scoped to their recorded source and
+host. They neither authorize a new laptop observation nor prove final-host24h,
+clock stability or cooling. Later source changes need affected checks and a new
+source-bound final-host window; resolve the actual checked-out migration head.
+
+## Historical candidate and interrupted windows
+
+The published seven-file cash/halt fix includes the soak startup guard: it reads
+an existing halted account immediately after login, before the next halt POST
+can mask lost state. Authentication/read checks share the original15-second
+deadline. The earlier affected24tests and real HTTP/PostgreSQL restart smoke
+passed on fingerprintfe94d676:90.214s,5restarts(max1.484s),haltp9527.710ms,
+with recorded GET-before-POST order after every restart. Its
+[historical review](evidence/soak-halt-publication-review-20261017.json) is retained.
+The subsequently reproduced selected-account cash and stopped-cache defects
+are also fixed. Final source fingerprint4fd1380c passes860 unit/392 PostgreSQL
+cases and a fresh image/runtime/recovery/cleanup check; see the
+[candidate review](evidence/cash-halt-publication-review-20261018.json).
+The exact seven-file patch is approved/published as e154a0a; all four CI jobs
+and its configured Sonar gate pass. Source bytes remain4fd1380c.
+
+On20Oct, native inspection proved a new kernel boot
+`34114b44-668d-4ba2-9480-91423bb4df0f`, replacing the window's bound boot
+`8e2a4ea6-7359-453d-8da4-23627cd94395`. Window79f7ab59792c is interrupted.
+Its stale checkpoint says RUNNING but records only2824cycles/80574.769830seconds
+(about22h23m),87restarts and23model runs. It has no terminal PASS, finished_at,
+observer result or root-wait result. Old tool session5980 is unknown. The reused
+PID namespace number does not restore process identity or continuity.
+
+The [launch](evidence/soak-24h-cash-20261018-79f7ab59792c-launch.json),
+[partial prefix](evidence/soak-24h-cash-20261018-79f7ab59792c-preterminal-review.json)
+and [23rd model review](evidence/soak-24h-cash-20261018-79f7ab59792c-23rd-model-review.json)
+remain historical partial evidence, with no24-hour credit. The [interruption archive/review](evidence/soak-24h-cash-20261018-79f7ab59792c-interruption-20261020-review.json)
+retains240explicit raw/source/helper/proof files; every archive member was
+independently compared with its saved hash and unchanged original. All23model
+profiles/69actual JSON answers were independently verified. This is retention of
+partial evidence, not terminal acceptance. Preserve the original files. Do not rerun the old launcher, auditor, finite observer or root waiter;
+the old terminal-only retention helper must retain its boot/PASS guards.
+No old cluster cleanup is authorized by this interruption.
+
+Fresh window078d596f2f79 was [prepared](evidence/soak-24h-cash-20261020-078d596f2f79-preparation.json)
+and [launched once](evidence/soak-24h-cash-20261020-078d596f2f79-launch.json)
+on the current boot/exact published source. Its reviewed finite verifier attached
+once, then correctly rejected a terminal CLOCK_DISCONTINUITY failure after
+39.744seconds/9cycles/0restarts/one model run. The runner/service PID fields are
+cleared and the verifier result is OBSERVER_NOT_ACCEPTED; no terminal PASS exists.
+The launch receipt preserves historical RUNNING_VERIFIED startup, not current
+liveness. Root's later live check caught the exited runner before writing any
+safe-boundary report. Do not retry the launcher, observer or auditor.
+
+A separate [read-only clock probe](evidence/clock-soak-failure-20261020-078d596f2f79.json)
+reproduced a311ms backward wall-clock step. Its cause remains unproven; no OS/time
+service changes or guard relaxation were performed. The [failed-window archive](evidence/soak-24h-cash-20261020-078d596f2f79-failure-review.json)
+retains233explicit raw/source/helper/proof files. Root independently verified
+every byte before [guarded cleanup](evidence/soak-24h-cash-20261020-078d596f2f79-cleanup.json):
+only the new marked database was dropped and its cluster smart-stopped; raw/data
+directories remain preserved. Cleanup intentionally updates the current plan
+after retaining its original running-plan bytes. No runner, observer or new
+PostgreSQL process remained live after that cleanup. A future final-host observation requires stable clocks
+and a new reviewed identity. All86400-second continuous duration,60-second gap,
+250ms clock divergence/halt and15-second restart budgets remain fixed. See
+[CLOCK_REVIEW.md](CLOCK_REVIEW.md) and the latest [checkpoint](CHECKPOINT.md).
+Mapped cooling/continuous host validation are now deferred to the final computer;
+research and full external Paper gates remain open.
+
+The earlier smoke remains a fe94
+harness milestone; its [source/raw archive](evidence/soak-halt-guard-smoke-20261017-dc10b4e9d5cb-retention-review.json)
+is retained and its exact owned fixture was cleaned without changing the operator
+instance or old53a8 cluster.
+
+Window53a8ee46e318 was gracefully stopped after the validation gap was confirmed:
+47cycles,1restart(1.250526s),0recordedfailures, statusINTERRUPTED. The old startup
+path did not observe halt state before reasserting it, so those samples cannot
+prove halt survival. No24-hour credit was ever awarded. OriginalPG/data are
+preserved; do not restart/resume/clean this window blindly. The
+[176-file retained archive](evidence/soak-24h-credentials-20261017-53a8ee46e318-retention-review.json)
+contains original3b69 source inputs and raws, independently byte-verified before
+source changes. The separate actual Docker halt/restart proof remains valid.
+
+The even earlier d452f16551ca window was interrupted by a verified WSL kernel
+restart; its raw archive and stopped cluster also remain preserved. Neither
+window's elapsed time counts toward a new continuous window. Old launch/auditor
+helpers remain bound to their historical source and run IDs; use only a freshly reviewed current-boot launcher/auditor for a new window.
+No operator/private data, broker/provider access, OS/power changes or relaxed
+continuity/performance gate are authorized by this fix.
+
+Historical f945 read/source-safety observation completed its own verified24h
+window on2026-10-16; older candidate passes remain below. The runner uses only a marked, migrated,
 synthetic PostgreSQL database through the `.qa` socket (or loopback TCP for CI),
 loopback HTTP, and an existing local
 model. It cannot submit broker orders or fetch provider data.
@@ -11,6 +108,12 @@ Before observation, freeze application code and dependency versions. The runner
 records their fingerprint and fails if code changes. An interrupted run resumed
 with `--resume` archives its previous window and starts a new continuous window;
 downtime never counts toward 24 hours. Inspect the checkpoint PID before retrying.
+
+The following is a **historical host-specific example**, not a final-host setup
+command or a pending laptop launch. Its starter hardcodes extracted x86_64 PG16,
+old cluster/socket paths and port55439; it does not create a database, marker or
+schema. Do not copy its username, token, model choice or output. Use the
+[final-host handoff](FINAL_HOST_HANDOFF.md) for conditional current command shapes.
 
 ```sh
 scripts/start_acceptance_postgres.sh
@@ -21,8 +124,9 @@ TEST_DATABASE_DISPOSABLE_TOKEN=fixture-soak-20260909 \
   --output .qa/soak-24h-new
 ```
 
-The separate `test_soak_acceptance` database must already have disposable marker
-`fixture-soak-20260909` and the current migration head `0018_job_lease_clock`. The runner refuses
+The historical `test_soak_acceptance` database required disposable marker
+`fixture-soak-20260909` and the then-reviewed migration head `0019_flexible_credentials`.
+A new fixture must instead match the checked-out head and runner guard. The runner refuses
 remote hosts, unapproved socket locations or identities. Raw control samples, checkpoints, and benchmark
 JSON stay under the specified ignored directory; retain these before cleaning it.
 SIGINT/SIGTERM saves progress and terminates only owned application/model children.

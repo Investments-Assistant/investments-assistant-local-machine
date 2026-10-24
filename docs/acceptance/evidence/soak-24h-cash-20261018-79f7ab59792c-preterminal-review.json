@@ -1,0 +1,188 @@
+{
+  "status": "PARTIAL_RAW_EVIDENCE_VERIFIED_NOT_24H_ACCEPTANCE",
+  "at": "2026-10-18T22:04:59.633499+00:00",
+  "run_id": "79f7ab59792c",
+  "published_head": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "source_fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "runner_identity_verified_live": {
+    "pid": 333647,
+    "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+    "pid_namespace": "pid:[4026532221]",
+    "start_ticks": 5593877,
+    "state": "S",
+    "command_sha256": "191e080c92b7df9ea52783273868f9aebcaccb405b6ce27c4377c9dc29916dca"
+  },
+  "postgres_identity_verified_live": {
+    "pid": 333634,
+    "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+    "pid_namespace": "pid:[4026532221]",
+    "start_ticks": 5593639,
+    "state": "S",
+    "command_sha256": "81256cfe65ca3d255685e5c9b1b07e4c65abd76e2f2d69afc5bff6ab6a22332e"
+  },
+  "checkpoint_observed_at": "2026-10-18T22:04:51.067488+00:00",
+  "observed_seconds_at_snapshot": 77356.73366029002,
+  "cycles_at_snapshot": 2709,
+  "raw_rows_read": 2709,
+  "rows_used_exact_checkpoint_prefix": 2709,
+  "halt_p95_ms": 25.59698800178012,
+  "halt_maximum_ms": 64.76100801955909,
+  "largest_raw_sample_gap_seconds": 30.001658836990828,
+  "service_restarts": 83,
+  "maximum_restart_seconds": 1.5681395910069114,
+  "completed_model_runs": 22,
+  "model_answers_independently_reparsed_correct": 66,
+  "failures_at_snapshot": [],
+  "raw_snapshot": ".qa/cash-preterminal-20261018-4e6d66e433b6",
+  "snapshot_file_sha256": {
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0005-3658b509.json": "fb05ec5af5750834fe079863474e93cb27874492364ad3878de618b0095e3b23",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0002-481a3fd3.json": "fc1fde3136245e8ec0ddd5ddafa11f49a5288f81db73121bdbd053940e76e96d",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0009-674284f3.json": "0f6c650352a88f864045b89917cc9334a2c139f990a1a173afe12b62b77cb711",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0007-4c5f9e49.json": "a04c7ff59b235834f5951f1e18abbdad2efefd14795f7eb593bc8776987a4bde",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0006-76424a80.json": "5fcd2882dd3303fe3cc0c59ea854a1fedbfda59db4908e25b137ef5f30b888aa",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0020-122725e7.json": "913367291ca4b8e20054a13186c8741736a133f1d28ccc70964715e58701455a",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0012-93d34282.json": "2298729e2cbeba0f201a424bda0ef481c4fd8a84d5c4996359177aa4d067764f",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0017-0b3b3a4f.json": "4428a7a3aae66ce24340bda13ab42a5bd1f5cc19d0a5c9f794a3258be4efb3e9",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0019-81300e97.json": "730e396191ae610c1b9594eba7efce0fc94600d53a5c70aeadf53c6d69416fce",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0000-0c21785b.json": "f8ee74bf3fa7b03af446a9e34d321202fd65059a7dd2863284177594fc5b6aae",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0014-c24cbb4f.json": "ef8604d113f2fc5f262fb1aaf13d62697de7fc9979c081c2ddb558541fab6cf6",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/latency-samples.jsonl": "12dd25c2a2e33bf2240ee9b1241d0b277c73ac3b94228d829dcbddf921aaec80",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0016-8371bfc3.json": "12e3b93061e6b0cbe162b715283bb5fd25a4cfc18d059bc02bb114cc23d10219",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0008-cf5871bc.json": "8f8b93c07593b3f17a634c8a0efe3aaa29e438b249065c58377190344836ec84",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0003-a8d4c9b8.json": "2b0a35b084b2101c68c7fa8c9d8bf11a223c327d24f304e1371d2a147dbed975",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0021-7dc064e6.json": "757b7b5615567410dd83823655ab38ebec66349bf5ed816f1442dc3ad9c80fd3",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0015-9e8093fe.json": "ac69242eba02ced1cfa7584595f4d7e4d78d0c552eb253b408f76e5afd5951b8",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0013-23ce0042.json": "69224f98ac44b3cada240860570f124292dcfabc8d595e9ea4029b2b76ada0c3",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0011-2f3df6de.json": "8deeece4a3d7dc652fb100e1a3a6d3e7f39bf663f77f65c5a64da172d76dbb8e",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/checkpoint.json": "fcdfa3c3b852c1dc84220aacd3e4d2b1d5374161b5fb4c0b8ca46d1df4c1bd10",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0004-4810d182.json": "b94354b9d7f7a5a290a42064abaf4edf129c4f806bfbe3d86f91c5640c6a7e74",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0001-cb1fd8fe.json": "fdd6aa0f3decb291ee40c7fdb2e5bff07e681e2d89ead7e3b24ca11380fc17aa",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0010-bf44ec9c.json": "c4dd0d0056f59bdea5f8b87ac749a1bb01a7c7e022ece1fccbfe401e71c459fd",
+    ".qa/cash-preterminal-20261018-4e6d66e433b6/model-0018-77c80acb.json": "afd5124ae2dd5581c0c871a44a7d9724194ecaa0859c95e699b7a60474852249"
+  },
+  "completed_models": [
+    {
+      "name": "model-0000-0c21785b.json",
+      "sha256": "f8ee74bf3fa7b03af446a9e34d321202fd65059a7dd2863284177594fc5b6aae",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0001-cb1fd8fe.json",
+      "sha256": "fdd6aa0f3decb291ee40c7fdb2e5bff07e681e2d89ead7e3b24ca11380fc17aa",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0002-481a3fd3.json",
+      "sha256": "fc1fde3136245e8ec0ddd5ddafa11f49a5288f81db73121bdbd053940e76e96d",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0003-a8d4c9b8.json",
+      "sha256": "2b0a35b084b2101c68c7fa8c9d8bf11a223c327d24f304e1371d2a147dbed975",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0004-4810d182.json",
+      "sha256": "b94354b9d7f7a5a290a42064abaf4edf129c4f806bfbe3d86f91c5640c6a7e74",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0005-3658b509.json",
+      "sha256": "fb05ec5af5750834fe079863474e93cb27874492364ad3878de618b0095e3b23",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0006-76424a80.json",
+      "sha256": "5fcd2882dd3303fe3cc0c59ea854a1fedbfda59db4908e25b137ef5f30b888aa",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0007-4c5f9e49.json",
+      "sha256": "a04c7ff59b235834f5951f1e18abbdad2efefd14795f7eb593bc8776987a4bde",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0008-cf5871bc.json",
+      "sha256": "8f8b93c07593b3f17a634c8a0efe3aaa29e438b249065c58377190344836ec84",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0009-674284f3.json",
+      "sha256": "0f6c650352a88f864045b89917cc9334a2c139f990a1a173afe12b62b77cb711",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0010-bf44ec9c.json",
+      "sha256": "c4dd0d0056f59bdea5f8b87ac749a1bb01a7c7e022ece1fccbfe401e71c459fd",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0011-2f3df6de.json",
+      "sha256": "8deeece4a3d7dc652fb100e1a3a6d3e7f39bf663f77f65c5a64da172d76dbb8e",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0012-93d34282.json",
+      "sha256": "2298729e2cbeba0f201a424bda0ef481c4fd8a84d5c4996359177aa4d067764f",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0013-23ce0042.json",
+      "sha256": "69224f98ac44b3cada240860570f124292dcfabc8d595e9ea4029b2b76ada0c3",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0014-c24cbb4f.json",
+      "sha256": "ef8604d113f2fc5f262fb1aaf13d62697de7fc9979c081c2ddb558541fab6cf6",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0015-9e8093fe.json",
+      "sha256": "ac69242eba02ced1cfa7584595f4d7e4d78d0c552eb253b408f76e5afd5951b8",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0016-8371bfc3.json",
+      "sha256": "12e3b93061e6b0cbe162b715283bb5fd25a4cfc18d059bc02bb114cc23d10219",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0017-0b3b3a4f.json",
+      "sha256": "4428a7a3aae66ce24340bda13ab42a5bd1f5cc19d0a5c9f794a3258be4efb3e9",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0018-77c80acb.json",
+      "sha256": "afd5124ae2dd5581c0c871a44a7d9724194ecaa0859c95e699b7a60474852249",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0019-81300e97.json",
+      "sha256": "730e396191ae610c1b9594eba7efce0fc94600d53a5c70aeadf53c6d69416fce",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0020-122725e7.json",
+      "sha256": "913367291ca4b8e20054a13186c8741736a133f1d28ccc70964715e58701455a",
+      "tasks_independently_correct": 3
+    },
+    {
+      "name": "model-0021-7dc064e6.json",
+      "sha256": "757b7b5615567410dd83823655ab38ebec66349bf5ed816f1442dc3ad9c80fd3",
+      "tasks_independently_correct": 3
+    }
+  ],
+  "observed_24h": false,
+  "acceptance_credit": false,
+  "runner_restarted_or_signalled": false,
+  "broker_connections_in_fixture": 0,
+  "external_orders_in_fixture": 0,
+  "limitations": [
+    "Point-in-time live prefix only; future observations and 24 completed model runs/72 tasks still required.",
+    "Raw samples have no independent wall timestamps; per-cycle wall/monotonic checks rely on the hash-bound runner.",
+    "Restart durations are recorded by the runner; no independent process restart traces retained.",
+    "No component-mapped cooling, physical sleep, broker recovery or economic acceptance.",
+    "Application HTTP inference is synthetic; actual existing GGUF benchmarks run in separate CPU processes."
+  ]
+}

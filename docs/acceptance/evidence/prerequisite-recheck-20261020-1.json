@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-20T11:44:10.213234+00:00",
+  "status": "FIRST_UNCHANGED_PREREQUISITE_CHECK_AFTER_PROGRESS",
+  "previous_turn": "PROGRESS",
+  "current_turn": "NO_PROGRESS",
+  "consecutive_unchanged_prerequisite_checks": 1,
+  "head": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "source_paths_unchanged": 160,
+  "native_boot_context": "MATCH",
+  "exact_fixture_processes_live": {
+    "runner": false,
+    "postgres": false,
+    "observer": false
+  },
+  "cleanup_and_failure_proof_sha256": {
+    "soak-24h-cash-20261020-078d596f2f79-cleanup.json": "c00f88648e455be04fa9c8afcf307a308f6c301222a4ef76a115c54811e57b7c",
+    "clock-soak-failure-20261020-078d596f2f79.json": "4c67066ad19ac48ef708a461d449bcfacd58324b89956af34b90383d9338ca49",
+    "soak-24h-cash-20261020-078d596f2f79-failure-review.json": "74f4e844bf4de9979029961358d4725afd61d49ed07c8edd557396e99428d460"
+  },
+  "sensor_download": {
+    "scope": "Exact previously requested localWindowsDownloadsfilenameonly",
+    "status": "REQUESTED_ZIP_NOT_PRESENT",
+    "file": "hwi_854.zip",
+    "other_files_listed": false,
+    "remote_or_reparse_files_opened": false
+  },
+  "new_user_prerequisites_received": false,
+  "new_soak_or_probe_started": false,
+  "broker_connections": 0,
+  "orders": 0,
+  "os_changes": false,
+  "goal_status": "active_incomplete"
+}

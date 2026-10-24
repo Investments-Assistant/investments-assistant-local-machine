@@ -1,0 +1,12 @@
+{
+  "status": "STALE_CURRENT_SOURCE_PASS_CLAIM_CORRECTED",
+  "recorded_at": "2026-10-17T15:20:11.363510+00:00",
+  "file": "docs/acceptance/PREREQUISITES.md",
+  "before_sha256": "a18206c43808c6b075947ae2451d73943ad18794330c42fd1f0c5ffadae4e967",
+  "after_sha256": "736f16d8d174b327aa92bdab23c2e0aa9b2d4ef3ab435e6cbe42289d633dbccf",
+  "finding": "Guide described historical observation/cleanup as a current-source pass and onboarding as pending after owner completed it",
+  "correction": "Current frozen-source window running, no24h credit; older proof historical; selected Paper read partial/consent now off; exact-instance inspection before restart/cleanup",
+  "authority_or_acceptance_threshold_changed": false,
+  "runtime_source_changed": false,
+  "new_test_or_broker_operation": false
+}

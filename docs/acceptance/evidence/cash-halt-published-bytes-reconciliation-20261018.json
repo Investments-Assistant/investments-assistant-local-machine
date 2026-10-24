@@ -1,0 +1,101 @@
+{
+  "status": "COMMIT_BYTES_RECONCILED_REMOTE_CI_PENDING",
+  "at": "2026-10-18T00:44:51.713661+00:00",
+  "scope": "Read-only local commit/blob/retained-build-input/owned-runner reconciliation; no remote CI, Docker, broker or database operation",
+  "approved_patch_sha256": "cfd2612f17d4cf7c41c507fdf0e1178c3b579e132095509b72cc28f3a58871b2",
+  "base_commit": "a4fccdea0c62179eda12a9fad089b74cb1c925b2",
+  "reconciled_commit": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "single_parent_verified": true,
+  "exact_commit_diff_equals_approved_patch": true,
+  "changed_files_count": 7,
+  "files_sha256": {
+    "scripts/soak_acceptance.py": "7495f50746b235fa35bcead6996b6f0d1e3ae78a0298cd81e76f6ea9c0d52953",
+    "tests/unit/soak_startup_test.py": "c3963ba57497faa3c1685d16a0651b24e7c95ceedf421a97bb32eb962cb69bfc",
+    "src/tools/brokers/ibkr.py": "64085986c7a9bdde1c721ab1f99e77464c8ed9c2377e6b3665ddfcfb4334e333",
+    "src/tools/brokers/ibkr_balances.py": "3fba253871594c56125279395b59a672bb75af25a76ce3f366c20339ad89a9c0",
+    "tests/unit/ibkr_balances_test.py": "21eaf26cbf74929e4ad0bbccb05ec4983a6925871ebb0be07c20c08914e5540a",
+    "tests/unit/ibkr_observations_test.py": "7feb3a087f33d4cb156fc4ef334bbe475e50c5f301fbcb39c0bb3f8c10889ced",
+    "tests/unit/ibkr_read_routing_test.py": "1fd8854b1fdf7a4d0a8f70c424aac57d2faa259db1e8c859ec8c3205f08b2967"
+  },
+  "source": {
+    "fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+    "input_count": 156,
+    "commit_and_current_files_match_frozen_manifest": true,
+    "complete_source_path_set_verified": true,
+    "source_input_manifest": ".qa/soak-cash-20261018-79f7ab59792c/source-input-manifest.json",
+    "source_input_manifest_sha256": "02361ea2492a487ac985fe208fd85a7f35997a01e536360b44ac88454108241c"
+  },
+  "image": {
+    "image": "investment-assistant:cash-collector-20261018-5d8b5cb04c1b",
+    "image_id": "sha256:92eabede31c807461e325d19133a27dfcc52a7aeba9973ecd8af9676804f8701",
+    "context_tar_sha256": "59c4c29e2792a845846a767c99298eddab3818f9cf2126af7e992427bd93d4f1",
+    "retained_tar_matches_all184_committed_inputs": true,
+    "context_files": 184,
+    "copied_files": 181,
+    "all181_saved_in_image_hashes_match_commit": true,
+    "context_only_paths": [
+      ".dockerignore",
+      "Dockerfile",
+      "config/build/debian.sources"
+    ],
+    "changes_from_parent_context": {
+      "src/tools/brokers/ibkr.py": {
+        "prior": "794ba77479bb695b8f0eefc151fc85f0314051810ac8d42c7dad8d755df96a36",
+        "current": "64085986c7a9bdde1c721ab1f99e77464c8ed9c2377e6b3665ddfcfb4334e333"
+      },
+      "src/tools/brokers/ibkr_balances.py": {
+        "prior": "a69725b441ee6ccba69a709cabca80e47b78f425760764f84991df7da143368b",
+        "current": "3fba253871594c56125279395b59a672bb75af25a76ce3f366c20339ad89a9c0"
+      }
+    },
+    "unchanged_parent_context_paths": 182,
+    "existing_local_runtime_and_cleanup_proof_reused": true,
+    "new_docker_call": false,
+    "image_labels_remain_original_candidate_base": true
+  },
+  "soak": {
+    "run_id": "79f7ab59792c",
+    "status_at_read": "RUNNING",
+    "checkpoint_observed_at": "2026-10-18T00:44:33.452543+00:00",
+    "continuous_seconds_at_read": 549.2165524790034,
+    "cycles_at_read": 27,
+    "restarts_at_read": 0,
+    "failures_at_read": [],
+    "runner_identity_native_verified": {
+      "pid": 333647,
+      "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+      "pid_namespace": "pid:[4026532221]",
+      "start_ticks": 5593877,
+      "state": "S",
+      "command_sha256": "191e080c92b7df9ea52783273868f9aebcaccb405b6ce27c4377c9dc29916dca"
+    },
+    "source_head_at_launch_preserved": "a4fccdea0c62179eda12a9fad089b74cb1c925b2",
+    "published_commit_now_mapping_same_exact_bytes": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+    "source_and_model_unchanged": true,
+    "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+    "bound_auditor_sha256": "edff62ee6e46df6f8cce304e0afd05bf276abec3649f9d762d0af4b03fcd7e03",
+    "launch_manifest_helpers_plan_unchanged": true,
+    "runner_not_restarted_or_signalled": true,
+    "observed_24h": false,
+    "terminal_audit_not_run": true,
+    "checkpoint_snapshot_sha256": "592851b94d3e74245b2aebdb8d5e5bb6a60328a99fdccccbd3a68f03dc5393c9"
+  },
+  "remote_publication": "Not independently verified in this receipt; root owns push/remote inspection",
+  "remote_ci": "PENDING",
+  "publication_approval_context": "User approved this exact seven-file patch; local commit verified, no broader approval inferred",
+  "artifact_sha256": {
+    "docs/acceptance/evidence/cash-halt-publication-review-20261018.patch": "cfd2612f17d4cf7c41c507fdf0e1178c3b579e132095509b72cc28f3a58871b2",
+    "docs/acceptance/evidence/cash-halt-publication-review-20261018.json": "2ee839d7a5d6963e0b9ebc724e6e96ed356289dba45ccddca21c72a3f090036d",
+    "docs/acceptance/evidence/cash-collector-image-build-20261018-5d8b5cb04c1b.json": "754f74612d9ecc6a3aeb7ed13dfc18a69f81cb5dfb05d8f86f8d5eb6fc25be7f",
+    "docs/acceptance/evidence/cash-collector-image-smoke-20261018-5d8b5cb04c1b.json": "35fa1287d32e9ca961666081620d6dea155cb34a8299d34bf8cd41abe7191d10",
+    "docs/acceptance/evidence/cash-collector-image-review-20261018-5d8b5cb04c1b.json": "14814ae28503e2cc86e84f1fc1a007191b3bb51f3a062e00518ecdde63b93eb1",
+    "docs/acceptance/evidence/soak-24h-cash-20261018-79f7ab59792c-launch.json": "fa2bf2872246cff44e4bf61d6e524fe286b9511fce59e9795a88b0cad0e210cf",
+    ".qa/soak-cash-20261018-79f7ab59792c/source-input-manifest.json": "02361ea2492a487ac985fe208fd85a7f35997a01e536360b44ac88454108241c"
+  },
+  "limitations": [
+    "Reconciles exact recorded image inputs and saved181file in-image proof; no new image build/runtime or binary-reproducibility claim.",
+    "Launch-time base/patch/manifest/auditor metadata stays immutable; later terminal audit may record changed HEAD and this record supplies explicit commit-to-byte mapping only.",
+    "Current RUNNING checkpoint is a point-in-time observation, not24hour acceptance.",
+    "No actual broker/provider/data/authority/live trading approval, credential access, operator runtime change or OS configuration change."
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "status": "SHORT_REAL_HTTP_RESTART_HALT_GUARD_SMOKE_PASS",
+  "observed_24h": false,
+  "run_id": "dc10b4e9d5cb",
+  "source_fingerprint": "fe94d676c22592bf20187ecf41f96c27588ecd2e92ea7d3cf88dedbe53b0f3d0",
+  "runner_sha256": "7495f50746b235fa35bcead6996b6f0d1e3ae78a0298cd81e76f6ea9c0d52953",
+  "unpublished_runner_patch_sha256": "46b1ae85e5ba2352d6d2404e679e27fe0a1df1aa56fbba1cbb6ed7904a5e4d6e",
+  "candidate_two_file_bundle_patch_sha256": "706eb16df33d994a0690fa539ab345438c731a0d4b9c114fe29eea067330703a",
+  "runner_patch_hash_scope": "Runner-only git diff; candidate_two_file_bundle_patch_sha256 separately binds runner and unit-regression diff",
+  "base_head": "a4fccdea0c62179eda12a9fad089b74cb1c925b2",
+  "cycles": 87,
+  "seconds": 90.21446416300023,
+  "restarts": 5,
+  "maximum_restart_seconds": 1.4838366190015222,
+  "halt_p95_ms": 27.709849000530085,
+  "route_trace_events": 304,
+  "post_restart_guard_trace": [
+    {
+      "restart": 1,
+      "authenticated_get_sequence": 52,
+      "subsequent_halt_post_sequence": 53
+    },
+    {
+      "restart": 2,
+      "authenticated_get_sequence": 103,
+      "subsequent_halt_post_sequence": 104
+    },
+    {
+      "restart": 3,
+      "authenticated_get_sequence": 154,
+      "subsequent_halt_post_sequence": 155
+    },
+    {
+      "restart": 4,
+      "authenticated_get_sequence": 205,
+      "subsequent_halt_post_sequence": 206
+    },
+    {
+      "restart": 5,
+      "authenticated_get_sequence": 272,
+      "subsequent_halt_post_sequence": 273
+    }
+  ],
+  "source_bound_halted_true_no_orders_guard_executed_before_each_restart_halt_post": true,
+  "trace_retains_no_headers_bodies_cookies_or_account_identifiers": true,
+  "cpu_model_tasks_independently_parsed": 3,
+  "broker_connections": 0,
+  "external_orders": 0,
+  "owned_postgres_identity": {
+    "pid": 131320,
+    "boot_id": "8e2a4ea6-7359-453d-8da4-23627cd94395",
+    "pid_namespace": "pid:[4026532221]",
+    "start_ticks": 2418023,
+    "state": "S",
+    "command_sha256": "147b0c1c4a7dfa9c6bf36e3f0c5bfb06a42e123d989b52a08f870fbf3bcf0afe"
+  },
+  "cleanup_performed": false,
+  "prior_published_image_ci_scope": "Unchanged application source/image only; fixed native-soak harness is unpublished and has no newCI claim",
+  "limitations": [
+    "90-second fixture smoke; not24h, production inference, cooling, Paper or economic acceptance.",
+    "Route-only response instrumentation adds small logging overhead and is bound to this owned smoke.",
+    "Persisted halted/empty-order predicates are executed by the bound runner; the trace deliberately omits response bodies."
+  ],
+  "artifact_sha256": {
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/postgres-setup.log": "853004287683e3b6fad0cea7f39d0a8c7cdec7d8221bbfdad57c4ee6524b5dcd",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/launcher-vs-reviewed-base.patch": "78e402ace64c1693618c31d888a7eb4576c27cd8fe68eaf0173567aee0147ac0",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/sitecustomize.py": "f52ce33e8b1fd093a9433850c172bf3c622a457d954477957612f7b74d52c46c",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/plan.json": "724918178a1171993975706707cf628645d65beb8081b30228a83a25260cb8cc",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/preparation-review.json": "cdc4a49988e215c8725ed295d6788f275ec9818e24b48bdb222a3fa92e6f3539",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/http-route-trace.jsonl": "5a94bd23d3a812b034e038580030ab053f032fc85ae2cb4ace8c5d1c215ea550",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/launch.py": "955c2504b5145d35fbc6ef47b0a0a69498a9609470c1c0a879d2eec10c890ad3",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/audit_smoke.py": "97a877eb2bde6ff6c803e27109fb235f5b9c38a41f4c170fd855d0a14ff41071",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/process_identity.py": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/postgres.log": "23e1ef30f8080f6a81374540cffd3beaffab31ef2aff06829179f6989efd3387",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/isolation-check.log": "5a00ba061921e7ac83b957eeb0c31d1ee7d12953663f4e1e10945cdee209bada",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/migrations.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/observation/model.log": "62acf2dc0da0f9ffa405152d824855d04a6d176235c5e7e0a4caa33dd6b80f19",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/observation/latency-samples.jsonl": "4818a60b06442c684c0a81338be1efa049bf3ef713a3fa1972f3f8298778ed61",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/observation/checkpoint.json": "e1c2c22a5ee38b5ec0195b43d43c138918ee8242349c72f12f475b637e4f36c7",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/observation/model-0000-161cff03.json": "4ae43bf366642e10357d8755f5de57979a34af1bd9c1502d9b2fde8a787f71ea",
+    ".qa/soak-halt-guard-smoke-20261017-dc10b4e9d5cb/observation/service.log": "5eae0c34c62cedc90324432333a259aacf680483e9d063c26ecd52d0d9866374",
+    "docs/acceptance/evidence/soak-halt-guard-smoke-20261017-dc10b4e9d5cb-launch.json": "8cf9d497a4daa851a938f58eba64b1b05c08d7cdaafd11587a58aafe63dec330",
+    "docs/acceptance/evidence/soak-halt-guard-smoke-20261017-dc10b4e9d5cb-launch.log": "5aa08bfc94a32d4c72616258ef9710147d62c4c11c01f68682eef77b16cb3a6d"
+  }
+}

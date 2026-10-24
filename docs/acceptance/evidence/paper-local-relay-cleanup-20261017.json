@@ -1,0 +1,28 @@
+{
+  "status": "OWNED_RELAY_ABSENT_AND_PORT_CLOSED_AFTER_NATIVE_BOOT_DISCONTINUITY",
+  "checked_at": "2026-10-17T09:44:11.391655+00:00",
+  "helper_sha256_verified": "3e52f474d023d6593670b00dea76c2ff69e742553a9ffb865d34dae81182c817",
+  "native_check_confirmed_by_parent": true,
+  "native_boot_changed_since_last_service_identity_proof": true,
+  "owned_relay_process_present": false,
+  "loopback_17497_listener_present": false,
+  "protocol_counts": {
+    "SESSION_STARTED": 1,
+    "SESSION_CLOSED": 1,
+    "SESSION_UNAVAILABLE": 0,
+    "PARALLEL_CLIENT_REJECTED": 0,
+    "OWNED_CHILD_CLEANUP_PENDING": 0,
+    "RELAY_CLOSED": 0
+  },
+  "session_child_cleanup_completed_before_SESSION_CLOSED": true,
+  "signal_sent_by_auditor": false,
+  "no_new_broker_read": true,
+  "no_protected_process_signalled": true,
+  "operator_requested_consent_disable": "PENDING_UI_UNAVAILABLE_NOT_ASSUMED_DISABLED",
+  "limits": [
+    "Log has one completed read transport session but no final RELAY_CLOSED code",
+    "Normal UI success is reported by the operator; persisted artifact audit awaits PG recovery",
+    "No broker account identifier, credentials, financial payload or auth session accessed",
+    "Cause of host boot discontinuity is not established"
+  ]
+}

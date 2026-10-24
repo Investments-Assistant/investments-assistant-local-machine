@@ -1,0 +1,51 @@
+{
+  "status": "PUBLISHED_HEAD_ALL_FOUR_CI_JOBS_AND_CONFIGURED_SONAR_GATE_PASS",
+  "verified_at": "2026-10-17T09:47:39.157606+00:00",
+  "head": "a4fccdea0c62179eda12a9fad089b74cb1c925b2",
+  "run_id": 38984378188,
+  "run_url": "https://github.com/Investments-Assistant/investments-assistant-local-machine/actions/runs/38984378188",
+  "jobs": [
+    {
+      "id": 117252298579,
+      "name": "Unit Tests / Run Unit Tests",
+      "conclusion": "success"
+    },
+    {
+      "id": 117252482729,
+      "name": "Chromium + PostgreSQL (synthetic model)",
+      "conclusion": "success"
+    },
+    {
+      "id": 117252482792,
+      "name": "Integration Tests / Run Integration Tests",
+      "conclusion": "success"
+    },
+    {
+      "id": 117253741297,
+      "name": "SonarCloud Quality Gate (combined coverage)",
+      "conclusion": "success"
+    }
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/ci-build-input-20261017-a4fccde/terminal-run.json",
+      "sha256": "1758dd2510ebb560cada82de57df6d443189e89452e80d86f47a55a32a3ae44f"
+    },
+    {
+      "path": ".qa/ci-build-input-20261017-a4fccde/quality-job-refetch.log",
+      "sha256": "5cdf982e9edb3514f9187ee08a403fa86da5d5aff9afce5c13b743dc4a0fc357"
+    }
+  ],
+  "sonar_project_key": "Investments-Assistant_investments-assistant",
+  "exact_scm_revision_verified": true,
+  "explicit_quality_gate_passed": true,
+  "prior_empty_log_retained": {
+    "path": ".qa/ci-build-input-20261017-a4fccde/quality-job.log",
+    "bytes": 0,
+    "meaning": "gh run view retrieval returned empty; direct readonly job-log API subsequently succeeded; not a CI failure"
+  },
+  "unchanged_runtime_source_fingerprint": "3b6942a4569d3cf659d353d397dbbc33acd7f1c20ccd57eb80a931bee3f5fcee",
+  "previous_detailed_test_evidence": "docs/acceptance/evidence/flexible-credentials-ci-20261017.json",
+  "test_count_note": "Prior exact-runtime tier counts reused; not newly counted or summed across overlapping tiers",
+  "broker_connection_or_order_by_this_check": false
+}

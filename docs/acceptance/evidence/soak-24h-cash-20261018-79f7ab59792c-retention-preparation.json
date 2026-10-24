@@ -1,0 +1,45 @@
+{
+  "status": "POST_TERMINAL_RETENTION_HELPER_PREPARED_NOT_EXECUTED",
+  "at": "2026-10-18T22:24:26.779374+00:00",
+  "work": ".qa/soak-cash-retention-20261018-79f7ab59792c",
+  "script": ".qa/soak-cash-retention-20261018-79f7ab59792c/retain.py",
+  "script_sha256": "2e75ee29982d6a5fcc6dde70f4169e831cb2716486bc5668b26185f39bcc397f",
+  "identity_helper_sha256": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7",
+  "plan_sha256": "811ef62e8a83ba2d4b191489eacc50913f3bf4c3af814f8bede3fe028a8a3221",
+  "syntax": "PASS",
+  "current160source_candidate_and19pinned_proof_hashes": "PASS",
+  "independent_source_fingerprint": "4fd1380c5c1595bfb8bbd311f02ec561fc013eac5f7da9563dc5c025151d1d30",
+  "published7filemapping_matches_candidate_manifest": true,
+  "current_fixed_input_bytes": 1946973,
+  "individual_max_bytes": 67108864,
+  "snapshot_max_bytes": 134217728,
+  "future_terminal_raw_path_count": 35,
+  "no_preflight_archive_auditor_observer_cleanup_executed": true,
+  "future_commands": {
+    "preflight": [
+      "/usr/bin/env",
+      "-i",
+      "PATH=/usr/bin:/bin",
+      "LANG=C.UTF-8",
+      ".venv/bin/python",
+      "-B",
+      ".qa/soak-cash-retention-20261018-79f7ab59792c/retain.py",
+      "--preflight"
+    ],
+    "retain_after_review_and_terminal": [
+      "/usr/bin/env",
+      "-i",
+      "PATH=/usr/bin:/bin",
+      "LANG=C.UTF-8",
+      ".venv/bin/python",
+      "-B",
+      ".qa/soak-cash-retention-20261018-79f7ab59792c/retain.py",
+      "--retain-reviewed"
+    ]
+  },
+  "outputs": {
+    "archive": "docs/acceptance/evidence/soak-24h-cash-20261018-79f7ab59792c-retained.tar.gz",
+    "manifest": "docs/acceptance/evidence/soak-24h-cash-20261018-79f7ab59792c-retention-manifest.json"
+  },
+  "limitations": "Only pinnedtop-levelCI/mapping reports retained; linkedremoteCIraw staysoriginalQA; noGGUFbinary/PGdump/privatefiles/unknowntraversal/acceptanceextrapolation."
+}

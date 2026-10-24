@@ -1,0 +1,66 @@
+{
+  "recorded_at": "2026-10-23T00:01:21.692641+00:00",
+  "status": "PUBLISHED_COMMIT_IMAGE_INPUT_BYTES_RECONCILED",
+  "scope": "Read-only local Git blob/current file/retained context/image evidence mapping; no rebuild or runtime rerun",
+  "published_commit": "a2b2f42da7610dd4b4feadafd4fce13d9acc78bc",
+  "parent": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+  "publication_evidence": "docs/acceptance/evidence/paper-submission-publication-20261023.json",
+  "publication_evidence_sha256": "ada42d41fdb0c5cdf58391cd3a56680703bf085d69082cd65fa867fbb795935e",
+  "approved_16_file_commit_diff_sha256": "6ba408644083ca1055a3c9a146889279fc8e550fa1a8004efe18015439217e4d",
+  "commit_has_exactly_approved_16_files": true,
+  "approved_candidate_blob_and_current_file_matches": 16,
+  "source_fingerprint": "b46651e69925c7e56f6ebf4e43816cf781bfa3330f94eef29b03c5e3ac3f0765",
+  "tests_fingerprint": "8d0bf60ca1f21d5e9fbe4a0092e85783e19e70e10e03efafffceb644da58728b",
+  "source_and_tests_unchanged_since_validated_candidate": true,
+  "image_id": "sha256:191135d0771de329f6c158e8d23db7f6ca937254e1b784c1a0dce70196a951e1",
+  "context": {
+    "files": 187,
+    "all_actual_published_git_blob_hashes_match_saved_manifest_and_current_paths": true,
+    "retained_tar_sha256": "e7d6fb97ba10560000bc19253b05793677fe833e0df452a6061a113a55a07963",
+    "retained_tar_unchanged_since_independent_all_byte_review": true,
+    "copied_image_files": 184,
+    "complete_saved_observed_image_file_hash_set_matches_published_commit": true,
+    "context_only_paths": [
+      ".dockerignore",
+      "Dockerfile",
+      "config/build/debian.sources"
+    ],
+    "distinct_git_blob_objects_read": 195
+  },
+  "original_image_provenance": {
+    "build_base_commit": "e154a0a365ece2a9fd81657034139c43c8e0abe6",
+    "build_kind": "dirty candidate atop e154",
+    "review_patch_sha256": "6ba408644083ca1055a3c9a146889279fc8e550fa1a8004efe18015439217e4d",
+    "source_fingerprint": "b46651e69925c7e56f6ebf4e43816cf781bfa3330f94eef29b03c5e3ac3f0765",
+    "retained_image_labels_and_original_receipts_unchanged": true,
+    "actual_new_commit_now_contains_same_exact_bytes": true,
+    "new_build_relabel_or_runtime_execution": false
+  },
+  "existing_validation_reuse": {
+    "backend_cases": 1338,
+    "image_build_smoke_runtime_and_owned_cleanup": "PASS for this exact source/context/image as recorded in retained independent review",
+    "new_validation_execution": false
+  },
+  "ci": {
+    "run_id": 39875250173,
+    "status": "IN_PROGRESS_NOT_ACCEPTED_AT_ROOT_REQUEST",
+    "queried_by_this_review": false,
+    "no_current_commit_CI_or_Sonar_pass_claimed": true
+  },
+  "artifact_sha256": {
+    "docs/acceptance/evidence/paper-submission-publication-20261023.json": "ada42d41fdb0c5cdf58391cd3a56680703bf085d69082cd65fa867fbb795935e",
+    ".qa/journal-submission-20261023-922d5044b4b3/independent-build-smoke-review.json": "55ae1fb57c0408324cb59075d254e9b86c6127a52fc3b377de2f3a7d9c7f61fb",
+    "docs/acceptance/evidence/paper-submission-publication-review-20261022.patch": "6ba408644083ca1055a3c9a146889279fc8e550fa1a8004efe18015439217e4d",
+    "docs/acceptance/evidence/journal-submission-image-build-20261023-922d5044b4b3.json": "cdf67eed3b27f4adf6c4de38046d5586c16bd1298c6bb7277a427c1790032f6a",
+    "docs/acceptance/evidence/journal-submission-image-smoke-20261023-922d5044b4b3.json": "e259b945b47738fa4c6964683454618b82d57ee256c78745a08d1225138b27d7",
+    "docs/acceptance/evidence/journal-submission-image-runtime-20261023-922d5044b4b3.json": "782ad65b886e8e53487791a6c9e89027463078f02e49ac7849c9b0db6f6214e9",
+    "docs/acceptance/evidence/journal-submission-image-runtime-20261023-922d5044b4b3-cleanup.json": "72c20644da9bdde69d55aab72e70a415c3b3dd4ee11363cf067644c00446233a"
+  },
+  "limitations": [
+    "Maps source/build-input bytes to the published commit; not a new image compilation or bit-reproducibility claim.",
+    "Original image provenance remains dirty candidate atop e154 plus approved patch; the image was not built from a2b HEAD or relabelled.",
+    "No new Docker, native PostgreSQL, private configuration, network, browser, model or test operation; no Git state mutation.",
+    "Current remote CI/Sonar is not accepted by this proof; root owns the finite CI watcher.",
+    "Actual external Paper and research remain OPEN; final-host24h/CPU-temperature/clock checks remain DEFERRED; live trading stays OFF."
+  ]
+}

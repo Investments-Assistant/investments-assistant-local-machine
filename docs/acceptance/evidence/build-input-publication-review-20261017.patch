@@ -1,0 +1,36 @@
+diff --git a/.gitignore b/.gitignore
+index c866fde..64fb2ef 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -9,6 +9,10 @@ __pycache__/
+ # Distribution / packaging
+ .Python
+ build/
++# Docker's immutable package-source input is reviewed configuration.
++!config/build/
++config/build/*
++!config/build/debian.sources
+ develop-eggs/
+ dist/
+ downloads/
+diff --git a/config/build/debian.sources b/config/build/debian.sources
+new file mode 100644
+index 0000000..187a694
+--- /dev/null
++++ b/config/build/debian.sources
+@@ -0,0 +1,15 @@
++# Immutable build inputs; update alongside the base-image digest and validation.
++# Archive expiry is disabled only for these dated snapshots, not signature checks.
++Types: deb
++URIs: https://snapshot.debian.org/archive/debian/20261009T000000Z/
++Suites: bookworm bookworm-updates
++Components: main
++Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
++Check-Valid-Until: no
++
++Types: deb
++URIs: https://snapshot.debian.org/archive/debian-security/20261009T000000Z/
++Suites: bookworm-security
++Components: main
++Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
++Check-Valid-Until: no

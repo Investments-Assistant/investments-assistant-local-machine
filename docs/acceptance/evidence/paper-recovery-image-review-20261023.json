@@ -1,0 +1,167 @@
+{
+  "status": "NEW_IMAGE_BUILD_SMOKE_AND_SCOPED_UNCHANGED_SURFACE_REVIEW_PASS",
+  "at": "2026-10-23T16:00:25.472039+00:00",
+  "image": "investment-assistant:order-reference-20261023-795c0c77a61e",
+  "image_id": "sha256:5631759f00daf16f457cb8d844a9ff2f56c9c22f4206e0f61ec1be1d20856dd4",
+  "base_commit": "a2b2f42da7610dd4b4feadafd4fce13d9acc78bc",
+  "source_fingerprint": "13aa112ff9960830e715dc80e7df76a206842d681f1c04ace3ca57892d94f7a5",
+  "tests_fingerprint": "12dbb43ee20b58f7d8bb938e26f8e278611a880d4db6c956f60faa9036d1a62c",
+  "canonical_patch_sha256": "b2da0209cb1792c0c1c8a9284c65ad12764f36c45a7caed9c850bc418b64e165",
+  "new_validation": {
+    "status": "ROOT_BUILD_NETWORK_NONE_SMOKE_AND_BYTE_REVIEW_PASS",
+    "at": "2026-10-23T15:59:28.685908+00:00",
+    "image_id": "sha256:5631759f00daf16f457cb8d844a9ff2f56c9c22f4206e0f61ec1be1d20856dd4",
+    "source_fingerprint": "13aa112ff9960830e715dc80e7df76a206842d681f1c04ace3ca57892d94f7a5",
+    "canonical_patch_sha256": "b2da0209cb1792c0c1c8a9284c65ad12764f36c45a7caed9c850bc418b64e165",
+    "context_members_compared": 187,
+    "copied_image_files_compared": 184,
+    "all_current_tar_image_bytes_match": true,
+    "only_changed_context_paths": [
+      "src/execution/broker_observations.py",
+      "src/execution/broker_submission.py",
+      "src/tools/brokers/ibkr_observations.py"
+    ],
+    "nonroot_uid": 1000,
+    "read_only": true,
+    "network": "none",
+    "owned_smoke_container_absent": true,
+    "build_and_smoke_actual_exit": 0,
+    "model_inference_or_private_instance_or_broker_actions": false,
+    "scope": "New image build/import/defaultdenial/byte checks only; no new model/startup/ingress/restart/24h/thermal pass"
+  },
+  "build_context_sha256": "5cea2edd88d325f511460bf9041c8f9cce6c2732135701a4e33e8233db0445d1",
+  "candidate_files_sha256": {
+    "src/execution/broker_submission.py": "db7543fe0cdff01b4fe186eb0a1d803a26a48a7a45849142386f8f8920accf9a",
+    "src/execution/broker_observations.py": "f4985f68e6003a16ff9080f3aabde2ffa986943c2d2c1ff86bcdda491174410b",
+    "src/tools/brokers/ibkr_observations.py": "a357b0d4d5aacfadfbb9600a8e1f7d8011ee2ff9fb77c525d549fbd8cf5f6708",
+    "tests/unit/broker_submission_test.py": "5bd961d0d763df3d41a3b1da662fa4386bf03dc0b573c2db54c1289f64a638dd",
+    "tests/unit/ibkr_observations_test.py": "0e25b4e404d3ba9b0ddaebecde0c8d61e7c2ab38db3685b1b764f69656db139e",
+    "tests/integration/broker_submission_journal_test.py": "851f72cdb2ea196838cbf2d6fac95e0b68f7b058e1f08750140346a986a6f8f5"
+  },
+  "prior_surface_reuse": {
+    "status": "ROOT_ACCEPTED_SCOPED_REUSE_NOT_NEW_RUNTIME_EXECUTION",
+    "independent_read_only_reviewer": "/root/observation_launch_review",
+    "context_names": 187,
+    "unchanged_context_paths": 184,
+    "changed_context_paths": [
+      "src/execution/broker_observations.py",
+      "src/execution/broker_submission.py",
+      "src/tools/brokers/ibkr_observations.py"
+    ],
+    "unchanged": [
+      "Docker/dependencies/config/model/UI/auth/migrations/entrypoint/network inputs"
+    ],
+    "reused_actual_a2b_checks": [
+      "existing GGUF load/checksum/read-only mount",
+      "production startup/readiness and0020 migration",
+      "persistent halt across app/DB restart under15s",
+      "prior owned runtime cleanup"
+    ],
+    "limitations": [
+      "No new model/startup/restart/ingress/24h/thermal execution for13aa source",
+      "Original PostgreSQL full tier458PASS/1CLOCK_DISCONTINUITY failure remains failed; affected single case passes once on retry,459distinct with passing executions",
+      "Current remoteCI/Sonar not run until new publication; a2bCI is historical",
+      "No actual Paper/economic evidence, broker order/cancel/read or financial authority"
+    ]
+  },
+  "public_evidence": [
+    {
+      "path": "docs/acceptance/evidence/order-reference-image-build-20261023-795c0c77a61e.json",
+      "sha256": "f23dba6d812e3726ccb435e648722e300ebf23334d3b95645661418400a9c017"
+    },
+    {
+      "path": "docs/acceptance/evidence/order-reference-image-smoke-20261023-795c0c77a61e.json",
+      "sha256": "a561310af21eb8c6af5094be2f4631c764a05e74d129eb1471d0f1a1395b5747"
+    },
+    {
+      "path": "docs/acceptance/evidence/paper-recovery-focused-20261023.json",
+      "sha256": "0d441b9d2d9599de1149b0308d2db3fb2f0f51f3b2eac5451074802d3dbd533d"
+    },
+    {
+      "path": "docs/acceptance/evidence/paper-recovery-backend-20261023.json",
+      "sha256": "13d110ba6fe3c46195fd7bd6c8bb4b1e16d1736860476d7d16f6bbbf5a4159c9"
+    },
+    {
+      "path": "docs/acceptance/evidence/paper-recovery-owned-cleanup-20261023.json",
+      "sha256": "2fb29e90b38b02a762241a59bfb63f12f105c87837aa652ded90ceb0d564b3e3"
+    },
+    {
+      "path": "docs/acceptance/evidence/paper-submission-image-review-20261023.json",
+      "sha256": "d80bc70ef944d700ac708559074342949a6caf0b5cf7e7bed1841b01950447e0"
+    },
+    {
+      "path": "docs/acceptance/evidence/paper-submission-published-image-reconciliation-20261023.json",
+      "sha256": "71a731a7ef46e7d7656abc07228b366a4ca10e467e3811bc4d699bcc8cf447a0"
+    }
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/preparation-ready-r2.json",
+      "sha256": "3a1cc21576d81646f22662a68c8d43411749678937b4fd68881fb4c6fb2c22c2"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/root-reviewed-image-phases.json",
+      "sha256": "bbff5d09db99b31bc8609aef5fb9f0865d8f343fa9d0223b50fe9bf9136c5a84"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/root-resume-preflight.json",
+      "sha256": "3f9a54e234eef089b0f9a151f4c5b23c613f0cca9ee8ad497584000cae4bd8d5"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/plan-image-validation.json",
+      "sha256": "205cab4f17d1c3645303e361dfaab4c376d6aa758a2c981ed5d668ae3874a5cd"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/prepare_context.py",
+      "sha256": "2c90b4ba22063c6d5b3ecced7539a564dbaf4a2eeed077767ae1d54da7c439e6"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/build.py",
+      "sha256": "dfa4f60caa0cf59604d3cea0c43b2a83129a974e690df04986ad7fd80608a443"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/smoke.py",
+      "sha256": "f99062979f21002dfb03e96cfb90876d641783c65afa190eabe186c9fd8c96ea"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/process_identity.py",
+      "sha256": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/build-execution.json",
+      "sha256": "f23dba6d812e3726ccb435e648722e300ebf23334d3b95645661418400a9c017"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/build.log",
+      "sha256": "42a7c423ecad4142d40308bbc349f988361180f6fed07f231bbf21e6fccc1c9c"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/smoke-execution.json",
+      "sha256": "3ed40175dcf62e12634f71a489c5ad7b12379b6f7e27343767a3e06134ac5236"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/smoke.log",
+      "sha256": "5a135e44fa1e5a17bbf56888356ec6360c844afe051183a72ae4fffc708c1747"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/smoke-stderr.log",
+      "sha256": "264e85788881891ce04eae727779bbe62277c7b35d12f415b17f1ff3e0bce826"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/smoke.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/root-image-review.json",
+      "sha256": "d41dfe1668f86fb3982dd573c2b5568cecc3a65611c83ef6c8fd2fb400b91151"
+    },
+    {
+      "path": ".qa/order-reference-image-20261023-795c0c77a61e/runtime-scope-reuse.json",
+      "sha256": "1f8067751c836e167c62e912d4c335b24a223d41671f5522bc659f3c026bce96"
+    }
+  ]
+}

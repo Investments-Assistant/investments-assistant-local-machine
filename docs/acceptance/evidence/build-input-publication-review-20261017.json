@@ -1,0 +1,54 @@
+{
+  "status": "PUBLISHED_EXACT_APPROVED_TWO_FILE_PATCH",
+  "recorded_at": "2026-10-16T23:54:54.204099+00:00",
+  "base_head": "26a8d01e80ee1dbb835003981fd3c6d6861a417e",
+  "file_count": 2,
+  "patch": "docs/acceptance/evidence/build-input-publication-review-20261017.patch",
+  "patch_sha256": "e15aa1a1747a816a47a5753d00aeac257ce582b526eddd9726f8ce8705c66f82",
+  "paths": [
+    {
+      "path": ".gitignore",
+      "sha256": "ae2583a3f65aa471ed7b231cf379e9c627f48c21991f9c6994eb9e037ba25231"
+    },
+    {
+      "path": "config/build/debian.sources",
+      "sha256": "36f8600e4c543f4afdc810983e0005d2174b4ec6141171360fa52f24bbfe28a3"
+    }
+  ],
+  "change": "Make existing reviewed immutable Debian build-source input reproducible from tracked checkout; narrow allowlist only",
+  "required_input_contents_changed": false,
+  "runtime_source_fingerprint_unchanged": "3b6942a4569d3cf659d353d397dbbc33acd7f1c20ccd57eb80a931bee3f5fcee",
+  "image_build_evidence": "docs/acceptance/evidence/flexible-credentials-image-build-20261017.json",
+  "runtime_ingress_and_cleanup": "PASS; no preexisting resources modified",
+  "publication_authorization": "EXPLICITLY_GRANTED_FOR_EXACT_TWO_FILE_PATCH",
+  "index_changed": true,
+  "commit_or_push_performed": true,
+  "local_image": "sha256:1525bf203b8effe7675e10b558811d3578196a54eee94052c69e6ebe69371e2d",
+  "validation_evidence": {
+    "build": {
+      "path": "docs/acceptance/evidence/flexible-credentials-image-build-20261017.json",
+      "sha256": "d150debf45890f8342f538ac42dff7c09a8587c5bfb9335548c185c0fddf6fc1"
+    },
+    "smoke": {
+      "path": "docs/acceptance/evidence/flexible-credentials-image-smoke-20261017.json",
+      "sha256": "ef8b73c0d11ff810f6aadebabe3b8f86c93b955170ec0144193a05a812e85a15"
+    },
+    "runtime": {
+      "path": "docs/acceptance/evidence/flexible-credentials-image-runtime-20261017.json",
+      "sha256": "85045da5b4583041f05014c0d8b296f8aabf4d77fdb86be5d89839708fbae3d0"
+    },
+    "runtime-cleanup": {
+      "path": "docs/acceptance/evidence/flexible-credentials-image-runtime-cleanup-20261017.json",
+      "sha256": "b1be59469709649709fc55e510c92e80196406fbc8088f7c5cec9f230555022e"
+    },
+    "ingress": {
+      "path": "docs/acceptance/evidence/flexible-credentials-image-ingress-20261017.json",
+      "sha256": "f0a6139a87046960345ff1c52419a147ac1510caa2a40e6fd5552eab13439ba0"
+    },
+    "ingress-cleanup": {
+      "path": "docs/acceptance/evidence/flexible-credentials-image-ingress-cleanup-20261017.json",
+      "sha256": "b97684b7cd1815e1c860232bad2975767952384714c745710b177444256938e0"
+    }
+  },
+  "publication_receipt": "docs/acceptance/evidence/build-input-publication-20261017.json"
+}

@@ -1,0 +1,40 @@
+{
+  "status": "READY_AWAITING_AUTHENTICATED_USER_READ",
+  "launched_at": "2026-10-17T00:01:59.261681+00:00",
+  "execution_context": "native host (sandbox process visibility not used)",
+  "helper_sha256": "3e52f474d023d6593670b00dea76c2ff69e742553a9ffb865d34dae81182c817",
+  "relay_pid": 239972,
+  "relay_start_ticks": 4141742,
+  "bind_host": "127.0.0.1",
+  "bind_port": 17497,
+  "windows_destination_host": "127.0.0.1",
+  "windows_destination_port": 7497,
+  "tws_listener_process": 29852,
+  "tws_listener_metadata": [
+    {
+      "LocalAddress": "::",
+      "LocalPort": 7497,
+      "OwningProcess": 29852,
+      "ProcessName": "tws"
+    }
+  ],
+  "lease_seconds": 600,
+  "session_seconds": 60,
+  "connect_timeout_seconds": 5,
+  "buffer_limit_bytes_per_direction": 65536,
+  "maximum_active_clients": 1,
+  "stdin": "DEVNULL",
+  "detached_new_session": true,
+  "payload_logging": false,
+  "broker_tcp_probe_performed": false,
+  "sdk_constructed": false,
+  "session_started_at_ready_verification": false,
+  "account_credentials_or_encrypted_id_read": false,
+  "paper_provenance": "User confirms current red Paper banner; conditional read-only approval and disabled-record save confirmed; selected-account management match remains for the user-triggered adapter read",
+  "restriction": "TWS localhost-only and Read-Only API remain required; no broader binds/firewall/OS/settings change",
+  "not_proven": [
+    "Broker connectivity or read outcome",
+    "Full external reconciliation",
+    "Paper order lifecycle or execution authority"
+  ]
+}

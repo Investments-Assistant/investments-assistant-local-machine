@@ -1,0 +1,205 @@
+{
+  "status": "INDEPENDENT_OFFLINE_JOURNAL_DURABILITY_PASS",
+  "scope": "Synthetic offline journal; actual owned PostgreSQL restart and database-only restore",
+  "execution": {
+    "root_tool": "88408",
+    "root_tool_exit_code": 0,
+    "root_terminal_status": "OFFLINE_JOURNAL_RESTART_AND_DATABASE_RESTORE_PASS",
+    "finished_at": "2026-10-22T18:00:45.437366+00:00",
+    "automatic_retry": false
+  },
+  "source_fingerprint": "b46651e69925c7e56f6ebf4e43816cf781bfa3330f94eef29b03c5e3ac3f0765",
+  "tests_fingerprint": "8d0bf60ca1f21d5e9fbe4a0092e85783e19e70e10e03efafffceb644da58728b",
+  "schema": "0020_broker_submission",
+  "review": {
+    "file_review_tool": "0833ac",
+    "file_review_exit_code": 0,
+    "native_read_only_tool": "7e8488",
+    "native_read_only_exit_code": 0,
+    "pinned_inputs_verified": 13,
+    "receipt_sha256": {
+      "journal_durability.py": "0af98db1998b2774e47ceea4bea17bdd88f7356c8351407ba584422a782089c3",
+      "fixture.py": "121589524c39ba9d127c46ea127af71985e4dcd6daa3b19211c71481bbd7353a",
+      "process_identity.py": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7",
+      "sitecustomize.py": "80a0ca25cc57cbc5d843997db204c4daf6ad5d95537e5081422b5d85c3b3b034",
+      "plan.json": "ec9a45ccf01704d1bd3a29996a5d89bf0d5bfd3aa8ecbc5f4bd1ff9646fe3f9f",
+      "journal-durability-root-reviewed.json": "3a8f76c360386a80fa8ac3365b7c393977d495561d55a5b64a6e1dba7bae8683",
+      "journal-durability-claim.json": "329613ea559d89342643ce3c0f20cadd14eaff37758c80e1472ac1dec7dab5e9",
+      "journal-durability-before-restart.json": "ddc0d838e5b892b7c3f5b346cc56c7aa94789ed2212c857478eddb302ef8e1e5",
+      "journal-durability-result.json": "2d7153d45a8b1a0eda6e4608e08f9648474e691f74373ab406a9a6f3a35c04c3",
+      "journal-durability-restore.json": "ef896afa512cc72419df2647cd63f9c60bcc526f1c24429819d66358321cdf35",
+      "journal-durability-restart-identity.json": "246f7d1abeb668c4888f87fab72057f03051af0db96652e314d6cbdb2322ccc3",
+      "journal-durability-stop-execution.json": "fed85bc3e8e33f0ef7006110556cc82fbee23eddb9f084754f1df3676338455a",
+      "journal-durability-stop-result.json": "4b3bd910fb79338cfaee77ee773b85b8e8411db096df4fe88327e12814f9830d",
+      "journal-durability-stop.log": "ca19178a35ab4153b75b494963b66ce8243e1b94c173107c87b44d09db23652d",
+      "journal-durability-restart-execution.json": "143ac7ff1635020be6bfb16450b838f4a9367d7d71a38481f1bc2a2211ada0a3",
+      "journal-durability-restart-result.json": "a05a11821c198253c910e48980152214d66d45fcb290f14ba910908e5d026180",
+      "journal-durability-restart.log": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad",
+      "journal-durability-restore-execution.json": "fdcf385245604526e305a65fbd8868d34c44bf0fe1ee7b568e58ba8dd1d03154",
+      "journal-durability-restore-result.json": "04d75e0d9983b9a92e26756b09a780ba07d1496acf6fdefc6d54d59e71a67fdc",
+      "journal-durability-restore.log": "0432ed3efc192d8beb8135f8eec92b56895fb11bf923f5ff112805f5544d4bd6",
+      "unit-result.json": "18a0fbc3fe5d75987eae3dcceda991ddf94440fbac92a6aa41e4ad91605739ec",
+      "unit-execution.json": "cdec5fb3f41e73515c22d710fd6d69a9a515383837d96fec23ff605326bb80df",
+      "integration-result.json": "8cb446bb22128bd7cd1f1e14cbaf9c92a3f7a391256b0010042be7e723598979",
+      "integration-execution.json": "82aa1851ff9c1511f4fd6ed8cbf691c6017feb3fbd210a369982f0ee072ee7f5"
+    },
+    "backend_counts_reparsed_from_retained_junit": {
+      "unit": 907,
+      "integration": 431
+    },
+    "only_plan_field_changed": "postgres_identity"
+  },
+  "phase_receipts": {
+    "stop": {
+      "exit_code": 0,
+      "maximum_seconds": 30,
+      "log_sha256": "ca19178a35ab4153b75b494963b66ce8243e1b94c173107c87b44d09db23652d"
+    },
+    "restart": {
+      "exit_code": 0,
+      "maximum_seconds": 30,
+      "log_sha256": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad"
+    },
+    "restore": {
+      "exit_code": 0,
+      "maximum_seconds": 180,
+      "log_sha256": "0432ed3efc192d8beb8135f8eec92b56895fb11bf923f5ff112805f5544d4bd6"
+    }
+  },
+  "native_read_only_verification": {
+    "status": "INDEPENDENT_READ_ONLY_SOURCE_AND_RESTORE_INVENTORY_PASS",
+    "context": {
+      "pid": 103937,
+      "boot_id": "efb14149-be2a-4b21-8436-0edbbf61ee67",
+      "pid_namespace": "pid:[4026532221]",
+      "start_ticks": 2228352,
+      "state": "R",
+      "command_sha256": "d99adcec6c9f39e2aed443f3bc90f83f001e96913112d25f0f1a9b74e3e2472a"
+    },
+    "postgres_identity": {
+      "pid": 19429,
+      "boot_id": "efb14149-be2a-4b21-8436-0edbbf61ee67",
+      "pid_namespace": "pid:[4026532221]",
+      "start_ticks": 206949,
+      "state": "S",
+      "command_sha256": "0d83e6fdd6237660097ba42daaa0fd3b47119a7ad742480c22072d580ab77f70"
+    },
+    "results": [
+      {
+        "database": "test_paper_contract_c401a8e2f0a0",
+        "database_marker_schema_and_owned_identity_verified": true,
+        "public_table_count": 33,
+        "total_rows": 17,
+        "all_table_counts_and_hashes_match_retained_restore": true,
+        "journal": {
+          "intents": 1,
+          "events": 3,
+          "state": "uncertain",
+          "same_intent_attempt_request_and_rows_as_before_restart": true,
+          "permanent_id": null,
+          "event_kinds": [
+            "handoff_started",
+            "staged",
+            "uncertain"
+          ]
+        },
+        "table_inventory_sha256": "4a70eb6a302d936554cd81951c39c30467672030764d78c5916a48c4e2dbe492"
+      },
+      {
+        "database": "test_paper_contract_restore_c401a8e2f0a0",
+        "database_marker_schema_and_owned_identity_verified": true,
+        "public_table_count": 33,
+        "total_rows": 17,
+        "all_table_counts_and_hashes_match_retained_restore": true,
+        "journal": {
+          "intents": 1,
+          "events": 3,
+          "state": "uncertain",
+          "same_intent_attempt_request_and_rows_as_before_restart": true,
+          "permanent_id": null,
+          "event_kinds": [
+            "handoff_started",
+            "staged",
+            "uncertain"
+          ]
+        },
+        "table_inventory_sha256": "4a70eb6a302d936554cd81951c39c30467672030764d78c5916a48c4e2dbe492"
+      }
+    ],
+    "database_mutations": false,
+    "transport_calls_performed_by_review": 0
+  },
+  "journal_semantics": {
+    "intent_count": 1,
+    "event_count": 3,
+    "state": "uncertain",
+    "permanent_id": null,
+    "event_kinds": [
+      "handoff_started",
+      "staged",
+      "uncertain"
+    ],
+    "same_intent_attempt_request_and_row_hashes_before_restart_after_restart_and_restored_copy": true,
+    "synthetic_transport_calls_initial_attempt": 1,
+    "synthetic_transport_calls_after_postgresql_restart": 0,
+    "post_restart_new_journal_object_dispatch_exercised": true,
+    "restored_copy_dispatch_exercised": false,
+    "python_application_process_restart_exercised": false,
+    "automatic_resend": false,
+    "execution_authority": "none",
+    "complete_reconciliation": false
+  },
+  "table_inventory": {
+    "public_tables": 33,
+    "total_rows": 17,
+    "source_and_restored_match_saved_restore": true,
+    "hash_algorithm": "Per row SHA256 of PostgreSQL row_to_json(t)::text; table SHA256 of sorted row hashes joined by newline",
+    "inventory_sha256": "4a70eb6a302d936554cd81951c39c30467672030764d78c5916a48c4e2dbe492",
+    "sanitized_restore_evidence": "docs/acceptance/evidence/paper-submission-durability-20261023-restore.json",
+    "sanitized_restore_sha256": "5b88db9e80148f0801a9e8362429603fe2468ffe18e0bff2725559bdf6c7ff27"
+  },
+  "private_archive": {
+    "relative_path": ".qa/paper-contract-20261022-c401a8e2f0a0/journal-durability-backup/test_paper_contract_restore_c401a8e2f0a0.dump",
+    "mode": "0600",
+    "bytes": 83582,
+    "recorded_execution_verified_sha256": "c87a3b653783a2646b74fb15bf2942261fbc966b5fa1ac64e0220b82e5abf2e8",
+    "binary_content_reread_by_reviewer": false
+  },
+  "recovery_scope": {
+    "database_only": true,
+    "ephemeral_fixture_key_written": false,
+    "ephemeral_fixture_key_recovered": false,
+    "vault_decryption_after_restore_proven": false,
+    "reports_model_filesystem_recovery_proven": false,
+    "source_target_and_private_dump_preserved": true,
+    "cleanup_or_drop_performed": false
+  },
+  "external_actions": {
+    "actual_broker_connections": 0,
+    "actual_broker_orders": 0,
+    "actual_provider_calls": 0,
+    "actual_model_calls": 0,
+    "review_transport_calls": 0,
+    "private_operator_data_or_credentials_accessed": false,
+    "os_power_clock_changes": false
+  },
+  "remaining": {
+    "actual_paper_L04_L15": "OPEN",
+    "research_L14": "OPEN",
+    "final_host_24h_cpu_temperature_clock": "DEFERRED_NOT_PASS",
+    "current_candidate_image_runtime_browser_remote_ci": "PENDING",
+    "docker_engine": "Available according to root's current check; not independently probed by this audit",
+    "live_trading_enabled": false
+  },
+  "limitations": [
+    "No real SDK transport, Paper-account verification, execution mandate or broker reconciliation.",
+    "No distributed exactly-once claim; unknown permanent identity remains unresolved and must not be guessed.",
+    "No-resend was directly exercised after PostgreSQL restart using a new journal object in the same Python process; a new application process was not tested.",
+    "The restored copy's complete public-table inventory and exact journal rows were independently SQL-verified; no dispatch/decryption was attempted there because the ephemeral fixture vault key was not recovered.",
+    "Database-only local restore; no vault-key/report/model/filesystem/off-host recovery acceptance.",
+    "Binary dump was not copied or reread by this reviewer; its recorded hash was verified by the executed pinned helper, and this audit independently checked its current private mode and size.",
+    "Zero external-action scope follows the reviewed synthetic helper/allowed child commands and receipts; this audit is not a packet trace.",
+    "No broad suites were rerun, and no fixture cleanup, source, workflow, configuration or other documentation mutation was performed by this review."
+  ],
+  "recorded_at": "2026-10-22T23:40:06.017450+00:00"
+}

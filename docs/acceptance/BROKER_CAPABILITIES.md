@@ -1,13 +1,22 @@
 # Retained broker capabilities
 
 Status describes this checkout's verified behavior, not all features offered by
-an upstream broker. No external account connection or order was made during this
-acceptance work. Global environment credentials cannot authorize helper reads.
+an upstream broker. One owner-authorized normal-UI IBKR read on17Oct retained a
+partial non-atomic balance snapshot: positions complete, cash incomplete, declared
+Paper/SDK-unverified, no executions/commissions/order-status evidence or orders.
+The owner subsequently saved Enabled/Read Authorized OFF; no repeat read or current
+connection permission is implied. See [metadata](evidence/paper-ui-read-metadata-20261017.json)
+and [cash-read scope](CASH_READ_SAFETY.md). Global environment credentials cannot
+authorize helper reads. Actual Paper L04/L15 and research L14 remain OPEN; laptop
+hardware/24h/clock work is deferred to the [final host](FINAL_HOST_HANDOFF.md).
+Historical no-connection statements below describe their particular fixture or
+package checks; they do not erase the later17Oct read or authorize another one.
 
 | Adapter | Read boundary | Account/currency fidelity | Durable external lifecycle | Writes / autonomy |
 |---|---|---|---|---|
 | Isolated simulator | Active authenticated owner, fixture account | Decimal account cash, qualified fixture instrument, explicit dated FX/multiplier; allocation-owned inventory; explicitly opted-in manual sales | Persisted intents, approval/mandate provenance, reservations, partial fills, versioned late/before-fill commissions with dated FX, deduplication, uncertainty and cancel/fill race fixtures | Simulator only; independent human order or versioned mandate approval; global risk checks |
 | IBKR | Explicit vault account, read consent, actual managed-account match; environment declaration remains unverified, serialized client worker | Account/currency summary retained; unique stock contract qualification; SPYL/IBIS2/EUR resolution fixture | Fixture-tested bounded callback collection, durable observation journal, duplicate/correction retention and partial balance attribution; continuous history and complete reconciliation remain incomplete | All submit/cancel entrypoints fail `EXTERNAL_WRITES_NOT_AUTHORIZED` |
+| Offline IBKR submission contract | Positively marked local test database only; current owner/binding and dispatch consent/configuration guards | Canonical Paper/STK/LMT request; exact Decimal/identity validation, not trusted qualification or a quote | Separate0020 intent/event journal: committed handoff, uncertainty/no resend, bounded injected tasks, callback/request discrepancy review; synthetic transport only | No runtime transport/public route/tool/job, independent approval/mandate/pretrade integration or actual SDK execution; default denial before DB access |
 | Alpaca | Explicit owner/account/broker configuration; absent or mismatched account rejected before SDK | SDK account/positions/orders retained; financial normalization rejects missing currency/FX; external fidelity unverified | Absent | All submit/cancel entrypoints disabled |
 | Coinbase | Explicit owner/account/broker configuration; absent or mismatched account rejected before SDK | Balance/order reads retained; comprehensive fiat valuation and qualified asset identity unverified | Absent | All submit/cancel entrypoints disabled; crypto outside default mandate |
 | Binance | Explicit owner/account/broker configuration; absent or mismatched account rejected before SDK | Spot balance/order reads retained; comprehensive fiat valuation and qualified asset identity unverified | Absent | All submit/cancel entrypoints disabled; crypto outside default mandate |
@@ -22,6 +31,34 @@ Fixture evidence: `evidence/broker-contracts.txt`, `evidence/scoped-helper-reads
 `evidence/mandates-concurrency.txt`, `evidence/suite-scoped-helpers.txt`.
 Actual account permissions, subscriptions, settled funds, external/manual activity,
 and external reconciliation remain unverified and block external execution.
+
+## Offline submission foundation — 22 October 2026
+
+The [durable contract](BROKER_SUBMISSION_CONTRACT.md) is separate from simulator
+accounting and the external read-observation journal. Even staging is restricted
+to a positively marked local disposable database at schema0020. A committed
+handoff attempt precedes an injected synthetic call; uncertainty cannot rearm or
+resend. Current binding/configuration checks fence dispatch and stale outcomes;
+owned retained review can survive read-consent/client/endpoint rotation while the
+actual account/environment binding remains unchanged. Unknown permanent IDs are
+not guessed from callbacks. Stable-identity outliers remain retained with explicit
+request quantity/limit/contract discrepancy reasons. No distributed exactly-once,
+financial mandate, pretrade reservation/qualification or actual SDK transport is
+implemented by this foundation.
+
+[Focused evidence](evidence/paper-submission-focused-20261022.json) records119PASS:
+47new unit,39new PostgreSQL journal,2migration-history and31retained closed-SDK
+boundary cases. The [full candidate backend](evidence/paper-submission-backend-20261022.json)
+passes907 unit plus431 PostgreSQL cases (1338distinct, zero failures/errors/skips).
+No new real broker connection/order, current remote CI/image/browser pass, actual
+Paper reconciliation or forward-campaign approval is established. Historical0018/
+0019 backup/restore and e154 CI/image proofs retain their original scope.
+[Schema0020 DB-only durability](evidence/paper-submission-durability-20261023.json)
+now passes: actual owned PostgreSQL restart, new journal object with zero resend,
+and33public tables/17rows restored with matching independently checked SQL counts/
+hashes. This proves neither a Python-process restart, ephemeral vault-key recovery
+nor dispatch from the restored copy. Production/off-host and actual Paper gates
+remain pending. Existing private data is not automatically migrated or replaced.
 
 ## IBKR environment evidence boundary
 

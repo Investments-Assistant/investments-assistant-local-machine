@@ -1,0 +1,38 @@
+{
+  "at": "2026-10-22T23:45:52.690529+00:00",
+  "status": "OWNED_NATIVE_VALIDATION_CLEANUP_PASS",
+  "root_tool": "6d94d0",
+  "exit_code": 0,
+  "scope": "Exact newly created disposable native PostgreSQL fixture only",
+  "source_database": "test_paper_contract_c401a8e2f0a0",
+  "source_dropped_after_positive_marker_schema_identity_and_no_clients": true,
+  "postgres_identity": {
+    "pid": 19429,
+    "boot_id": "efb14149-be2a-4b21-8436-0edbbf61ee67",
+    "pid_namespace": "pid:[4026532221]",
+    "start_ticks": 206949,
+    "state": "S",
+    "command_sha256": "0d83e6fdd6237660097ba42daaa0fd3b47119a7ad742480c22072d580ab77f70"
+  },
+  "postgres_confirmed_exited": true,
+  "smart_stop": true,
+  "force_drop_or_stop": false,
+  "data_directory_preserved": true,
+  "restored_target_preserved_in_stopped_cluster": "test_paper_contract_restore_c401a8e2f0a0",
+  "private_dump_preserved": true,
+  "private_dump_sha256": "c87a3b653783a2646b74fb15bf2942261fbc966b5fa1ac64e0220b82e5abf2e8",
+  "reviewed_original_plan_snapshot": ".qa/paper-contract-20261022-c401a8e2f0a0/plan-before-owned-cleanup.json",
+  "reviewed_original_plan_sha256": "ec9a45ccf01704d1bd3a29996a5d89bf0d5bfd3aa8ecbc5f4bd1ff9646fe3f9f",
+  "updated_cleanup_plan_sha256": "c692dc2bdda9a4649fe6390f6c1949e5caee56ab04dbc1a7534677f8836ef3e6",
+  "receipt_sha256": {
+    "root_cleanup_once.py": "6b91c36186452345d18a585ad3a9ca453582e85535d2009d3f332e403d3e20d5",
+    "root-cleanup-claim.json": "e59b8a1d1784cc22d3a4ef836269dc3b00a82df3b36dde84bdbdb61de8b04368",
+    "root-cleanup-execution.json": "5df3bbc1d66d332c88edc6da26d4a3969328f0ddfb25465e19c7b291061f27eb",
+    "root-cleanup-result.json": "dbdf70caa37dab9e66122904ca7f86bd06bf59a98c157d219b770f31f436be4c",
+    "root-cleanup-output.log": "0b93ff8a2932333c35d3b73ae7efb03f7afaa5493b183c8dc08f0b17e37aa4e0",
+    "root-durability-retention-review.json": "29bd0fd407143d881b5d0707e83d6d72c9ebc171ab56774aee33cd33d72f468c"
+  },
+  "private_operator_or_old_cluster_changes": false,
+  "broker_provider_orders": 0,
+  "live_enabled": false
+}
