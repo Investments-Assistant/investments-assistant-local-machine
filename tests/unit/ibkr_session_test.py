@@ -29,6 +29,9 @@ class SDK:
         self.threads.append(threading.get_ident())
         return self.connected
 
+    def managedAccounts(self):
+        return ["SYNTHETIC-SESSION"]
+
     def sleep(self, seconds):
         self.threads.append(threading.get_ident())
         self.pumped.set()
@@ -116,33 +119,22 @@ def test_missing_consent_is_rejected_before_a_worker_or_connection_starts():
 
 
 def test_default_connection_owns_its_event_loop_and_disconnects_without_sdk_writes(monkeypatch):
-    import sys
-    from types import SimpleNamespace
     import asyncio
 
-    sdk, trace, loops = SDK(), [], []
+    from tests.unit.ibkr_connection_scope_test import Wire
 
-    def connect(**kwargs):
-        assert kwargs["readonly"] is True and kwargs["account"] == "SYNTHETIC-SESSION"
-        loops.append(asyncio.get_event_loop())
-        trace.append(("connect", threading.get_ident()))
-
-    def disconnect():
-        assert asyncio.get_event_loop() is loops[0]
-        trace.append(("disconnect", threading.get_ident()))
-
-    sdk.connect, sdk.disconnect = connect, disconnect
-    sdk.managedAccounts = lambda: ["SYNTHETIC-SESSION"]
-    monkeypatch.setitem(sys.modules, "ib_async", SimpleNamespace(IB=lambda: sdk))
+    wire = Wire(monkeypatch, accounts=("SYNTHETIC-SESSION",), reply_account="SYNTHETIC-SESSION")
     worker = ReadSessionWorker(account())
     worker.start()
     try:
         owner = worker.call(lambda *_: (threading.get_ident(), asyncio.get_event_loop()))
-        assert owner[1] is loops[0]
+        assert owner[1] is wire.loop
+        assert wire.financial == [["6", "2", "1", "SYNTHETIC-SESSION"]]
     finally:
         assert worker.close(timeout=1)
-    assert loops[0].is_closed()
-    assert len({item[1] for item in trace}) == 1
+    assert wire.loop.is_closed() and wire.transport.closed
+    assert [item[0] for item in wire.trace] == ["connect", "disconnect"]
+    assert {item[1] for item in wire.trace} == {owner[0]}
 
 
 def test_queue_capacity_refuses_excess_work_and_shutdown_rejects_queued_reads(monkeypatch):
@@ -194,8 +186,12 @@ def test_session_lifetime_and_budget_validation_are_bounded():
 def test_existing_snapshot_collector_runs_on_owned_session_and_removes_handlers(monkeypatch):
     import sys
     from types import SimpleNamespace
+    import asyncio
 
-    from tests.unit.ibkr_observations_test import SDK as CallbackSDK
+    from tests.unit.ibkr_observations_test import (
+        SDK as CallbackSDK,
+        Event,
+    )
     from src.tools.brokers.ibkr_observations import collect_ibkr_observations
 
     class ConnectedSDK(CallbackSDK, SDK):
@@ -203,15 +199,38 @@ def test_existing_snapshot_collector_runs_on_owned_session_and_removes_handlers(
             CallbackSDK.__init__(self)
             SDK.__init__(self)
             self.trace = []
+            self.managed = []
+            self.wrapper.managedAccounts = lambda value: setattr(self, "managed", value.split(","))
+            self.wrapper.clientId = None
+            self._onError = lambda *_: pytest.fail("Stock automatic summary refresh was retained")
+            self.errorEvent += self._onError
+            self.connectedEvent = Event()
+            self.client.decoder = SimpleNamespace()
+            self.client.connectAsync = self.connect_async
+            self.client.getAccounts = lambda: list(self.managed)
+            for name in ("reqPositions", "reqAllOpenOrders", "reqAccountSummary", "reqExecutions"):
+                setattr(self.client, name, lambda *_: pytest.fail("Unrequested startup warmup"))
 
-        def connect(self, **kwargs):
-            assert kwargs["readonly"] is True and kwargs["account"] == "synthetic"
+        async def connect_async(self, host, port, client_id, timeout):
+            assert client_id == self.wrapper.clientId == 77 and timeout == 10
+            self.wrapper.managedAccounts("synthetic")
             self.trace.append(("connect", threading.get_ident()))
 
         def managedAccounts(self):
-            return ["synthetic"]
+            return list(self.managed)
+
+        def _run(self, awaitable):
+            return asyncio.get_event_loop().run_until_complete(
+                asyncio.wait_for(awaitable, timeout=self.RequestTimeout)
+            )
+
+        async def reqAccountUpdatesAsync(self, actual):
+            assert actual == "synthetic"
+            self.client.reqAccountUpdates(True, actual)
+            self.wrapper.accountDownloadEnd(actual)
 
         def disconnect(self):
+            self.connected = False
             self.trace.append(("disconnect", threading.get_ident()))
 
     sdk = ConnectedSDK()

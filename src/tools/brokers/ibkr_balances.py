@@ -9,7 +9,7 @@ from src.execution.broker_balances import CashFact
 def _fresh_cash(ib, actual):
     """One owner-thread subscription window, never the SDK's retained cache.
 
-    connect(account=actual, readonly=True) already completed initial sync. End
+    The sole selected account's primary download completed during startup. End
     only that account's old read subscription, then request a new initial
     download. ib_async's blocking call waits for accountDownloadEnd, but its
     wrapper ignores that callback's account argument. The temporary guard below
@@ -128,6 +128,9 @@ def _fresh_cash(ib, actual):
 
 
 def collect_balances(ib, actual):
+    from src.tools.brokers.ibkr import require_selected_account
+
+    require_selected_account(ib, actual)
     started = datetime.now(UTC)
     # Each synchronous call resolves its SDK end marker or raises/ times out.
     positions = ib.reqPositions()
@@ -148,6 +151,7 @@ def collect_balances(ib, actual):
             )
         )
     cash, cash_complete = _fresh_cash(ib, actual)
+    require_selected_account(ib, actual)
     return dict(
         kind="balance_snapshot",
         actual_account=actual,

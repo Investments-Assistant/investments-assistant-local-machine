@@ -15,7 +15,7 @@ from src.db.models import User, BrokerAccount, BrokerObservation
 from src.execution import broker_stream, broker_monitor
 from src.execution.policy import PolicyDenied
 from src.operations.models import JobLease, OperationalAlert
-from tests.unit.ibkr_observations_test import SDK, fill
+from tests.unit.ibkr_observations_test import SDK, Event, fill
 from tests.integration.broker_observations_test import seed, fixture_key  # noqa: F401
 
 pytestmark = pytest.mark.integration
@@ -32,14 +32,36 @@ class StreamingSDK(SDK):
         self.entered = threading.Event()
         self.closed = threading.Event()
         self.cleanup_failure = False
+        self.managed = []
+        self.wrapper.managedAccounts = lambda value: setattr(self, "managed", value.split(","))
+        self.wrapper.clientId = None
+        self._onError = lambda *_: pytest.fail("Automatic SDK summary refresh was retained")
+        self.errorEvent += self._onError
+        self.connectedEvent = Event()
+        self.client.decoder = Obj()
+        self.client.connectAsync = self.connect_async
+        self.client.getAccounts = lambda: list(self.managed)
+        for name in ("reqPositions", "reqAllOpenOrders", "reqAccountSummary", "reqExecutions"):
+            setattr(self.client, name, lambda *_: pytest.fail("Unrequested SDK startup warmup"))
 
-    def connect(self, **kwargs):
-        assert kwargs["readonly"] is True and kwargs["account"] == "synthetic"
+    async def connect_async(self, host, port, client_id, timeout):
+        assert client_id == self.wrapper.clientId == 77 and timeout == 10
         self.connected = True
+        self.wrapper.managedAccounts("synthetic")
         self.trace.append(("connect", threading.get_ident()))
         self.entered.set()
         if self.startup_hold is not None:
             assert self.startup_hold.wait(5)
+
+    def _run(self, awaitable):
+        return asyncio.get_event_loop().run_until_complete(
+            asyncio.wait_for(awaitable, timeout=self.RequestTimeout)
+        )
+
+    async def reqAccountUpdatesAsync(self, actual):
+        assert actual == "synthetic"
+        self.client.reqAccountUpdates(True, actual)
+        self.wrapper.accountDownloadEnd(actual)
 
     def disconnect(self):
         self.connected = False
@@ -49,7 +71,7 @@ class StreamingSDK(SDK):
             raise RuntimeError("private provider cleanup details")
 
     def managedAccounts(self):
-        return ["synthetic"]
+        return list(self.managed)
 
     def isConnected(self):
         return self.connected

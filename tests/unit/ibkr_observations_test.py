@@ -45,6 +45,9 @@ def fill(account="synthetic", identity="fixture.1"):
 
 
 class SDK:
+    def managedAccounts(self):
+        return ["synthetic"]
+
     def __init__(self):
         self.execDetailsEvent = Event()
         self.commissionReportEvent = Event()
@@ -91,6 +94,18 @@ class SDK:
             self.disconnectedEvent.emit()
             raise TimeoutError("private provider text")
         return [observed]
+
+
+@pytest.mark.parametrize("accounts", [[], ["other"], ["synthetic", "other"]])
+def test_ambiguous_session_cannot_start_an_order_or_execution_snapshot(accounts):
+    sdk = SDK()
+    sdk.managedAccounts = lambda: accounts
+    sdk.reqAllOpenOrders = lambda: pytest.fail("Downloaded orders from ambiguous session")
+    sdk.reqExecutions = lambda *_: pytest.fail("Downloaded executions from ambiguous session")
+    result = CallbackWindow("synthetic").collect(sdk, "fixture-account-filter")
+    assert result["request_finished"] is False
+    assert result["status"] == "partial" and result["observations"] == []
+    assert result["failures"] == ["BROKER_SNAPSHOT_REQUEST_FAILED"]
 
 
 def test_out_of_order_events_and_snapshot_keep_missing_commission_truthful():

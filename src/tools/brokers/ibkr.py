@@ -1,7 +1,8 @@
 """Explicit-account read-only IBKR adapter via the maintained ib_async package.
 
-The worker owns its event loop and always disconnects. Live/paper writes remain
-unavailable pending independent external-account and durable broker acceptance.
+The worker owns its event loop and always disconnects. TWS Read-Only API remains
+required: the native handshake has no read-only wire flag. Live/paper writes
+remain unavailable pending independent account and durable broker acceptance.
 """
 
 from __future__ import annotations
@@ -9,9 +10,10 @@ from __future__ import annotations
 import asyncio
 from decimal import Decimal
 import hashlib
+import logging
 from datetime import UTC, datetime
 import threading
-from contextlib import contextmanager
+from contextlib import suppress, contextmanager
 
 from src.execution.external import disabled_external_write
 from src.tools.broker_accounts import BrokerAccountConfig
@@ -36,6 +38,133 @@ def _account_ref(actual: str) -> str:
     return "masked-" + hashlib.sha256(actual.encode()).hexdigest()[:12]
 
 
+def require_selected_account(ib, actual: str):
+    """Broad SDK reads are allowed only for a currently sole managed account.
+
+    Output filtering does not limit the underlying wire request. Once the owned
+    session has observed a different scope, a later matching list cannot restore
+    its authority. Account identifiers never appear in the denial reason.
+    """
+    if getattr(ib, "_ia_connection_gap", False) is True:
+        raise RuntimeError("IBKR_SESSION_NOT_READY")
+    if (
+        getattr(ib, "_ia_account_scope_invalid", False) is True
+        or getattr(ib, "_ia_selected_account", actual) != actual
+        or ib.managedAccounts() != [actual]
+    ):
+        ib._ia_account_scope_invalid = True
+        raise ValueError("IBKR_SOLE_MANAGED_ACCOUNT_REQUIRED")
+
+
+def _scope_owned_reads(ib, actual):
+    # SDK wire/error diagnostics contain account and financial payloads. Silence
+    # only this freshly owned instance; never change shared SDK/global loggers.
+    private_logger = logging.Logger("investments-assistant.ibkr-private")
+    private_logger.addHandler(logging.NullHandler())
+    private_logger.propagate = False
+    ib._logger = ib.client._logger = ib.wrapper._logger = ib.client.decoder.logger = private_logger
+    ib._ia_selected_account = actual
+    ib._ia_account_scope_invalid = False
+    ib._ia_account_scope_established = False
+    ib._ia_connection_gap = False
+    # The stock handler silently starts an unfiltered summary request on 1102.
+    # This bounded adapter performs only explicit requests, never auto-refreshes.
+    ib.errorEvent -= ib._onError
+    original_accounts = ib.wrapper.managedAccounts
+
+    def stop_established():
+        if ib._ia_account_scope_established:
+            # Callback exceptions would expose arguments through Decoder's log.
+            try:
+                ib.disconnect()
+            except Exception:
+                # Sticky denial remains; the owner still performs cleanup.
+                with suppress(Exception):
+                    ib.client.disconnect()
+
+    def managed_accounts(accounts):
+        original_accounts(accounts)
+        if ib.managedAccounts() != [actual]:
+            ib._ia_account_scope_invalid = True
+            stop_established()
+
+    ib.wrapper.managedAccounts = managed_accounts
+
+    def connection_health(_req_id, code, _text, _contract):
+        if code in {1100, 1101, 1102, 1300}:
+            ib._ia_connection_gap = True
+            # Block new financial reads/results while the bounded callback owner
+            # retains its final partial batch and numeric gap, then closes. A
+            # managed-account scope change still disconnects immediately above.
+
+    ib.errorEvent += connection_health
+
+    def guarded_request(original):
+        def request(*args, **kwargs):
+            require_selected_account(ib, actual)
+            return original(*args, **kwargs)
+        return request
+
+    for name in ("reqPositions", "reqAllOpenOrders", "reqAccountSummary", "reqExecutions"):
+        setattr(ib.client, name, guarded_request(getattr(ib.client, name)))
+    original_updates = ib.client.reqAccountUpdates
+
+    def account_updates(subscribe, acctCode):
+        # Cleanup must remain possible after authority is lost.
+        if subscribe is not False:
+            require_selected_account(ib, actual)
+            if subscribe is not True or acctCode != actual:
+                raise ValueError("IBKR_SOLE_MANAGED_ACCOUNT_REQUIRED")
+        return original_updates(subscribe, acctCode)
+
+    ib.client.reqAccountUpdates = account_updates
+    return connection_health
+
+
+async def _connect_selected(ib, config, actual):
+    """Metadata handshake, then one selected primary account download only."""
+    client_id = int(config["client_id"])
+    ib.wrapper.clientId = client_id
+    await ib.client.connectAsync(
+        config.get("host", "127.0.0.1"), int(config.get("port", 4002)), client_id, timeout=10,
+    )
+    if ib.client.getAccounts() != [actual]:
+        ib._ia_account_scope_invalid = True
+    require_selected_account(ib, actual)
+    wrapper = ib.wrapper
+    original_end = wrapper.accountDownloadEnd
+    had_override = "accountDownloadEnd" in vars(wrapper)
+
+    def account_download_end(account):
+        if account != actual:
+            ib._ia_account_scope_invalid = True
+            wrapper._endReq(
+                "accountValues", ValueError("IBKR_SOLE_MANAGED_ACCOUNT_REQUIRED"), success=False,
+            )
+            return
+        try:
+            original_end(account)
+        except Exception:
+            ib._ia_account_scope_invalid = True
+            wrapper._endReq(
+                "accountValues", ValueError("IBKR_SOLE_MANAGED_ACCOUNT_REQUIRED"), success=False,
+            )
+
+    wrapper.accountDownloadEnd = account_download_end
+    try:
+        await ib.reqAccountUpdatesAsync(actual)
+    finally:
+        if had_override:
+            wrapper.accountDownloadEnd = original_end
+        else:
+            del wrapper.accountDownloadEnd
+    require_selected_account(ib, actual)
+    if not ib.isConnected():
+        raise RuntimeError("IBKR_SESSION_NOT_READY")
+    ib._ia_account_scope_established = True
+    ib.connectedEvent.emit()
+
+
 @contextmanager
 def _connection(account: BrokerAccountConfig | None):
     config = _config(account)
@@ -50,6 +179,7 @@ def _connection(account: BrokerAccountConfig | None):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     ib = None
+    health_handler = None
     try:
         from ib_async import IB
 
@@ -57,22 +187,20 @@ def _connection(account: BrokerAccountConfig | None):
         ib.RequestTimeout = 10
         ib.RaiseRequestErrors = True
         actual = config["broker_account_id"]
-        ib.connect(
-            host=config.get("host", "127.0.0.1"),
-            port=int(config.get("port", 4002)),
-            clientId=int(config["client_id"]),
-            account=actual,
-            timeout=10,
-            readonly=True,
-            raiseSyncErrors=True,
-        )
-        if actual not in ib.managedAccounts():
-            raise ValueError("BROKER_ACCOUNT_NOT_MANAGED")
+        health_handler = _scope_owned_reads(ib, actual)
+        # IB.connect/connectAsync performs all-account position/execution/Multi
+        # warmups before its caller can validate membership. The lower-level
+        # metadata handshake and selected download share this one 10s budget.
+        ib._run(_connect_selected(ib, config, actual))
         yield ib, actual
     finally:
         try:
             if ib is not None:
-                ib.disconnect()
+                try:
+                    ib.disconnect()
+                finally:
+                    if health_handler is not None:
+                        ib.errorEvent -= health_handler
         finally:
             loop.close()
             asyncio.set_event_loop(None)
@@ -87,6 +215,7 @@ def _error(exc):
         "EXPLICIT_BROKER_ACCOUNT_AND_ENVIRONMENT_REQUIRED",
         "DEDICATED_NONZERO_CLIENT_ID_REQUIRED",
         "BROKER_ACCOUNT_NOT_MANAGED",
+        "IBKR_SOLE_MANAGED_ACCOUNT_REQUIRED",
         "IBKR_CLIENT_BUSY",
         "IBKR_SYNC_ADAPTER_REQUIRES_WORKER_THREAD",
         "INCOMPLETE_CONTRACT",
@@ -136,11 +265,17 @@ def _read(account, operation):
         raise RuntimeError("IBKR_SYNC_ADAPTER_REQUIRES_WORKER_THREAD")
     from src.tools.brokers.ibkr_session import route_read
 
-    handled, result = route_read(account, operation)
+    def scoped_operation(ib, actual):
+        require_selected_account(ib, actual)
+        result = operation(ib, actual)
+        require_selected_account(ib, actual)
+        return result
+
+    handled, result = route_read(account, scoped_operation)
     if handled:
         return result
     with _connection(account) as (ib, actual):
-        return operation(ib, actual)
+        return scoped_operation(ib, actual)
 
 
 def get_ibkr_account(account: BrokerAccountConfig | None = None) -> dict:

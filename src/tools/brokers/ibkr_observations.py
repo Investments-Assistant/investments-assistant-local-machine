@@ -157,6 +157,9 @@ class CallbackWindow:
         self._require_owner()
         request_finished = False
         try:
+            from src.tools.brokers.ibkr import require_selected_account
+
+            require_selected_account(ib, self.actual_account)
             # reqAllOpenOrders does not bind or grant ownership of another client's orders.
             for trade in ib.reqAllOpenOrders():
                 self.order_status(trade)

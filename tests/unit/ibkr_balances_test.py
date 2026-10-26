@@ -27,6 +27,9 @@ class Event:
 
 
 class SDK:
+    def managedAccounts(self):
+        return ["selected"]
+
     def __init__(self):
         self.positions = [
             Obj(
@@ -111,6 +114,16 @@ def test_explicit_snapshot_preserves_fractional_quantity_and_separate_cash_curre
     assert values["position_request_complete"] and values["cash_request_complete"]
     assert values["atomic_snapshot"] is False
     assert "selected" not in str(result.model_dump(mode="json"))
+
+
+@pytest.mark.parametrize("accounts", [[], ["other"], ["selected", "other"], ["selected", "selected"]])
+def test_balance_request_rejects_unselected_or_ambiguous_session_before_download(accounts):
+    sdk = SDK()
+    sdk.managedAccounts = lambda: accounts
+    sdk.reqPositions = lambda: pytest.fail("Requested balances before verifying account scope")
+    with pytest.raises(ValueError):
+        collect_balances(sdk, "selected")
+    assert sdk.subscription_calls == []
 
 
 def test_empty_positions_are_explicit_but_missing_cash_is_not_zero():

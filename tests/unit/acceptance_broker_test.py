@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -76,8 +76,17 @@ def test_ambiguous_contract_is_rejected():
 
 
 def test_failed_connection_disconnects_and_releases_worker_resources():
-    sdk = MagicMock()
-    sdk.connect.side_effect = TimeoutError("sensitive provider details")
+    from ib_async import IB
+
+    created = []
+
+    def sdk_factory():
+        sdk = IB()
+        sdk.client.connectAsync = AsyncMock(side_effect=TimeoutError("sensitive provider details"))
+        sdk.client.send = MagicMock()
+        sdk.disconnect = MagicMock(wraps=sdk.disconnect)
+        created.append(sdk)
+        return sdk
     fixture = BrokerAccountConfig(
         "fixture",
         "user",
@@ -91,11 +100,14 @@ def test_failed_connection_disconnects_and_releases_worker_resources():
             "client_id": 123,
         },
     )
-    with patch.dict("sys.modules", {"ib_async": SimpleNamespace(IB=lambda: sdk)}):
+    with patch.dict("sys.modules", {"ib_async": SimpleNamespace(IB=sdk_factory)}):
         assert ibkr.get_ibkr_account(fixture)["error"] == "IBKR_READ_UNAVAILABLE"
+    assert len(created) == 1
+    sdk = created[0]
     sdk.disconnect.assert_called_once()
     assert not ibkr._connection_lock.locked()
-    assert sdk.connect.call_args.kwargs["readonly"] is True
+    sdk.client.connectAsync.assert_awaited_once_with("127.0.0.1", 4002, 123, timeout=10)
+    sdk.client.send.assert_not_called()
 
 
 @pytest.mark.parametrize("module", [alpaca, binance, coinbase, ibkr])
@@ -159,8 +171,10 @@ def test_ibkr_account_match_does_not_turn_environment_configuration_into_proof(p
             "client_id": 77,
         },
     )
-    sdk = MagicMock()
-    sdk.accountSummary.return_value = []
+    sdk = SimpleNamespace(
+        managedAccounts=lambda: ["synthetic-managed-account"],
+        accountSummary=MagicMock(return_value=[]),
+    )
 
     @contextmanager
     def connected(account):
@@ -173,6 +187,7 @@ def test_ibkr_account_match_does_not_turn_environment_configuration_into_proof(p
     assert result["declared_environment"] == "paper" and result["verified_environment"] is None
     assert result["environment_verification"] == "operator_configuration_only"
     assert result["execution_permission"] == "read_only_external_writes_disabled"
+    sdk.accountSummary.assert_called_once_with(account="synthetic-managed-account")
 
 
 @pytest.mark.parametrize("module", [alpaca, binance, coinbase])
