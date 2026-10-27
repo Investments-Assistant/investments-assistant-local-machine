@@ -1,0 +1,126 @@
+{
+  "status": "PREPARED_PRIVATE_UPGRADE_HELPER_GUARDS_AND_SYNTHETIC_FUNCTIONS_PASS_NOT_AUTHORIZED",
+  "verified_at": "2026-10-26T12:23:39.734086+00:00",
+  "current_helper_sha256": "e0ac83bfc2f6a80df82fb4e4ff65b509e5b5cb569f695dd75e8a878794cfe3e9",
+  "plan_sha256": "c23cb1f0d720463e65ad745469bd11d62c9b829fa465e5ceb99e6b5e78abc848",
+  "migration_sql_sha256": "39ba7d416192ceb5f70c3c6a3102b4b96061cae29b630b5e3f0640378779208c",
+  "tested_helper_predecessor_sha256": "feccb536c8ff7150c3d1cf222854f3eacd823b279da381db207178991ea0a7a8",
+  "fixture_case_groups": [
+    {
+      "case": "inventory_auxiliary_sequence_and_schema_functions",
+      "status": "PASS",
+      "tables": 7,
+      "sequences": 1
+    },
+    {
+      "case": "custom_settings_and_unsupported_profile_fail_closed",
+      "status": "PASS",
+      "rejections": 2
+    },
+    {
+      "case": "ram_dump_and_authenticated_encrypted_backup",
+      "status": "PASS",
+      "plaintext_database_dump_on_disk": false
+    },
+    {
+      "case": "modified_encrypted_archive_rejected",
+      "status": "PASS"
+    },
+    {
+      "case": "private_copy_restore_matches_tables_sequences_schema_database_defaults",
+      "status": "PASS"
+    },
+    {
+      "case": "helper_copy_upgrade_preserves_original_data_and_sequence_state",
+      "status": "PASS",
+      "source_stays_0019": true
+    },
+    {
+      "case": "changed_sequence_state_detected_without_returning_values",
+      "status": "PASS"
+    }
+  ],
+  "fixture_owned_cluster_stopped": true,
+  "root_rehashed_fixture_pins": 6,
+  "root_rehashed_fixture_manifest_members": 202,
+  "instrumented_commands_not_case_count": 98,
+  "current_helper_difference": "Only main outer error reporting: after authorization an incomplete result receipt reports unknown state and forbids retry, rather than incorrectly claiming no execution. All25operational function AST bodies identical.",
+  "current_helper_guard_checks": [
+    "Missing-approval execution refusal under audit-hook denial of helper children/private or secret inputs/mutations PASS",
+    "Public-only native preflight PASS",
+    "Synthetic post-authorization result-receipt write failure reports operation state unknown PASS",
+    "Syntax PASS"
+  ],
+  "scope_limits": [
+    "Seven fixture groups exercise functions with a synthetic PG stub/dummyfiles, not operator-bound main/recipe/source_guard/execute.",
+    "The guarded SQL has five separate already-passing cases; those were not rerun here.",
+    "No operator backup, key/config preservation, copy restoration or migration performed; new owner approval is still required.",
+    "No app/broker/SDK/order operation; live staysOFF and external writesCLOSED."
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/upgrade-helper-fixture-20261026-be0a84534684/evidence.json",
+      "sha256": "4e1add1bf61ab8461b843c292785502196c6ddab33aab0fa1a57aee150c88906"
+    },
+    {
+      "path": ".qa/upgrade-helper-fixture-20261026-be0a84534684/raw-manifest.json",
+      "sha256": "85c4453743e10d0d133ebe522b22093bfb008af431eac86031326734b95808f1"
+    },
+    {
+      "path": ".qa/upgrade-helper-fixture-20261026-be0a84534684/fixture-result.json",
+      "sha256": "84692ad9b6e13fe242442280042dcd050f16a4a367ff4003f52cad6c8ffefdae"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/upgrade_private_once-tested-feccb536.py",
+      "sha256": "feccb536c8ff7150c3d1cf222854f3eacd823b279da381db207178991ea0a7a8"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/upgrade_private_once.py",
+      "sha256": "e0ac83bfc2f6a80df82fb4e4ff65b509e5b5cb569f695dd75e8a878794cfe3e9"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/execution-plan.json",
+      "sha256": "c23cb1f0d720463e65ad745469bd11d62c9b829fa465e5ceb99e6b5e78abc848"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/migration-0019-0020.sql",
+      "sha256": "39ba7d416192ceb5f70c3c6a3102b4b96061cae29b630b5e3f0640378779208c"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/refusal-v2-result.json",
+      "sha256": "d88831590d1c5c13e52d54b120f776be264e4960c871439fce5dbb42bc49bb6a"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/refusal-v2-execution.json",
+      "sha256": "ca4a12ad5c1a42c1eab297106741982a9da282f7ad2cb46e8780923766ec5909"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/refusal-v2-stdout.log",
+      "sha256": "977ec9eb20d27428e4a035af01098abe62ad37bfc44c336b48b83caf51cf17f8"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/refusal-v2-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/native-preflight-v2-result.json",
+      "sha256": "c0d3956b3625037f3320e4d9c28e4d6201f6aeea0b34949282521f2f21cf2e7f"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/native-preflight-v2-execution.json",
+      "sha256": "c1bf5202134be2ec2af00d8004752c90fd3f1fb99a9e8115d05e4e8881b1db31"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/native-preflight-v2-stdout.log",
+      "sha256": "64e4dc76b8c293f3c213664af6e729a43ec85adbef308ee47d9afad41d7781da"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/native-preflight-v2-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/receipt-failure-guard-result.json",
+      "sha256": "44b1492b2b020b5de711ff2505043b13ac79da594c1c4ecc5e019dd79543ce36"
+    }
+  ]
+}

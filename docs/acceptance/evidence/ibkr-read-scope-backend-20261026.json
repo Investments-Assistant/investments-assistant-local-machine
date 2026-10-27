@@ -1,0 +1,198 @@
+{
+  "status": "CURRENT_NATIVE_BACKEND_PASS",
+  "audited_at": "2026-10-26T01:22:46.750424+00:00",
+  "head": "6c518a262088a099d1c7637e0c0fe90d763314c8",
+  "source_fingerprint": "612fa07bbdd90344b0df49f2a3c513e35c4d8d9043bd338c313511d2cf1dc435",
+  "tests_fingerprint": "dd2391363e00cb73e01fc45e2fb49340da2887dac416eae2a91490d5c9bb38a8",
+  "files_sha256": {
+    "src/tools/brokers/ibkr.py": "d2d9c549c2f83008585a8f3dd8e3d9bdcd27add52da2996d84254befa9774dc6",
+    "src/tools/brokers/ibkr_balances.py": "3fcbc179d93f91a48ce44202b7cf1a28fecdf72130b54c307d40ad598c42ce48",
+    "src/tools/brokers/ibkr_observations.py": "acc69bb3554350bf999f6be7bad51657d87c5b528ef279266f2c69c2a4fb33a0",
+    "tests/unit/ibkr_connection_scope_test.py": "94327ef87777e3359eec34f19e6c8379abe5f4efc3a19f4570e2eb8adb5cb38b",
+    "tests/unit/ibkr_session_test.py": "13c11bee64eccab0456ca62352fdfe88c9269c13bc1b26b209cfa00aed06506a",
+    "tests/unit/ibkr_observations_test.py": "c81722e3774e40fce73a489fcf4586f2cf67167eb33f383abc84226453e407ca",
+    "tests/unit/ibkr_balances_test.py": "3e434bc6fcb202918a0524f6480b07dbe071b09fc66fa33a05150100c64727bb",
+    "tests/integration/broker_stream_test.py": "86036e2756488aaaaede89c4a26d15098523451e872bfa47d1ad75e041088a52",
+    "tests/unit/acceptance_broker_test.py": "e3eeba90c1a6c2b5e74025c77b7726ffda0bad3cf5634f8cca098ca5b72f3e8c"
+  },
+  "tiers": {
+    "unit": {
+      "tests": 961,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 0
+    },
+    "integration": {
+      "tests": 459,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 0
+    }
+  },
+  "focused_counts_not_added": true,
+  "prior_failures_retained": true,
+  "external_index_preserved": true,
+  "validation_scope": "Disposable marked PostgreSQL and socket-free installed SDK contracts; no actual broker account",
+  "raw_evidence": [
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/fixture.py",
+      "sha256": "54d8a662b3a845962b0901a2194fe4600dfb472a78bbc0339e0e07ce648189f9"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/process_identity.py",
+      "sha256": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/sitecustomize.py",
+      "sha256": "80a0ca25cc57cbc5d843997db204c4daf6ad5d95537e5081422b5d85c3b3b034"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/run_validation_v3.py",
+      "sha256": "b9653c2bb4f4c3bc28191647c31699267a92ee01305a03d845cfc0e51524d033"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/validation-freeze-v3-20261026.json",
+      "sha256": "1babe832be50b88eb830079c9f512246cf7d425bd6d3f2db5288fb4ecce48670"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/preparation.json",
+      "sha256": "871814d605065217bf7b5d960d0ed4e00a273377f0bc700a285cd589c31c10d9"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/root-initialize-execution.json",
+      "sha256": "63df8e6b3bf4f7b2ced01864e305f7b49bd59b93f3f5cec8796fce0fe10b6334"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/root-initialize-result.json",
+      "sha256": "d239b6215112853a99be80a12df994a1bfd66d45a8872683f3946776f5e1b5df"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/root-initialize.log",
+      "sha256": "aaf58fdbd3cf35f2f313a809f30d20827e4f54545a89d0ec3420ffa49a75a5b8"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/isolation-check.log",
+      "sha256": "93ef4526d11257f0193f382d8ef9fb20de9d496d681cc6fa522c263e43c7b98f"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/migrations.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/plan-backend-validation.json",
+      "sha256": "d7690a6b94c8dbbf7eea1cc2e4ec0ed3b5f9a7fef9cf46174f4543a6cbcc87b7"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/unit-v3-execution.json",
+      "sha256": "5f261f7a657ad0b88d11ad593a3e258f28180314c098989be861c779e0f9c0e9"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/unit-v3-result.json",
+      "sha256": "fcc1108207ea4c3bfe29e9beb6445fb8fcfa002d599aebae8c8d0d0a7a1c1ed4"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/unit-v3.log",
+      "sha256": "c1c8ff514444111ff68c5f1f87a3710143b0c2e6dd0bfed1cbc79ef4c67edd04"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/unit-v3.xml",
+      "sha256": "4ce9f87c1f67a24db3a0ca2e60ebbb28141bec91363dbb71b7dd992aa77a68d6"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/unit-v3-coverage.xml",
+      "sha256": "5d2fe7119d3f6fe5f24f60e2bb0df0609b58e337308ae37146e0857fb6ec6bf0"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/integration-v3-execution.json",
+      "sha256": "e4e27f91bb0074e62059090ff45d37140a145f9bc41e35a6a41ca2c7d9377876"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/integration-v3-result.json",
+      "sha256": "aa6a38ec3fcf8a220347535692cff9b5e7ce89bff1f7560ba36fcbe4335cb53f"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/integration-v3.log",
+      "sha256": "0ae4f215f7a4cbba00935fc722a343a82ab8810ddda0b0abfb49adf7b9266782"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/integration-v3.xml",
+      "sha256": "85c9aca926df3b2807da097e29dff71fbd7b146c2a4c9e96d741786a66d6b5d4"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/integration-v3-coverage.xml",
+      "sha256": "7f04df8a39577ea314a6aae5bc8d10541182196031781e32848828ba9c4de78b"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/unit-v2-execution.json",
+      "sha256": "21b6f2467681c40dd9c58a1501ab6336816a5390c59dca4427bea784cb5d28e1"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/unit-v2-result.json",
+      "sha256": "cf4a6756b8aea65f9d4c658fcd75438290d261338399afc1933a21a991eb6e0d"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/unit-v2.log",
+      "sha256": "500ea64f6d94aa8dbcb953bdd826228d8bc24f87697c3c5ad7e4f27ee00e9ad6"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/unit-v2.xml",
+      "sha256": "45e66efc7ced2b66bb6da4f7d1b69744face2ea94e94b152cf4d2ac20fdb64b0"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/integration-execution.json",
+      "sha256": "e62a8527beff2079d9cd8d535f99d1755704a44dd420d527d2e350b8d53327d6"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/integration-result.json",
+      "sha256": "5e8229565d0d045584b15c994e1db104f69e5e17ee844b02279318dad0b54bed"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/integration.log",
+      "sha256": "d591a71afec2480ae39bb14be0e9470e905d0cc8fcf0af1387aa49e55604610d"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/integration.xml",
+      "sha256": "a122c10c02eeb19cf49d39d2fbb805e1eff5a4a38c33a5d453fe2565ca069ea5"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/scope-focused-v1-execution.json",
+      "sha256": "ef9e31b9e40f13ddb3732ca62f20f9b92215195516b322e9300d7445cf841b15"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/scope-focused-v1.log",
+      "sha256": "2ae799518ff7ec3a717b7a49565ff2fc9bd78e9b7c052a967f7c8b265dd30198"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/scope-focused-v2-execution.json",
+      "sha256": "1c2dbace2440e38c8f80e761ddd63b0e3553ad669e11e1fe79db054c23fe880d"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/scope-focused-v2.log",
+      "sha256": "97386241d77c3cc4a9e75e5a93492179436b82cbc94ad08ba802897f37b1bf7e"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/scope-focused-v3-execution.json",
+      "sha256": "e84e6cbd28cf547b9c7da985d41b5ce709282f9784ac29c8ce2d72a53caea024"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/scope-focused-v3.log",
+      "sha256": "64717a976b527d2b87d94b0acbfa697e4f2b21c999353f4247f6fb673ab820b1"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/scope-focused-v3.xml",
+      "sha256": "f7436a3dacb1bd352e8c592ca58ffe63ca87482a50b2e63405ff1a75edd31fde"
+    }
+  ],
+  "actual_broker_connections": 0,
+  "provider_requests": 0,
+  "private_operator_data_access": false,
+  "private_pilot_replayed": false,
+  "live_trading": "OFF",
+  "external_writes": "CLOSED",
+  "limits": [
+    "No actual Paper identity/lifecycle/forward acceptance",
+    "No new image, CI, model, hardware or private-app deployment pass"
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "status": "OWNER_APPROVED_PRIVATE_BACKUP_RESTORE_REHEARSAL_AND_CONDITIONAL_0020_UPGRADE_PASS",
+  "verified_at": "2026-10-26T15:11:57.591978+00:00",
+  "checkout_head": "08cdba57b6d8f4d192e2fa858945ae1d4cee12d4",
+  "scope": "PRIVATE_ENCRYPTED_BACKUP_RESTORE_REHEARSAL_CONDITIONAL_0019_0020_UPGRADE_ONLY",
+  "helper_sha256": "e0ac83bfc2f6a80df82fb4e4ff65b509e5b5cb569f695dd75e8a878794cfe3e9",
+  "plan_sha256": "c23cb1f0d720463e65ad745469bd11d62c9b829fa465e5ceb99e6b5e78abc848",
+  "migration_sql_sha256": "39ba7d416192ceb5f70c3c6a3102b4b96061cae29b630b5e3f0640378779208c",
+  "native_boot_id": "d5e34cc2-b5df-408d-9e0c-eaf8fb9359bd",
+  "actual_helper_exit_code": 0,
+  "actual_original_revision_verified": "0020_broker_submission",
+  "preserved_preexisting_public_tables": 31,
+  "resulting_public_tables": 33,
+  "preserved_sequences": 2,
+  "new_journals_empty": true,
+  "source_matches_rehearsed_schema_sha256": "a0a2594dea2dc125ea75e2c614ac076d9f3e2d22341d58e187e5f14de99f46df",
+  "preexisting_data_and_sequence_digests_match": true,
+  "matching_original_keys_and_configuration_unchanged": true,
+  "encrypted_0019_backup_and_sealed_config_preserved": true,
+  "backup_directory_owner_mode": "0700",
+  "encrypted_archives_owner_mode": "0600",
+  "recovery_key_separate_directory_owner_mode": "0700",
+  "recovery_key_owner_mode": "0600",
+  "recovery_key_contents_read_by_root_verification": false,
+  "private_rehearsal_copy_retained": true,
+  "app_started": false,
+  "broker_connection": false,
+  "orders": 0,
+  "source_restored_or_dropped": false,
+  "automatic_retry_cleanup_or_downgrade": false,
+  "client_command_receipts": 257,
+  "client_commands_are_instrumentation_not_test_cases": true,
+  "live_trading": "OFF",
+  "external_SDK_writes": "CLOSED",
+  "scope_limits": [
+    "This is actual local operator-data recovery/upgrade, not a broker or application-start test.",
+    "Existing public table digests/counts, full dumped schema, sequence state and database defaults were compared; private values stay local.",
+    "Recovery material and private copy remain on this computer; off-host backup and final deployment validation are not claimed.",
+    "App startup, authenticated owner UI and fresh account-scoped Paper access require their separately applicable approvals."
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/owner-approval-receipt.json",
+      "sha256": "46ef67112d394686e38edddb8f392e17027342f2e3bd4625507a97595d9203a9"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/approval.json",
+      "sha256": "14444085b7ceb214e03e78e6162291504d083f5ff44b0eb3ef6bc3bc68e9d577"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/execution-plan.json",
+      "sha256": "c23cb1f0d720463e65ad745469bd11d62c9b829fa465e5ceb99e6b5e78abc848"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/upgrade_private_once.py",
+      "sha256": "e0ac83bfc2f6a80df82fb4e4ff65b509e5b5cb569f695dd75e8a878794cfe3e9"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/migration-0019-0020.sql",
+      "sha256": "39ba7d416192ceb5f70c3c6a3102b4b96061cae29b630b5e3f0640378779208c"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/launch-execution.json",
+      "sha256": "4c1aec980286f737b0af689b0e747572fbae6df22e6f0f952c080a2a639d55fe"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/launch-child.json",
+      "sha256": "88915731b9f0e47a038be7480e7340173dc21d3a00f0125ac98e99e6b08bcc97"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/launch-result.json",
+      "sha256": "439a91be863c33cf4fe98cc46bdfd3ccf3f6464edd10dd907bd6045698127727"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/claim.json",
+      "sha256": "9f2e73ee6f852757cdbfa200a38ad00dfe811b89e0becaa1fcf9a084670231a7"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/preservation.json",
+      "sha256": "b49340ee556f64299efa15b75cad648eced1c8163d4abadd5fe1afd39ef201c4"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/rehearsal.json",
+      "sha256": "8eea02b46665c6aa22bed812b2fd298afe82402baa3854d10e030f2c9b6faa01"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/result.json",
+      "sha256": "5f158dfeef600f702b16c6aba1a836bf8b282f455e5364db57f0b93c9a8a9828"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/operation-receipt-manifest.json",
+      "sha256": "06980ecc1221d7f21022841702f79c9c55e69cbb767bff5bfbb21503b414311c"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/backup/matching-config-and-keys.fernet",
+      "sha256": "f6241b5d2f91d5df430ba7eb1fe6d53ee5b62c51da73cfda2f9ea2e64772098e"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/backup/database-0019.dump.fernet",
+      "sha256": "c114e9b859f8b1c3be938756ee33e641ab428dbefda91a4da5300a54f4a6bcf8"
+    }
+  ]
+}

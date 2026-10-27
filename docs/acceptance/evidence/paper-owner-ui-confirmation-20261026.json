@@ -1,0 +1,19 @@
+{
+  "status": "OWNER_CONFIRMED_BROWSER_APP_ACCESS_AND_SAVED_READ_FLAGS_OFF",
+  "recorded_at": "2026-10-26T19:00:29.940366+00:00",
+  "owner_reported_app_browser_access": true,
+  "owner_reported_saved_read_switches_off": true,
+  "scope": "Owner UI observation only; no account payload/secret/SDK read or new connection authority",
+  "fresh_Paper_provenance_or_execution_authority": false,
+  "scope_limits": [
+    "This is owner-reported browser/authenticated stored-settings usability, not a new automated private browser test.",
+    "Saved flags were not decrypted by the agent; no actual account identifier is included.",
+    "A current Paper session and separate scoped read approval are still required."
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-app-start-20261026/owner-ui-confirmation.json",
+      "sha256": "ecf0c018f4711d8ef42333bde70fea390634b6d5d743713badb607558412e19b"
+    }
+  ]
+}

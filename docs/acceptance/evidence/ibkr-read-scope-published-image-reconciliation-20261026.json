@@ -1,0 +1,21 @@
+{
+  "status": "PUBLISHED_COMMIT_IMAGE_BYTES_MATCH",
+  "at": "2026-10-26T02:37:23.802183+00:00",
+  "commit": "08cdba57b6d8f4d192e2fa858945ae1d4cee12d4",
+  "image_id": "sha256:146d8bac0b87bd1b36aceb38950779acca17ea0b6281021c6b2aa47497a411e9",
+  "source_fingerprint": "612fa07bbdd90344b0df49f2a3c513e35c4d8d9043bd338c313511d2cf1dc435",
+  "tests_fingerprint": "dd2391363e00cb73e01fc45e2fb49340da2887dac416eae2a91490d5c9bb38a8",
+  "patch_sha256": "419b5807aa4b881a9f62d77891682321b5d6f6aa8d6d2fac4204d6c90c8d411f",
+  "context_members_verified_against_commit": 187,
+  "copied_image_files_verified_against_commit": 184,
+  "original_image_provenance": "Built as unpublished exact candidate atop6c; original revision/patch labels preserved",
+  "image_rebuilt_or_relabelled": false,
+  "backend_rerun": false,
+  "private_pilot_replayed": false,
+  "original_image_proof": "docs/acceptance/evidence/ibkr-read-scope-image-20261026.json",
+  "original_image_proof_sha256": "e5c36af3112fbc096022395fefe8df930e73163e29815212db585e917bee4f7e",
+  "publication_proof": "docs/acceptance/evidence/ibkr-read-scope-publication-20261026.json",
+  "publication_proof_sha256": "799de8304a6228f3e8fba1f11a1149b12e9cb3dcf7f6146898f520fbed717268",
+  "current_ci": "PENDING_VERIFICATION",
+  "external_Paper_and_target_host_acceptance": false
+}

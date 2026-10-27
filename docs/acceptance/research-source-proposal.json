@@ -1,7 +1,7 @@
 {
   "proposal": "private-eodhd-source-check-v1",
   "reviewed_on": "2026-10-23",
-  "status": "OWNER_APPROVED_MANIFEST_PREPARED_AWAITING_FREE_ALLOWANCE",
+  "status": "SOURCE_CHECK_COMPLETE_PARTIAL_IDENTITY_QUALIFICATION",
   "owner_approval": {
     "question_call": "call_74bd452a29e64cecaf97bc2e99810272",
     "answer": "Approve the free data check"
@@ -24,7 +24,8 @@
     "expires_at": "2026-10-25T11:22:15.645432+00:00",
     "maximum_http_requests": 9,
     "maximum_API_call_units": 9,
-    "started": false
+    "started": true,
+    "collection_complete": true
   },
   "limits": {
     "maximum_http_requests": 12,
@@ -38,8 +39,24 @@
   "storage": "New ignored private local directory, chosen after approval; no Git, public artifacts, chat data extracts, app display or shared access",
   "account_or_token_provided": true,
   "account_token_readiness_evidence": "Owner confirms free account ready and key saved locally via call_2934bdcbcb314d608ec359d6f892fe9f; no agent key read",
-  "remaining_free_allowance_confirmed": false,
-  "data_requests_made": 0,
+  "remaining_free_allowance_confirmed": true,
+  "allowance_evidence": "call_dcb34e6cdf404482a85f68a6c7c58122: never used;0of20dailycalls before collection; extra500notauthorized",
+  "data_requests_made": 12,
+  "documented_API_call_units_used_by_check": 12,
+  "source_scope_request_cap_consumed": true,
+  "further_requests_authorized_by_this_check": false,
+  "optional_identity_manifest": {
+    "path": ".qa/eodhd-private-source-check-20261023/check-20261024/identity-20261024/plan.json",
+    "sha256": "07cf89ec6d4568eba95ce7bf04cae67719e92645fcc4884181e39638aea61363",
+    "requests": 3,
+    "collection_complete": true
+  },
+  "qualification_evidence": {
+    "path": "docs/acceptance/evidence/research-source-qualification-20261024.json",
+    "sha256": "62d470a5364e52d569a8c0776885e0e589b07a7b804ed3094ad615fb8cf3f79c",
+    "provider_declared_identity_and_price_shape_pass": ["MSFT.US", "AAPL.US"],
+    "unqualified": {"SPY.US": "Strict primary flag not true; no identity fallback"}
+  },
   "provider_enabled": false,
   "required_before_request": [
     "Explicit owner source-check approval",

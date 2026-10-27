@@ -1,0 +1,26 @@
+{
+  "status": "OWNER_PAPER_BANNER_CONFIRMED_LOCAL_RUNTIME_NOT_READY",
+  "date": "2026-10-24",
+  "owner_reply_reference": "call_11faffcf661c413ea3dee3ed52e09557",
+  "owner_reported_paper_banner_visible": true,
+  "new_connection_or_order_authority": false,
+  "last_owner_read_flags": "Enabled and Read Authorized OFF",
+  "native_metadata_tool": "91520a",
+  "native_metadata_exit_code": 0,
+  "boot_id": "b44e07f3-c808-44be-a84c-ae3c6f9a97e5",
+  "pid_namespace": "pid:[4026532221]",
+  "mount_namespace": "mnt:[4026532219]",
+  "listener_present": {"18443": false, "55441": false, "17497": false},
+  "matching_private_directory_processes": 0,
+  "inaccessible_process_metadata": 39,
+  "private_directory_and_pgdata_present": true,
+  "limits": [
+    "No matching readable cwd and absent listeners do not prove exhaustive process absence.",
+    "No private database query, credentials, financial data, TWS probe or service mutation occurred.",
+    "Old recovery helpers bind an obsolete boot and schema0019; current app requires0020.",
+    "Fresh recovery/backup/schema review and applicable approval are required before app recovery.",
+    "SDK startup requests data before selected-account validation; a checkout-only safety correction is being tested before any new connection proposal."
+  ],
+  "external_writes": "UNCONDITIONALLY_DISABLED",
+  "live_trading": "OFF"
+}

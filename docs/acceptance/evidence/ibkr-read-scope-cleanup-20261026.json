@@ -1,0 +1,38 @@
+{
+  "status": "OWNED_DISPOSABLE_FIXTURE_CLEANUP_PASS",
+  "at": "2026-10-26T01:24:52.095944+00:00",
+  "tool": "1a06e8",
+  "exit_code": 0,
+  "data_directory_preserved": true,
+  "operator_data_touched": false,
+  "raw_evidence": [
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/root_cleanup_once.py",
+      "sha256": "11bf4a6f458536d3b8be604494a87c15a55d6cfe944d935d5191d192d9bddd8f"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/root-cleanup-claim.json",
+      "sha256": "b54e5dee1a11ca8c4dc30d6066a28540b217ff7b808a534375259404c17ca81e"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/root-cleanup-execution.json",
+      "sha256": "473161df9ca7d16cf26dc670128b70af035df285f2e761aae8d5017dbaed4dd0"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/root-cleanup-result.json",
+      "sha256": "4a65663df1cf993bab3df6d2c018c9cd4e9ea724c3e2bdf95b9db38bb8f34717"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/root-cleanup-output.log",
+      "sha256": "0b93ff8a2932333c35d3b73ae7efb03f7afaa5493b183c8dc08f0b17e37aa4e0"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/plan-before-owned-cleanup.json",
+      "sha256": "d7690a6b94c8dbbf7eea1cc2e4ec0ed3b5f9a7fef9cf46174f4543a6cbcc87b7"
+    },
+    {
+      "path": ".qa/account-read-scope-20261026-29d8b18ee69d/plan.json",
+      "sha256": "8ee9ed0ee36b04680311f3281a0bb552b84f29e44ee0000e5bd275b146d30b09"
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "status": "OWNER_APPROVED_PRIVATE_POSTGRES_ONLY_RECOVERY_AND_READ_ONLY_METADATA_COMPLETE",
+  "verified_at": "2026-10-26T11:58:02.786584+00:00",
+  "checkout_head": "08cdba57b6d8f4d192e2fa858945ae1d4cee12d4",
+  "approval_scope": "EXISTING_PRIVATE_POSTGRES_RECOVERY_AND_READ_ONLY_METADATA_ONLY",
+  "helper_sha256": "52612e28488189bff47b73806fe98f58719738b560ed51039909c3e2dfb4709a",
+  "plan_sha256": "3644e24e81849defaa497816bd6dcc4bde5f7a359a68e1dc4d5617c2c82f6ca0",
+  "native_boot_id": "d5e34cc2-b5df-408d-9e0c-eaf8fb9359bd",
+  "actual_helper_exit_code": 0,
+  "service_action": "EXISTING_CLUSTER_NORMAL_RECOVERY_ONLY",
+  "transport": "Existing owner-only Unix socket; no TCP",
+  "database_identity_checks": {
+    "database_matches": true,
+    "data_directory_matches": true,
+    "port_matches": true,
+    "socket_matches": true,
+    "no_tcp": true,
+    "postgres16": true,
+    "private_marker_matches": true
+  },
+  "schema_metadata": {
+    "revision_count": 1,
+    "revisions": [
+      "0019_flexible_credentials"
+    ],
+    "intent_table_present": false,
+    "event_table_present": false
+  },
+  "aggregate_metadata_scope": "Only aggregate counts and owner-chain validity; values retained locally, no financial payload or identifiers",
+  "aggregate_owner_chain_valid": true,
+  "app_started": false,
+  "migration_performed": false,
+  "backup_performed": false,
+  "keys_or_credentials_read": false,
+  "broker_connection": false,
+  "orders": 0,
+  "automatic_retry": false,
+  "source_or_test_changes": false,
+  "normal_postgres_recovery_metadata_writes_authorized": true,
+  "live_trading": "OFF",
+  "external_SDK_writes": "CLOSED",
+  "scope_limits": [
+    "This is private runtime prerequisite recovery, not broker-paper evidence or host/model acceptance.",
+    "Current private schema0019 requires separately approved backup/rehearsal and additive0020 migration before app startup.",
+    "Private app startup, key/financial/config inspection and broker reads were not included; no further authority inferred.",
+    "No table-row comparison, backup, restoration, full consistency audit or absence-of-data-loss claim from aggregate counts alone."
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/owner-approval-receipt.json",
+      "sha256": "1d3e34a1741df6a2ee8f02e862a73b44a556f1b99578346470568d8a14d6e86f"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/approval.json",
+      "sha256": "5ed2bd46368649226f5063c26681dd9de00dcebcd34e775398ae14aa7adf243e"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/execution-plan.json",
+      "sha256": "3644e24e81849defaa497816bd6dcc4bde5f7a359a68e1dc4d5617c2c82f6ca0"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/recover_postgres_only.py",
+      "sha256": "52612e28488189bff47b73806fe98f58719738b560ed51039909c3e2dfb4709a"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/launch-execution.json",
+      "sha256": "e96defc8252ca21a3cb4fde964c50703c4870df682852d3b0f949f890eeeb6ac"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/launch-child.json",
+      "sha256": "abd51bb4b0fee2089bc6597ed66fd0141e4458178e2c7c1703e21812977bcbc5"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/launch-result.json",
+      "sha256": "d092db2fca275d2282ea4661c29bfa486a9f479737da45619e4a2d722561e24f"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/claim.json",
+      "sha256": "85b1e8fbddf3edc3e04f18b662621134bdc1632c5825edd2cb5aeda42be2de33"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/result.json",
+      "sha256": "12361946daef8c000fed435a28021a6947ecc8ba3c6c8907f12fb2d9f1306a49"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/command-1-execution.json",
+      "sha256": "429b6e53a00ba9c50d7788a3d1bb49db96dda23d48cbff3ec95cfebe8be4a659"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/command-2-execution.json",
+      "sha256": "76cc920ea8ab748681cfab120479f9d5d0b0e886905683dc5736716b4d21fcab"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/command-3-execution.json",
+      "sha256": "76e414e3b47b33abba1a875fc80881559ba1fe27ab97bfc6378674acff40f66b"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/command-4-execution.json",
+      "sha256": "cfc8c2cf38c7a8b9e11d30a9f07af95b3794148aa148702bfa379602149c6e17"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/command-5-execution.json",
+      "sha256": "3eb7ecc15543cf8693cd1c72b5181dd6f45d82f7565ad0e855a5a9d217aa9d1d"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/command-1-result.json",
+      "sha256": "4d38749b09d297e6113dfc6718e4b4fe7c8a995e045ba876703b5995d38e4c02"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/command-2-result.json",
+      "sha256": "1137766608b489484b1734f49a19f8e26b3d1d0e9a511f582b1999c4b87f3520"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/command-3-result.json",
+      "sha256": "76d81ac5fc29740fa3f2f8dbb724238b9d05a794c39e00d3d7662e44b42fcbf8"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/command-4-result.json",
+      "sha256": "1c070a8ea353213dd7ef1800878e067670b078dfd015fe78f29b96b94af3bbc5"
+    },
+    {
+      "path": ".qa/paper-runtime-recovery-20261026/command-5-result.json",
+      "sha256": "1188f1570bfd5e9d5c537a7cb496dc8b8f068864ef60bb87473244cfc8e82ecb"
+    }
+  ]
+}

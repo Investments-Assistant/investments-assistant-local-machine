@@ -1,0 +1,151 @@
+{
+  "status": "BOUNDED_SOURCE_CHECK_COMPLETE_PARTIAL_IDENTITY_QUALIFICATION",
+  "at": "2026-10-24T11:50:48.169578+00:00",
+  "head": "6c518a262088a099d1c7637e0c0fe90d763314c8",
+  "actual_HTTP_requests": 12,
+  "documented_daily_API_units": 12,
+  "owner_confirmed_daily_free_allowance": 20,
+  "extra_call_balance_authorized_or_used_by_this_plan": false,
+  "source_scope_cap_consumed": true,
+  "further_provider_requests_authorized_by_this_check": false,
+  "original_collection_evidence": {
+    "path": "docs/acceptance/evidence/research-source-collection-20261024.json",
+    "sha256": "02461c00e70c7386368c8a1561763d59408a2bc54bf3b339b16d9ff2c042e18e"
+  },
+  "identity_actual_process_exit": 0,
+  "identity_tool_session": "765bd2/session73200 -> ec2ef8 terminal0",
+  "identity_safety_tests": {
+    "current_version_passed": 8,
+    "current_exit": 0,
+    "seconds": 0.37,
+    "earlier_six_overlapping_passes_preserved_not_added": true,
+    "network": "MockTransport only/socket DNS denied"
+  },
+  "offline_qualification_actual_exit": 0,
+  "qualification_tool": "5e8a48/session96728 -> 539a7a terminal0",
+  "qualification_checks": {
+    "all_three_daily_series_unique_chronological_and_expected_calendar_complete": true,
+    "all_three_positive_finite_OHLC_consistent_and_nonnegative_volume": true,
+    "all_three_can_supply_250_session_engineering_shape": true,
+    "corporate_action_documented_fields_shape_complete": true,
+    "MSFT_US_provider_declared_identity_currency_primary_match": true,
+    "AAPL_US_provider_declared_identity_currency_primary_match": true,
+    "SPY_US_strict_primary_flag_match": false,
+    "SPY_disposition": "Retain for investigation; not qualified, no rank-first/primary-flag fallback or further request"
+  },
+  "evidence": [
+    {
+      "path": ".qa/research-source-check-20261023/identity_check.py",
+      "sha256": "f097797e818d38462aed4a54ff5221904a0db1b4a4dea97fb7b56f2712da32d2"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/identity_offline_test.py",
+      "sha256": "2376826a0bc89d620c6d116fac12bcefdbec0185ececa7d31c17c71a2c899d93"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/identity-offline-tests-execution.json",
+      "sha256": "8b84313ec0d8df287b63211ee73cd7d077b7ca5411ac9dfbe329e71ca9e2c9ee"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/identity-offline-tests.xml",
+      "sha256": "d31330742ab1928c81457b7f54d95dd958c10e7e02ab99689cfba2760866ad39"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/identity-offline-tests.log",
+      "sha256": "7ee80106f1abbaaa581ce1211400cf3331164e30080b64a31ac2be739c01369a"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/identity-offline-tests-v2-execution.json",
+      "sha256": "0e98e1997cba6b2f0e6d12c75d27d2ed67438e11d34c3d9c98d17bd1b44a05c8"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/identity-offline-tests-v2.xml",
+      "sha256": "50bfbec79b214b2a7874e98d91e268f1cc04f0d990ced60825649fc91e057aa3"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/identity-offline-tests-v2.log",
+      "sha256": "7675afcbf0656da4d29291a330ffc7200eb716c466b0dd4338f6eecaa12bf6a4"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/identity-prepare-execution-20261024.json",
+      "sha256": "e6ec65c69742734cdb36dd8687dc491cbd488c19d67e97697d05a53a7ad5b426"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/collect_identity_once_20261024.py",
+      "sha256": "12f1d9148c244c687dc312e726d1d1e20413d5463e47dacca1b1c05a1c86a5f4"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/identity-collect-execution-20261024.json",
+      "sha256": "aafe4fe7163694f720dea70ec47a50d0d239c52eb6201eb6d2c80ab13a4d46f6"
+    },
+    {
+      "path": ".qa/research-source-check-20261023/qualify_private.py",
+      "sha256": "0346809f4571939932a8cf7cf6b92407bfd6515bfbffe03c6878089de21ff6bc"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/quality-review.json",
+      "sha256": "ad88b146c9fe18dbf0a49bcf125597d6be793091649ce314ab184359e564031b"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/quality-review-v2.json",
+      "sha256": "6b8774b3f98c091723d40cfa284081bbd21c50e95e1a377dc29ec9dcb8ee771a"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/identity-20261024/plan.json",
+      "sha256": "07cf89ec6d4568eba95ce7bf04cae67719e92645fcc4884181e39638aea61363"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/identity-20261024/started.json",
+      "sha256": "da470e8b289e0efe188d06476f20ce617a88411ba8541a77a9a7dcc873e6a260"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/identity-20261024/result.json",
+      "sha256": "b8b5cfc76ebd5e76207b044789d7634f81541164c816f13201c52028384109ee"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/identity-20261024/process.log",
+      "sha256": "9e8a7aea290d4aa8695fae14034d6cf3573679940599af586b2066e97fab551f"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/identity-20261024/attempt-03.json",
+      "sha256": "ddb0c93809f38f5bba444349dcbfadcc76cda037085f412c7eaac62269b88fea"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/identity-20261024/attempt-02.json",
+      "sha256": "a1e0d784384f8316c2370c2f78e5d003a4b9b8436d7638e1cee786be90b7247a"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/identity-20261024/attempt-01.json",
+      "sha256": "39074f03a2436cf1a1430a3d74bc5f0bc43d1f6bfd161e5c522d3a8b4dfa0310"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/identity-20261024/response-01.json",
+      "sha256": "4da53788d63bc1cc7a86b6fbf4ee23361cd6ee5b9f152223c231cb5158e27c23"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/identity-20261024/response-02.json",
+      "sha256": "abb1646bd6802bb22fb6c85095d7ff20a07a688c6e0929a8f39d5e8fc313dc97"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/check-20261024/identity-20261024/response-03.json",
+      "sha256": "c59203025ba2ffe76276eca8a70999d4a0cb0b72746042d4c75df5a87e00888b"
+    }
+  ],
+  "retained_failures_and_corrections": [
+    "Initial offline calendar-range query rejected a weekend lower bound before writing a report; corrected by exact inclusive filtering of generated exchange sessions, without refetching.",
+    "Independent review added split ex-date calendar contradictions to offline qualification; initial report and final-v2 both retained.",
+    "Independent review found identity per-chunk quota-date and nonfinite-JSON guards; fixed before network with two focused regression cases."
+  ],
+  "limits": [
+    "Provider-declared identity and indicative prices are not broker qualification or independently reconciled market truth.",
+    "Current downloads do not establish historical first-seen availability; revisions/survivorship remain unverified.",
+    "Source sample is not approved real-study or trading universe; no strategy or held-out result has been computed.",
+    "USD sample does not establish the owner actual base currency or FX/risk/capital policy.",
+    "News/model historical availability, real-study assumptions and external Paper/forward gates remain open."
+  ],
+  "economic_conclusion": "INSUFFICIENT EVIDENCE",
+  "strategy_or_real_order_or_broker_connection": false,
+  "app_source_tests_config_or_git_index_changed": false,
+  "raw_provider_data_or_research_results_published": false,
+  "goal_complete": false
+}

@@ -1,0 +1,96 @@
+{
+  "status": "LOCAL_CURRENT_CANDIDATE_IMAGE_PASS",
+  "at": "2026-10-26T01:53:01.150676+00:00",
+  "image_id": "sha256:146d8bac0b87bd1b36aceb38950779acca17ea0b6281021c6b2aa47497a411e9",
+  "image": "investments-assistant:account-scope-20261026-29d8b18ee69d-v3",
+  "base_commit": "6c518a262088a099d1c7637e0c0fe90d763314c8",
+  "provenance": "Unpublished dirty candidate atop6c, exact10file419b5807; source/test hashes independently verified",
+  "source_fingerprint": "612fa07bbdd90344b0df49f2a3c513e35c4d8d9043bd338c313511d2cf1dc435",
+  "tests_fingerprint": "dd2391363e00cb73e01fc45e2fb49340da2887dac416eae2a91490d5c9bb38a8",
+  "candidate_patch_sha256": "419b5807aa4b881a9f62d77891682321b5d6f6aa8d6d2fac4204d6c90c8d411f",
+  "context_members": 187,
+  "copied_files_verified": 184,
+  "context_sha256": "37d18a8eca1e38755370d1882faabf01be1d50ea0a464100f81ecdbfcdfa3b52",
+  "architecture": "amd64",
+  "user": "appuser",
+  "smoke_exit_code": 0,
+  "network": "none",
+  "read_only": true,
+  "capabilities_dropped": "ALL",
+  "no_new_privileges": true,
+  "model_mount_or_private_operator_input": false,
+  "owned_smoke_container_removed": true,
+  "broker_connections": 0,
+  "external_orders": 0,
+  "publication_or_registry_push": false,
+  "independent_artifact_review": "observation_launch_review PASS",
+  "backend_proof": "docs/acceptance/evidence/ibkr-read-scope-backend-20261026.json",
+  "backend_proof_sha256": "5926ef84b24b7d20285262fe71fda2ec4fc0be394f484a9af7bf267a57fc73a4",
+  "raw_evidence": [
+    {
+      "path": "docs/acceptance/evidence/account-scope-image-build-20261026-29d8b18ee69d-v3.json",
+      "sha256": "e3d7fb57a171dbf8e19797cebf8253f854568a9039412f5db1d02570a6292c1a"
+    },
+    {
+      "path": "docs/acceptance/evidence/account-scope-image-build-20261026-29d8b18ee69d-v3.log",
+      "sha256": "2430d16b70420da8423c86625ed61b9c5023ff64e78176c8015d17c871289f60"
+    },
+    {
+      "path": "docs/acceptance/evidence/account-scope-image-smoke-20261026-29d8b18ee69d-v3.json",
+      "sha256": "30b9ac3d5bc7d4c515204cebcd0ebabfa92fef0eb1c5800fb755f37c70624b00"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/build.py",
+      "sha256": "0e1d5923463b930eb0cf1412e00fecd22ff4d7572829d8b88c9a789ab5d5503d"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/prepare_context.py",
+      "sha256": "2c90b4ba22063c6d5b3ecced7539a564dbaf4a2eeed077767ae1d54da7c439e6"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/smoke.py",
+      "sha256": "4540216d5ac7b462d6fa79ed7b5b551d330893fc7be2fffe5241c72384a6ac21"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/build-execution.json",
+      "sha256": "e3d7fb57a171dbf8e19797cebf8253f854568a9039412f5db1d02570a6292c1a"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/build.log",
+      "sha256": "2430d16b70420da8423c86625ed61b9c5023ff64e78176c8015d17c871289f60"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/smoke-execution.json",
+      "sha256": "fb629bfd3348d9846f1d658b97129aa1d3ea81275970a5e566f17a16cd372132"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/smoke.log",
+      "sha256": "02f4dc16b9932dbcd22fccdb8a2863c0fe133414bf7f87cbe2dfd41cf8f4dbf1"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/smoke-stderr.log",
+      "sha256": "264e85788881891ce04eae727779bbe62277c7b35d12f415b17f1ff3e0bce826"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/smoke.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/root-native-image-review.json",
+      "sha256": "98b8b8c5346f4a71787c296a265da3348ea8423d6ce051a5de04f575481ccf11"
+    },
+    {
+      "path": ".qa/account-scope-image-20261026-29d8b18ee69d-v3/plan.json",
+      "sha256": "b4f7385acf36a18c2edf42b6e04d45534dc2905f1c1b8f4b1db4a3c5e602e59e"
+    }
+  ],
+  "limits": [
+    "No new actual model inference, database, ingress, restart,24hour,thermal or target-host run",
+    "No real Paper connection/environment/lifecycle or forward acceptance",
+    "Current publication and CI/Sonar remain pending"
+  ]
+}

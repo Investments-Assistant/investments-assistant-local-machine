@@ -1,0 +1,59 @@
+{
+  "experiment": "private-two-stock-historical-pilot-v1",
+  "status": "PROPOSED_NOT_APPROVED_NOT_RUN",
+  "purpose": "Limited retrospective diagnostic; no investment recommendation, broker connection or deployment eligibility",
+  "source_check_evidence": {
+    "path": "docs/acceptance/evidence/research-source-qualification-20261024.json",
+    "sha256": "62d470a5364e52d569a8c0776885e0e589b07a7b804ed3094ad615fb8cf3f79c"
+  },
+  "proposed_research_samples": ["MSFT.US", "AAPL.US"],
+  "SPY_US": "Excluded while the provider primary-listing flag remains unqualified; no substitution or relaxed identity rule",
+  "independent_runs_not_multi_asset_portfolio": true,
+  "virtual_capital_per_independent_run": "10000",
+  "base_currency": "USD",
+  "owner_actual_capital_currency_or_trading_mandate_inferred": false,
+  "data_selection": "Earliest 240 common complete sessions from the frozen source-check dataset, selected chronologically before any strategy outcome; preserve unused sessions",
+  "split_sessions": {"train": 120, "validation": 60, "test": 60},
+  "split_state": "Independent cash start for each instrument/strategy/window; no holdings, optimized parameters or fitted state carried into validation/test",
+  "lookback_sessions": 10,
+  "lookback_rule": "Inside each independent window, as in the existing evaluator; no pre-window strategy execution",
+  "strategies": ["cash", "buy_and_hold", "momentum"],
+  "news_model_comparison": "NOT_RUN: no attributable historical news/model/first-availability evidence supplied; never substitute invented or synthetic news for this real-data pilot",
+  "cost_assumptions": {
+    "commission_bps": "10",
+    "minimum_commission": "1",
+    "spread_bps": "5",
+    "slippage_bps": "5",
+    "fx_bps": "10",
+    "fx_application": "No FX conversion/cost for evidenced USD prices and virtual USD base; no assumption about the owner's actual account",
+    "volume_participation": "0.01",
+    "lot": "0.001",
+    "cash_interest": "0"
+  },
+  "costs_are_verified_broker_tariff": false,
+  "price_and_action_mapping": {
+    "prices": "Raw provider open/close; do not use dividend/split-adjusted close",
+    "volume": "Provider split-adjusted volume; refuse any in-window split before replay pending a separate share-unit review",
+    "dividends": "Historic unadjusted per-share amount and evidenced USD currency; accrue on ex-date before open, pay only after the evidenced payment date has ended in America/New_York",
+    "tax": "Gross dividends; no withholding or personal tax model",
+    "calendar": "Documented inferred US equity-session calendars; provider identity is not broker contract qualification"
+  },
+  "execution_model": "Signals at close; hypothetical fills only at a later session open using the existing simulator. Daily volume is an ex-post capacity approximation, not evidence of executable opening liquidity or actual spreads/fills.",
+  "diagnostic_criteria_only": {
+    "minimum_closed_holdout_trades": 20,
+    "maximum_holdout_drawdown_pct": 10,
+    "minimum_holdout_net_excess_over_same_instrument_buy_hold_pct": 0,
+    "deployment_standard_approved": false
+  },
+  "holdout_policy": "Freeze protocol, adapter/engine and data hashes before execution. No fitting, optimization, outcome-driven selection, threshold change, repeated holdout tuning or silent retry. Preserve failures.",
+  "private_result_contents": ["Net returns/costs", "Drawdown", "Exposure", "Volatility and zero-risk-free Sharpe convention", "Turnover/trade and exit sample sizes", "Hit rate with sample count", "Rejected signals/operational failures", "Gross dividends and payment timing", "Comparison with cash and same-instrument buy-and-hold", "Sample/revision/survivorship/first-availability limitations"],
+  "economic_decision": "A predeclared diagnostic failure can be NO-GO. Passing diagnostics alone cannot be GO: historical availability, news/model comparison, representativeness and forward evidence remain insufficient.",
+  "storage": "Ignored owner-only private local directory; no raw/provider-derived data, return series or strategy results in Git, public artifacts, app display or chat extracts",
+  "additional_API_requests_allowed": false,
+  "purchase_or_subscription_allowed": false,
+  "application_provider_enablement_allowed": false,
+  "broker_connection_or_order_allowed": false,
+  "original_engineering_fixture_plan_changed": false,
+  "full_L14_gate_claimed_complete_by_this_pilot": false,
+  "live_trading_allowed": false
+}

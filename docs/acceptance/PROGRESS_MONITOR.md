@@ -19,15 +19,24 @@ not gate PASS statuses; PLAN.md remains the acceptance matrix.
 | L11 | 5 | 5 |
 | L12 | 6 | 6 |
 | L13 | 7 | 6.875 |
-| L14 | 7 | 1.875 |
+| L14 | 7 | 2.75 |
 | L15 | 4 | 0.25 |
 | L16 | 4 | 4 |
 
-Current audit:90% displayed (displaydelta0pp), raw90.375/100. Publishedd5aa99e
-CI/Sonar passes; L11=5/5, L04=7.375/8 for verified offline recovery foundations.
-Image bytes reconcile with that commit. Owner approval of a bounded free EODHD
-source check earns no research-result credit; account/token and actual data are
-still absent. FullPaper/research remain open; new24h/mapped cooling are deferred
+Current audit:91% displayed (displaydelta0pp), raw91.250/100. Current selected-account
+read-scope source passes961unit/459PostgreSQL cases; L04=7.375/8. L11=5/5 after
+verified current-commit CI acceptance. Exact ten-file419b5807 is approved/published
+as08cdba5; CI40259671081/allfourjobs/configuredSonar gate PASS, with actual artifacts
+independently reviewed. See [CI proof](evidence/account-scope-ci-20261026.json).
+Current image146d8bac build/
+isolated184-file smoke PASS, with owned container cleanup independently verified.
+Publishedd5aa99e CI/Sonar/image proof
+retains its historical byte scope. Permitted source acquisition/qualification,
+64synthetic adapter cases and18actual owner-approved comparisons with independent
+input/result/accounting review raiseL14to2.75/7. MSFT/AAPL pass source checks; SPY
+remains unqualified. Outcomes stay private; historical news/model first availability,
+survivorship and forward evidence remain incomplete. FullPaper/
+research remain open; new24h/mapped cooling are deferred
 to the actual final host. Historical entries below are preserved in order.
 
 Total weight 100. Baseline 53%; next audit 58% (+5 pp) credited persisted
@@ -592,3 +601,46 @@ Final20Oct safe-boundary custom audit: GOALPROGRESS90%/Δ0pp/raw89.875. Verified
 2026-10-23 FINAL exactpublished-CI audit: GOALPROGRESS90% Δ0pp/raw90.375 (+0.125 sincependingCIaudit). L11returns5/5 afteractuald5aa all4CIjobs+configuredexact-SCM SonarPASS; allotherfixedweights/subscores unchanged.920unit/459PG/1383overlappingcombined,24browser/8TLS-WSS,0fail/error/skip. CurrentCIcleanPGdoesnoterase retained localclockfailure. ResearchL14 and fullactualPaperL04/L15OPEN; finalhosthardware/profile/24h/tempDEFERRED. No100/completion/statusmutation.
 
 23 October resumed prerequisite review, baseline and final custom audits:90% Δ0pp/raw90.375. No new acceptance credit. Required offline cancel/fill cases already covered; seven existing passing CI cases verified without running tests. Source/tests/HEAD unchanged; research/Paper inputs still missing, owner price-file question pending, final-host checks deferred. First unchanged-prerequisite continuation after prior CI progress; no Goal status mutation.
+
+
+26October private-runtime prerequisite/upgrade-preparation final audit:
+91% displayed/Delta0pp/raw91.250 unchanged. Owner-approved PG-only recovery and
+read-only metadata PASS; actual schema0019/app stopped. Five new synthetic SQL
+cases and seven focused backup-helper groups PASS; both new owned fixtures stopped.
+No extra L09credit (already6/6). Exact protected backup/restore/conditional0020
+flow is reviewed but awaits new owner approval; no actual backup/migration/key
+preservation or further broker action occurred. Research/Paper/final-host remain
+incomplete/deferred under the unchanged rubric and safety constraints.
+
+
+26October approved-operator-update final audit91%/Delta0pp/raw91.250 unchanged:
+actual encrypted0019backup/sealed matching settings-key preservation/privatecopy
+restore+0020rehearsal/original0020update PASS. Existing31tables/2sequences preserved,
+33post tables/newjournals empty; all257client commands exit0(instrumentation only).
+No extra L09credit(already6/6). Normal TLS starter independently reviewed,2refusal
+cases/4pure controlgroups/publicnativepreflightPASS; actual app start awaits new
+owner approval. No broker action, Paper/research or final-host completion inferred.
+
+
+26October normal-app-start final audit91%/Delta0pp/raw91.250 unchanged:
+owner-approved normal TLS app startup and post-launch same-process readiness/
+login/auth checks PASS; app deliberately left running. Owner browser/sign-in and
+saved read-flagsOFF UI check pending. No fresh SDK read/order, new model benchmark,
+Paper/research or final-host completion; no additional credit for already-scored
+local criteria. The prior app-start permission blocker was resolved by approval.
+
+
+26October currentPaper/read-preparation custom audit91%/Delta0pp/raw91.250:
+owner confirms current Paper banner and Read-Only API checked, after normal app
+access/readflagsOFF confirmation. Final00879c relay19pure testsPASS and finalhash
+missingapproval guard refuses before resources; independent ancestorpath finding
+resolved. Windows7497/tws listener metadata only, no TCP/API read. No L04/L15
+credit for synthetic transport/preparation. Fresh one-read approval remains
+required; broader research and finalhost gates remain open/deferred. LiveOFF.
+
+
+26October approvedone-read transport milestone finalcustomaudit91%Delta0/raw91.250:
+exactone-sessionhelper launchedonce/claimconsumed/ownedREADYafterlauncherexit.
+READONLYsafeSQLbaselinePASS with one17Oct historicalsnapshot(cashincomplete),
+not anewread. Await currentownerUIreadresult+bothflagsoff. NoadditionalPaper
+credit, fullresearchOPEN/finalhostDEFERRED, SDKwritesCLOSED/liveOFF.

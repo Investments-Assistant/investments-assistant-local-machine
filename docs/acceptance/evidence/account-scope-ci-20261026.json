@@ -1,0 +1,157 @@
+{
+  "status": "EXACT_APPROVED_TEN_FILE_COMMIT_ALL_FOUR_CI_AND_CONFIGURED_SONAR_GATE_PASS",
+  "verified_at": "2026-10-26T02:46:06.102904+00:00",
+  "head": "08cdba57b6d8f4d192e2fa858945ae1d4cee12d4",
+  "run_id": 40259671081,
+  "run_url": "https://github.com/Investments-Assistant/investments-assistant-local-machine/actions/runs/40259671081",
+  "workflow_conclusion": "success",
+  "jobs": [
+    {
+      "id": 121369097565,
+      "name": "Unit Tests / Run Unit Tests",
+      "conclusion": "success"
+    },
+    {
+      "id": 121369352097,
+      "name": "Chromium + PostgreSQL (synthetic model)",
+      "conclusion": "success"
+    },
+    {
+      "id": 121369352148,
+      "name": "Integration Tests / Run Integration Tests",
+      "conclusion": "success"
+    },
+    {
+      "id": 121370777465,
+      "name": "SonarCloud Quality Gate (combined coverage)",
+      "conclusion": "success"
+    }
+  ],
+  "test_tiers": {
+    "unit": {
+      "tests": 961,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "tests": 459,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "combined": {
+      "tests": 1424,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "combined_overlap": "Combined run repeats unit/integration and includes four root-level import smoke tests; execution counts are not added.",
+  "combined_additional_case_count": 4,
+  "browser_flows": 24,
+  "ingress_checks": 8,
+  "combined_measured_line_coverage": {
+    "covered": 10645,
+    "valid": 12602,
+    "reported_rate": "0.8447",
+    "browser_server_coverage_included": true,
+    "measured_browser_line_bit_rows": 131
+  },
+  "sonar": {
+    "project_key": "Investments-Assistant_investments-assistant",
+    "branch": "main",
+    "scm_revision": "08cdba57b6d8f4d192e2fa858945ae1d4cee12d4",
+    "ce_task_id": "AaF2GQE1wSmsgR9Bx6Ry",
+    "exact_report_quality_gate": "PASSED",
+    "metadata_report": ".scannerwork/report-task.txt",
+    "evidence": [
+      "2026-10-26T02:44:36.4267933Z 02:44:36.425 INFO  Project key: Investments-Assistant_investments-assistant",
+      "2026-10-26T02:45:07.5162828Z 02:45:07.493 INFO  SCM revision ID '08cdba57b6d8f4d192e2fa858945ae1d4cee12d4'",
+      "2026-10-26T02:45:12.7466563Z 02:45:12.746 INFO  ANALYSIS SUCCESSFUL, you can find the results at: https://sonarcloud.io/dashboard?id=Investments-Assistant_investments-assistant&branch=main",
+      "2026-10-26T02:45:12.7469784Z 02:45:12.746 INFO  More about the report processing at https://sonarcloud.io/api/ce/task?id=AaF2GQE1wSmsgR9Bx6Ry",
+      "2026-10-26T02:45:19.3577228Z \u2714 Quality Gate has PASSED."
+    ],
+    "separate_neutral_checks_not_used_as_acceptance": [
+      {
+        "name": "SonarCloud Code Analysis",
+        "conclusion": "neutral",
+        "title": "Quality Gate not computed"
+      }
+    ]
+  },
+  "model_scope": "CI synthetic model/providers; actual PostgreSQL/Chromium/loopback NginxTLS/WSS. Independent actualGGUF image evidence remains separate.",
+  "broker_connections": 0,
+  "external_orders": 0,
+  "workflow_rerun": false,
+  "raw_evidence": [
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/terminal-run.json",
+      "sha256": "68f3864e59ede5a9bbfad5820262410dd919f37d473f773791ad1e8d599edd57"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/terminal-jobs.json",
+      "sha256": "5fce511476bc818f7a6801ba93cced84a7cb78f9c11a4d94d8638f2f3330e31d"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/terminal-artifacts.json",
+      "sha256": "19a6053a1a1cb3d5cd86dc1dec8a6bd0c70366dd095df7d630fbce94bc2c313f"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/artifacts/junit-unit/junit-unit.xml",
+      "sha256": "a89db46fc3d6c88814047087435f45c5b1fd3d97fbb45e6be6817bc2709df56d"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/artifacts/junit-integration/junit-integration.xml",
+      "sha256": "5ea571cb4cef73d044477ad679bd146feef67d344b266426fcfeba22d3df0749"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/artifacts/junit-e2e/junit-e2e.xml",
+      "sha256": "728ee00cf4cd04f790cf3c2b88820d7779ff955a50d7f734fed8c4b744b8f502"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/artifacts/coverage-combined/coverage-combined.xml",
+      "sha256": "acc294b2828716458a0919f88799201aaf97123ebd6c1c2c79ec737e264e3454"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/artifacts/browser-synthetic-evidence/docs/acceptance/evidence/browser-ci.txt",
+      "sha256": "98ad8d1bc49efda9ed81a4751d160bdc7d10c491836d09be006f3e393b091d7c"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/artifacts/browser-synthetic-evidence/docs/acceptance/evidence/nginx-ci.json",
+      "sha256": "4064053e8ace4c8f10691b85fd3b5b83de5782db32fa2650114e06eaae7993c7"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/artifacts/coverage-browser/.coverage.browser.runnervmtai0g.pid5333.XzjNO2ux.HFX3uV06ZFyh",
+      "sha256": "6499c065caad98010e8763a30a3555f2feeb89482c7ed328f1bba2bc7171096d"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/artifacts/coverage-browser/.coverage.browser.runnervmtai0g.pid5330.XSE1jw4x.H064fZKsswnh",
+      "sha256": "eb37f1107377e809b89775988533e7a7eba381dd2cda57294af16080dc65ebeb"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/job-121369097565.log",
+      "sha256": "6a45e53e7517fd98c496204741f6081a295b3febbd5713249a3e6135314854b5"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/job-121369352097.log",
+      "sha256": "8276281faaee0d3748041ab54aba2a9ea6ebbf61f31f7ec03a1ff9b669b5828e"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/job-121369352148.log",
+      "sha256": "0536cb1a0d53d39453983796a439f5800d129cff02bd7a8583514a18b95e9fe7"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/job-121370777465.log",
+      "sha256": "7972d368318706ea03737faadda65305a51514a8c6d268ae5e21904d3ffb4b4e"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/ci-watch-execution.json",
+      "sha256": "5c6b458bf6cc35ec56004d2ad335bea3d5770c131b5d743424a07461cb1783f5"
+    },
+    {
+      "path": ".qa/account-scope-publication-20261026-29d8b18ee69d/artifact-download-execution.json",
+      "sha256": "e3cd13a8b385d7e6151ceeb54c387f07480dd8f54fea2843925c1cae8acce848"
+    }
+  ]
+}

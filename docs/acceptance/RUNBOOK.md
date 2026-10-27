@@ -25,13 +25,24 @@ bootstrap credentials, or assigns unknown-owner records. No production database
 migration was run. The separate operator-validation database was backed up and
 explicitly upgraded to 0019 without replacing its data or keys; see
 [credential validation](FLEXIBLE_CREDENTIALS.md) and [checkpoint](CHECKPOINT.md).
+On26October the owner separately approved its encrypted0019backup, sealed
+matching settings/key preservation, private restore/rehearsal and conditional
+0019->0020 update. [Actual evidence](evidence/private-upgrade-result-20261026.json)
+verifies the original at0020 with prior data/sequences/files preserved and empty
+new journals. The subsequently [separately approved app start](evidence/private-app-start-result-20261026.json)
+passes native TLS/readiness/login/auth checks and intentionally leaves the normal
+loopback app running. Any broker read remains separate. Retain the encrypted backup,
+separately protected recovery key and private
+copy locally. Never use the rehearsal copy as the normal app database or rerun
+the completed one-shot helper. Rollback is not automatic;0020 refuses downgrade.
 
 For a **new empty isolated database**, explicitly set DATABASE_URL to that
 instance, then run `.venv/bin/alembic upgrade head`. Create users through the
 existing `scripts/create_user.py` command. Review `--help` before supplying inputs;
 never put a production password into evidence or shell history.
 
-For an existing reviewed installation: stop writes only with deployment approval,
+Only for a genuinely unversioned installation matching the reviewed baseline:
+stop writes only with deployment approval,
 take an encrypted pg_dump backup, restore to a disposable database, compare all
 schema columns/indexes against `migrations/reviewed_schema.json`, then stamp that
 verified baseline with `alembic stamp 0001_reviewed` and upgrade the disposable
@@ -41,6 +52,9 @@ Numeric conversion preserves available stored digits; it cannot recover precisio
 already lost by historical floating point storage. Roll back with a verified
 backup and compatible code; automatic precision-reducing downgrades are refused.
 Production upgrade remains approval-gated.
+An already versioned0019/0020 database must never be stamped back to0001. Its
+reviewed upgrade follows only its exact revision range and verified backup/copy
+rehearsal; preserve any failed or uncertain state before proposing recovery.
 
 ## Current runtime and observation
 
@@ -54,11 +68,15 @@ separately authorized existing-instance migration; do not truncate IDs or reuse
 an older migration/start helper.
 
 The private operator app/database are existing user data, not disposable fixtures.
-The owner confirms both Paper Enabled and Read Authorized unchecked and saved;
+The owner historically confirmed both Paper Enabled and Read Authorized unchecked and saved;
 no further broker read/order follows from these runbook commands. Inspect the
 latest private plan and [checkpoint](CHECKPOINT.md) for boot ID, PID/start ticks,
 owned paths and last recovery receipt before retrying a failed operation. A
 restricted sandbox can hide native processes, so absence there is not exit proof.
+IBKR_ENABLED=false is not a universal per-account read fence. Normal startup
+requires no automatic broker jobs; verify saved consent through the authenticated
+Brokerage Accounts UI before Portfolio, broker-reading chat or Read broker evidence.
+Health/login checks must not fabricate sessions or request broker data.
 
 The separate observation `53a8ee46e318` was stopped for a reproduced runner
 validation gap. The local fix passes24affected tests and its90-second smoke.

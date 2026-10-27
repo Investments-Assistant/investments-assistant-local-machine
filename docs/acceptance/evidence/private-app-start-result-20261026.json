@@ -1,0 +1,123 @@
+{
+  "status": "OWNER_APPROVED_NORMAL_PRIVATE_TLS_APP_READY_NO_BROKER_REQUEST",
+  "verified_at": "2026-10-26T18:38:21.124726+00:00",
+  "checkout_head": "08cdba57b6d8f4d192e2fa858945ae1d4cee12d4",
+  "scope": "NORMAL_PRIVATE_LOOPBACK_TLS_APP_START_HEALTH_LOGIN_ONLY_NO_BROKER",
+  "helper_sha256": "5472a7aa7b74fbccf786b0bb9498d5ce6fe6072ce1546380d909190d51c20730",
+  "plan_sha256": "79b0b6ed3f2c3b58ac85ca6c26c9d26897f84865d59fd62b9128ee7434d6d8f0",
+  "native_boot_id": "d5e34cc2-b5df-408d-9e0c-eaf8fb9359bd",
+  "actual_helper_exit_code": 0,
+  "normal_entrypoint": "src.app:app",
+  "normal_scheduler_preserved": true,
+  "listener": "Owned127.0.0.1:18443 only",
+  "TLS": "Pinned existing certificate with hostname and chain verification",
+  "database_and_existing_local_model_readiness_http": 200,
+  "public_login_http": 200,
+  "anonymous_auth_me_http": 401,
+  "verified_database_revision": "0020_broker_submission",
+  "verified_public_tables": 33,
+  "verified_background_work_profile": "Zero authorized monitoring/report/scan opt-ins, active bank states or simulator accounts/mandates/orders/events; no other source client before start",
+  "private_key_and_dotenv_file_metadata_unchanged": true,
+  "helper_reads_private_secret_contents": false,
+  "app_reads_its_unchanged_settings_normally": true,
+  "saved_account_read_flags": "Not decrypted or freshly verified; awaiting normal owner UI check",
+  "normal_default_view": "Chat; no automatic portfolio collector",
+  "authenticated_session_fabricated": false,
+  "broker_request_by_helper": false,
+  "orders": 0,
+  "new_migration_or_initialization": false,
+  "new_model_download_or_benchmark": false,
+  "automatic_app_stop_cleanup_or_retry": false,
+  "application_intentionally_left_running": true,
+  "private_application_log_published_or_read_for_this_proof": false,
+  "live_trading": "OFF",
+  "external_SDK_writes": "CLOSED",
+  "scope_limits": [
+    "This verifies native local TLS/startup/readiness and anonymous auth behavior, not Windows/browser access or authenticated owner login.",
+    "Model readiness is not a new answer-quality/performance benchmark or final-host acceptance.",
+    "GlobalIBKR_ENABLEDfalse is not a universal vault-account read fence; owner must verify saved flagsOFF through normal authenticated Brokerage Accounts UI before Portfolio or any broker-reading flow.",
+    "No fresh actual broker/account environment validation, read or execution authority is inferred."
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-app-start-20261026/owner-approval-receipt.json",
+      "sha256": "66cdcf1356871e7301bc56968bc92d40cf9a0ba8443793b1aaa7fcd794af3764"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/approval.json",
+      "sha256": "b321a99f245d9d9e67ea9e6b9550ce40672e19a11425e2fe469ed54dc4195cd8"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/execution-plan.json",
+      "sha256": "79b0b6ed3f2c3b58ac85ca6c26c9d26897f84865d59fd62b9128ee7434d6d8f0"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/start_app_once.py",
+      "sha256": "5472a7aa7b74fbccf786b0bb9498d5ce6fe6072ce1546380d909190d51c20730"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/launch-execution.json",
+      "sha256": "9584756db74398acd8091c41453c9b439a8b3cc6c545a46c1a2e2f3371da4d5d"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/launch-child.json",
+      "sha256": "f6d698d0c5736de27b40c7320259e9a0fd8264d532c3eddf89424e147775e88e"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/launch-result.json",
+      "sha256": "d116252ce545f8ab9bf172def57934685c0ef50086e2b1ff983ce2252cff9261"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/claim.json",
+      "sha256": "ebee7413b8cf1ae8cdf8b6a448b3f1dfbb801658cce6f58e7cc85f3f4c005a68"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/app-child.json",
+      "sha256": "ecdf96e31ee1ba0c8786cac48ec1bbe26bbf878888eee61274bf24e2da5aecc0"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/result.json",
+      "sha256": "5c5f16088187bf068003396c9e8f7a0ecbc533b565064a508a3429e726e02bd9"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/launch-stdout.log",
+      "sha256": "c8711a8fc3619d1eb726a017ed0342a6944f8b781ea2ac75bbcc452f2624a6a7"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/launch-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/command-1-execution.json",
+      "sha256": "536b84c7c37940645527f1d891024715e8a8e6ee005dcc57b69b84c264d6ea9b"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/command-2-execution.json",
+      "sha256": "2a3ab364f78a332d9b2388cd7d114fe4bf2b6d0b71f2c5fa2fc63cd17ffe59b5"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/command-3-execution.json",
+      "sha256": "0419c33b9ad0a9a14593a47f691a285e49cdffc4463da7f5c60bda68156ca39c"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/command-4-execution.json",
+      "sha256": "4f484d03fab725d2ce724863deb189fda28bd210bfb02cf45f184ae80c6e8972"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/command-1-result.json",
+      "sha256": "a3e62edf9f46cb23866440dabd49536e27e28695ee1c7dde845747bf79d5a781"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/command-2-result.json",
+      "sha256": "811cc8715437eb0fb9b32cadb5339450ea6a965c1990f0cde79d986199c9f1d3"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/command-3-result.json",
+      "sha256": "cdda633be5ab51fcf88f71fbd3c7e5c58988a683abd449009737a731c8cec554"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/command-4-result.json",
+      "sha256": "c40851442383ec7bc15d108a641e93d4be0ea223881ef5cb2c86d5e9d49bd72f"
+    }
+  ]
+}

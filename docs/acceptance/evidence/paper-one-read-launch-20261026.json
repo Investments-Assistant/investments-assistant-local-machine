@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_SINGLE_RELAY_READY_BASELINE_VERIFIED_OWNER_READ_RESULT_PENDING",
+  "recorded_at": "2026-10-26T21:13:11.117768+00:00",
+  "head": "08cdba57b6d8f4d192e2fa858945ae1d4cee12d4",
+  "owner_approval_question_id": "call_4e8a5b5c46134320af04fa4a5a20cbff",
+  "helper_sha256": "00879c878331d0389024dce02c12341f7302d9777748d81d71e2dc636aef7290",
+  "plan_sha256": "bb5e305988c4672c217aa593f35deb257d33a1d4de3cc92a309784662dbda2f3",
+  "relay_pid": 166106,
+  "relay_start_ticks": 3606687,
+  "launcher_exit_code": 0,
+  "post_launcher_same_owned_listener_verified": true,
+  "relay_session_start_reported_at_postlaunch_check": false,
+  "listener_TCP_readiness_probe": false,
+  "fixed_scope": {
+    "normal_owner_ui_read_attempts": 1,
+    "maximum_admitted_sessions": 1,
+    "session_seconds": 60,
+    "helper_lease_seconds": 600,
+    "loopback_only_proxy_endpoints": true,
+    "raw_payload_logging": false,
+    "automatic_retry_or_claim_reset": false
+  },
+  "safe_metadata_baseline": {
+    "read_only_client_exit": 0,
+    "database_schema_identity_valid": true,
+    "single_owner_single_ibkr_record": true,
+    "historical_balance_snapshots": 1,
+    "snapshot_is_historical_17_october": true,
+    "position_request_complete": true,
+    "cash_request_complete": false,
+    "atomic_snapshot": false,
+    "environment_declared_paper": true,
+    "environment_verified_null": true,
+    "execution_authority_none": true,
+    "execution_commission_order_observations": 0,
+    "financial_values_identifiers_or_settings_returned": false
+  },
+  "new_ui_read_result": "PENDING_OWNER_REPORT_NOT_YET_VERIFIED",
+  "both_saved_read_flags_off_after_attempt": "PENDING_OWNER_CONFIRMATION",
+  "native_scope_or_environment_verified_by_this_transport": false,
+  "full_external_lifecycle_history_fees_reconciliation_proven": false,
+  "SDK_writes": "CLOSED",
+  "live_trading": "OFF",
+  "limitations": [
+    "READY and historical SQL baseline are not new actual Paper read/completeness evidence.",
+    "Snapshot environment remains owner-declared and SDK-unverified; no order authority.",
+    "Windows wildcard listener metadata is not effective firewall/localhost-only enforcement proof.",
+    "Inspect same claimed process/receipts before any follow-up; never relaunch to recover an observation timeout.",
+    "Private results remain local; inspect only allowlisted safe completion metadata."
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-read-preparation-20261026/owner-one-read-approval-receipt.json",
+      "sha256": "4587456d8052515a8d3adec90e77d48509f9326290bddb113501549644053658"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/approval.json",
+      "sha256": "caff38869df70af523c15e2ca9945237e1f6107faa371fa5efaf215c1edfaa7b"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/native-preflight.json",
+      "sha256": "b1cd3688d20f622f34abfa4b0abd4f4d5766e0f2f2e93fe4cdc2be9e0a10db6a"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/launch_read_relay.py",
+      "sha256": "3cad135a2ef01c9ac37671606b9bd8a9c4232eccaad961aa210d7aa2b2657b05"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/launcher-static-review.json",
+      "sha256": "dcad13defa04fbab90517f6614b9f5b0bd06fe3ed52a0a436a2900f8925b86f5"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/launch-preflight.json",
+      "sha256": "7ef4d1efacf8883859cc32aafe0b30e66b9d3d6df8f496558f387af41c5b9427"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/launch-execution.json",
+      "sha256": "6d503862de7eaa303d0561757f395e610d351c63271d88764fc8245f12eaa855"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/relay-child.json",
+      "sha256": "c556f1cd65946b018a0e5bdd52a62022d9f751e4e0f9af3492d18ec9058ba2bb"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/claim.json",
+      "sha256": "7f69a1978cd67981c91402cde25c517b83fc866f8cf0c694d950eec6f089ff85"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/launch-result.json",
+      "sha256": "4d77bf1fd2203976cc2a75dc82b78d46475bb80463c0ed75d48ce1157674c586"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/post-launch-ready.json",
+      "sha256": "689528af9cf5522acbeb1dc678738ef466b1bea8447331f09e033f65c82484c2"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/metadata.sql",
+      "sha256": "178f20a6ef6e2e657ad1669c09b0df1ed2a13b785da53e3fb7ae9a71393d2913"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/METADATA_REVIEW.md",
+      "sha256": "7b8eb5550e2ce18f411f743ae272942eb64712fc927c333b740d986f06609061"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/metadata-before-execution.json",
+      "sha256": "a00988c096fbf7471b9c20dba210c8bc3f7937c98014b8558545d475a7d05855"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/metadata-before-child.json",
+      "sha256": "b683025a43f28038aca3fec85331f602cd7efa8e04001874cf3867b69fd01fbf"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/metadata-before-result.json",
+      "sha256": "dcad1ff1e6ffcae94733c495e5e7a59cbba9a2f5e8cc032f4e0e49639412ed8a"
+    }
+  ]
+}

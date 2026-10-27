@@ -6092,3 +6092,1238 @@ endpoint. A separate hash-bound one-shot plan will be reviewed first, preserving
 the original completed nine-call artifacts. Aggregate must remain<=12requests and
 <=20dailyunits; never spend the extra balance. Actual research/economic study and
 Paper remain open; realSDKwrites/live OFF and final-host deferral unchanged.
+
+## 24 October — twelve-request source check finished; partial qualification
+
+Original source approval includes up to three identity lookups. Current primary
+Search API docs explicitly confirm Free plans and one documented unit/request;
+independent reviewer confirms no new provider permission is needed within the
+original12request cap. Prepared separate identitymanifest
+**07cf89ec6d4568eba95ce7bf04cae67719e92645fcc4884181e39638aea61363**,
+bound to original completed9/plan/result/terminal/body hashes. Current helper
+**f097797e818d38462aed4a54ff5221904a0db1b4a4dea97fb7b56f2712da32d2**
+passes8mock-only safety tests/actualexit0/0.37s. Preserve the earlier six overlapping
+passes; do not add them as unique tests. Independent review added per-request/
+stream UTC-quota-day checks and strict nonfinite JSON rejection before networking.
+
+Identitywrapper **12f1d9148c244c687dc312e726d1d1e20413d5463e47dacca1b1c05a1c86a5f4**
+ran ONCE tool765bd2/session73200/child15564 ->ec2ef8 actualterminal0. Root9d3987
+verifies three new private body hashes, terminal receipt/log. **12HTTP requests/
+12documented units total**, within owner-confirmed20unuseddaily units; no500extra
+balance, purchase or upgrade. Both collection plans are terminal; do not retry,
+copy, rearm or make any further provider request under this consumed12request cap.
+
+Private offline source qualification completes actualexit0 via5e8a48/session96728
+->539a7a. All three series pass unique/chronological/session-calendar, finite
+positive OHLC/consistent range/nonnegative-volume checks and conservative250-session
+capacity; documented corporate-action fields pass the bounded checks. MSFT/AAPL
+match exact provider code/exchange/type/country/USD/name plus strictprimaryTrue.
+SPY has exactly one otherwise matching candidate but **strictprimaryTrue fails**;
+it stays unqualified, with no fallback or relaxed guard. This is provider-declared
+identity/indicative data, not MIC/broker qualification or historical first-seen
+evidence. No strategy/holdout result exists.
+
+[Qualification evidence](evidence/research-source-qualification-20261024.json), SHA
+**62d470a5364e52d569a8c0776885e0e589b07a7b804ed3094ad615fb8cf3f79c**,
+pins24helpers/tests/private plan/receipt/report/body artifacts. Final private
+`quality-review-v2.json` SHA**6b8774b3f98c091723d40cfa284081bbd21c50e95e1a377dc29ec9dcb8ee771a**;
+initialad88 report is retained. First offline checker invocation rejected the
+Saturday lower calendar bound before writing a report; exact inclusive filtering
+of generated exchange sessions fixed that local query without a refetch. A later
+independent review added split ex-date calendar discrepancy detection; final-v2
+keeps the old report, and source findings are unchanged. No dataset/gate failure
+was hidden or guard weakened.
+
+Custom milestone audit **91%/Δ0/raw90.625** (L14=2.125/7); source acquisition and
+partial qualification add0.25 versus the prior1.875, not a full research pass.
+Prepared [private two-stock historical pilot](RESEARCH_PILOT_PROPOSAL.md), exact
+JSON SHA **3a5371cc7e04edc7530d2392cfdc5ab0fcc6070e75c6fc74d1ca1e2c9fbddae3**.
+It proposes separate MSFT/AAPL/cash/buy-hold/momentum10 runs, virtualUSD10,000,
+earliest240common sessions120/60/60, fixed diagnostic costs/criteria and private
+results. SPY stays excluded. Current-download/news/model/survivorship/first-seen
+and daily-fill limitations remain explicit; no full L14/GO/live claim is possible
+from this limited pilot. Original synthetic plan is unchanged. Asked the owner
+to approve this exact research protocol; **answer pending**, so do not run a
+strategy or infer permission from the earlier source-only decision.
+
+Root82c52b verifies pilot bounds, all24evidence pins, affected doc links, unchanged
+app source/tests and empty Git index/whitespace. No current backend/browser/build/
+CI rerun was needed. All actual source data and research output remain private;
+no broker connection/order, app-provider enablement, private-runtime or OS action.
+Saved Paper read flags OFF, realSDKwrites/live OFF, final-host deferral unchanged.
+Next action: the pending exact private-pilot decision, then source-specific raw
+price/dividend mapping and synthetic adapter checks before any authorized replay.
+
+Final protocol-boundary progress audit **91%/Δ0/raw90.625**, unchanged by proposal
+preparation. No strategy/evaluation has run and no new acceptance credit applies.
+Both finite provider collection receipts are terminal0; no observer, collector,
+test or offline-quality process from this unit remains running. The pending
+private-pilot decision is the next boundary; no Goal status change was made.
+
+## 24 October — exact private historical pilot approved; adapter verified
+
+Ownercall_0a604ac1bfbf4ea8913c55d3045d905b answers **“Approve this private historical
+pilot”** for exact protocolSHA3a5371cc7e04edc7530d2392cfdc5ab0fcc6070e75c6fc74d1ca1e2c9fbddae3.
+Keep that JSON immutable; [separate approval evidence](evidence/research-pilot-approval-20261024.json)
+activates it. Root7b0147 verifies48 saved source/receipt/body pins, the exact
+protocol and unchanged research engineSHA**db489d457c53e95087ab299a2b26279be4b7a2e4005ed774e090039493a65c27**.
+CurrentHEAD**6c518a262088a099d1c7637e0c0fe90d763314c8** is a newer external
+documentation/evidence commit; preserve it. `git diff d5aa HEAD` has no source,
+tests, scripts, config, dependency or Dockerfile change, so previous portable
+validation is reused within its recorded byte scope; no new6cCI pass is claimed.
+
+New ignored `.qa/research-pilot-20261024/adapter.py` SHA
+**c9ca5a2dd26d5713742b86f3e4e836b6a5d40fa434e4850a1a8575ddc0d4bc88**;
+synthetic testsSHA**34bc6bff15322a53a9d352405f86a8c7469b500ea52377d2c4e89cf23d8ba957**.
+Actual saved adapter-tests-execution.json/JUnit/log establish **64PASS/exit0**;
+older63overlap is retained, not added. Root6a479f reads the full adapter/tests/
+receipt: strict originalSEARCH identity for only MSFT/AAPL/USD/primaryTrue,
+complete inferredXNAS calendar, rawOHLC, split refusal, unadjusted dividends and
+payment after the evidenced date ends in NewYork including DST/weekends.
+Synthetic ledger/typedJSON roundtrip confirms no premature or duplicate payment.
+Agent did not read actual provider inputs, key or run a strategy/network call.
+
+Custom adapter milestone **91%/Δ0/raw90.750**, L14=2.25/7. No actual pilot or
+held-out result yet. Root is preparing the one-shot runner and fake-replay control
+tests before normalizing actual inputs and freezing all hashes. Controltest
+toolf7f676/session60273 was launched; inspect SAME session/runner-tests-execution
+receipt/log/JUnit before retry. No actual normalized data/freeze/started/result
+exists in new0700 `.qa/eodhd-private-source-check-20261023/research-pilot-20261024`.
+No actual broker/API/private-app/OS action, no source/test/index or trading change.
+Original12request source cap remains consumed; no further provider requests.
+
+## 24 October — approved private historical pilot complete and reconciled
+
+Controltest f7f676/session60273 ->0baef5 terminal0: **5PASS**, fake replay and
+synthetic inputs only. Independent static review found no material runner/adapter/
+engine defect. Root verified64current adapter cases plus5control cases against
+actual JUnits, input hashes and terminal receipts before preparation; older63
+adapter receipt is historical and not added to the count.
+
+Preparation76e525/session24404 ->854c37 actualexit0 normalizes only the saved
+qualified MSFT/AAPL inputs. FreezeSHA
+**033d0585968a5e98324cafa62b2e945cbdeaf863ac20e415bd020e622e31cb02**;
+normalized-barsSHA**a82b45dbad8976f227f1b7e20935bcb633965731eeb43d29318d8d72ec437c0a**;
+runnerSHA**cba9e8db8731a12beaff3c557569c964f48fa3b395ea52647de5e043e190905e**.
+Root16cc24 independently matches every normalized raw open/close/volume/USD unit
+to its saved source and verifies the exact earliest240common-date selection,
+approved protocol, source/engine/test/adapter pins and no started/evaluated cell.
+No price or strategy values were printed.
+
+Reviewed finite execute_once wrapper then runs the exact frozen pilot **ONCE**:
+tool6b9c93 actualterminal0. All **18 real historical comparisons** complete:
+MSFT/AAPL ×train/validation/test120/60/60 ×cash/buy-hold/momentum10, virtualUSD10,000
+independent starts, no news/model, no fitting or source/parameter change. Both
+runner and wrapper refuse replay after any started/partial/completed work. Do not
+retry/rearm/copy the pilot, consume its holdout again or rerun a successful cell.
+
+Root7d44a3 rehashes all18cellfiles/aggregate/inputdata and rebuilds each engine
+input hash **without rerunning a strategy**. Independent checks verify each
+window's cash start/row count, later-session fills, trade counts, final equity =
+cash +marked holdings +dividend receivable, gross dividends paid+receivable and
+zero same-currency dividend FX effect. Rootebb0af recomputes fixed diagnostic
+criteria and saves a private interpretation with sample/method/source limits,
+again without a strategy replay or any output of return/trade/strategy values.
+
+[Public completion proof](evidence/research-pilot-result-20261024.json), SHA
+**3b2df383bd203f5d404054dfa9b6fc035fb1ba8728574eb7a17826261a810dec**,
+pins58new artifacts/receipts/test/input/result/assessment files. Actual private
+`result.json` SHA**6f0b95b19cc6732bbac96fd9bd75f5bf3369f62db2eac4bc8380b8797429ca6d**;
+`assessment.json` SHA**9f35237392906f7cb94d30f54b1e72dbd69035fc823843eb0279a032036452b8**.
+They stay under owner0700/0600 `.qa/eodhd-private-source-check-20261023/research-pilot-20261024`.
+Public evidence contains only execution/verification metadata and hashes, never
+provider data, returns, positions, trades or diagnostic verdicts. The frozen
+protocol's old PROPOSED status is historical; the separate exact approval and
+actual terminal/result evidence establish completion. Do not ask for this approval
+again or mutate the protocol hash to update its label.
+
+Custom actual-pilot milestone **91%/Δ0/raw91.250**, L14=2.75/7. The pilot is
+complete, **full Goal/L14 are not**: time-aware news/model first availability,
+revision/survivorship/representativeness and separately agreed forward evidence
+remain unfinished; deployment economic conclusion stays INSUFFICIENT EVIDENCE.
+Actual Paper lifecycle/provenance/authority and final-host acceptance remain open.
+All application source/tests/config/index are unchanged; existing d5aa validation
+is reused within unchanged byte scope, no backend/browser/build/CI repeated.
+External6c documentation commit is preserved. No new API request, key read,
+purchase, broker connection/order, private app/OS or live action occurred.
+
+Next missing Paper prerequisite: asked whether TWS is currently open in Paper
+Trading with the red simulated banner, keeping Read-Only API enabled. Answer
+pending; it supplies session status only and **does not authorize a connection or
+order**. Saved account Enabled/Read Authorized remain OFF; do not reconnect/probe
+TWS, decrypt account configuration, restart/migrate private app data or enable
+writes from this pilot approval or a banner confirmation. Prepare and review any
+fresh scoped read separately. No laptop24h/temperature/clock work is requested;
+those remain deferred to the actual final computer. No operation from this pilot
+is left running and no Goal status change was made.
+
+Final pilot-boundary audit **91%/Δ0/raw91.250** confirms no extra credit from doc
+updates; full research/Paper/final-host gates remain open. Final local verifier
+rehashes all58pilot artifact pins and exact approved protocol, verifies183local
+documentation links, fixed-rubric arithmetic, source/tests clean, unchanged6cHEAD,
+empty index and whitespace. No strategy or credential read was repeated. Resume
+from the actual completed result, never from the frozen protocol's historical
+proposal label. Next input is only the pending fresh Paper-session status.
+
+## 24 October — fresh Paper status and selected-account retrieval scope
+
+Owner confirms current red Paper banner in call_11faffcf661c413ea3dee3ed52e09557;
+this supplies session status only, not connection/order authority. Native metadata
+tool91520a exit0 finds newbootb44e07f3-c808-44be-a84c-ae3c6f9a97e5,
+pid2221/mnt2219, no18443/55441/17497 listeners, no matching private cwd among
+readable processes (39inaccessible), private directory/pgdata present. No SQL,
+credential/account read, TWS probe or private-service mutation. Current app is not
+ready on its saved local port. Do not reuse old boot/schema0019 recovery helpers;
+new recovery/backup/schema review and applicable approval precede app use. Current
+source requires0020; actual private schema was not queried. See
+[prerequisite metadata](evidence/paper-session-prerequisite-20261024.json).
+
+Static SDK review discovers a concrete retrieval-scope gap: default IB.connect
+initially requests positions, multi-account updates and unfiltered executions
+before the app checks selected-account membership; later filtering protects
+returned/persisted data but is not selected-account upstream scope. SDK1102 also
+auto-requests account summary. No actual extra-account exposure is established.
+Independent review confirms a lower-level handshake can validate exactly one
+selected managed account before financial requests; scope changes must invalidate
+the owned connection. Checkout fix and installed-SDK in-memory regressions are in
+progress; no actual broker connection or relaxed consent is authorized.
+
+Fresh synthetic fixture `.qa/account-read-scope-20261024-8ae932fbec1c` initialized
+ONCE via43ef08/session62553 ->58b1f4 terminal0. Dedicated
+test_account_scope_8ae932fbec1c, fresh matching marker, schema0020, socket.qa/b-8ae932fb,
+nativePG38991/start671962/sameboot, noTCP. Explicit isolated environment denies
+operator dotenv/private-file access. Preserve this fixture until affected checks
+and guarded owned cleanup complete; do not restart old fixtures or private data.
+Latest custom audit91%/Δ0/raw91.250; no credit from the banner or runtime inspection.
+All18approved historical pilot cells remain terminal and must never be rerun.
+
+Independent review of the new scope/privacy correction finds no remaining
+blocking defect. Current custom audit **91%/Δ0/raw91.000** reserves0.125 each in
+L04 (now7.25) and L11 (now4.875) pending affected tests/current-candidate acceptance;
+fixed weights unchanged. New test results are not yet accepted. Root Ruff command
+unexpectedly honored configured auto-fix and changed style during initial freeze;
+retain initial focused receipt if launched and refreeze affected inputs before
+accepting a result. Use `ruff check --no-fix` in future checks. This is a root
+verification sequencing error, not a broker test failure or permission change.
+Docker native querye9abe5 confirms29.8.2/linux-amd64 available; new image helpers
+are only prepared in `.qa/account-scope-image-20261024-8ae932fbec1c`, not built.
+
+## 26 October — interrupted selected-account verification resumed
+
+Owner says Proceed. HEAD remains6c518a262088a099d1c7637e0c0fe90d763314c8;
+all21prior changed/new files are now externally staged. Preserve that index;
+root has no new publication approval and did not stage, commit or push. Baseline
+custom audit **91%/Δ0/raw91.000**, no extra credit from elapsed time.
+
+Native identityd7a0e4 confirms boot03a5fc73-b096-43c6-ab77-c8ad6584a4fe,
+pid2221/mnt2219. The24Oct fixture's old boot/PID and stale READY label cannot be
+reused. No focused completion receipt was saved before interruption; preserve its
+old evidence and data, without blind restart/cleanup. A fresh synthetic fixture
+`.qa/account-read-scope-20261026-29d8b18ee69d` initializes ONCE via88363b/session93200
+->77b0f5 actualexit0, newtest_account_scope_29d8b18ee69d and socket.qa/b-29d8b18e,
+schema0020/noTCP/new matching marker. Native identity/plan guards apply before tests.
+Ruff20d397 `--no-fix` PASS, syntax/input snapshot3ee4f4 saved. Any subsequent
+agent changes need final hash reconciliation before accepting tests.
+
+Agent focused-v1 launcher failed before collection because resolving the virtualenv
+Python symlink selected systemPython without pytest; original failure/log retained.
+This is a launcher error, not a source/test result. Corrected venv command is the
+next operation; inspect its same receipts before retry. No actual TWS/provider/
+private app/database action, no stale Paper-banner assumption or order authority.
+All18private pilot comparisons remain terminal, preserved and never replayed.
+
+Native fullPG48f0e5/session12344 ->ab11f8 terminal1 on source9056d71f/tests c3660495:
+**448PASS/11FAIL/0errors/skips**, all11 in broker_stream_test's legacy
+StreamingSDK high-level-connect fixture. Original log/JUnit/receipt retained, not
+promoted to a passing tier. Independent review also identifies a runtime behavior
+to preserve: upstream-health gaps must deny new financial requests/results while
+the bounded capture can drain its final partial evidence, then close normally;
+account-list changes still disconnect immediately. Agent is updating that health
+distinction, detaching its owned health handler during final cleanup, and adapting
+the integration SDK fixture while preserving every existing assertion. Source is
+not frozen; old image candidate/context must not be built after subsequent changes.
+Custom milestone **91%/Δ0/raw90.875**, L04=7.125, L11=4.875; fixed weights unchanged.
+
+Focused sandboxv2 was identified/stopped by nativePID4500/start18496 (two guarded
+SIGINTs did not wake its blocked asyncio loop; final exact-PID SIGTERM ended it).
+Terminal childexit-15 and unchanged inputs retained in scope-focused-v2 receipts;
+partial104-case log is not a pass. Do not retry sandbox execution; native fullunit
+will cover those same tests after source is frozen. No native fullunit has started.
+
+Current fresh marked test PG remains owned/live for verification; inspect its
+plan and boot before reuse. Docker26Oct native5ee6b3 reports Linux-engine pipe
+missing; owner engine-start question pending. New187-file public context was
+prepared and independently byte/index-verified before this follow-up repair, but
+no image build/smoke was launched. Existing staged index hashf2a96745 is preserved.
+No private app recovery/migration, broker/provider connection, order, OS change,
+publication or historical-pilot replay occurred.
+
+Follow-up repair frozen at source**612fa07bbdd90344b0df49f2a3c513e35c4d8d9043bd338c313511d2cf1dc435**,
+tests**bb766947d50e299c012380b3ebda78bd3329115d72dc669ecc54412fb95a2dbf**;
+`validation-freeze-v2-20261026.json` pins8source/testfiles. Current candidate adds
+the adapted integration fixture (now9publicationfiles including scope guide),
+so old8filepatch/context are historical and must not be built/published. No
+earlier publication approval covers this candidate.
+
+Actual native scope-focused-v3 completed **11PASS/exit0/12.90s**, input hashes
+unchanged, not timed out. All original scenario assertions remain: success,
+gap, consent revoke, disconnect, cancel/startup_cancel, cleanupfailure and
+1100/1101/1102/1300. Health gaps deny new requests/results but allow final bounded
+partial-evidence drain; account scope changes still disconnect. Exact owned health
+handler detaches on final cleanup. LogSHA64717a976b527d2b87d94b0acbfa697e4f2b21c999353f4247f6fb673ab820b1,
+JUnitSHAf7436a3dacb1bd352e8c592ca58ffe63ca87482a50b2e63405ff1a75edd31fde.
+Ruff9e8413 `--no-fix` PASS all8source/testfiles.
+
+Native fullunit c763cb/session69747 is RUNNING once on this new frozen source;
+inspect SAME handle plus `unit-v2-execution.json`/result/log before retry. New
+root runner `run_validation_v2.py` uses exclusive `unit-v2`/`integration-v2`
+outputs to preserve original fullPGfailure. Full current PG rerun follows unit
+terminal because both tiers share the same explicitly marked test database.
+No real broker/provider/private-app/OS or Git index action occurred.
+
+Native fullunit c763cb/session69747 ->387369 terminal1: **958PASS/3FAIL**, 961cases,
+source612f/testsbb76 unchanged, original log/JUnit/receipts retained. All3failures
+are remaining old mocks in acceptance_broker_test: high-level SDK connect timeout
+and two port/environment cases. Root adapts only those fixtures: actual installed
+IB with a mocked async metadata handshake failure (assert zero financial sends,
+sanitized error and final disconnect/lock release), and explicit sole-account
+metadata for the two environment checks. All original environment/closed-write
+assertions remain; readonly is not falsely claimed as a low-level wire flag.
+Production code stays612f. Candidate now10publicationfiles including this test file.
+
+New freeze-v3 testsSHA**dd2391363e00cb73e01fc45e2fb49340da2887dac416eae2a91490d5c9bb38a8**;
+Ruff9b08e6 PASS. Native fullunit12239a/session94110 nowRUNNING once with exclusive
+`unit-v3` outputs (child10390/start103846/currentboot). Inspect same handle and
+unit-v3-execution/result/log before retry. No integration-v2/v3 full rerun started
+yet. Original fullPGfailure plus11case targetedPASS remain distinct evidence.
+All prior image contexts/candidates require the new test/candidate hash before use;
+runtime tar37d18a8e contains unchanged current612f bytes but is not a built image.
+
+## 26 October — final current backend PASS; Docker packaging prerequisite
+
+Native fullunit12239a/session94110 ->c9d4fa actualexit0: **961PASS/0fail/error/skip**,
+36.774s, JUnitSHA4ce9f87c1f67a24db3a0ca2e60ebbb28141bec91363dbb71b7dd992aa77a68d6.
+Final fullPG857730/session49228 ->b17abe actualexit0: **459PASS/0fail/error/skip**,
+227.68s, no clock failure. Both runs preserve source612fa07b/testsdd239136 hashes.
+Do not add focused11 or partial earlier runs to those counts. Earlier failures
+remain retained; no test assertion or clock guard was weakened.
+
+Root audit41c6b2 independently verifies JUnits/terminal receipts/log hashes,
+current source/tests/HEAD and unchanged external index. [Backend proof](evidence/ibkr-read-scope-backend-20261026.json),
+SHA**5926ef84b24b7d20285262fe71fda2ec4fc0be394f484a9af7bf267a57fc73a4**,
+pins37raw artifacts. Final independent static review finds no concrete defect.
+[Scoped reuse](evidence/ibkr-read-scope-reuse-20261026.json) verifies only3broker-read
+runtime modules differ from validatedd5aa; prior browser/TLS/model/startup/restore
+inputs remain unchanged. This is not new image/CI/model/host acceptance.
+
+Owned native cleanup1a06e8 actualexit0 verifies marked test database identity,
+zero other clients, drops only that disposable target and smart-stops its owned
+PostgreSQL. Datadir/evidence preserved; private operator data untouched. See
+[cleanup proof](evidence/ibkr-read-scope-cleanup-20261026.json). All unit/PG/test
+cleanup operations are terminal; do not restart this cleaned fixture or rerun
+successful backend tests absent changed inputs or a new concrete concern.
+
+The exact **ten-file** current patch is prepared, **not approved/published**:
+[review](evidence/ibkr-read-scope-publication-review-20261026.json),
+patchSHA**419b5807aa4b881a9f62d77891682321b5d6f6aa8d6d2fac4204d6c90c8d411f**.
+It contains3runtime modules,6testfiles and the scope guide only. Existing unrelated
+staged research/docs are preserved; index hash remainsf2a96745. Root neither
+staged, committed nor pushed. No previous exact-bundle approval covers this patch.
+
+Current build package `.qa/account-scope-image-20261026-29d8b18ee69d-v3`
+is CONTEXT_PREPARED_NOT_BUILT:187public members, tarSHA
+**37d18a8eca1e38755370d1882faabf01be1d50ea0a464100f81ecdbfcdfa3b52**,
+source612f/testsdd23. Earlier8/9file candidate/context revisions are historical;
+use only this final ten-file plan. Docker native5ee6b3 reports missing Linux-engine
+pipe; owner-start question is pending. No build claim/execution or smoke exists.
+
+Resume after owner confirms Docker engine: inspect this exact plan, current
+native boot03a5fc73 and any build-execution/build.exit/smoke receipts first.
+If still unstarted and all hashes/authority match, execute the reviewed
+`build.py --build-reviewed-local` in native context, then its owned network-none,
+read-only, non-root `smoke.py`. Do not rerun backend or the consumed private pilot.
+New publication approval and currentCI follow completed local image review.
+Private app recovery/backup/schema0020 review and any actual Paper connection
+remain separate prerequisites; the stale banner grants no connection/order.
+Broader news/model/forward research and final-host acceptance remain incomplete.
+No broker/provider/private-app/OS/24h/temperature or live action occurred.
+
+FINAL custom audit **91%/Δ0/raw91.125**, L04=7.375/8 for the clean final backend;
+L11=4.875/5 reserves current image/publication/CI. All weights and other subscores
+unchanged; full Goal incomplete. Current next action is owner starting Docker's
+Linux engine, not another test/soak/temperature window or new broker approval.
+No Goal status change is made by this manual, owner-authorized work.
+
+Final verifierb28994 rehashes37backend+7cleanup artifact pins, all10candidate
+files,187tar/current inputs and202local doc links; fixed rubric sums91.125/100,
+external staged index unchanged and owned testPG stopped. Final Ruff--no-fix and
+whitespace checks893947 PASS. No test/pilot rerun; no operation remains active.
+
+## 26 October — owner restored Docker; exact image build running
+
+Owner confirms engine running in call_bd00fc5fcdd74021bd58d2df2b7f3325. Preflight
+652e39 verifies HEAD6c, staged-indexf2a96745 unchanged, final10file419b5807 source612f/
+testsdd23 and no prior build/smoke receipts. Baseline custom audit91%/Δ0/raw91.125.
+Reviewed native build6d68b5/session42245 is now RUNNING once; child17347/start271644
+on the same03a5fc73 boot. Existing plan/build-execution/public build metadata retain
+the exact engine/command/input bindings. Inspect SAME session and receipts before
+any retry. No registry push, private app deployment, broker/provider action or
+backend/pilot replay; all trading restrictions unchanged. Smoke follows actual
+terminal build success only. No image PASS is claimed yet.
+
+Build6d68b5/session42245 ->1c1247 actualexit0, image
+**sha256:146d8bac0b87bd1b36aceb38950779acca17ea0b6281021c6b2aa47497a411e9**.
+The unchanged frozen plan now records BUILD_PASS_LOCAL_SOURCE_CANDIDATE; raw/public
+build metadata/log/exit retain source and helper hashes. Read-only origin/main
+63ad7d/session49100 ->bbffd9 verifies exact6c, matching localHEAD; no Git mutation.
+Build milestone custom audit91%/Δ0/raw91.125 gives no smoke/CI credit yet.
+Reviewed isolated smoke c8ffe4/session41416 is RUNNING once, child17601/start282859
+on03a5fc73. Inspect SAME handle/smoke-execution/log/exit before retry; no native
+operator/model/database/broker input is mounted or connected. Publication still
+requires separate exact ten-file approval after local review is complete.
+
+## 26 October — current image verification complete; exact publication prepared
+
+Smoke c8ffe4/session41416 ->95107a actualexit0/PASS: image146d8bac/current612f
+with184copiedfiles matching the exact187-member public tar/current files,
+networknone/read-only/uid1000/capsALLdropped/no-new-privileges. Synthetic credentials,
+PDF/OpenBLAS/import, sole-account guard/default-denial checks pass. No private
+operator/model inputs or broker connection were used. Nativebfa90b independently
+verifies exact image labels/ID/architecture/user and absence of the owned labelled
+smoke container; no unrelated container changed. All build/smoke operations are
+terminal, with durable exit0/receipt/log hashes. Do not rerun them absent changed
+inputs or a new concrete concern.
+
+Independent observation_launch_review rehashes actual terminal receipts/logs,
+all187tar/current and184copied files, source612f/testsdd23, ten-file419b5807 patch,
+and all37backend artifact pins. No material discrepancy. [Current image proof](evidence/ibkr-read-scope-image-20261026.json),
+SHA**e5c36af3112fbc096022395fefe8df930e73163e29815212db585e917bee4f7e**,
+retains local unpublished dirty-candidate-atop6c provenance; no new inference,
+database/ingress/restart/host/Paper/CI acceptance is claimed. Prior unchanged
+surfaces remain scoped reuse. Original961unit/459PG results still apply; no suite,
+fixture or private historical pilot was restarted/replayed.
+
+[Exact ten-file review](evidence/ibkr-read-scope-publication-review-20261026.json)
+is now READY_FOR_EXACT_TEN_FILE_PUBLICATION_REVIEW. PatchSHA419b5807 is unchanged;
+old image-pending review is retained privately. Prepared publication plan:
+`.qa/account-scope-publication-20261026-29d8b18ee69d/plan.json`, NOTAPPROVED/NOTEXECUTED.
+Commit only these10reviewed paths, preserving unrelated staged research/docs;
+normal non-force push to origin/main and inspect exact resultingCI. Parent/local
+HEAD and read-verified origin/main are6c; staged indexf2a96745 remains unchanged.
+Fresh approval is required because previous approvals covered different exact
+bundles. No commit/push, real account read/write, app deployment or OS action.
+
+Final image-boundary custom audit **91%/Δ0/raw91.125** confirms local image PASS
+adds no publication/CI or external-gate credit. Root93ed29 rehashes59raw
+backend/cleanup/image pins, all10candidatefiles, reverse-applies exact419b5807
+patch in check-only mode, validates206local links and unchanged6cHEAD/f2aindex.
+Whitespace PASS. All native build/smoke/check processes and short agents finished.
+
+Owner approval question is now pending for ONLY the exact ten-file419b5807 commit,
+normal push to origin/main and exact resultingCI inspection. Wait for its explicit
+answer; Docker-start confirmation does not grant publication. On approval, inspect
+`.qa/account-scope-publication-20261026-29d8b18ee69d/plan.json`, recheck current
+HEAD/remote/index/files and any prior commit/push receipt before acting. Commit
+only reviewed paths and preserve unrelated staged research/docs. Reconcile tested
+bytes to the resulting commit/image rather than rebuilding or rerunning passing
+backend/pilot checks. Actual Paper/research/final-host constraints remain unchanged;
+no Goal status mutation, trading-setting change or new account connection occurred.
+
+## 26 October — exact ten-file publication complete; current CI running
+
+Owner replies **Proceed** immediately after the prepared exact ten-file419b5807
+publication request; approval is recorded in the bound QA approval.json. This
+authorizes code commit/push/currentCI only, no broker/private-runtime action.
+Fresh remote0a22c1/session32897 ->7c0ccf still6c. Commit bf6f5d/session93962 ->e23c15
+exit0 is **08cdba57b6d8f4d192e2fa858945ae1d4cee12d4**, parent6c, exactly approved
+patch and10blob hashes. `git commit --only` preserved every unrelated index entry;
+no broad staging/reset was used. Normal non-force push26086f/session81432 ->abb74f
+exit0 and fresh remote lookup verify origin/main exactly08cd.
+
+[Publication proof](evidence/ibkr-read-scope-publication-20261026.json) and
+[187context/184image committed-byte reconciliation](evidence/ibkr-read-scope-published-image-reconciliation-20261026.json)
+retain raw receipts/approval/commit/push/log hashes and original dirty-candidate
+image146d provenance. No rebuild, test/pilot replay or image relabelling. Current
+source612f/testsdd23 and961unit/459PG/image evidence stay applicable. Unrelated
+staged research/docs remain preserved; full old f2a index hash is historical
+because the ten approved paths are now committed.
+
+Custom publication audit91%/Δ0/raw91.125 keeps L11partial pending actualcurrentCI.
+Read-only run discovery20d9b6 selects push run**40259671081**, exact08cd, attempt1,
+workflow338954985 (End-to-End Tests). Current metadata d496fa is in-progress.
+Reviewed finite watch b9d55f/session80966 RUNNING once; child24057/start554743 on
+03a5fc73. Inspect SAME handle/ci-watch-execution/result/log before retry; never
+dispatch/rerun a workflow to get a favorable result. CI approval covers inspection,
+not accepting/dismissing quality findings. Bound ci-plan.json and prepared collector
+retain expected961unit/459PG/1424overlapping combined (including4root-level import
+smoke cases),24browser/8TLS-WSS and primary exact-SCM Sonar checks. Four root-level
+smoke cases are not independent model/broker end-to-end proof.
+
+All Git commit/push processes are terminal. Continue watching this exact run and
+collect actual terminal artifacts/logs before claiming CI/quality PASS; preserve
+any failure and fix only within authorized checkout scope. No external brokerage,
+provider/data, private app/database or OS action; live remains OFF/SDKwritesclosed.
+
+## 26 October — exact current CI verified; publication checkpoint complete
+
+The existing watch b9d55f/session80966 completed as47d197 with actual exit0;
+the reviewed artifact collector fa0a6f/session78899 completed ase1e9c3 with actual
+exit0. Do not restart either operation. Run40259671081/attempt1 is SUCCESS for
+exact08cdba57b6d8f4d192e2fa858945ae1d4cee12d4. Allfourjobs and the configured
+primary exact-SCM Sonar gate PASS. No workflow dispatch/rerun or issue disposition.
+
+[Actual CI evidence](evidence/account-scope-ci-20261026.json),
+SHA b4844c7643a9999a59b8d50c00dafa14fb3a0a36460d4196a5d5361a510ecfc0,
+binds17raw artifacts/logs/receipts. An independent read-only audit verified all
+pins, JUnit identities/counts, actual browser/ingress checks, measured browser
+coverage and configured Sonar acceptance. Results:961unit/459PostgreSQL cases,
+zero failures/errors/skips;24actualbrowserflows/8TLS-WSSchecks. Combined1424cases
+repeat the1420backend cases and add4root import smoke cases; do not add those
+execution counts or claim real-model/broker end-to-end coverage. Measured coverage
+10645/12602lines=84.47%, including131browser-server line-bit rows from2SQLitefiles.
+The separate neutral Sonar check is not used for acceptance.
+
+Custom monitor confirms91% displayed/Delta0pp, raw91.250/100; L11restored5/5,
+all other gate scores unchanged. Public proof headers at publication time retain
+their truthful historical CI-pending status; the new CI proof supplies subsequent
+acceptance without mutating their hash chains. No new build/model/backend/pilot
+run was needed. Source612fa07b/testsdd239136 and187context/184image-file mapping to
+08cd remain valid. Unrelated staged research/docs are preserved. No active
+publication/watch/collector/test/build operation remains from this milestone.
+
+Research and actual Paper gates remain OPEN; final-computer validation is
+DEFERRED as instructed. No new private database/app recovery, broker connection,
+order, trading-setting change, OS change or Goal-status mutation occurred.
+
+## 26 October — current native context and database-only proposal ready
+
+User saysProceed. The retained Goal service is PAUSED; this manually authorized
+continuation changes no Goal status. Read the original attachment completely and
+the task-observer global-first instructions; custom progress_monitor baseline
+confirms91%/Delta0/raw91.250. GitHEADremains08cd with unrelated staged/docs intact.
+
+First inspect the interrupted preparation: refusal-result.json is terminal
+UNAPPROVED_EXECUTION_GUARD_PASS/exit3/APPROVAL_REQUIRED, no helper subprocess or
+private access. No recovery attempt or approval exists. An initial public-only
+preflight safely refused FRESH_NATIVE_CONTEXT_REVIEW_REQUIRED (receipt
+preflight-result.json); no private action occurred. Fresh read-only native context
+9a9255 verifies actual bootd5e34cc2-b5df-408d-9e0c-eaf8fb9359bd,
+pid:[4026532221]/mnt:[4026532219], PID1systemd. Sandboxed PID1codex sees different
+namespaces and is not host process-absence proof. Previous03a5candidate is archived
+under `.qa/paper-runtime-recovery-20261026/predecessor-03a5fc73`.
+
+The new helper is prepared before permission. Independent paper_read_review
+identified a false failure from comparing transientR/S process state; root fixed
+it to compare stable identity and independently reject absence/zombie, and the
+reviewer confirms no remaining finding. Final helper SHA
+52612e28488189bff47b73806fe98f58719738b560ed51039909c3e2dfb4709a;
+execution-planSHA3644e24e81849defaa497816bd6dcc4bde5f7a359a68e1dc4d5617c2c82f6ca0.
+Negative audit-hook guardda462b PASS (exit3APPROVAL_REQUIRED, zero helper private
+opens/subprocesses/mutations); final native preflight1c07df PASSexit0. The preflight
+reads only QA recipe, native self-context, GitHEAD and public executable hashes.
+It does not inspect private cluster files/processes/listeners, open SQL or start
+a service. Syntax PASS; no product/source/test change or expensive repeated tier.
+
+Local-only [review](../../.qa/paper-runtime-recovery-20261026/REVIEW.md),
+SHAf7f60cde6572f25f2cb0abbf108642b285aaf7ea665c2ec1d825c9e49884cbb5,
+and [proposal](../../.qa/paper-runtime-recovery-20261026/proposal.json),
+SHA5e776599a67672319b969d7623825af2f5fbad222fc422575fbcf13a61ed1bf4,
+describe the exact first stage: normal recovery/reuse of the existing PostgreSQL16
+cluster, Unix socket/noTCP, then bounded read-only identity/schema/aggregatecounts.
+Normal startup can replay WAL and update its recovery metadata. No app startup,
+backup/restore, migration, keys/accountciphertext/financialpayload, broker/TWS,
+relay, order, kill, lock deletion or automatic retry is included. Historical
+0019/disabledreadflags are not verified current state. Later backup/migration/app
+and actual read stages need their separately applicable reviewed authority.
+
+Owner approval for ONLY this database stage is now requested/pending. Do not
+create approval.json or run --execute until an explicit scoped answer arrives.
+On approval: read review/plan/helper, rehash exact bytes, verify fresh native boot
+and current HEAD, inspect any approval/claim/result/owned child receipt before
+attempting once in native context. Any new boot/changed recipe or incomplete
+attempt requires fresh review. On denial, preserve private state and report the
+dependent Paper gate blocked without further preparation loops. All actual
+research/Paper/final-host restrictions remain unchanged; no broker/order/service
+operation or provider call occurred in this continuation.
+
+Final custom progress audit: **91%/Delta0pp, raw91.250/100**; fixed weights and
+gate scores unchanged. Final public-only native preflight PASSED; the separate
+missing-approval execution guard correctly REFUSED before private access. No
+private recovery was attempted. Rootb0f12e verifies17CIrawpins/current08cdHEAD,
+208local links and helper/plan/receipt bindings. Current indexSHA
+a93381e14d8589205c16c14fa68900a8b8d41a25ff4d69bb6a3407ab1c2b9316;
+no staging/reset or source/test/config/migration/workflow diff was introduced.
+Whitespace7d50f3 PASS. All short audits/reviews are finished. Next owner action:
+answer the pending database-only approval; no laptop24h/temperature or Docker
+request. Research/Paper remain incomplete and final-host validation deferred.
+
+## 26 October — owner-approved database-only recovery complete
+
+Owner explicitly answersApprove this database-only check to the pending scoped
+request. Exact approval and owner receipt recordedbc6aa5; fresh native450703 still
+matchesd5e34cc2/pid2221/mnt2219 and08cdHEAD. Reviewed helper52612e28/plan3644e24e
+unchanged; no previous claim/result existed. Custom baseline91%/Delta0/raw91.250.
+
+One native launch101c1b/session67094 completeda93569 with actualexit0. All launch,
+child/start-ticks, exclusive claim, command and terminal receipts are retained in
+`.qa/paper-runtime-recovery-20261026`. Do not rerun this completed attempt.
+ResultSHA12361946daef8c000fed435a28021a6947ecc8ba3c6c8907f12fb2d9f1306a49 is
+PG_ONLY_IDENTITY_SCHEMA_AGGREGATES_COMPLETE_APP_NOT_STARTED. PostgreSQL was stopped
+(pg_ctl status3), then normal recovery succeeded(exit0). Exact native server,
+database, data directory, local socket/noTCP, PostgreSQL16 and private marker checks
+all PASS. Three bounded READONLY queries exit0. Actual revision is exactly
+0019_flexible_credentials; both0020journal tables are absent. Aggregate owner-chain
+check passes; counts remain private. No record-level consistency/data-loss claim
+is inferred from counts. No error/timeout or unresolved owned child remains.
+
+[Sanitized recovery evidence](evidence/private-postgres-recovery-20261026.json)
+pins the actual receipt chain. PostgreSQL remains up as the approved first-stage
+outcome; the app stays stopped. No SQL data writes/migration, backup, key/config/
+account ciphertext/financial payload access, broker/TWS connection, order, service
+stop/kill, lock deletion or automatic retry. Startup may perform PostgreSQL's normal
+authorized WAL/checkpoint metadata writes. No source/test/Git/OS changes.
+
+Current app requires0020 and must not start on0019. Next safe work: prepare the
+exact protected backup/restore rehearsal and additive0019->0020 proposal from
+source only; actual backup, private key preservation, migration and app restart
+are outside the consumed database-only approval and need applicable new authority.
+No further private inspection or Paper action is authorized by this milestone.
+
+## 26 October — conditional upgrade SQL tested on a new synthetic fixture
+
+Public-source offline Alembic generation d74ef8 exit0 renders only explicit
+0019_flexible_credentials:0020_broker_submission; no database or private config
+access. Root reviews the2043-byte output: two new journal tables, their indexes/
+constraints and the expected Alembic revision update. Wrapped SQL adds transaction
+budgets, expected0019/private-marker/table-set checks and stable ordered table
+locks plus SQL-only row/count digest comparison before any DDL. A static quoting
+defect in the initial unexecuted wrapper was found and fixed; old SQL is retained.
+Final wrappedSQLSHA39ba7d416192ceb5f70c3c6a3102b4b96061cae29b630b5e3f0640378779208c.
+
+The independent upgrade_sql_fixture agent uses only a new positively marked
+synthetic PostgreSQL16 cluster, owner-only Unix/noTCP. Native a62669/session15261
+completed2186b7 with actualexit0. Five cases PASS: valid baseline commits0020 with
+empty new journals and unchanged prior rows; changed row, unexpected table, wrong
+revision and wrong private marker each fail with rollback and unchanged original
+fixture data/schema. Actual private operator database is untouched by these tests.
+The new owned fixture was stopped with fresh PID/exe/cwd/startticks verification;
+postmaster.pid is absent. Do not rerun it or the successful cases.
+
+[SQL guard evidence](evidence/private-upgrade-sql-guards-20261026.json) pins actual
+fixture evidence5ba394e110b970477693d33c5be65f2adfdae71da716803dad54d0d39808b97b
+and terminal resulta11f8dee. Root independently rehashes all757 private raw pins.
+The150 command executions are instrumentation, not150 test cases: only5cases.
+This validates guarded SQL/DDL/rollback, not the new backup/restore orchestration.
+No migration/backup/key access to the operator source, app/broker action or source/
+test change. New finite preparation-only orchestration helper and private-target
+plan are being reviewed before the next single conditional-flow approval request.
+
+## 26 October — finite backup/conditional-upgrade helper prepared, not approved
+
+New QA-only helper `.qa/paper-upgrade-preparation-20261026/upgrade_private_once.py`
+is476lines/mode0600, finalSHA
+feccb536c8ff7150c3d1cf222854f3eacd823b279da381db207178991ea0a7a8.
+Root reviewed the complete initial flow and all subsequent additions. Scope binds
+only encrypted0019backup, sealed matchingenv/session/vault/TLSfile byte copies,
+new private restore copy/rehearsal, then the exact0020source update if every guard
+passes. No app start or broker operation. Plaintext dump/config stays in bounded
+anonymous RAM; encrypted artifacts and a separate owner-only recovery-key directory
+are preserved. No values are parsed or displayed. Archive/restore destinations
+are exclusive. Failure/interruption stops without retry/cleanup/restore/downgrade.
+Source0019 identity/quiescence/recipe/data/schema/sequence/config consistency and
+rehearsal comparisons must pass before the guarded source DDL transaction.
+
+Execution planSHAc23cb1f0d720463e65ad745469bd11d62c9b829fa465e5ceb99e6b5e78abc848
+binds exact08cd/d5e/native namespaces, prior PGreceipt12361946/stable process
+identity, basehelper52612e28, five public PostgreSQL executables, SQL39ba7d,
+migration4c6c9485, fixed sealed-file paths and unique target suffix9aa36afa2deb38cc.
+This only prepares targets; no actual key/config input was read or destination
+created. No approval.json/claim.json/result.json/backup exists for this new flow.
+
+Missing-approval execution guardcba6ec PASS(exit3APPROVAL_REQUIRED) under audit-hook
+denial of helper subprocesses/private or certificate inputs/mutations. Final
+public-only native preflight06a329 PASSexit0 for exactfecc/c23/39ba; it reads only
+public recipe/native self-context/Git/binary hashes, not private state or SQL.
+Syntax and pure-stub sequence identifier quoting pass. Clean client PGOPTIONS
+bound statement/lock/idle transactions, and owned command timeouts preserve exact
+child identity without killing or retrying. Unsupported foreign/materialized/
+partitioned relations or custom database ownership/ACL/settings stop before backup;
+ordinary sequence values/definitions are compared as server-computed hashes.
+
+A NEW focused synthetic helper fixture is being prepared by upgrade_sql_fixture
+to verify the changed RAMdump/Fernet/restore/schema/sequence primitives and copy
+upgrade. Do not restart the previous completed5-case SQL fixture. Inspect the
+agent's next fixture path/session/receipts before resuming interrupted validation.
+The operator source remains at0019/app stopped; only the earlier database-only
+approval was consumed. Do not ask/run the new conditional flow until this focused
+verification and the final review/plan are concrete; no actual backup/migration
+or extra private inspection is authorized yet.
+
+## 26 October — focused helper verification complete; exact upgrade approval pending
+
+New focused fixture `.qa/upgrade-helper-fixture-20261026-be0a84534684` tests only
+synthetic PostgreSQL16/dummy secret files. Nativece7c8c/session51627 completes
+f8b0ee with actualexit0; all7new case groups PASS: inventory/schema/sequence/DB
+defaults, custom-setting/unsupported-profile denials, anonymous-RAM pg_dump and
+authenticated Fernet backup, tampered-archive rejection, matching0019copy restore,
+helper-driven0020update only on that copy with original0019/data/sequence retained,
+and changed-sequence detection. Its owned new cluster is stopped using fresh
+PID/exe/cwd/startticks checks; postmaster.pid absent. No previous5SQLguard rerun,
+operator-bound flow/source_guard or private operator input was used by this fixture.
+
+Actual fixture evidenceSHA4e1add1bf61ab8461b843c292785502196c6ddab33aab0fa1a57aee150c88906,
+terminal resultSHA84692ad9b6e13fe242442280042dcd050f16a4a367ff4003f52cad6c8ffefdae.
+Root f904a8 verifies6raw fixture pins and202manifest members;98commands are
+instrumentation, not98tests. Testedfeccb536 predecessor is retained as
+`upgrade_private_once-tested-feccb536.py`. Afterward root fixes only main's outer
+receipt-error reporting: if an output receipt fails after authorization, report
+unknown operation state/inspect claim/no retry, rather than falsely no execution.
+Synthetic failure reproduction96d7b3 PASS. All25operational function AST bodies
+are unchanged; reuse the actual fixture results for those functions.
+
+Final helperSHAe0ac83bfc2f6a80df82fb4e4ff65b509e5b5cb569f695dd75e8a878794cfe3e9;
+plan remainsc23cb1f0d720463e65ad745469bd11d62c9b829fa465e5ceb99e6b5e78abc848,
+SQL39ba7d and source migration4c6c9485 unchanged. Final missing-approval guard
+abf4bc PASSexit3 under denied private/secret opens/children/mutations; final
+public-only native preflight1861b1 PASSexit0. Syntax PASS. No operator backup,
+key/config preservation, restore or migration has run. [Helper evidence](evidence/private-upgrade-helper-20261026.json)
+SHAd4527c06908e933cee47a51e6ad3105e07aa984c99694c2547d9af2f3df8591e
+binds16actual recipe/fixture/guard pins with scoped predecessor reuse.
+
+The exact local [review](../../.qa/paper-upgrade-preparation-20261026/REVIEW.md)
+SHA16eb5b775aad76eb76b9a37ba741498b49d598586fe72eb00a98d1c1638f2f98
+and [proposal](../../.qa/paper-upgrade-preparation-20261026/proposal.json)
+SHAacffefb1317a3f8978d4e45f58c3d3363ac386823372c01b6f316435d24420c6
+are ready. Owner question is pending for ONE conditional encrypted0019backup/
+matching settings-key preservation/private-copy restore+rehearsal/source0020
+operation. Successful conditional stages need no repeated question. No app start,
+broker/TWS/order, external flag change or source restore/downgrade is included.
+Encrypted bundles and a separately protected recovery key remain local; this is
+not an off-host backup. Failure stops and preserves artifacts; no auto cleanup.
+
+On approval: inspect exact review/plan/helper, verify current hashes and fresh
+native context/current08cdHEAD, then inspect any approval/claim/result/owned-child
+receipts BEFORE acting. Use the reviewed .venv Python/B flag and only exact bound
+targets. Do not rerun the completed PG-only recovery or either stopped test fixture.
+If a boot/recipe/source identity changed, review before execution; an in-flight
+or partial claim requires inspection, never automatic retry. Until the explicit
+answer arrives, create no new approval/claim and perform no private backup/update.
+The actual operator source remains0019 and app stopped. All research/Paper/live/
+final-host restrictions remain unchanged; original backend/CI/image evidence reused.
+
+## 26 October — final database-check continuation handoff
+
+Final custom progress_monitor audit91%/Delta0pp, raw91.250/100; fixed scores and
+weights unchanged. The completed PG-only recovery is a prerequisite; L09 was
+already fully credited. Operator backup/update is not authorized or executed.
+Research/Paper stayOPEN; final-host checks stayDEFERRED; liveOFF/SDKwritesCLOSED.
+Roota00d84 verifies39direct raw pins across the3new public milestone proofs,
+218local links and exact helper/plan/review bindings. HEAD08cd and unrelated index
+SHAa93381e14d8589205c16c14fa68900a8b8d41a25ff4d69bb6a3407ab1c2b9316
+are unchanged. Whitespaceae6038 PASS; source/test/config/migration/workflow diff
+659552 empty. All short audits/helpers/owned fixture commands are finished.
+
+Smallest owner action: answer the pending single encrypted-backup/private-restore/
+conditional0020-update request. No new credential, account setup, Docker start,
+laptop24h/temperature work or broker action is requested. The app remains stopped;
+the operator PostgreSQL remains up after its approved recovery. Reuse successful
+backend/CI/image/SQL/helper fixture evidence; do not rerun completed operations.
+
+## 26 October — approved private backup/rehearsal/source0020 update complete
+
+Owner explicitly answersApprove this backup and conditional update. Existing
+helpere0ac83bf/planc23cb1f/SQL39ba7d/review16eb5b77/proposalacffefb1 are unchanged;
+no prior approval/claim/result/launch/backup existed. Fresh nativef71ff8 verifies
+d5e34cc2/pid2221/mnt2219/08cdHEAD. Exact scope/hash approval and owner receipt
+recorded3e4163. Custom baseline91%/Delta0/raw91.250.
+
+Single native launch62f1d2/session19028 completed0e60a2 with actualexit0. Do not
+rerun this completed operation. Result
+SHA5f158dfeef600f702b16c6aba1a836bf8b282f455e5364db57f0b93c9a8a9828
+isPRIVATE_0019_BACKUP_RESTORE_REHEARSAL_AND_CONDITIONAL_0020_UPGRADE_PASS.
+PreservationSHAb49340ee records31preexisting public tables/2sequences; encrypted
+0019dump and sealed matching settings/session/vault/TLS files retained with a
+new separate owner-only recovery key. Root verifies backup/key directories0700,
+encrypted files/key0600 using metadata; no recovery key value is read or printed.
+No original key/config replacement or parsing/account decryption occurred.
+
+Actual private restore copy0019 matches all supported public table counts/data
+digests, full dumped schema, sequence state and database defaults. Exact0020
+rehearsal passes on that copy, then unchanged-source checks pass before the guarded
+DDL transaction. Source now verifies0020,33public tables/both new journals empty,
+preserved prior data except intended Alembic revision, unchanged sequences/original
+sealed-file identity+bytes and full source schema==rehearsal.
+RehearsalSHA8eea02b46665c6aa22bed812b2fd298afe82402baa3854d10e030f2c9b6faa01,
+schemaSHAa0a2594dea2dc125ea75e2c614ac076d9f3e2d22341d58e187e5f14de99f46df.
+All257client command receipts are contiguous/exit0; these are instrumentation,
+not257test cases. No pending/failed client or automatic retry.
+
+[Actual sanitized update proof](evidence/private-upgrade-result-20261026.json)
+SHAaee84444253dd86699f62f5ebb13ff9cf7d84355618cd0d1ea5f769753bea354
+pins15raw artifacts including encrypted bundle hashes and526member receipt
+manifest. Independent observation_launch_review audit confirms approval/hash/
+claim/terminal consistency and all code conditions required before PASS. It does
+not claim a new live SQL inspection. Backup/key/private copy remain local, not an
+off-host backup or final-host validation. Never automatically restore/drop the
+source, downgrade or remove these artifacts.
+
+The app is STILLSTOPPED; no broker/TWS/order, source restore/drop, settings/consent
+change, OS action or Goal status mutation. LiveOFF/SDKwritesCLOSED. Subsequent
+custom milestone audit91%/Delta0/raw91.250; no extra L09credit (already6/6).
+Research/Paper remainOPEN and target-host observation/thermal work remainsDEFERRED.
+
+Next authorized work is source-only preparation of a normal TLS app-start helper;
+actual startup needs fresh permission because this completed scope expressly kept
+the app stopped. Important source-trace finding: IBKR_ENABLED=false is NOT a
+universal selected-account read fence. Do not claim it blocks all SDK reads or
+decrypt account content without scope. Verify no automatic jobs/reads through
+normal startup, zero opted-in background metadata/no relay and safe health/login
+paths; trace default frontend boot before giving an owner navigation instruction.
+No broad new global fence or TLS/auth/scheduler bypass is justified. Use normal
+authenticated owner UI for subsequent saved-consent verification; no new broker
+read follows from service startup. Original source/tests/CI/image evidence remains
+valid and must be reused; staged/unrelated docs are preserved.
+
+## 26 October — normal TLS starter reviewed; app-start approval pending
+
+Actual backup/update proof remainsaee84444. Root0beedf rehashes its15directpins
+and526member receipt manifest; independent audit confirms recorded success/code
+conditions. Operator source was last verified0020/app stopped, with encrypted0019
+backup, separate recovery key and private rehearsal copy retained. This is concrete
+progress, not a completion or new host/Paper claim. No successful operation rerun.
+
+New source-only starter `.qa/paper-app-start-20261026/start_app_once.py`,
+SHA5472a7aa7b74fbccf786b0bb9498d5ce6fe6072ce1546380d909190d51c20730,
+and planSHA79b0b6ed3f2c3b58ac85ca6c26c9d26897f84865d59fd62b9128ee7434d6d8f0
+bind current08cd/d5e/native namespaces, stable PG identity/base52612e28, actual
+upgrade5f158dfe, schema0020/33tables, expected aggregate owner/control metadata,
+exact public startup sources, pinned public certificate and exact false flags.
+No private env/key contents, account decrypt, private metadata/SQL/socket, broker,
+model download or service action occurred during this preparation.
+
+Root reviews the full draft and final changes; independent observation_launch_review
+static audit PASS. SQL now uses the pinned base owned-client receipt/timeout path
+in the NEW QA directory; transient FD churn is tolerated while listener ownership
+is enforced; post-claim receipt failure reports unknown state/no retry. A fixed
+false-provider flag set cannot override authentication settings. No old private
+plan rewrite or obsolete helper import, migration, automatic stop/cleanup/retry.
+
+Two actual audit-hook refusal cases b8e381 PASS (missing approval, attempted auth
+flag injection) with helper children/private or certificate opens/mutations denied.
+Four pure synthetic control groups36592e PASS: stable R/S identity vs start-tick/
+zombie/absence denial; read-only SQL protocol/timeouts/error/multirow denial;
+owned loopback listener with FD churn vs public/unowned denial; unknown-state
+output after a synthetic claimed-operation receipt failure. They use AST-extracted
+functions/stubs, not actual app/SQL/network state. Syntax PASS. Final public-only
+native preflight5a45a8 PASSexit0; no private access or app start.
+
+[Starter preparation evidence](evidence/private-app-start-preparation-20261026.json)
+SHAe7bf34dfa38c452806ae2eab1ef7b875b4f7cd267af67c7bee1f1cc118394e20
+pins15raw helper/plan/review/guard/control/preflight artifacts. Exact
+[review](../../.qa/paper-app-start-20261026/REVIEW.md),
+SHA3603bfa7bb24c084b22a28ab7ab9247506dbd527cba14e136c0c624a7bc43997,
+is ready. App-start owner question is now pending. Do NOT create its approval,
+claim, result, child or application log, or start it until an explicit answer.
+
+If approved, one normal persistent `src.app:app` start uses the existing private
+working directory/.venv/settings/local model, production auth, recommend mode,
+normal scheduler and verified HTTPS127.0.0.1:18443. Fresh preconditions require
+matching PG/0020/33tables, owner chain, empty journals, zero automatic report/scan/
+monitoring/bank/simulator activity, no other source clients/app/relay and unchanged
+runtime bytes. Finite75s readiness requires DB+model ready, login200, anonymous
+auth/me401, exact owned loopback listener and preserved key/env FILEmetadata.
+The app reads its existing secrets normally; helper never reads their contents.
+
+Public frontend/login trace confirms defaultChat and stored account settings,
+idle authenticated WebSocket/cached market/safety/reports do not call the broker
+collector. Portfolio does. IBKR_ENABLEDfalse is not a universal read fence; do not
+claim fresh saved consent. After a successful approved start, owner may sign in
+and verify both Enabled/Read AuthorizedOFF in Brokerage Accounts before Portfolio,
+broker-reading chat or Read broker evidence. The agent never fabricates a session
+or fetches the owner's settings. No actual broker read/order follows from startup.
+
+Resume: inspect the exact new review/plan/helper and any prior approval/claim/
+child/result before an attempt, recheck native context/current08cd/runtime bytes,
+then execute only after its scoped owner approval. Preserve a partial/failed
+attempt; inspect the recorded child and private log rather than blindly retry or
+kill. No Docker, new account, laptop24h/temperature or OS action is needed.
+
+## 26 October — final approved-update continuation checkpoint
+
+Final custom progress_monitor audit91%/Delta0pp/raw91.250; rubric unchanged. Actual
+owner-approved backup/restore/rehearsal/source0020 is COMPLETE; app-start helper is
+reviewed and preflighted but its new permission question is pending. L09 already
+has full credit. Research/Paper remainOPEN; final-host checksDEFERRED; liveOFF and
+SDKwritesCLOSED. No Goal status mutation or budget-pause claim.
+
+Root03bfc4 rehashes15starter-preparation pins, verifies246local links, actual-update
+proof and exact helper/plan/review bindings. HEAD08cd and unrelated staged index
+SHAa93381e14d8589205c16c14fa68900a8b8d41a25ff4d69bb6a3407ab1c2b9316
+remain unchanged. Whitespace212e8a PASS; application source/test/runtime diff038fdb
+empty. All short reviews/audits/tests are finished; no app-start approval/claim/
+result/child/log exists. No new private query or secret access during preparation.
+
+Smallest owner action: answer the pending normal local TLS app-start request.
+The last approval expressly kept the app stopped, so do not infer startup
+permission from backup success or an automatic Goal continuation. After an explicit
+answer inspect the exact starter review/plan/helper, fresh native/runtime state
+and any attempt receipts, then run only that scope once. No broker, migration,
+new account, Docker start,24h laptop/temperature test or OS change is requested.
+Preserve the completed operation and all encrypted recovery material; do not
+restart old helpers/fixtures or duplicate a partial app launch.
+
+## 26 October — app-start permission recheck 1
+
+Previous Goal turn is PROGRESS: actual approved backup/rehearsal/source0020
+completed and the exact normal TLS starter was prepared/verified. This automatic
+continuation is NO MATERIAL PROGRESS, not a verified process wait. Check1d2361
+confirms08cdHEAD, same5472a7aahelper/79b0b6edplan, terminal actual-upgradePASS and
+no app-start approval/claim/result/child/log. No interrupted or live operation is
+being retried. The owner has not answered the existing app-start request; automatic
+Goal continuation does not grant that excluded service scope.
+
+Independent observation_launch_review narrowly rechecks remaining broker code/tests:
+uncertainty/dedup/partial-fill/restart/cancel-fill fixtures already cover the known
+local contract. No necessary new offline unit or failing reproduction identified.
+Real Paper transport/integration remains absent and unpassed; another disconnected
+fake layer would not close it. SDK submit/cancel guards remain unconditionally
+closed. Broader research needs permitted point-in-time data/decisions; source-call
+cap and consumed pilot must not be bypassed or rerun. Final-host work stays deferred.
+
+Acceptance rows L09/L11/L12/L15 are reconciled to already verified current proof;
+this documentation maintenance earns no new acceptance credit. No source/test,
+private runtime, broker, trading-setting, Git index or external-system change.
+Final custom audit91%/Delta0pp/raw91.250 unchanged. First consecutive unchanged
+app-permission blocker check since material progress: count1/3. Leave GoalACTIVE;
+do not mark blocked on this first recheck or mark complete. Next action is the
+already pending owner app-start decision; do not send duplicate approval questions,
+repeat passed tests or fabricate new work. Save/inspect this count at continuation.
+
+## 26 October — app-start approval arrived; normal native TLS startup PASS
+
+During the next permission recheck, owner explicitly answeredApprove starting the
+local app before any blocked-status mutation. The pending app-permission blocker
+is resolved; do not reuse its old counter. Fresh native4ce7d9 verifies exact
+d5e34cc2/pid2221/mnt2219/08cd and starter5472a7aa/plan79b0b6ed/review3603bfa7,
+with no previous app attempt. Approval and owner receipt71b70b bind the exact
+normal startup scope. Custom baseline91%/Delta0/raw91.250; approval alone earns0.
+
+One native launch6822ad/session57121 completed8fc856 with actualexit0. Do not
+relaunch this completed start or duplicate the server. Actual result
+SHA5c5f16088187bf068003396c9e8f7a0ecbc533b565064a508a3429e726e02bd9 is
+NORMAL_TLS_APP_READY_OWNER_LOGIN_REQUIRED_NO_BROKER_READ. Four bounded read-only
+metadata clients exit0; same PG/private marker,0020/33tables/emptyjournals, expected
+owner/control counts, no other source client/app/relay and zero automatic work
+profile pass before launch. Normal production auth/scheduler/recommend/provider
+profile is preserved; no new migration, model download, account decrypt by helper,
+key/config replacement, fabricated session or automatic kill/cleanup/retry.
+
+Persistent normal app PID125035/start2674220, executable/usr/bin/python3.12,
+private working directory, current bootd5e and exact uvicorn command
+SHA84f4ac0f32a6e2f8902d13884a69ff603a2a9828075516b0d7b3bd11ad1dd350
+are recorded in app-child/result. Pinned existing certificate hostname/chain
+verification succeeds. Actual native DB+existing local model ready200, login200,
+anonymous auth/me401; exact owned127.0.0.1:18443 listener verified. PG identity and
+key/env FILEmetadata unchanged; relay17497 and PG55441TCP absent. Application log
+remains private0600 and was not read/published for this proof. No SDK request or
+order by the helper; liveOFF/SDKwritesCLOSED. This is readiness, not a new model
+answer-quality/performance benchmark or final-host acceptance.
+
+[Actual startup proof](evidence/private-app-start-result-20261026.json),
+SHA93719d0ba2e56ff5000cd7f7664b389761bf5d0979eff314cedc0fd38a1e4f3f,
+pins20raw approval/recipe/claim/child/terminal/client artifacts. Independent
+observation_launch_review audits recorded hashes/approval/claim/exit0/process
+identity and source conditions required before PASS; no extra live/private query
+or present-liveness claim. Helper leaves the app running intentionally. Do not
+stop it or old PG/fixtures merely because this Goal turn ends.
+
+Owner UI question is now pending: openhttps://localhost:18443, sign in with the
+existing Investments Assistant account and inspect both Enabled/ReadAuthorizedOFF
+in Brokerage Accounts; reply only status. Do not ask for login/account details or
+have the agent retrieve settings/fabricate a session. No Portfolio/ReadEvidence/
+broker-reading chat until the saved flags are checked. Frontend defaultChat does
+not start a collector; IBKR_ENABLEDfalse is not a universal account-read fence.
+This UI check grants no broker-read or execution authority. Browser/Windows access
+and authenticated owner login are not proved by native readiness alone.
+
+This turn is material PROGRESS: the approved normal application is started and
+verified. `.qa/goal-continuation-state.json` resets the old permission blocker and
+records the distinct owner-browser/saved-flags check, first appearance count1
+including this originating Goal turn. Count the original appearance when auditing
+three consecutive blocked turns; do not omit it merely because earlier work in
+that turn made progress. A human reply/new evidence or meaningful state change
+resolves the relevant condition. No Goal status mutation occurred.
+
+Resume by inspecting the existing app-child/result/current native identity rather
+than starting again. Reuse all valid backend/CI/image/runtime evidence. Keep actual
+Paper/research OPEN and final-host24h/thermal/clock work DEFERRED. No new provider,
+broker/TWS, order, secret extraction, OS change or publication is authorized.
+
+
+Post-launch verificationaa66ed confirms the SAME ownedPID125035/start2674220,
+exact command/cwd/exe and native boot, after starter and launcher were terminal.
+Pinned nativeTLS DB/model-ready200/login200/anonymousauth401 and owned loopback
+listener still pass; no relay/PGTCP. No restart, stop, config change, portfolio/
+account setting read, broker request or secret content access. [Post-launch proof](evidence/private-app-post-launch-20261026.json)
+pins4actual artifacts. This is one scoped persistence/readiness check, not a
+continuous soak, Windows/browser/owner-login proof or a new model benchmark.
+
+
+## 26 October — final normal-app-start continuation checkpoint
+
+Final custom audit91%/Delta0pp/raw91.250 unchanged after actual normal startup
+and post-launch persistence checks. The earlier app-permission blocker is resolved;
+no blocked status was set. The owner-browser/saved-read-flags check is pending,
+first appearance count1 including this originating turn. Material progress is
+actual persistent app startup/verified TLS/readiness/auth, not another plan.
+Research/Paper remainOPEN; final-host validationDEFERRED; liveOFF/SDKwritesCLOSED.
+
+Root8367d2 verifies20actual startup raw pins/253local links, exact08cdHEAD and
+unchanged unrelated staged indexSHAa93381e14d8589205c16c14fa68900a8b8d41a25ff4d69bb6a3407ab1c2b9316.
+Whitespace0867cd PASS; application source/test/runtime diff02bb11 empty. Subsequent
+post-launch proof0b771dce pins4fresh artifacts and confirms the same app is still
+ready AFTER its starter/launcher exited; it does not prove browser/owner login or
+continuous observation. All short agents/controllers are terminal; the owned normal
+app and operator PG intentionally remain running. No restart/stop or broker action.
+
+Smallest owner action: openhttps://localhost:18443, sign in with the existing
+Investments Assistant account, and reply whether both Enabled/ReadAuthorized are
+unchecked in Brokerage Accounts (or whether the app does not open). The existing
+UI question is already pending; do not duplicate it. Keep account identifiers and
+login details out of chat. Do not open Portfolio/ReadEvidence or request broker
+chat reads yet. Do not bypass auth, fetch settings as agent or assume fresh Paper
+provenance/consent. Broker data/forward authority remain separately gated.
+
+On continuation inspect actual app-child/result and current native identity/owned
+listener if diagnosing access; never start a duplicate or stop it from a stale PID.
+Reuse successful backend/CI/image/native startup evidence. No new24h laptop,
+temperature, clock, Docker, model/provider download or OS step is requested.
+No Goal status mutation or overall completion claim; all original scope persists.
+
+
+## 26 October — owner UI prerequisite recheck 2 of3
+
+Previous Goal turn was actual app-start PROGRESS. Current continuation is
+NO MATERIAL PROGRESS, not a verified process wait. Recheck6ce3c4 confirms terminal
+successful startup/launcher0/post-launchPASS receipts, unchanged08cdHEAD and no
+application source diff. Owner has not answered the existing browser/sign-in/
+read-flagsOFF question; no confirmation record exists. No runtime probe, duplicate
+start, test rerun, broker/provider request, secret read or consent change occurred.
+Final custom audit91%/Delta0pp/raw91.250 unchanged.
+
+Same owner-UI blocker count2/3 includes its original appearance in the successful
+app-start turn. Goal remainsACTIVE at this second check. If the next Goal turn
+still has no new human reply/evidence or productive authorized action, run the
+final short audit and set GoalBLOCKED at count3; do not keep an automatic loop
+running. A new owner response can resolve/change the condition. Do not duplicate
+the already pending UI question or treat automatic continuation as confirmation.
+Smallest next input: whether the app opens and both saved read boxes are unchecked.
+Preserve running app/PG, completed evidence and all original trading restrictions.
+
+## 26 October — owner browser/read-flags confirmation received
+
+During the third recheck the owner explicitly repliedApp opens; both unchecked
+before any blocked-status mutation. That resolves the browser/saved-flags condition;
+do not mark the Goal blocked from that old counter or repeat the same UI question.
+The owner used normal app sign-in/Brokerage Accounts. No login/account details
+were received and no agent session fabrication/settings request/decryption occurred.
+The new `owner-ui-confirmation.json` is under `.qa/paper-app-start-20261026`.
+[Owner UI evidence](evidence/paper-owner-ui-confirmation-20261026.json) records
+only app access and reported Enabled/ReadAuthorizedOFF, not broker provenance or
+connection authority. This new evidence changes the next action and is PROGRESS.
+
+Next current TWS status question is pending: red Paper/simulated banner visible
+and Read-OnlyAPI still checked, while app read switches stayOFF. Status alone
+does not authorize a connection. Keep all actual SDK writes closed/liveOFF.
+One further read needs its scoped approval, current selected-account/Paper checks
+and normal authenticated owner UI consent; no read/re-enable/relay now.
+
+Source-only finite relay preparation is delegated to paper_read_review in
+`.qa/paper-read-preparation-20261026`; no native/real relay may run until reviewed
+and separately approved. Historical relay3e52f474 source is rehashed before reading;
+it is literal WSLloopback17497->Windowsloopback7497 through owned PowerShell stdio,
+64KiB buffers/no payload log/5sconnect/finite child cleanup. Existing synthetic
+proof covers that older core. New scope should be one session<=60s and total
+lease<=600s, no sequential reuse, no firewall/trust/OS change or raw broker output.
+Do not import/run old helpers or repeat their real session. New helper code/tests
+are preparation only, with any test destination positively synthetic/not7497.
+
+
+## 26 October — current Paper status and final one-read preparation
+
+Owner replyBoth confirmed resolves the pending current Paper-banner/Read-OnlyAPI
+status questioncall_3ce49489c96345d683b1f2b4804c56cc. That question explicitly grants
+no connection authority. Earlier normal app login/both saved read switchesOFF is
+confirmed; do not repeat setup, recovery, migration, app start or the status question.
+The running app and operator PG are intentionally preserved. Goal staysACTIVE.
+
+[Preparation proof](evidence/paper-read-preparation-20261026.json) pins13raw QA
+artifacts including exacthelper00879c878331d0389024dce02c12341f7302d9777748d81d71e2dc636aef7290
+and planbb5e305988c4672c217aa593f35deb257d33a1d4de3cc92a309784662dbda2f3.
+All19 pure-double casesPASS; finalhash root missingapproval guard exits3 before
+resource/private input/write access, no claim. Independent review found ancestor
+redirection; final resolvedpath checks/test fix it before controls/context/claim.
+No actual relay/new broker TCP/SDK/financial read or account-flag change occurred.
+Historical unchanged Windows stdio core retains its scoped synthetic-echo proof;
+current fake tests do not prove native TWS compatibility or data completeness.
+
+Native metadata09c805 confirms Windows7497 listener owned by twsPID23100 on IPv6
+wildcard::; it is NOT a loopback-binding or effective firewall/localhostonly proof.
+No socket probe was used. Proposed relay targets literalWindows127.0.0.1 only;
+retain TWS localhostonly setting, never broaden trust/firewall/OS configuration.
+
+Current one-shot candidate allows one admitted session<=60s/lease<=600s,64KiB
+buffers/no payloadlogs/5sconnect; exactnativeboot/namespaces and hashbound approval
+required. Approval/claim areABSENT. Do not launch without fresh explicit one-read
+owner consent for the SAME intended saved Paper record and private metadata review.
+Revalidate current owned app/PG/head/nativecontext/listeners immediately before
+any approved launch. Readiness must use stdout plus ownedlistener metadata; NEVER
+TCPprobe17497, which consumes its sole session and initiates the upstream attempt.
+After READY owner alone enables both savedreadflags via normal authenticated UI,
+clicksReadbrokerevidence once, reports only safe status, then turnsbothflagsOFF/save.
+No fabricated login/settingsdecrypt/accountID or financialpayload in chat/public.
+No retry, claimreset, order/cancel, newproviderrequest or brokerwriteauthority.
+
+Customprogress_monitor finished91%Delta0/raw91.250. No new acceptancecredit for
+preparation; L04/L15 actualscope/completeness/reconciliation/forwardauthority and
+broader L14 research remain OPEN. New laptop24h/temperature/clock work remains
+DEFERRED to the finalhost, notpassed. SDKwritesCLOSED/liveOFF. Nextownerpermission
+is the new boundedone-read question, not another statuscheck. This approval blocker
+first appears here(count1), replacing the resolved currentTWSstatus condition.
+
+
+Final preapproval safe-boundary reconciliation26October:
+13new raw preparation pins and171local acceptance-document links verified.
+HEAD08cd/application source unchanged. Unstaged whitespacePASS; stagedcheckPASS
+excluding the immutable historical publication.patch. Fullstagedcheckexit2 flags
+45lines that are exactly one unified-diff blank-context prefix(space), not source
+whitespace edits. Preserve approvedpatch bytes/hash; no evidence normalization.
+New one-read approval question requested once and pending; approval/claimABSENT,
+no actual relay/brokerconnection. Finalcustomaudit91%Delta0/raw91.250. GoalACTIVE
+at firstappearance of this newapproval blocker; currentTWSstatus blocker resolved.
+
+Unexpected INDEX change: earliera93381 now4d0c36f7573c0b3d3a6eecc62eaf53b1103416a58c6d5ce369a751fcfb5e24e1;
+34stageddocs/evidencefiles, including formerlyuntracked publicproofs. Root performed
+no staging/reset/commit; progress_monitor reports no commands or Gitmutation.
+Provenance unknown; preserved without undo/publication. No appsource/test/config
+diff, index stable during finalverification. Initialreconciliation b2f652 exits1
+on index assertion before writes; second3bd837 exits1 on fullstagedcheck before
+writes. Both investigated read-only(c1e9e8/e9feca); finalreceipt records facts in
+.qa/paper-read-preparation-20261026/preapproval-reconciliation.json.
+No source retest/rebuild/pilot replay needed. No validation operation left to poll;
+approved normal app/PG deliberately remain running. Smallest nextowneraction is
+answer pending one-read approval. KeepappswitchesOFF until approved relayREADY.
+Before launch revalidate fresh nativecontext/exactappPG/source/listeners; never
+TCPprobe17497 or reset claim. Research/PaperOPEN/finalhostDEFERRED/liveOFF.
+
+
+## 26 October — pending one-read approval recheck2of3
+
+Previous Goal turnPROGRESS completed currentPaper/ReadOnly ownerstatus and final
+relay preparation; it first encountered the new explicitone-readapproval blocker.
+This automaticcontinuation is NO_PROGRESS, not a verifiedprocesswait. Read-only
+04608c confirms exact08cdHEAD/noapplicationsource diffs,13preparationpins valid,
+approval/claimABSENT and no new ownerpermission. No relay/SDK/privateaccount read,
+providerrequest, runtime start/stop, test rerun or Gitmutation. Existing question
+already pending; do not duplicate it or treat continuation/status as permission.
+
+Finalshort customprogress_monitor audit91%Delta0/raw91.250; no materialchange.
+Saved count2 includes original productive turn's pendingpermission appearance.
+GoalACTIVE/incomplete at count2. If nextcontinuation still has no ownerreply or
+new productive authorized action, finalaudit then markGoalBLOCKED at count3;
+do not continue an automaticno-progress loop. New approval resolves this condition
+and requires nativepreflight before exactlyone ownerUIread, never an automatic
+retry. SDKwritesCLOSED/liveOFF, researchOPEN/finalhosthardwareDEFERRED.
+
+
+## 26 October — one-read approval blocker3of3; final blocked audit
+
+PreviousGoalturnNO_PROGRESS. Current read-only114dd9 verifies exact08cdHEAD, no
+applicationsource diffs, all13preparedrawpins valid, approval/claimABSENT. The
+alreadyrequested exactone-read permission has no owneranswer; neither automatic
+continuation nor priorPaper/ReadOnlystatus grants it. No runtime/controller job
+is awaiting verification. No duplicateprompt, test rerun, broker/providerread,
+settings decrypt, relay, runtime restart/stop or Gitmutation occurred.
+
+Finalcustomprogress_monitor91%Delta0/raw91.250 confirms no independent safe
+gate-closing work without ownerinput. Samegenuinepermissionblocker now appears
+for3consecutiveGoalturns, including originalproductivepreparationturn1 and two
+unchangedrechecks. BlockedauditPASSED; issuing update_goalblocked after this
+checkpoint. This is INCOMPLETE, notcompleted. On userresume reset the blocked
+audit count, inspect preservedstate and require actual scopedapproval before
+any relay/nativeAPI connection. Do not keepautomaticno-progress loops running.
+
+Nextowneraction: answer existingone-readapprovalprompt. Keepbothsavedappread
+switchesOFF until separatelyapprovedrelayREADY; no24h or temperaturetest here.
+ActualPaper/fullreconciliation and broaderresearch remainOPEN; finalhosthardware
+checksDEFERRED, notpassed. All reviewedprivatebackup/update/appstartup evidence,
+currentCI/image/tests and externallyobservedstageddocs are preserved. Normal
+approvedapp/PG remainintentionallyuntouched; SDKwritesCLOSED/liveOFF.
+
+
+## 26 October — exact one-read approval received; native preflightPASS
+
+Owner explicitlyapprovedtheSAMEsavedPaperaccountONEread in question
+call_4e8a5b5c46134320af04fa4a5a20cbff. This resolves the previouspermission
+blocker; reset blocked-audit counters. Preserve the fullGoal/research/finalhost
+limitations. Goaltool laststatusblocked has no programmaticresume action; actual
+ownerpermission now authorizes this bounded nextstep, not completion.
+
+Receipt .qa/paper-read-preparation-20261026/owner-one-read-approval-receipt.json
+records exactscope. Actual nativepreflight b06a7b/ea3f62PASS: same appPID125035
+startticks2674220 andPG17955/start286159 inbootd5e/native2221; exact08cd/public
+sourcepins, pinnedTLSready200/database+modeltrue, login200/auth401, ownedloopback
+app, noPGTCP/no17497relay. Windows7497 stilltwsPID23100 on::, onlymetadata—not
+Paper/nativeaccount/effectivefirewallproof. No brokerTCP/APIrequest.
+
+New metadata-only preflight/detachedlauncher reviewedPASS by observation_launch_review.
+Root tightens its READY receipt to reject nonempty safe relaystderr and avoid
+unobserved actual-connection-count claims. CompileonlyPASS; no applicationchange.
+Exactapproval.json now binds reviewed00879chelper/bb5eplan and actualownerpermission;
+helperclaim isABSENT untilone-shotlaunch. Do not reissue approval, clearclaims or
+repeatanyoldrecovery/appstart. One-session60s/lease600s, ownerUIreadonce/offafter,
+privatepayloadslocal/rootonlysafemetadata. SDKwritesCLOSED/liveOFF.
+Custombaselineaudit91%Delta0/raw91.250; approval/preflightaloneearnnoPapercredit.
+
+
+## 26 October — actual single approved relay READY; owner one-read prompt
+
+Nativeone-shot launch555b39/session36186, terminal90f5f3exit0. Exactreviewed
+00879chelper/bb5eplan/caff3886approval consumed exclusiveclaim once. ChildPID166106
+startticks3606687/bootd5e/native2221. Nativepostcheck8ef2bf proves SAME detached
+process survivedlauncherexit and owns12717497 viafd/inode; safe relaystderrEMPTY,
+noSESSION_STARTED reported at that observation, no TCPreadinessprobe. Do not
+infer ongoingabsence of a session after that time or any Paper/nativeaccountproof.
+
+[Actuallaunchproof](evidence/paper-one-read-launch-20261026.json) pins16rawartifacts.
+Source-reviewedmetadata.sql178f20a6 executedONCE BEFORE ownerinstruction via
+identity-verified nativePG Unixsocket, READONLY/5sSQL/15souter; fc913f psql0.
+Identity/schema0020/singleownerrecord/ownerchainPASS. ExactlyoneHISTORICAL17Oct
+snapshot: positionscomplete/cashincomplete/non-atomic, declaredPaper/environment
+null/authoritynone; zeroexecution/commission/orderobservations. No values/IDs/
+settings/credentials/financialarrays returned. This baselineisNOTanewbrokerread.
+ActualAFTER query is stillpending; metadata-before execution/result receipts exist,
+never rerun the BEFORE query. No applicationlog/privatevault decrypt.
+
+Ownerprompt now requests normalBrokerageAccountsUI SAMErecordenableboth/save,
+ReadbrokerevidenceONCE/confirm, afterresultdisableBOTH/save, replyonlysafestatus
+andflags-off. Existing prompt already pending; do not duplicate or ask for IDs.
+No rootfabricatedauth/privateAPIrequest. Keepreadonly/localonly/Paper. Ifexpiry
+orreadfailure do notautoconnect/relaunch/retry/resetclaim; inspect SAME166106
+identity/logs/result first. Helperlease600s/session60s includesfiniteguard/cleanup;
+OSclockdiscontinuity mayfailclosed and cannotbe bypassed or OSrepairedhere.
+
+Nextcontinuation: inspect SAME claimednativehelper/readyfiles/safestderr before
+anythingelse. Ownerreadresult+bothoffconfirmation required. Run exactsafeSQL
+ONCE AFTER completion (newmetadata-after receipts, sameidentity/socket) and compare
+counts/typedtimestamps/allowlistedflags; retainpartial/null/history limitations.
+Do not read financialpayloads/raw applicationlogs or repeatread to improve evidence.
+Inspect closedlistener/sameownedchildcleanup after its sole session or expiry;
+no success from READY/baselinealone. Realnativebinding is enforced inappbefore
+financialsync but no nativeproof flagispersisted; keep evidencescopeaccurate.
+
+Finalshort customaudit91%Delta0/raw91.250; no duplicatecredit fortransport or
+historicalbaseline. Current ownerUIresult blockerfirstappearancecount1 after
+resolvedpermissionblocker. PreviousGoaltool statusblocked hasno programmatic
+resumeaction; userapproval authorizes thiswork. FullPaper/researchOPEN, targethost
+24h/temp/clockDEFERRED. SDKwritesCLOSED/liveOFF. App/PG deliberatelypreserved.

@@ -10,7 +10,8 @@ historical interrupted, failed and completed observations with their source scop
 
 The owner explicitly keeps research and external Paper gates open. L04/L15 still
 need their outstanding lifecycle, provenance, reconciliation and authority evidence;
-L14 still needs permitted historical data and the approved universe/evaluation.
+L14 still needs time-aware news/model, representativeness and agreed forward
+evidence beyond the completed private price-only pilot.
 Portable offline Paper implementation can continue within checkout authority, but
 offline tests cannot establish actual connectivity, execution authority or economic
 results. External SDK writes remain closed and live trading stays OFF. This handoff
@@ -24,13 +25,21 @@ CPU temperature/throttling sources. GPU capability needs its own runtime/build
 evidence. The final host is unknown; do not assume Windows, WSL, Linux, a Pi, an
 existing sensor tool, a network address or certificate trust.
 
-Current portable source is published asd5aa99e, migration0020; [image5631759f](evidence/paper-recovery-image-review-20261023.json)
+Current portable source is published as08cdba5, migration0020; [image146d8bac](evidence/ibkr-read-scope-image-20261026.json)
 reconciles all187context/184copied files to that commit. It is an amd64 build and
 isolated smoke result, with prior actualGGUF/startup/restart proof reused only for
-unchanged surfaces. [ExactcurrentCI/Sonar39983987095](evidence/paper-recovery-ci-20261023.json)
-passes allfourjobs,920unit/459PG/1383overlappingcombined and24browser/8TLS-WSS.
+unchanged surfaces. [Exact currentCI/Sonar40259671081](evidence/account-scope-ci-20261026.json)
+passes allfourjobs,961unit/459PG/1424overlappingcombined and24browser/8TLS-WSS.
 None of this proves
 final-host compatibility or hardware acceptance.
+
+The owner-approved [local private backup/rehearsal/update](evidence/private-upgrade-result-20261026.json)
+now verifies this laptop's operator database at0020 while preserving its prior
+data, sequences and matching settings/keys. Encrypted0019backup, separately
+protected recovery key and private rehearsal copy remain local. This is not an
+off-host backup, migration to the final computer, or permission to transfer/start
+anything there. Retain the protected material; never use the rehearsal copy as
+the normal app database or copy the ignored tree blindly.
 
 Retain the chosen source revision, dirty application diff if any, dependency lock
 hash, migration head, build-input hashes, image ID/architecture and GGUF licence,

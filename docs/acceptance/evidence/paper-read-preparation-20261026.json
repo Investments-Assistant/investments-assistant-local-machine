@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "status": "PREPARATION_VERIFIED_OWNER_STATUS_RECEIVED_FRESH_READ_APPROVAL_REQUIRED",
+  "recorded_at": "2026-10-26T19:32:01.929251+00:00",
+  "head": "08cdba57b6d8f4d192e2fa858945ae1d4cee12d4",
+  "owner_current_paper_banner_reported": true,
+  "owner_current_tws_read_only_api_reported": true,
+  "owner_app_access_and_saved_flags_off_previously_confirmed": true,
+  "pure_tests": {
+    "run": 19,
+    "failures": 0,
+    "errors": 0,
+    "real_sockets_or_children": 0
+  },
+  "final_missing_approval_guard": "PASS_REFUSED_EXIT3_BEFORE_RESOURCES",
+  "independent_path_review": "RESOLVED_ANCESTOR_REDIRECTION_FINDING_STATIC_REVIEW_COMPLETE",
+  "windows_listener_metadata": {
+    "port": 7497,
+    "process_name": "tws",
+    "address": "::",
+    "binding_is_wildcard": true,
+    "local_only_enforcement_verified": false
+  },
+  "proposed_scope": {
+    "owner_normal_ui_reads": 1,
+    "relay_admitted_sessions": 1,
+    "session_seconds": 60,
+    "relay_lease_seconds": 600,
+    "local_endpoints": "WSL127.0.0.1:17497_to_Windows127.0.0.1:7497",
+    "payload_logs": false,
+    "financial_results": "PRIVATE_LOCAL_ONLY"
+  },
+  "actual_new_broker_connections": 0,
+  "actual_new_broker_reads": 0,
+  "relay_launched": false,
+  "approval_or_claim_present": false,
+  "trading_or_settings_changed": false,
+  "sdk_writes": "CLOSED",
+  "live_trading": "OFF",
+  "limitations": [
+    "Owner attestation is not independent native Paper/account or execution-authority proof.",
+    "Transport metadata and pure tests do not verify broker connectivity, scope, completeness or reconciliation.",
+    "Separate fresh owner one-read approval and current preflight are required before launch.",
+    "No new provider requests or paid service; no final-host or research completion inferred."
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-read-preparation-20261026/windows_local_relay_once.py",
+      "sha256": "00879c878331d0389024dce02c12341f7302d9777748d81d71e2dc636aef7290"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/execution-plan.json",
+      "sha256": "bb5e305988c4672c217aa593f35deb257d33a1d4de3cc92a309784662dbda2f3"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/test_relay_pure.py",
+      "sha256": "a3050f8757b5083f37aa05b21ac50139a86e367ee66b02d013b0bf4c0ac6acae"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/pure-tests-result.json",
+      "sha256": "8a38853eef5479343f20e319a06f158fd6fcf41f89839c0ea14f870786d97bab"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/pure-tests-execution-r3.json",
+      "sha256": "b5c86d2dbcde648e34397c9f0f9ea68659411ad92968fe83dde6df806ae6fb63"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/root-guard-harness.py",
+      "sha256": "657841dd505970a3f1ec0db40cf0b56b84b070d2a4adbe3e4450858d1b949b22"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/root-guard-v2-result.json",
+      "sha256": "6adb65ade9cdac3a242b2a0f84df1521fd38b50ce70f25df3e5260ad2ee42454"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/root-guard-v2.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/root-guard-v2.stderr",
+      "sha256": "39b99b439159b5ff2b0d2845d8f97d00dd362c904b85426a855573d9056ab801"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/relay-candidate-final.diff",
+      "sha256": "bafd273dcfb7621a412c9ba335fcbaf103134e2e8b87bfc159f0e4361cbf2e45"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/REVIEW.md",
+      "sha256": "596bb0cea321d6052a96effdc4833ed5593847b1f56916b184d13b59a7ffaeec"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/owner-tws-status-confirmation.json",
+      "sha256": "e621c7fd07a4adb3b3d1cae512a76417fb8be23d9f8485b180a77bbf636e19e1"
+    },
+    {
+      "path": ".qa/paper-read-preparation-20261026/windows-listener-metadata.json",
+      "sha256": "890abb429d5b409bf6320fae13ffcf7ee85d13cbcffb53c01ff647c8734406e9"
+    }
+  ]
+}

@@ -1,0 +1,302 @@
+{
+  "status": "OWNER_APPROVED_PRIVATE_PILOT_COMPLETE_VERIFIED",
+  "at": "2026-10-24T12:39:25.379294+00:00",
+  "head": "6c518a262088a099d1c7637e0c0fe90d763314c8",
+  "approved_protocol": {
+    "path": "docs/acceptance/research-pilot-proposal.json",
+    "sha256": "3a5371cc7e04edc7530d2392cfdc5ab0fcc6070e75c6fc74d1ca1e2c9fbddae3",
+    "owner_question_call": "call_0a604ac1bfbf4ea8913c55d3045d905b",
+    "answer": "Approve this private historical pilot"
+  },
+  "source_qualification_evidence": {
+    "path": "docs/acceptance/evidence/research-source-qualification-20261024.json",
+    "sha256": "62d470a5364e52d569a8c0776885e0e589b07a7b804ed3094ad615fb8cf3f79c"
+  },
+  "synthetic_validation": {
+    "adapter_cases_passed": 64,
+    "runner_control_cases_passed": 5,
+    "all_actual_exit_codes": 0,
+    "older_63_adapter_receipt_not_added_to_count": true,
+    "actual_private_data_or_actual_strategy_used_in_tests": false,
+    "network_denied": true
+  },
+  "actual_preparation": {
+    "tool_session": "76e525/session24404 ->854c37 terminal0",
+    "freeze_sha256": "033d0585968a5e98324cafa62b2e945cbdeaf863ac20e415bd020e622e31cb02",
+    "normalized_bars_sha256": "a82b45dbad8976f227f1b7e20935bcb633965731eeb43d29318d8d72ec437c0a",
+    "engine_sha256": "db489d457c53e95087ab299a2b26279be4b7a2e4005ed774e090039493a65c27",
+    "root_frozen_review": "16cc24; originalrawopen/close/volumeUSDandearliest240commonselection verified beforeactualrun"
+  },
+  "actual_execution": {
+    "tool": "6b9c93",
+    "exit_code": 0,
+    "runs": 1,
+    "completed_comparisons": 18,
+    "design": "2 separate samples x3 chronological windows x3 fixed strategies",
+    "windows": "120/60/60 independent cash start; ten-session lookback inside each window",
+    "private_result_sha256": "6f0b95b19cc6732bbac96fd9bd75f5bf3369f62db2eac4bc8380b8797429ca6d",
+    "silent_retry_or_parameter_tuning": false,
+    "network_broker_or_provider_actions": 0
+  },
+  "independent_static_review": "observation_launch_review found no material defect in bounded runner/adapter/engine review",
+  "root_reconciliation": {
+    "tool": "7d44a3",
+    "all18cell_inputhashes_rebuilt_without_replay": true,
+    "all18cellfiles_aggregate_and_datahashes_verified": true,
+    "window_state_initialcash_temporalfill_and_equityrowcounts_verified": true,
+    "cash_holdings_dividend_receivable_USDidentity_reconciled": true,
+    "diagnostic_criteria_recomputed_without_replay": "ebb0af",
+    "private_assessment_sha256": "9f35237392906f7cb94d30f54b1e72dbd69035fc823843eb0279a032036452b8"
+  },
+  "evidence": [
+    {
+      "path": ".qa/research-pilot-20261024/adapter.py",
+      "sha256": "c9ca5a2dd26d5713742b86f3e4e836b6a5d40fa434e4850a1a8575ddc0d4bc88"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/adapter_test.py",
+      "sha256": "34bc6bff15322a53a9d352405f86a8c7469b500ea52377d2c4e89cf23d8ba957"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/adapter-tests-execution.json",
+      "sha256": "002892a2b998ec05eebffc8f309f0206b26f759a56ce24154ab5052a380bd516"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/adapter-tests-junit.xml",
+      "sha256": "60816f8747ba98abde230c41fdbb7dc269760fade2328693689210650d5689e6"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/adapter-tests.log",
+      "sha256": "89ef075ed9f82cf2fc1e0ba0acf2aa8d979d2250e6c3129063b63a5c4f57e6e9"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/run_pilot.py",
+      "sha256": "cba9e8db8731a12beaff3c557569c964f48fa3b395ea52647de5e043e190905e"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/runner_test.py",
+      "sha256": "9d4550f76bb7cca3d00542f650c6317ef97d582a61564b9d3bdf41f84fdde1e5"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/runner-tests-execution.json",
+      "sha256": "4e394c6e446eba8331a43dd16d312e2b1330dd2a9e8302bb569482c2266ac8de"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/runner-tests-junit.xml",
+      "sha256": "42bf6462e0561126a2ca759bf1e7cbcda964091016d2bc91b777d979d5039949"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/runner-tests.log",
+      "sha256": "2456ff14beda5017fde75e54110d18d83fe6355248fc701b5d2966472152a6cb"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/prepare-execution.json",
+      "sha256": "a0e7fefb8d1ded82a8aa1a96ba2ac34b773c41a45fcb8473fcc5c4ab2160fb4c"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/prepare.log",
+      "sha256": "6099d56f0cbcfc476d2d19ddb5c8145e9f9c66ec9f70fbb4475f9609e940e0b5"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/frozen-review.json",
+      "sha256": "d952811537a5664f5cab72f26d416d1e8aca7829f1c0439468d000cc63d6dc54"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/execute_once.py",
+      "sha256": "796948e0cdd8de88881807225998a4ec6959a4ab3a8adeac80920892ec4c92c0"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/pilot-execution.json",
+      "sha256": "0a9b682d2bc1c7a6e93abb7c72fc7ad9e89d827a8df096d7e3c51229037b6584"
+    },
+    {
+      "path": ".qa/research-pilot-20261024/reconciliation-review.json",
+      "sha256": "80b890109abc559988ad81cbe7b59983d0e99a7d10c37a8d819673aa258363bc"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/normalized-bars.json",
+      "sha256": "a82b45dbad8976f227f1b7e20935bcb633965731eeb43d29318d8d72ec437c0a"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/freeze.json",
+      "sha256": "033d0585968a5e98324cafa62b2e945cbdeaf863ac20e415bd020e622e31cb02"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/started.json",
+      "sha256": "103d3a9d9b74f73562cf059d2a2aee282495fe5483b4e9cd3ce4c4016a8be833"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/process.log",
+      "sha256": "aa01a7b3bac6faeb33d564c9a5752aeb8a999d83d8a1bb4e38dc98532f2596f3"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/result.json",
+      "sha256": "6f0b95b19cc6732bbac96fd9bd75f5bf3369f62db2eac4bc8380b8797429ca6d"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/assessment.json",
+      "sha256": "9f35237392906f7cb94d30f54b1e72dbd69035fc823843eb0279a032036452b8"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-test-buy_and_hold-result.json",
+      "sha256": "5052e9fe516e7c4e63241a096c323d8e8ddafbf005de2f32f07622118347c038"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-test-buy_and_hold-started.json",
+      "sha256": "4356a200e876d4de8f5cd63f1b6b3ca1023cc52cac158b5ab553503f877a6420"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-test-cash-result.json",
+      "sha256": "bdf548d29969677b985dc73cc77a1fd410e69aef90c7ec3abf4e9bfa96b0d91c"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-test-cash-started.json",
+      "sha256": "f9df0feed6ebd915b8132ade6b8afd82f9f5faaa61340aa63232792353e4782e"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-test-momentum-result.json",
+      "sha256": "0b405d2c82333d91a9093c198c84baaede9d98b40762b78244cacb987049b45d"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-test-momentum-started.json",
+      "sha256": "300dc19bf98d3c751157e7f077b1a8630965c169429d400c6a4d2f04ac1e3807"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-train-buy_and_hold-result.json",
+      "sha256": "6e7e9eed193dde42df3f469d46a88c8d6bbb572de22e89552c9282df337f1995"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-train-buy_and_hold-started.json",
+      "sha256": "c4ad063dcfb9f0672e4fd04a84625627ce453c773716cd8a208b5e1e63a5140e"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-train-cash-result.json",
+      "sha256": "1095582dfb00d0288d5db04b51f5c4955e38fe3c14fe20abeeb4f263d1cdc570"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-train-cash-started.json",
+      "sha256": "57af06944d1154bb27f7c0553d083d49dcd2a0ab23adc2cf93b26273d6a00dba"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-train-momentum-result.json",
+      "sha256": "5ae8d84901614a63feb5f345c120805de84ee98fe32884d03f41cbc87ca0b4bd"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-train-momentum-started.json",
+      "sha256": "921cc7ab325a443b74a5483d29b85456b0717906c2f2fc5413d70bc7de1a1344"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-validation-buy_and_hold-result.json",
+      "sha256": "476a07d0d1cfa4f459f2800fbd2dbeba6dd25b4bc6a18b32fe0b2a1bca9d5957"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-validation-buy_and_hold-started.json",
+      "sha256": "783b3587286b77c7f3f0d008bf07ed7df42d35558813c575530189cc4212d4eb"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-validation-cash-result.json",
+      "sha256": "fdd20460497359c4a455424d08127cdddc2f90bc33989bf6af1eb1b5bd010389"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-validation-cash-started.json",
+      "sha256": "bc4473c9cd4b83b830d3d5d5410087a0a20704eae104ef54c2bcab0a333c7de4"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-validation-momentum-result.json",
+      "sha256": "d0d5a80947ce012dc03e1abb40db7e48df0219b8efad6d1eda92117dff177034"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-AAPL.US-validation-momentum-started.json",
+      "sha256": "237b56b9fe10e6be16ccf8c3200690420e2f5ecd18544eece05d2dab8c4d44a2"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-test-buy_and_hold-result.json",
+      "sha256": "0722400201135e52367cb674b77513d2aeb150a20c4fa716412f1955ffc62dba"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-test-buy_and_hold-started.json",
+      "sha256": "ece4b3594480b614bdd0ef87af9ce38500ee4d5162e7a80b576e5f0a3b826b41"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-test-cash-result.json",
+      "sha256": "aa65d90f88c8b4cdc48c74e675c06cfd2f8992b7e43fc851a4d9f3b39b511abd"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-test-cash-started.json",
+      "sha256": "a5e6239035622d56ec730e5e504bf250f6e6daa606611ba6398af7be416b4d02"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-test-momentum-result.json",
+      "sha256": "5315811632352c76164e302da04754f04d6e41f17c27676d8b4b2ad4777cb1cb"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-test-momentum-started.json",
+      "sha256": "519b98ac87377504187f32bc5f3a33392f71d38747a9b30acc299a4b1f0b00a6"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-train-buy_and_hold-result.json",
+      "sha256": "3eb3c1d66c61d805275a485ff005da6ec50f7458c7d58bae04eda69ef77b077f"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-train-buy_and_hold-started.json",
+      "sha256": "b241e5205caa487ba2917821ba61942574fe3081c5c81871df7f2ffa3cbe2448"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-train-cash-result.json",
+      "sha256": "d36f485bdd8cfd25ae4fdbf3b3c6334d90ca567b068b66d9e027f11525308b7f"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-train-cash-started.json",
+      "sha256": "7d42a9419573f4a070cb5103652a85afe5b15486d8fa04ef58560ed87a441185"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-train-momentum-result.json",
+      "sha256": "7cb9326fa9f46693b37a648668638aef4bcbf823cfbd301b4aea57613d04c7f7"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-train-momentum-started.json",
+      "sha256": "2161002504b042773614433f7edbfbd2ef86dad803d75dc2e1ecf8b60c854294"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-validation-buy_and_hold-result.json",
+      "sha256": "4b35a4ae89112759ac732016d2635427369144c2c50409d116c8e4f9737f04c4"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-validation-buy_and_hold-started.json",
+      "sha256": "ae269ae2334de8543046225b4f8e4e3e53e6ac076ee5f39ec59cb3da16013ebf"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-validation-cash-result.json",
+      "sha256": "22103eec17d6af5f3d2b1253dfad731375a2066b407a92459826bfba2c3831d4"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-validation-cash-started.json",
+      "sha256": "d79cd55eaa156aa8f2be4a6ec66814491fa8d7b8a0d4d24961fbd019e2a8d55c"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-validation-momentum-result.json",
+      "sha256": "602a15fb230cfeb4639287761450fb2444ee9e7a8bc661fb88ac9716a097235e"
+    },
+    {
+      "path": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024/cell-MSFT.US-validation-momentum-started.json",
+      "sha256": "8c8f16c6004c890a065bbb6f01c1b374e106b17b43d74e51a462dd8d1ad7a41b"
+    }
+  ],
+  "raw_prices_returns_trade_details_and_strategy_verdicts_published": false,
+  "private_file_permissions": "0700 directory;0600 every private input/journal/result/assessment",
+  "news_model_comparison": "NOT_RUN_NO_ATTRIBUTABLE_HISTORICAL_FIRST_AVAILABILITY_INPUTS",
+  "deployment_economic_conclusion": "INSUFFICIENT EVIDENCE",
+  "limitations": [
+    "Two active stocks and one source snapshot do not establish representative or survivorship-free evidence.",
+    "Hypothetical cost and daily-volume/open-fill assumptions are not verified broker charges/executable liquidity.",
+    "Current price/action revisions and historical availability remain unverified; no news/model comparison.",
+    "Forward Paper and actual-host acceptance remain open; pilot neither approves trading nor changes the Goal criteria."
+  ],
+  "actual_broker_connections": 0,
+  "actual_external_orders": 0,
+  "additional_API_requests": 0,
+  "application_source_tests_config_or_Git_index_changed": false,
+  "live_enabled": false,
+  "full_L14_gate_complete": false,
+  "goal_complete": false
+}

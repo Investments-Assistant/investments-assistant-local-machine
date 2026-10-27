@@ -1,0 +1,72 @@
+{
+  "status": "FIVE_SYNTHETIC_PRIVATE_UPGRADE_SQL_GUARDS_PASS_FIXTURE_STOPPED",
+  "verified_at": "2026-10-26T12:11:07.270149+00:00",
+  "migration_source_sha256": "4c6c9485c0f6095fe17af97115e5c2e3cf01001821e0c8676fdef66e155946d0",
+  "migration_sql_sha256": "39ba7d416192ceb5f70c3c6a3102b4b96061cae29b630b5e3f0640378779208c",
+  "tier": "New isolated synthetic PostgreSQL16 fixture; no operator data or service used",
+  "cases": [
+    {
+      "case": "valid",
+      "status": "PASS",
+      "migration_exit_code": 0,
+      "expected_commit": true,
+      "failed_transactions_preserved_schema_data": false
+    },
+    {
+      "case": "changedrow",
+      "status": "PASS",
+      "migration_exit_code": 3,
+      "expected_commit": false,
+      "failed_transactions_preserved_schema_data": true
+    },
+    {
+      "case": "extratable",
+      "status": "PASS",
+      "migration_exit_code": 3,
+      "expected_commit": false,
+      "failed_transactions_preserved_schema_data": true
+    },
+    {
+      "case": "wrongrevision",
+      "status": "PASS",
+      "migration_exit_code": 3,
+      "expected_commit": false,
+      "failed_transactions_preserved_schema_data": true
+    },
+    {
+      "case": "wrongmarker",
+      "status": "PASS",
+      "migration_exit_code": 3,
+      "expected_commit": false,
+      "failed_transactions_preserved_schema_data": true
+    }
+  ],
+  "owned_fixture_stopped": true,
+  "operator_upgrade_performed": false,
+  "app_or_broker_started": false,
+  "independently_rehashed_private_raw_pins": 757,
+  "case_count": 5,
+  "scope_limits": [
+    "These five cases validate the wrapped SQL guard/DDL/rollback, not the entire backup/encryption/restore orchestration.",
+    "The 150 command receipts and 757 raw pins are instrumentation, not additional test cases.",
+    "Actual database backup, key/config preservation, private copy restoration and migration await separate owner approval."
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/upgrade-sql-fixture-20261026-fd9a8d73f37f/evidence.json",
+      "sha256": "5ba394e110b970477693d33c5be65f2adfdae71da716803dad54d0d39808b97b"
+    },
+    {
+      "path": ".qa/upgrade-sql-fixture-20261026-fd9a8d73f37f/fixture-result.json",
+      "sha256": "a11f8deeb900e2b7c529d2a871e0be7bbcb2c1920651191c5267579626e98a2d"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/migration-0019-0020.sql",
+      "sha256": "39ba7d416192ceb5f70c3c6a3102b4b96061cae29b630b5e3f0640378779208c"
+    },
+    {
+      "path": ".qa/paper-upgrade-preparation-20261026/migration-offline-result.json",
+      "sha256": "7b8adafe168772b7d9166492c5d4ec5b6735672430e2bc5534bf83548cc0cf29"
+    }
+  ]
+}

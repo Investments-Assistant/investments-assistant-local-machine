@@ -1,0 +1,14 @@
+{
+  "status": "EXACT_PRIVATE_PILOT_APPROVED_NOT_RUN",
+  "at": "2026-10-24T12:23:47.612020+00:00",
+  "owner_question_call": "call_0a604ac1bfbf4ea8913c55d3045d905b",
+  "owner_answer": "Approve this private historical pilot",
+  "protocol_path": "docs/acceptance/research-pilot-proposal.json",
+  "protocol_sha256": "3a5371cc7e04edc7530d2392cfdc5ab0fcc6070e75c6fc74d1ca1e2c9fbddae3",
+  "engine_sha256": "db489d457c53e95087ab299a2b26279be4b7a2e4005ed774e090039493a65c27",
+  "verified_saved_source_evidence_items": 48,
+  "head": "6c518a262088a099d1c7637e0c0fe90d763314c8",
+  "private_directory": ".qa/eodhd-private-source-check-20261023/research-pilot-20261024",
+  "no_additional_API_broker_or_app_enablement": true,
+  "source_strategy_results_or_key_output": false
+}

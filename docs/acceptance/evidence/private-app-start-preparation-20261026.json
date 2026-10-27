@@ -1,0 +1,89 @@
+{
+  "status": "NORMAL_PRIVATE_TLS_APP_START_PREPARED_REVIEWED_GUARDS_PASS_NOT_AUTHORIZED",
+  "verified_at": "2026-10-26T18:19:24.214250+00:00",
+  "helper_sha256": "5472a7aa7b74fbccf786b0bb9498d5ce6fe6072ce1546380d909190d51c20730",
+  "plan_sha256": "79b0b6ed3f2c3b58ac85ca6c26c9d26897f84865d59fd62b9128ee7434d6d8f0",
+  "review_sha256": "3603bfa7bb24c084b22a28ab7ab9247506dbd527cba14e136c0c624a7bc43997",
+  "prerequisite_actual_upgrade_result_sha256": "5f158dfeef600f702b16c6aba1a836bf8b282f455e5364db57f0b93c9a8a9828",
+  "independent_static_review": "PASS; exact approval/hash/PG/schema/zero-auto-work/normal-auth-TLS/owned-loopback/failure guards inspected",
+  "missing_approval_and_auth_flag_injection_denials": "Two audit-hook cases PASS; helper children/private or certificate inputs/mutations forbidden",
+  "pure_control_groups": [
+    "Stable identity ignores R/S but rejects changed start ticks, absent and zombie",
+    "Read-only metadata protocol/timeouts and failed/multiple-result denial",
+    "Transient FD churn tolerated; public or unowned app listener denied",
+    "Post-claim receipt failure reports unknown state and prevents retry"
+  ],
+  "native_public_preflight": "PASS exit0; QA/public source/Git/native self-context only",
+  "app_started": false,
+  "private_sql_or_socket_or_secret_access": false,
+  "broker_connection": false,
+  "fresh_app_start_approval_required": true,
+  "scope_limits": [
+    "Preparation does not start or functionally test the actual operator application.",
+    "Normal startup will preserve authentication, TLS and scheduler; source review and fresh authorized metadata must deny automatic background broker work.",
+    "IBKR_ENABLED=false is not a universal vault-account read fence; owner must verify saved consent OFF through normal authenticated UI before Portfolio/ReadEvidence/broker-reading chat.",
+    "The helper uses only readiness/login/anonymous auth checks, with no session fabrication, account setting retrieval, broker request, model download, migration or cleanup."
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-app-start-20261026/start_app_once.py",
+      "sha256": "5472a7aa7b74fbccf786b0bb9498d5ce6fe6072ce1546380d909190d51c20730"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/execution-plan.json",
+      "sha256": "79b0b6ed3f2c3b58ac85ca6c26c9d26897f84865d59fd62b9128ee7434d6d8f0"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/REVIEW.md",
+      "sha256": "3603bfa7bb24c084b22a28ab7ab9247506dbd527cba14e136c0c624a7bc43997"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/guard-harness.py",
+      "sha256": "c9aae232890a1ed1af974aca37d5e6f7a4e0718acdcbdd6c4eb9e0c57abe1030"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/guard-execution.json",
+      "sha256": "657a194d79901c126989b72ede8c17e093f5cab606e801ce6a919b16822c5538"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/guard-result.json",
+      "sha256": "9b2dc0941f98e9b7f2d60b04fdb345b3222acccf784fd5cdd14c8d06400030cb"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/missing_approval-stdout.log",
+      "sha256": "588b9fad2b3928671a653dedf0209ebd2db8a5ca6c38063a99964bb3c7a3e3c9"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/missing_approval-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/bad_flags-stdout.log",
+      "sha256": "7b392b8eb080b59b8c2793055c5a89d244a3b86587c383ba04e7a99c963bed62"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/bad_flags-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/control-guard-result.json",
+      "sha256": "b6441d5bba5cf60203777d3c9347c832dd1a8ed6c24ac4f81bcb9c55f95162a5"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/native-preflight-execution.json",
+      "sha256": "edb77f704b27a4cde8eb4b64970654b22a3407ffe359ed938c2771c3e9d8496c"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/native-preflight-result.json",
+      "sha256": "86df2a1dbd4cd99afa0bf8930387067a91f22eb76da4ea5e3b8a9c5a6d272ba3"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/native-preflight-stdout.log",
+      "sha256": "fa6e60479c29b0c4d290a0a936a53205a16e4b18932099025f4167c9b322dd3d"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/native-preflight-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

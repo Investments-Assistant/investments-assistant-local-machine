@@ -1,5 +1,14 @@
 # Remaining gates and prerequisites
 
+**26 October current one-read workflow:** the owner explicitly approved ONE read
+of the SAME saved Paper account. The [single claimed helper and safe baseline](evidence/paper-one-read-launch-20261026.json)
+are verified; helperPID166106/start3606687 survived its launcher and owned12717497
+at the recorded native check. No readiness TCP probe was made. Owner normal-UI
+read-once/result and both flagsOFF/save are now pending; inspect this SAME claim
+and safe receipts before any follow-up, never auto-relaunch or repeat the read.
+The prior approval blocker is resolved. Full actualPaper/research remainOPEN,
+finalhostphysicalchecksDEFERRED; SDKwritesCLOSED/liveOFF.
+
 ## Owner direction — 22 October 2026
 
 This laptop is not the deployment target. Its24h observation, mapped CPU-temperature
@@ -16,6 +25,45 @@ The Goal remains incomplete. Historical failures/proofs are preserved below;
 later source/migration changes require affected checks before reusing their PASS.
 
 ## Current portable verification — 23 October 2026
+
+**24 October update:** the owner confirms a visible Paper banner only. Native
+metadata shows no app/relay listener; old recovery helpers bind an obsolete boot.
+No private database query or restart is authorized from that reply. Before a
+new actual read, finish the checkout-only selected-account retrieval correction:
+default SDK financial warmups preceded membership checks and its1102 handler
+auto-requested summary data. Final961unit/459PostgreSQL cases PASS; the new image
+build and isolated smoke now PASS after the owner started Docker. The exact
+ten-file approval/publication is complete as08cdba5; [current-CI40259671081](evidence/account-scope-ci-20261026.json)
+and its configured Sonar gate PASS. Actual artifacts confirm961unit/459PostgreSQL,
+24browserflows,8TLS/WSSchecks and84.47% measured combined coverage. The
+[backend proof](evidence/ibkr-read-scope-backend-20261026.json),
+[image proof](evidence/ibkr-read-scope-image-20261026.json),
+[scoped unchanged-surface reuse](evidence/ibkr-read-scope-reuse-20261026.json) and
+[owned cleanup](evidence/ibkr-read-scope-cleanup-20261026.json) are verified. No actual
+extra-account access is established. Fresh runtime recovery/backup/schema review
+and a separately scoped read approval remain necessary. See
+[current metadata](evidence/paper-session-prerequisite-20261024.json).
+
+**26 October runtime update:** the owner-approved database-only recovery/check
+is [complete](evidence/private-postgres-recovery-20261026.json). Actual native
+database/server/private-marker identity PASS; PostgreSQL16 uses only its owner-only
+Unix socket with no TCP. The separately approved
+[protected backup/restore rehearsal/conditional update](evidence/private-upgrade-result-20261026.json)
+now PASS: the source is verified0020, its31prior public tables/2sequences and
+matching keys/settings are preserved, and both new journals are empty. The app
+was subsequently started under separate approval; [native startup checks](evidence/private-app-start-result-20261026.json)
+PASS. No broker request or order occurred. The completed one-shot
+recovery and upgrade must not be rerun.
+Fresh native bootd5e34cc2 supersedes03a5fc73; old candidate and sandbox refusal
+remain preserved. The [normal loopback TLS starter](evidence/private-app-start-preparation-20261026.json)
+was separately approved and executed with verified TLS/readiness/login/auth.
+Owner [browser access and saved-flagsOFF UI verification](evidence/paper-owner-ui-confirmation-20261026.json)
+are now confirmed. The owner also confirms the current TWS Paper banner and
+Read-Only API checked. Separate one-read approval has now been granted for the single current workflow;
+no repeat or execution authority follows. See [reviewed preparation](evidence/paper-read-preparation-20261026.json). The backup/update approval alone
+did not authorize startup. See the checkpoint.
+IBKR_ENABLED=false is not a universal selected-account read fence; do not infer
+fresh saved consent or broker authority from global flags or historical UI state.
 
 The [offline journal](BROKER_SUBMISSION_CONTRACT.md), migration0020 and retained
 closed SDK boundaries pass [119 focused checks](evidence/paper-submission-focused-20261022.json)
@@ -70,7 +118,7 @@ restart but not its cause. Goal service nowACTIVE; no completion claimed.
 | Historical e154 image/runtime | [New candidate image review](evidence/cash-collector-image-review-20261018-5d8b5cb04c1b.json) verifies source4fd1380c/image92eabede:184context/181copied files, actual readonlyGGUF/nonroot production app, persisted halts, app7.167s/DB1.130s restarts and owned cleanup. Prior unchanged UI/ingress surfaces are reconciled, not rerun. | Local validation complete; preserve provenance. Exact seven-file approval/publication is complete (e154a0a); current remoteCI39083730719/allfourjobs/configuredSonar is verified PASS for exacte154. |
 | L13 mapped CPU cooling — DEFERRED | Preserved672-sample ACPI THM0 series covers11h11m51s,67.05–95.05C, passive100/throttle0. Its component remains unmapped, so no CPU cooling acceptance. The earlier HWiNFO review is historical. | Laptop ZIP/download/setup request cancelled22Oct. Select a trusted component-mapped source appropriate to the unknown final host and retain sustained-load evidence there. No sensor tool, driver or OS change is preapproved; see [cooling review](COOLING_REVIEW.md) and [handoff](FINAL_HOST_HANDOFF.md). |
 | L04/L15 broker paper lifecycle | User selected same encrypted account and confirmed one read through normal UI. Persisted1snapshot/valid owner/binding/idempotency metadata; positionscomplete/cashincomplete/non-atomic, declaredPaper/SDKunverified/authoritynone. Actual read is partial evidence only. App stopped on kernel restart; PG/app recovered; relaygone/17497closed. | App restored; owner confirms Enabled/Read Authorized unchecked and saved. Do not repeat read. Full reauthentication/history/execution/reconciliation/forward plan remain separate, with orders requiring additional authority. |
-| L14 research/economic evidence | Fixed cost-aware fixture replay passes; economic result INSUFFICIENT EVIDENCE. Owner confirms no local file, approves the bounded EODHD Sandbox check and reports the free account/key ready. Helper25offline checks pass; exact nine-request plan is prepared, not started. No actual data, approved real-study universe or sufficient coverage is established. Yahoo permissions remain OFF. Historical unintended baseline lookup has unknown outcome; later tests mock or deny provider imports. | Confirm at least nine free calls remain, then inspect the SAME unstarted, unexpired hash-bound manifest before the [private source check](RESEARCH_SOURCE_PROPOSAL.md). Do not purchase, blindly retry a partial run, enable an app provider, change fixture splits/targets or claim preparation passes L14. |
+| L14 research/economic evidence | The exact approved [private price-only pilot](RESEARCH_PILOT_PROPOSAL.md) is complete:64synthetic mapping checks/5control checks,18actual comparisons and independent cell/hash/accounting review pass. Results/diagnostic verdicts are private. MSFT/AAPL are the qualified samples; SPY remains unqualified. The source12request cap is consumed; no provider requests occurred in the pilot. Broader economic evidence stays INSUFFICIENT. | Preserve results without tuning/rerun. Remaining full research needs attributable historical news/model first-availability evidence, revision/survivorship/representativeness treatment and the separately agreed forward observation. None is supplied by a current price snapshot. No further provider, purchase, broker or deployment permission follows from pilot completion. |
 | Real bank sync/external operations | Synthetic consent, adapter, restore and local alert tests pass; no real institution consent, external destination or off-host target configured. | Keep disconnected; obtain concrete target/privacy scope and separate setup/notification/deployment authorization. No public/LAN exposure or firewall changes. |
 | L16 live eligibility | PASS(NO-GO; safely disabled): LIVE_TRADING_ENABLED=false and all external SDK writes denied even under synthetic true flag. | Keep live OFF; no live mandate or trading authorization. |
 
@@ -115,11 +163,13 @@ For a step-by-step explanation, start with [Getting the prerequisites ready](PRE
    Inspect private runtime receipts/PIDs before restarting anything; never use
    synthetic fixture cleanup against the new private operator database.
 2. Research gate: the owner has no existing price-history file. Review the
-   [approved free private source check](RESEARCH_SOURCE_PROPOSAL.md); owner confirms
-   account/key ready and the nine-request manifest is prepared. Remaining free
-   allowance confirmation is pending, and no data request has occurred.
-   A source check is separate from real-study approval; the result remains
-   INSUFFICIENT EVIDENCE. No purchase or arbitrary download is authorized.
+   [approved free private source check](RESEARCH_SOURCE_PROPOSAL.md) is complete
+   at its12request cap. MSFT/AAPL qualify within the recorded source scope; SPY
+   does not. The separately approved [private historical pilot](RESEARCH_PILOT_PROPOSAL.md)
+   has completed18comparisons and reconciliation; its results stay private.
+   Historical news/model availability and forward evidence remain missing;
+   broader economic evidence stays INSUFFICIENT.
+   No further call, purchase or arbitrary download is authorized by the old cap.
 3. Final-host gates: leave this laptop's cooling/24h/clock work deferred. Once the
    real target is known, follow [FINAL_HOST_HANDOFF.md](FINAL_HOST_HANDOFF.md) for
    inventory, compatible profile, fresh fixtures and independent acceptance.

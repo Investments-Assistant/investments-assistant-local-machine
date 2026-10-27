@@ -1,10 +1,13 @@
 # Private historical-price source check — 23 October 2026
 
-The owner confirms they have **no local price-history file**. Do not ask for that
-file again. The owner **approved** the bounded, no-purchase source check below on
+The owner originally had **no existing local price-history file**. Do not ask for
+one again. The owner **approved** the bounded, no-purchase source check below on
 23 October. On 24 October the owner confirmed the free account and locally saved
-key; the exact nine-request manifest is prepared. Actual access has **not started**:
-remaining free allowance confirmation is still required. This does not
+key and confirmed0of20dailycalls used. Actual access is now **complete**: nine
+price/action requests plus three permitted identity lookups, twelve documented
+daily units total. No further requests are authorized by this source-check cap.
+Microsoft/Apple pass structural and provider-declared identity checks; SPY remains
+unqualified because the strict primary flag did not match. This does not
 pass L14 or establish an investment result.
 The machine-readable scope is [research-source-proposal.json](research-source-proposal.json).
 
@@ -22,7 +25,8 @@ and analyze data privately. They restrict shared access and redistribution.
 The proposed use is a private, noncommercial, headless source-quality check only.
 The owner must choose the provider and accept applicable account terms themselves;
 recheck any additional terms at signup. The owner reports creating the free
-account; no agent has accessed the token or requested market data. Do not buy,
+account; only the reviewed one-shot collectors loaded its key for the intended
+provider. The key was never printed. Do not buy,
 attach payment details or activate a paid
 trial. Source: [personal-use terms](https://eodhd.com/financial-apis/terms-conditions).
 
@@ -63,9 +67,10 @@ dividend twice, assume raw-volume units or feed this schema into the Yahoo adapt
 Sources: [price semantics](https://eodhd.com/financial-apis/api-for-historical-data-and-volumes),
 [corporate actions](https://eodhd.com/financial-apis/api-splits-dividends).
 
-One year is **not yet shown sufficient** for the unchanged engineering fixture's
-120/60/60 sessions plus ten-session lookback. There is no five-year acceptance
-minimum. Do not change the [fixture plan](research-fixture-plan.json), inspect a
+The acquired samples pass the conservative250-session capacity check. This is not
+a new acceptance minimum or a change to the [fixture plan](research-fixture-plan.json):
+its120/60/60 windows and ten-session lookback stay unchanged. There is no five-year
+acceptance minimum. Do not inspect a
 held-out outcome for tuning or infer historical point-in-time availability from a
 current download. Survivorship, revisions, FX, news/model availability, an approved
 real-study universe, costs and capital remain separate unresolved research inputs.
@@ -87,20 +92,23 @@ Owner decision recorded: **“Approve the free data check”**, response to
 for an explicit provider decision (attachment lines 47 and 57). It does not supply
 the account, token, free allowance or actual data by itself. The owner subsequently
 confirmed the free account and saved local key via `call_2934bdcbcb314d608ec359d6f892fe9f`;
-no credential has been read by an agent. The pending question asks only whether at
-least nine free API calls remain today.
+the original collector subsequently loaded the key after the quota confirmation.
+It made nine requests; the separately reviewed optional identity collector made
+three. Neither plan may be rearmed or retried. No provider data is public.
 
 The one-shot helper and 25 offline mock-only safety checks are retained under
 `.qa/research-source-check-20261023/`; root reviewed the actual terminal-success
 receipt, JUnit and code after the interruption without repeating the tests.
-The exact plan requests EOD/dividends/splits for each sample, nine requests/units,
+The original plan requests EOD/dividends/splits for each sample, nine requests/units,
 for 25 October 2025–23 October 2026. It is private, hash-bound and expires at
 11:22:15 UTC on 25 October 2026. Before any fetch, inspect that same plan, its
 hash and `started.json`/attempt/result receipts. A started or partial run must
 never be blindly retried, copied to another directory or rearmed. Missing or
 expired prerequisites permit preparation only, not a request. Source identity,
 currency, coverage and point-in-time availability remain unverified even after
-raw collection; there is no strategy run in this step.
+raw collection; the [final qualification evidence](evidence/research-source-qualification-20261024.json)
+records what did and did not pass. There is no strategy run in this step. Any
+research pilot needs the separate [prepared protocol decision](RESEARCH_PILOT_PROPOSAL.md).
 
 Approval of this proposal authorizes only the bounded source check, subject
 to obtaining the free account/token and checking current terms. It would not

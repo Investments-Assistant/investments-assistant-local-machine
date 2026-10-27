@@ -1,0 +1,34 @@
+{
+  "status": "OWNED_APP_PERSISTS_AFTER_LAUNCHER_EXIT_TLS_READY",
+  "verified_at": "2026-10-26T18:45:04.911480+00:00",
+  "same_owned_native_app_identity": true,
+  "starter_and_launcher_already_terminal": true,
+  "pinned_TLS_readiness_http": 200,
+  "login_http": 200,
+  "anonymous_auth_http": 401,
+  "owned_loopback_listener": true,
+  "app_restart_stop_or_config_change": false,
+  "broker_request": false,
+  "scope_limits": [
+    "One native post-launch check, not continuous observation, browser/Windows access or authenticated owner login.",
+    "No portfolio/account setting retrieval, private secret read, new benchmark, model download, broker access or order."
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/paper-app-start-20261026/post-launch-check-execution.json",
+      "sha256": "93b074a4456e09d78f81099110334ae25303e026c989481227081746f3b10461"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/post-launch-check-result.json",
+      "sha256": "d6813007d258e4a65c1ebedf12633b7f07547ff299b2f7c7b7a89fd7c0d00aca"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/app-child.json",
+      "sha256": "ecdf96e31ee1ba0c8786cac48ec1bbe26bbf878888eee61274bf24e2da5aecc0"
+    },
+    {
+      "path": ".qa/paper-app-start-20261026/launch-result.json",
+      "sha256": "d116252ce545f8ab9bf172def57934685c0ef50086e2b1ff983ce2252cff9261"
+    }
+  ]
+}

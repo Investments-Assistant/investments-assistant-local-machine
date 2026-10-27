@@ -1,6 +1,45 @@
 # Getting the remaining prerequisites ready
 
+**26 October current one-read workflow:** the owner explicitly approved ONE read
+of the SAME saved Paper account. The [single claimed helper and safe baseline](evidence/paper-one-read-launch-20261026.json)
+are verified; helperPID166106/start3606687 survived its launcher and owned12717497
+at the recorded native check. No readiness TCP probe was made. Owner normal-UI
+read-once/result and both flagsOFF/save are now pending; inspect this SAME claim
+and safe receipts before any follow-up, never auto-relaunch or repeat the read.
+The prior approval blocker is resolved. Full actualPaper/research remainOPEN,
+finalhostphysicalchecksDEFERRED; SDKwritesCLOSED/liveOFF.
+
 ## Current direction — 22 October 2026
+
+26 October portable update: the selected-account read-scope/privacy correction
+passes961unit/459PostgreSQL cases on final source612fa07b. The owner started Docker;
+the new local image build and isolated184-file smoke now PASS. The exact ten-file
+patch is approved/published as08cdba5; [currentCI40259671081](evidence/account-scope-ci-20261026.json)
+and its configured Sonar gate PASS with961unit/459PostgreSQL,24browserflows,
+8TLS/WSSchecks and84.47% measured combined coverage. The24Oct
+Paper-banner confirmation is historical, not
+fresh read authority; saved account read flags were historically confirmedOFF.
+The separately approved startup passes native TLS/readiness/auth checks.
+Owner [browser access and both saved flagsOFF](evidence/paper-owner-ui-confirmation-20261026.json)
+are now confirmed through normal UI. The owner now also confirms the current
+TWS Paper banner and Read-Only API checked; separate one-read approval remains
+pending. See [reviewed preparation](evidence/paper-read-preparation-20261026.json). No laptop
+24-hour or temperature work is required. See [checkpoint](CHECKPOINT.md).
+
+The owner-approved database-only recovery/schema/count check is now
+[complete](evidence/private-postgres-recovery-20261026.json). Its identity checks
+pass. The separately approved [backup/restore rehearsal/update](evidence/private-upgrade-result-20261026.json)
+also PASS, and the actual original database is now verified0020 with matching
+data/sequences/keys/settings preserved. The [separately approved startup](evidence/private-app-start-result-20261026.json)
+also PASS: native TLS, database/local-model readiness200, login200 and anonymous
+auth401. The owner confirms normal app access and both read flagsOFF; no broker
+request occurred. Keep those flagsOFF and avoid Portfolio/ReadEvidence/broker
+chat until the separately approved bounded read is ready. The owner now confirms
+the current TWS Paper banner and Read-Only API checked. A new bounded read still
+needs separate explicit approval and normal owner consent. See the
+checkpoint; do not repeat account creation or ask for identifiers/credentials.
+No credentials in chat, new account setup, further Docker start or
+24-hour laptop run is requested.
 
 The owner will deploy on a different computer. This laptop's24h observation,
 mapped CPU-temperature checks and clock repair are **DEFERRED to the final host**,
@@ -83,13 +122,15 @@ settings rather than rely on defaults ([2026 release notes](https://www.ibkrguid
 
 ## Historical prices: a file of past market prices
 
-**23 October update:** the owner has no local price-history file. The next
-decision is the [bounded free source-check proposal](RESEARCH_SOURCE_PROPOSAL.md),
-not another request for a file. The owner approved the private EODHD Sandbox
+**24 October update:** the owner originally had no existing price-history file;
+do not ask for it again. The owner approved the private EODHD Sandbox
 source-quality check only. On 24 October they confirmed the free account/key
-ready; the nine-request manifest is prepared and awaits confirmation of the
-remaining free allowance. No real-study universe is approved and no data request
-has started. No purchase or app-provider enablement is authorized. L14
+ready and confirmed free allowance. The twelve-request source check is complete:
+Microsoft/Apple pass documented structural/provider-identity checks; SPY remains
+unqualified. No additional request is authorized by that cap. The
+[private research pilot](RESEARCH_PILOT_PROPOSAL.md) was then approved and completed
+18comparisons with private results and independent accounting checks. No purchase,
+broker action, further API call or app-provider enablement is authorized. L14
 remains open and the economic conclusion remains INSUFFICIENT EVIDENCE.
 
 This means past prices for named shares/funds, with dates and enough source
@@ -110,8 +151,12 @@ license do not establish rights to its underlying data.
 
 There is currently no general CSV-import command to recommend: the retained
 public history adapter is source-specific and default-disabled, while the fixed
-offline evaluator uses synthetic data. We will inspect the actual permitted
-format before preparing its adapter/evaluation. Existing fixture results prove
+offline evaluator uses synthetic data. The separate headless source check has
+inspected the saved provider schema; it does not enable the app or run a strategy.
+A source-specific mapping and exact approved pilot have now been tested/executed
+privately. Broader historical news/model availability and forward evidence are
+the missing research inputs; do not rerun the consumed holdout or provider cap.
+Existing fixture results prove
 engineering behavior only; the economic conclusion stays **INSUFFICIENT EVIDENCE**.
 See [replay scope](REPLAY.md) and the [unapproved forward plan](FORWARD_OBSERVATION.md).
 

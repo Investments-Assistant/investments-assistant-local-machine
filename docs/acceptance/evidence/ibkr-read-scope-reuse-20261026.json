@@ -1,0 +1,21 @@
+{
+  "status": "SCOPED_UNCHANGED_SURFACE_REUSE",
+  "at": "2026-10-26T01:24:52.094483+00:00",
+  "validated_source_commit": "d5aa99ec1f2a67e62c929d9bc2dcb1a616af453b",
+  "current_candidate_base": "6c518a262088a099d1c7637e0c0fe90d763314c8",
+  "changed_runtime_paths": [
+    "src/tools/brokers/ibkr.py",
+    "src/tools/brokers/ibkr_balances.py",
+    "src/tools/brokers/ibkr_observations.py"
+  ],
+  "prior_ci_proof": "docs/acceptance/evidence/paper-recovery-ci-20261023.json",
+  "prior_ci_proof_sha256": "71ac04b82e2a5cdbffa8c66a62d7b2010f1d8b30fe5eb7ab3c47438f2112a2ac",
+  "reused_surfaces": [
+    "24 browser flows and8 TLS/WSS checks",
+    "unchanged model/startup/persistent-halt and database-restore surfaces"
+  ],
+  "scope": "Those tests do not perform actual broker reads; only3broker-read modules changed; candidate backend is separately executed",
+  "reviewer": "paper_read_review final static audit",
+  "fresh_image_or_ci_claim": false,
+  "new_model_or_host_acceptance": false
+}
