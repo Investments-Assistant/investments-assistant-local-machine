@@ -1,0 +1,69 @@
+{
+  "status": "CONSENT_SAVE_READ_RACE_REPRODUCED_AND_FOCUSED_FIX_PASSES",
+  "verified_at": "2026-10-27T00:29:16.344884+00:00",
+  "base_head": "fae5a36426079e6b28d7192edd8646b73c765705",
+  "candidate_app_js_sha256": "43470e2cbde542b4e20ffd571ada8cfb25bdc4bfd72c6943aef93b8503162405",
+  "old_source_app_js_sha256": "ae4b9e57933472dae3353318872e245beb1f6a97583140417e98ce7f02fb4c06",
+  "old_failure": {
+    "held_puts": 1,
+    "committed_puts": 0,
+    "saved_flags_off": true,
+    "draft_flags_on": true,
+    "dialog_count": 1,
+    "refresh_posts_before_commit": 1
+  },
+  "fixed_focused_browser_scope": "Real broker DOM and full actual app.js injected after DOMContentLoaded; all HTTP intercepted, no backend or DB",
+  "fixed_behaviors": [
+    "Saved OFF/draft/pending or failed saves block confirmation and refresh",
+    "Both saved booleans must be true; acknowledged server response supplies current cache",
+    "Old account loads cannot overwrite a newer save acknowledgement",
+    "Direct/stale handler checks the same state before confirmation",
+    "In-flight reads cannot be duplicated; saved evidence remains independently available"
+  ],
+  "focused_viewports": [
+    "1440x1000",
+    "390x844"
+  ],
+  "unexpected_console_or_page_errors": 0,
+  "unknown_outgoing_requests": 0,
+  "broker_connections": 0,
+  "private_operator_runtime_or_settings_access": false,
+  "actual_user_failure_cause_proven": false,
+  "full_24_flow_real_PG_browser_validation": "PASS_SEPARATELY_FINAL_HTML_A27E_JS4347",
+  "current_modified_candidate_CI_image_publication": "IMAGE_PASS; PUBLICATION_AND_EXACT_CI_PENDING",
+  "base_fae5_CI": "PASS exact40423538188; distinct from this modified UI candidate",
+  "SDK_writes": "CLOSED",
+  "live_trading": "OFF",
+  "screenshots": "Outside repo; see pinned screenshot-metadata.json",
+  "raw_evidence": [
+    {
+      "path": ".qa/broker-consent-save-20261027/old-source-repro.json",
+      "sha256": "55858a1cf78352a423fbfc855c39776d953beaf329f2f56780416ddb9e7356d6"
+    },
+    {
+      "path": ".qa/broker-consent-save-20261027/focused-postfix-summary.json",
+      "sha256": "dd49fd57cf3453c5fc0712906db66e07d810d2504b511f74d5c11ad59f37f79a"
+    },
+    {
+      "path": ".qa/broker-consent-save-20261027/owner-consent-error.json",
+      "sha256": "7726ed31b7fa59270743f962aec9d0683eca74df95448efdff32e1679070e54b"
+    },
+    {
+      "path": ".qa/broker-consent-save-20261027/screenshot-metadata.json",
+      "sha256": "bcf6c8c6923bce43e44181c25aaed8722957ce15b757e5a5e6fa9acadad31677"
+    },
+    {
+      "path": ".qa/broker-consent-save-20261027/candidate-inputs.json",
+      "sha256": "515913483b2fd795ccf154643137c4a90befde41963c8d450c4e46d199241d98"
+    }
+  ],
+  "reconciled_at": "2026-10-27T00:48:48.252947+00:00",
+  "focused_HTML_scope": "Same broker DOM and actual43470e app.js before only the script query version changed; final realbootstrap version/body verified separately",
+  "final_bootstrap_proof": "docs/acceptance/evidence/broker-consent-save-browser-20261027.json",
+  "final_candidate_files_sha256": {
+    "src/web/static/app.js": "43470e2cbde542b4e20ffd571ada8cfb25bdc4bfd72c6943aef93b8503162405",
+    "src/web/static/index.html": "a27e97023b5bfd81927b1c23113ecedb378a326ae4ee579efcf804d3f5f41588",
+    "scripts/verify_browser.py": "719894d71bd496b1b56e77b041cdae06b399ff900d3b08d272f687755ce04d18",
+    "tests/e2e/broker_observations.py": "122d4aaf18a3a5ab78eb015eff04cf5cd2ef4752a9c1c32e755ecbfa16acf724"
+  }
+}

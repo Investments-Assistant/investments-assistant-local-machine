@@ -63,11 +63,12 @@ def main():
                     errors = []
                     page.on("pageerror", lambda error: errors.append(str(error)))
                     expected_errors = []
+                    expected_http_errors = set()
 
                     def console_message(msg):
                         if msg.type != "error":
                             return
-                        if (
+                        if (msg.location.get("url"), msg.text) in expected_http_errors or (
                             msg.location.get("url") == base + "/api/banks/synthetic-connection/account"
                             and msg.text
                             == "Failed to load resource: the server responded with a status of 409 (Conflict)"
@@ -381,7 +382,7 @@ def main():
                     assert other.request.get(base + f"/api/simulations/{replay_id}/evidence").status == 404
                     from tests.e2e.broker_observations import verify_broker_observations
 
-                    verify_broker_observations(page, context, other, base, csrf)
+                    verify_broker_observations(page, context, other, base, csrf, expected_http_errors)
                     from tests.e2e.report_retention import verify_report_retention
 
                     verify_report_retention(page, context, other, base, csrf, user_a, report_id)

@@ -1,0 +1,306 @@
+{
+  "status": "FINAL_CACHE_BUSTED_UI_FULL24_BROWSER_PASS_OWNED_CLEANUP_VERIFIED",
+  "verified_at": "2026-10-27T00:46:39.525013+00:00",
+  "source_pins": {
+    "src/web/static/app.js": "43470e2cbde542b4e20ffd571ada8cfb25bdc4bfd72c6943aef93b8503162405",
+    "src/web/static/index.html": "a27e97023b5bfd81927b1c23113ecedb378a326ae4ee579efcf804d3f5f41588",
+    "scripts/verify_browser.py": "719894d71bd496b1b56e77b041cdae06b399ff900d3b08d272f687755ce04d18",
+    "tests/e2e/broker_observations.py": "122d4aaf18a3a5ab78eb015eff04cf5cd2ef4752a9c1c32e755ecbfa16acf724",
+    "tests/e2e/fixture_server.py": "91607cb3a5628999e79abd707d432c65ef6eb3678a35b5b445e48b6c722a6d86"
+  },
+  "check_count": 24,
+  "checks": [
+    "login",
+    "page identity",
+    "market snapshot unavailable/source permission (intercepted provider state)",
+    "profile persistence, project assignment/reload and owner isolation",
+    "disabled encrypted IBKR settings create/edit, blank-secret preservation, disable and isolation",
+    "portfolio view",
+    "proposal",
+    "independent approval",
+    "independent buy-only and price-band simulator mandate approvals",
+    "expense import, currencies, pages, category, full-period export and raw-payload/history retention with re-import suppression",
+    "bank disabled status; intercepted consent/selection/retry/history retrieval with fresh expense fetch/disconnect",
+    "owner-reviewed pending/booked reconciliation, receipt clocks, export, CSRF/replay denial",
+    "cost-aware replay, evidence download/reproduction/isolation",
+    "buy/sell opt-in, separate approvals, fills, fees and realized PnL",
+    "broker journal, confirmed read and isolation (synthetic source)",
+    "immutable valuation capture and flow-adjusted observation comparison",
+    "halt",
+    "model self-approval denial",
+    "CSRF denial",
+    "cross-user denial",
+    "in-app alert acknowledgement",
+    "chat report PDF, confirmed retention tombstone and isolation",
+    "durable chat evidence, confirmed retention tombstones, reload and ownership",
+    "logout cookie replay and open-WebSocket revocation"
+  ],
+  "browser_exit_code": 0,
+  "cleanup_exit_code": 0,
+  "browser_plugin": "ABSENT; existing installed Playwright used",
+  "Playwright_reason": "Browser plugin not available; existing installed Chromium/Playwright without dependency installation",
+  "environment": {
+    "url": "http://127.0.0.1:36007",
+    "viewports": [
+      "1440x1000",
+      "390x844"
+    ],
+    "fresh_marked_disposable_PG": true,
+    "PG_only_Unix_socket": true,
+    "private_operator_runtime_never_targeted": true
+  },
+  "console_errors": [],
+  "expected_fixture_http_errors": [
+    "Failed to load resource: the server responded with a status of 409 (Conflict)",
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+  ],
+  "expected_http_scope": "Existing intentional bank409 and exact intercepted fixture PUT503 only",
+  "bootstrap": {
+    "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/bootstrap-verification.json",
+    "sha256": "a3981fd25d970958c0f7105a387d2e92708fdd79219a56ac56efc4272de28934",
+    "version": "broker-consent-20261027a",
+    "actual_200_responses": 6,
+    "document_script_urls_verified": 2,
+    "actual_JS_body_sha256": "43470e2cbde542b4e20ffd571ada8cfb25bdc4bfd72c6943aef93b8503162405",
+    "interception": false
+  },
+  "cleanup": {
+    "only_new_marked_test_database_dropped": true,
+    "zero_clients_required": true,
+    "only_exact_ownedPG_smart_stopped": true,
+    "force_drop": false,
+    "data_and_evidence_preserved": true,
+    "owned_HTTP_and_driver_exited": {
+      "children": [
+        {
+          "identity": {
+            "pid": 223823,
+            "boot_id": "d5e34cc2-b5df-408d-9e0c-eaf8fb9359bd",
+            "pid_namespace": "pid:[4026532221]",
+            "start_ticks": 4900192,
+            "state": "R",
+            "command_sha256": "7ad1860fa1be735e16aca3addc384e1b388e7ee246eec1f9b9d082dff15fda8a"
+          },
+          "still_matching": false
+        },
+        {
+          "identity": {
+            "pid": 223848,
+            "boot_id": "d5e34cc2-b5df-408d-9e0c-eaf8fb9359bd",
+            "pid_namespace": "pid:[4026532221]",
+            "start_ticks": 4900378,
+            "state": "R",
+            "command_sha256": "2a150b50eaf879d330f9ec2f1092bf0d1a0504f6537008c1fe3f482e3df52bce"
+          },
+          "still_matching": false
+        }
+      ]
+    },
+    "operator_app_or_DB_touched": false
+  },
+  "broker_connections": 0,
+  "external_orders": 0,
+  "real_model_inference": false,
+  "screenshots": [
+    {
+      "path": "/tmp/browser-save-full-20261027-1a127b9bcaa4/.qa/browser-evidence/expense-history-desktop.png",
+      "sha256": "b272f5b879c58b41a932d26466955ce06c2b27b1c5d07c56d727baaebaca57ab"
+    },
+    {
+      "path": "/tmp/browser-save-full-20261027-1a127b9bcaa4/.qa/browser-evidence/expense-history-mobile.png",
+      "sha256": "9e544ca791daa0421b519340202cccc25ae98a27aca57e444a603207794c1e56"
+    },
+    {
+      "path": "/tmp/browser-save-full-20261027-1a127b9bcaa4/.qa/browser-evidence/expense-reconciliation-desktop.png",
+      "sha256": "adad681634ef466ac2246bc1e4369c31f9ab1c674b7c1f6ab8879ad81ed0a435"
+    },
+    {
+      "path": "/tmp/browser-save-full-20261027-1a127b9bcaa4/.qa/browser-evidence/expense-reconciliation-mobile.png",
+      "sha256": "ad966953a7f1fcee4ee191f9ddec94454f30d391fa1ec9547e75754f7a4798b1"
+    },
+    {
+      "path": "/tmp/browser-save-full-20261027-1a127b9bcaa4/.qa/browser-evidence/halted-desktop.png",
+      "sha256": "5b182e0e209dfa033caa59fa4b0d532d075c03a867ff952174f4e82beb467bd5"
+    },
+    {
+      "path": "/tmp/browser-save-full-20261027-1a127b9bcaa4/.qa/browser-evidence/halted-mobile.png",
+      "sha256": "2b16296eba392b4f135fb90cefe86939c2fba9694a68f6f70bde627a3e0a8785"
+    },
+    {
+      "path": "/tmp/browser-save-full-20261027-1a127b9bcaa4/.qa/browser-evidence/proposal-desktop.png",
+      "sha256": "4d89f2e9163e4e401970d4f3470b5a457584951554f8b76b625d420499c0bcb8"
+    },
+    {
+      "path": "/tmp/browser-save-full-20261027-1a127b9bcaa4/.qa/browser-evidence/valuation-desktop.png",
+      "sha256": "e29fcb9f436fa6e1a7bad440bad6f98ebf3fd6beadea1facfed4c1b778073e15"
+    },
+    {
+      "path": "/tmp/browser-save-full-20261027-1a127b9bcaa4/.qa/browser-evidence/valuation-mobile.png",
+      "sha256": "cdbb773a22b13b79213579fc28b66412d6515843b730c4a4e4ab55e2605561dc"
+    },
+    {
+      "path": "/tmp/browser-save-full-20261027-1a127b9bcaa4/.qa/browser-evidence/workspace-settings-desktop.png",
+      "sha256": "9a9582ac843babc4848aed4c26c12b02efa74519671cd220b8430c764d5f9515"
+    }
+  ],
+  "earlier_pass_preserved": {
+    "path": ".qa/broker-consent-save-20261027/before-cachebust-broker-consent-save-browser-20261027.json",
+    "sha256": "d818e28c462159db3ef193dfbfa6182da1c40487eb922483f45678dc7151700b"
+  },
+  "current_publication_or_CI_for_candidate": "PENDING_NEW_EXACT_BUNDLE",
+  "limits": [
+    "Synthetic PG/deterministicmodel/broker only; no actualPaper/privateapp deployment/model/host/24h/thermal acceptance",
+    "Current browser candidate only; no new remoteCI or publication claim",
+    "No backend suites rerun; no source/docs/Git writes by verification agent"
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/browser-verification.json",
+      "sha256": "cc16fb5dce45aee5da89699f17d57666fef912495acbbe2432fcdcb5644b2dfe"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/bootstrap-verification.json",
+      "sha256": "a3981fd25d970958c0f7105a387d2e92708fdd79219a56ac56efc4272de28934"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/bootstrap_probe.py",
+      "sha256": "ca5c39678bdf6930323c1b9897c82bbc2e1212128311d5453afb925eb8ee3742"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/browser-child-1.json",
+      "sha256": "d2500e5dc47166e9f7eff04d3282773bc61b9e529ed740af697ef80eeb3c4cde"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/browser-child-2.json",
+      "sha256": "0f9036cd6a09340d77630b3107b1521418d9011778b826547fe07b889c334f2d"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/browser-execution.json",
+      "sha256": "80393ff5786fe04672e1dd1f8d621bdaf036de892630c4e0f4c098c0e855c31b"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/browser-owned-children-after.json",
+      "sha256": "c2395141e4ae710b64285fb236e6faee4e1c4e2a959bd2508eeb7708aae4c740"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/browser-result.json",
+      "sha256": "b254f087ff2897bbc6cc77e3089b3a4e7765f70c1ee96881a2b0e37c5d122bf8"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/browser.stdout.log",
+      "sha256": "4d31afbd9b3398829e6bde6a229241515cb660cd73ccde94de3c206317b691bf"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/cleanup-execution.json",
+      "sha256": "74e69f8b35679b0347c7ef543d6878bad19d031ecce383a9a69cadc9d52034c7"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/cleanup-result.json",
+      "sha256": "56d2dc309aa6a7a37a128386748ff3db2190dde1f79c064933f136bf6b01173f"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/fixture.py",
+      "sha256": "ec48b4b45fe168f20c4463e152bf93d88811080c742738b16e3f83fa3e6523eb"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/initialize-execution.json",
+      "sha256": "b8dc772c9513ff8ff527c1d877ae324fe3d4af82b60ec73e03d24b1d16fcbec3"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/initialize-result.json",
+      "sha256": "0dcc00ae66ec2ae30ac9fc591841ba58c95a49a025b3142d5bb59438f16e95f9"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/launch_phase.py",
+      "sha256": "7d172b26feb9b842488ba64ba58b7cad08fbeb7f5e5182f9cff915e6ad99d6a9"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-1-execution.json",
+      "sha256": "63a4427fbf354e4044ddc8501f9e5b10acc384bee09773bc7199e3cea637635c"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-1-postgres-setup.log",
+      "sha256": "2970bd371df976aa43a990d58ee96bae821823d86ef1b1210f50a48780caf865"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-1-result.json",
+      "sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-2-execution.json",
+      "sha256": "f5e07f29d0d3c34b3eb2f6f5ceedfbf27bed5bc3c167ff0ef64ec30eb048d78c"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-2-postgres-setup.log",
+      "sha256": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-2-result.json",
+      "sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-3-execution.json",
+      "sha256": "4237c88914ccd71da03d13475630c01e333f708e6d81fb0f3be28e4cff6afde5"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-3-isolation-check.log",
+      "sha256": "93ef4526d11257f0193f382d8ef9fb20de9d496d681cc6fa522c263e43c7b98f"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-3-result.json",
+      "sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-4-execution.json",
+      "sha256": "231fc29fe3964be83237787a0f55c86bbde8f74efcb710a304a6771c6166fe4b"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-4-migrations.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-4-result.json",
+      "sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-5-cleanup.log",
+      "sha256": "ca19178a35ab4153b75b494963b66ce8243e1b94c173107c87b44d09db23652d"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-5-execution.json",
+      "sha256": "b104613d71db3127950e6f54a3ee1f2fb079f9cb70118b8233428f971fe01599"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/operation-5-result.json",
+      "sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/phase.py",
+      "sha256": "1f85f223290ec8052aae39d999bd1f6ce0ab2b4ea8953041c6b3c766fc7cb41a"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/plan.json",
+      "sha256": "000adba47c0850540aee19643b63533f2efffb03c1df3f7785d3e8af8f0e1788"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/postgres.log",
+      "sha256": "bc4c6a4229d7aba65f5a532f02848b305e845eead42b47d204e651a2c8348d2a"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/preparation-review.json",
+      "sha256": "93ee83f1d81a17565941e1953aa85aeb1ed006ddcc6bc3285ff76261f2b935ed"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/process_identity.py",
+      "sha256": "be61cb68419c10faa8711ef9105224e5c85657b041b81d5640bef53253d4c5d7"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/sitecustomize.py",
+      "sha256": "549f50bdc23bd892aaa139c245b8acb4a0aefa4467e946534e19d40e1dd44348"
+    },
+    {
+      "path": ".qa/browser-save-full-20261027-1a127b9bcaa4/test-environment.json",
+      "sha256": "5cef4173483d46e0a7cd7a50334d821cb0274d237533c81cec2ad679935e62aa"
+    }
+  ]
+}

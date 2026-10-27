@@ -1,0 +1,116 @@
+{
+  "status": "CURRENT_UI_IMAGE_BUILD_AND_AFFECTED_ASSET_SMOKE_PASS",
+  "verified_at": "2026-10-27T00:48:48.252947+00:00",
+  "base_commit": "fae5a36426079e6b28d7192edd8646b73c765705",
+  "candidate_files_sha256": {
+    "src/web/static/app.js": "43470e2cbde542b4e20ffd571ada8cfb25bdc4bfd72c6943aef93b8503162405",
+    "src/web/static/index.html": "a27e97023b5bfd81927b1c23113ecedb378a326ae4ee579efcf804d3f5f41588",
+    "scripts/verify_browser.py": "719894d71bd496b1b56e77b041cdae06b399ff900d3b08d272f687755ce04d18",
+    "tests/e2e/broker_observations.py": "122d4aaf18a3a5ab78eb015eff04cf5cd2ef4752a9c1c32e755ecbfa16acf724"
+  },
+  "image_id": "sha256:447db60f77a5b9c9a32f3959206b1c6a8e7bdfea106ea6cde0798abaa8feec85",
+  "image": "ia-consent-save:20261027-43470e2c-v3",
+  "context_files": 187,
+  "context_sha256": "9edb2119b3077fae19c3cc45b2cdc8b566628f064a332f8996efe3ff1d3d2bef",
+  "all_copied_files_compared": 184,
+  "complete_image_file_set_and_bytes_match": true,
+  "changed_image_inputs": [
+    "src/web/static/index.html",
+    "src/web/static/app.js"
+  ],
+  "smoke": {
+    "exit_code": 0,
+    "user": "appuser",
+    "uid": 1000,
+    "network": "none",
+    "read_only": true,
+    "capabilities_dropped": "ALL",
+    "no_new_privileges": true,
+    "no_private_paths_or_bind_mounts": true,
+    "save_account_control_present": true,
+    "owned_container_absent_afterwards": true
+  },
+  "build_dependency_scope": "Original Dockerfile/base/signed snapshot/locked dependencies unchanged; default network mode reused existing dependency cache",
+  "initial_offline_mode_failure": {
+    "terminal_exit": 1,
+    "cause": "network=none did not reuse the normal build dependency cache and could not resolve the configured snapshot; not a source failure",
+    "preserved": true
+  },
+  "build_dependency_network_mode": "default",
+  "new_dependency_versions_or_source_change_for_rebuild": false,
+  "actual_model_database_ingress_restart_Paper_or_final_host_test": "Not rerun; prior unchanged source-scope evidence retained separately",
+  "registry_push_or_operator_deployment": false,
+  "broker_connections": 0,
+  "external_orders": 0,
+  "raw_evidence": [
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/plan.json",
+      "sha256": "ac4bacc9b0defa4de204f087a4160e3d5a260b9d326dc0e59c523e814b49dd41"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/build_and_smoke.py",
+      "sha256": "6f36b3d026ce3f76788356f909aa12f1f7dc9bf0ff4162366769122c4ed09afd"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/build-execution.json",
+      "sha256": "e8b2f4581459485e745701a0e7a742a80f623b6a3f8f57cd23e3f9891dd726b3"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/build-child.json",
+      "sha256": "5b17054e83986988187a2be2f23ec2d993a0f635efa68c5a1fdaae0f5504e817"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/build.log",
+      "sha256": "85762f4e83372b24afb71bea6d14c662a7e5473de6e131d1726e3e7a75aff85a"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/build-result.json",
+      "sha256": "194c586bd8dbd53f8e9240b2430f9987ad2bfcc5e60bdb26c823e9c236e1540d"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/image-identity.json",
+      "sha256": "5e53da369d8f62e50880abac60aedd7f2d45e2ad64f20fd02a86defe4b0d80a3"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/smoke-execution.json",
+      "sha256": "237a2d2bebf3ab90a2a5fbaa9715441f6e09d71493bdec37b37d68fcc8363f3d"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/smoke-child.json",
+      "sha256": "9e9374f528b43ac414f5f27df2522f9f274a420ab742aad065d0339e947260a0"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/smoke.stdout",
+      "sha256": "a83692d545ccb8a8190182b9c8570e60c37de43f52922bdd0e6f58fdb2516ffa"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/smoke.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/smoke-result.json",
+      "sha256": "20fbbea5c46a000955be68b2ed65871f07011d6dd56e29e069ced912dd947a0a"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c-v3/result.json",
+      "sha256": "634da4afb02949a7733f66beff6197cb339f6b9e6688a3c5a5279d5d459869f3"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c/build-result.json",
+      "sha256": "9a418a7c4c4d12de2f5224bcb152d38fff09a20cd1833531ba04e0311f0eac80"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c/build.log",
+      "sha256": "286b005db611d99f1e53b7505bede3421dc8b6407583b5f30284232851742d22"
+    },
+    {
+      "path": ".qa/consent-save-image-20261027-43470e2c/build-execution.json",
+      "sha256": "a102ffa4cee424cabb5e8d8f067fb6dce4b23e9c026af771ef7ce702647b23e4"
+    }
+  ],
+  "final_HTML_asset_version": "broker-consent-20261027a",
+  "previous_success_before_cache_version": {
+    "path": ".qa/broker-consent-save-20261027/before-cachebust-broker-consent-save-image-20261027.json",
+    "sha256": "44b4b6a55c58173376cc59fc7949e581fb213339cc17a58ec5b3675c166a5deb"
+  }
+}

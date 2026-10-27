@@ -748,6 +748,40 @@ let brokerProviders = {...DEFAULT_BROKER_PROVIDERS};
 let brokerAccounts = [];
 let editingBrokerAccountId = null;
 let editingBrokerAccount = null;
+let brokerSavePending = false;
+let brokerLoadGeneration = 0;
+const brokerReadsPending = new Set();
+
+function brokerReadBlockedReason(account) {
+  if (!account) return 'Reload your saved account settings before reading.';
+  if (brokerSavePending) return 'Wait for your account settings to finish saving.';
+  if (brokerReadsPending.has(account.id)) return 'A read is already in progress.';
+  if (editingBrokerAccountId === account.id) return 'Save or cancel your edits before reading.';
+  if (account.masked_fields?.enabled !== true || account.masked_fields?.read_authorized !== true) {
+    return 'Enable this account and authorize reads, then save it.';
+  }
+  return '';
+}
+
+function updateBrokerActions() {
+  document.querySelectorAll('[data-broker-refresh]').forEach(button => {
+    const account = brokerAccounts.find(item => item.id === button.dataset.brokerRefresh);
+    const reason = brokerReadBlockedReason(account);
+    button.disabled = Boolean(reason);
+    button.title = reason || 'Read using the saved account permissions.';
+    const status = button.closest('.broker-account').querySelector('[data-broker-read-status]');
+    if (status) status.textContent = reason || 'Read permission saved.';
+  });
+  document.querySelectorAll('[data-edit-account], [data-delete-account], [data-broker-field]').forEach(control => {
+    control.disabled = brokerSavePending;
+  });
+  for (const id of ['broker-save', 'broker-cancel', 'broker-display-name']) {
+    const control = document.getElementById(id);
+    if (control) control.disabled = brokerSavePending;
+  }
+  const provider = document.getElementById('broker-provider');
+  if (provider) provider.disabled = brokerSavePending || Boolean(editingBrokerAccountId);
+}
 
 function brokerLabel(broker) {
   return {alpaca: 'Alpaca', ibkr: 'Interactive Brokers', coinbase: 'Coinbase', binance: 'Binance'}[broker] || broker;
@@ -796,6 +830,7 @@ function renderBrokerAccounts() {
       <div class="broker-account-head"><span class="broker-account-name">${escapeHtml(account.display_name)}</span><span class="broker-account-provider">${escapeHtml(brokerLabel(account.broker))}</span></div>
       <div class="broker-account-fields">${fields || 'No fields configured'}</div>
       <div class="broker-account-actions"><button data-edit-account="${escapeHtml(account.id)}">Edit</button><button data-delete-account="${escapeHtml(account.id)}">Disable</button>${account.broker === 'ibkr' ? `<button data-broker-evidence="${escapeHtml(account.id)}">Saved execution evidence</button><button data-broker-refresh="${escapeHtml(account.id)}">Read broker evidence</button>` : ''}</div><pre class="broker-evidence" data-broker-result="${escapeHtml(account.id)}" hidden></pre>
+      ${account.broker === 'ibkr' ? '<div class="broker-account-fields" data-broker-read-status role="status"></div>' : ''}
     </div>`;
   }).join('');
   el.querySelectorAll('[data-broker-evidence]').forEach(button => {
@@ -810,17 +845,24 @@ function renderBrokerAccounts() {
   el.querySelectorAll('[data-delete-account]').forEach(button => {
     button.addEventListener('click', () => deleteBrokerAccount(button.dataset.deleteAccount));
   });
+  updateBrokerActions();
 }
 
 async function brokerExecutionEvidence(button, refresh) {
   const accountId = refresh ? button.dataset.brokerRefresh : button.dataset.brokerEvidence;
   const account = brokerAccounts.find(item => item.id === accountId);
   if (!account) return;
+  if (refresh) {
+    const reason = brokerReadBlockedReason(account);
+    if (reason) { setBrokerStatus(reason, 'error'); updateBrokerActions(); return; }
+  }
   if (refresh && !window.confirm(`Connect read-only to ${account.display_name} and collect available executions, fees, positions and currency cash balances? This does not verify paper/live status or submit orders.`)) return;
+  if (refresh) brokerReadsPending.add(accountId);
   const output = button.closest('.broker-account').querySelector('[data-broker-result]');
   output.hidden = false;
   output.textContent = refresh ? 'Reading available broker evidence…' : 'Loading saved evidence…';
   button.disabled = true;
+  if (refresh) updateBrokerActions();
   try {
     const url = `/api/broker-accounts/${encodeURIComponent(accountId)}/observations`;
     const cursor = !refresh && button.dataset.cursor;
@@ -843,7 +885,8 @@ async function brokerExecutionEvidence(button, refresh) {
   } catch (error) {
     output.textContent = error.message;
   } finally {
-    button.disabled = false;
+    if (refresh) { brokerReadsPending.delete(accountId); updateBrokerActions(); }
+    else button.disabled = false;
   }
 }
 
@@ -854,13 +897,16 @@ function setBrokerStatus(message, kind = '') {
 }
 
 async function loadBrokerAccounts() {
+  if (brokerSavePending) return;
+  const generation = ++brokerLoadGeneration;
   try {
     const providerResp = await fetch('/api/broker-accounts/providers');
+    if (generation !== brokerLoadGeneration || brokerSavePending) return;
     if (providerResp.ok) {
       const providerData = await providerResp.json();
       brokerProviders = providerData.providers || brokerProviders;
     }
-    renderBrokerFields();
+    if (!editingBrokerAccountId) renderBrokerFields();
     const resp = await fetch('/api/broker-accounts');
     if (resp.status === 401) { window.location.assign('/login'); return; }
     if (!resp.ok) {
@@ -868,10 +914,12 @@ async function loadBrokerAccounts() {
       throw new Error(detail.detail || 'Brokerage account management is unavailable.');
     }
     const data = await resp.json();
+    if (generation !== brokerLoadGeneration || brokerSavePending) return;
     brokerAccounts = Array.isArray(data.accounts) ? data.accounts : [];
     renderBrokerAccounts();
     setBrokerStatus('Encrypted account settings ready', 'saved');
   } catch (error) {
+    if (generation !== brokerLoadGeneration || brokerSavePending) return;
     console.error('Broker account load failed', error);
     document.getElementById('broker-accounts-list').textContent = error.message;
     setBrokerStatus(error.message, 'error');
@@ -889,6 +937,7 @@ function editBrokerAccount(accountId) {
   document.getElementById('broker-display-name').value = account.display_name || '';
   document.getElementById('broker-cancel').hidden = false;
   renderBrokerFields();
+  updateBrokerActions();
   setBrokerStatus('Editing account — blank secrets keep the existing values');
 }
 
@@ -899,6 +948,7 @@ function resetBrokerForm() {
   document.getElementById('broker-display-name').value = '';
   document.getElementById('broker-cancel').hidden = true;
   renderBrokerFields();
+  updateBrokerActions();
   setBrokerStatus('');
 }
 
@@ -913,12 +963,16 @@ function collectBrokerConfig() {
 }
 
 async function saveBrokerAccount() {
+  if (brokerSavePending) return;
   const provider = document.getElementById('broker-provider').value;
   const body = {
     broker: provider,
     display_name: document.getElementById('broker-display-name').value.trim(),
     config: collectBrokerConfig(),
   };
+  brokerSavePending = true;
+  ++brokerLoadGeneration; // Older account loads cannot replace the save acknowledgement.
+  updateBrokerActions();
   setBrokerStatus('Saving encrypted settings…');
   try {
     const url = editingBrokerAccountId ? `/api/broker-accounts/${encodeURIComponent(editingBrokerAccountId)}` : '/api/broker-accounts';
@@ -932,10 +986,21 @@ async function saveBrokerAccount() {
       const detail = await resp.json().catch(() => ({}));
       throw new Error(detail.detail || 'Brokerage account could not be saved.');
     }
+    const saved = await resp.json();
+    if (typeof saved.id !== 'string' || !saved.id || saved.broker !== provider || !saved.masked_fields) {
+      throw new Error('Saved account confirmation is unavailable. Reload your account settings before reading.');
+    }
+    brokerAccounts = brokerAccounts.filter(account => account.id !== saved.id);
+    if (saved.active !== false) brokerAccounts.push(saved);
+    brokerAccounts.sort((a, b) => a.display_name.localeCompare(b.display_name));
     resetBrokerForm();
-    await loadBrokerAccounts();
+    renderBrokerAccounts();
+    setBrokerStatus('Encrypted account settings ready', 'saved');
   } catch (error) {
     setBrokerStatus(error.message, 'error');
+  } finally {
+    brokerSavePending = false;
+    updateBrokerActions();
   }
 }
 
