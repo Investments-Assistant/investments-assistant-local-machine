@@ -1,0 +1,192 @@
+{
+  "status": "DEPENDENCY_CANDIDATE_LOCAL_GATES_PASS_PENDING_PUBLICATION_CI",
+  "verified_at": "2026-10-28T00:15:43.075447+00:00",
+  "base_commit": "0c2edd8904d8794b9192c18f8c9312464386f03d",
+  "source_sha256": {
+    "pyproject.toml": "491ff54054b4ee52e9c1bac851fb61e684068fae412c0e44624a15f01c7acab7",
+    "poetry.lock": "5fadec677949d54d313ae89c3416dc65001480ac7e09784983bbce3b8c5f88f4",
+    "requirements-poetry.txt": "00492d2e5cb014a7a716004be6dbe26b655961b8ef10ddee2702bfde8a4c6e81"
+  },
+  "versions": {
+    "Pillow": "13.0.0",
+    "Brotli": "1.2.1",
+    "brotlicffi": "1.2.1.0",
+    "filelock": "4.2.1",
+    "virtualenv": "21.14.13",
+    "Poetry": "2.3.4"
+  },
+  "scope": {
+    "runtime_lock_packages_changed": [
+      "brotli",
+      "brotlicffi",
+      "pillow"
+    ],
+    "other_lock_packages_unchanged": true,
+    "bootstrap_pins_changed": [
+      "filelock",
+      "virtualenv"
+    ],
+    "existing_implementation_markers_retained": true
+  },
+  "saved_alert_comparison": {
+    "received": 80,
+    "matched_before": 62,
+    "matched_candidate": 1,
+    "matching_severity_before": {
+      "critical": 7,
+      "high": 28,
+      "medium": 22,
+      "low": 5
+    },
+    "version_range_matches_removed": 61,
+    "remaining_package": "diskcache",
+    "remaining_severity": "medium",
+    "not_unique_CVE_count": true,
+    "no_remote_dismissal_or_acceptance": true
+  },
+  "checks": {
+    "poetry_check_lock": "PASS",
+    "hash_pinned_bootstrap_resolver_dry_run": "PASS_NO_INSTALL",
+    "focused_original_unit_tests": 26,
+    "focused_unit_failures": 0,
+    "focused_unit_blocked_external_or_private_operations": [],
+    "runtime_library_versions_verified": true,
+    "real_generated_PNG_WOFF2_WeasyPrint_PDF": "PASS_BOTH_HOST_OVERLAY_AND_IMAGE",
+    "actual_PDF_pages": 1,
+    "data_URL_only_resources": true,
+    "image_build_exit_code": 0,
+    "image_context_files": 187,
+    "image_copied_files_hash_verified": 184,
+    "non_root": true,
+    "network": "none",
+    "read_only": true,
+    "owned_smoke_containers_absent": true
+  },
+  "image_id": "sha256:dd13142846753e3b51e19866bb0281c47b7b590fcc4cc1c20f598fe334aaf3df",
+  "image_tag": "ia-dependency-fix:20261028-191c639d63ee",
+  "context_sha256": "4963cd893f313e898fbd0b51c435d21166658dfced283c19e33e051fd4d23f4e",
+  "harness_failures_retained": {
+    "sandbox_units": "Local socket IPC probeEPERM; native probe and same26assertions/guards passed, no application source fix",
+    "image_renderer": "Initial missing Docker --interactive produced empty stdin; wrapper rejected emptyoutput. Corrected render-only phase passed on same immutable image; no rebuild."
+  },
+  "diskcache_residual": {
+    "version": "5.6.3",
+    "patched_release_at_audit": null,
+    "advisory": "https://github.com/advisories/GHSA-w8v5-vhqr-4h9v",
+    "mitigation_scope": "Application never activates persistent Llama caching; static source/upstream default evidence, not a patched dependency or accepted alert"
+  },
+  "not_tested": [
+    "PyPy/brotlicffi runtime",
+    "ARM64 image execution",
+    "new real-model/target-host workload benchmark",
+    "operator deployment",
+    "actual broker/Paper/research acceptance"
+  ],
+  "operator_or_project_environment_installs": false,
+  "registry_push": false,
+  "broker_reads_or_orders": 0,
+  "live": "OFF",
+  "future_exact_commit_CI": "PENDING",
+  "evidence_pins": [
+    {
+      "path": ".qa/dependency-remediation-20261027/baseline-files.json",
+      "sha256": "b98a47d959181dfa0bcefef660badccfd3f71d59a6d8f7cbb493a7d512e256f4"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/candidate-alert-evaluation.json",
+      "sha256": "2f7d0f1f1adfd5eab977a2bad1a6f5a2813922f9a9a9704f0d4335f9f2f67afc"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/bootstrap-check-result.json",
+      "sha256": "d474471dd6a8de7c850cc70e52a567fec13cca7d577331d8c458c2c8c68fced2"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/bootstrap-pip-report.json",
+      "sha256": "431453501651ba6bf72248a6c2a84a028df890ed338c5fd66f46358dc533a69f"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/lock-consistency-check.json",
+      "sha256": "d67044aad8c5cc02f707c967faf16f0c30963e9ab8ffc1f3c7de92e8c3d930a9"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/lock-update-result.json",
+      "sha256": "720e5edfc6cce3c70495f3d28ae506351d704bae363a09f13c5a3a302a202a07"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/synthetic-render-proof.json",
+      "sha256": "4fa7305a6dc609f33b416d04502bf32bd6ab19bca32eba4c8f081e29e761ca80"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/synthetic-render-v2-result.json",
+      "sha256": "9e159c1235cf0fe93fde40d6de2830d5ad50a775fdd77d2a5e48fd8d26a557fd"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/smoke-unit-v3-result.json",
+      "sha256": "09dbab1ef8e3592b5db5685d84e92c24933462ae616d436a8f266f038eacf64e"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/smoke-diagnostic-result.json",
+      "sha256": "bb9e915140fa2bad1c07bd0f0b7c7b12880b469e8603aa5a863b090d420e8b79"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/smoke-diagnostic-trace.log",
+      "sha256": "15d5451cb6dd76f842e7c70d6120acdc4189db6c3fb0628a1384eb415e05d7ca"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/smoke-unit-native-v4-proof.json",
+      "sha256": "c59eb0680c2368f3e45e4c94dca6bc6570dd059bac6bc1f120363f118cddc9b3"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/smoke-unit-native-v4-result.json",
+      "sha256": "5ac099911182b1a4e52c10d80e22a047c6964c0626acc89acff5c2bf952e4402"
+    },
+    {
+      "path": ".qa/dependency-remediation-20261027/smoke-residual-proof.json",
+      "sha256": "e3b0cafaa2c6e042e1828a98eff32da9c5e26ef33a7e3c93e4c17de10d62c7b0"
+    },
+    {
+      "path": ".qa/dependency-image-20261028-191c639d63ee/plan.json",
+      "sha256": "5c8f862088cbe5d4442070b6586af2e4915f6292cef655de0aaa223b0b215c1b"
+    },
+    {
+      "path": ".qa/dependency-image-20261028-191c639d63ee/build-result.json",
+      "sha256": "71e29b62f71127a34e410e99221b219cecf0859166fea69aebf4cba1a8ee02b5"
+    },
+    {
+      "path": ".qa/dependency-image-20261028-191c639d63ee/smoke-result.json",
+      "sha256": "abdcb6ec3cc63a03d6405b253ddbd192fbdc2083b465ff7f80a2c903638b4f37"
+    },
+    {
+      "path": ".qa/dependency-image-20261028-191c639d63ee/render-result.json",
+      "sha256": "3e17d0992cb1053303a2a5f99533798816093162b042733552c04d46a3dfb529"
+    },
+    {
+      "path": ".qa/dependency-image-20261028-191c639d63ee/render-v2-result.json",
+      "sha256": "bbe836ec4f88c44abb647a418d72ba28b2d42c81efa02db96f01d9f132d19de5"
+    },
+    {
+      "path": ".qa/dependency-image-20261028-191c639d63ee/result.json",
+      "sha256": "56dc6497bb0233e1f1f815aa9d049c663a216fde80c609b98933a603cb4f436f"
+    },
+    {
+      "path": ".qa/dependency-image-20261028-191c639d63ee/build.log",
+      "sha256": "7cd7cc39f301ca187295f7ab0e0f7867a125b3d46301ba6c46300e2d368ac6de"
+    },
+    {
+      "path": ".qa/dependency-image-20261028-191c639d63ee/smoke.stdout",
+      "sha256": "301f073ed3708d8719b538767f8ce4da0d7d3b679e47ab2a8647b4894779c56b"
+    },
+    {
+      "path": ".qa/dependency-image-20261028-191c639d63ee/render-v2.stdout",
+      "sha256": "df6158dc63c220f49f64ca8fc459765b8d74f8fa50dbae98843c1fa0f1bc1dce"
+    },
+    {
+      "path": ".qa/dependency-alert-triage-20261027/triage-evaluated-v2.json",
+      "sha256": "98ea0a08c44d14b9fe748dc520064fc42142bcfe849f225810e505f65fedcfeb"
+    },
+    {
+      "path": ".qa/dependency-remediation-plan-20261027/proposal.md",
+      "sha256": "5bf703bdbfb94eef9daffe2d87f15785437b487c48c7586a8b89dbf580a130da"
+    }
+  ]
+}

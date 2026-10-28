@@ -77,6 +77,10 @@ python-binance = ">=1.0.19"
 
 # ── Report generation ─────────────────────────────────────────────────────────
 weasyprint = ">=70.0"
+# Security floors for existing image and font decoding dependencies.
+pillow = ">=13.0.0"
+brotli = {version = ">=1.2.1", markers = "platform_python_implementation == 'CPython'"}
+brotlicffi = {version = ">=1.2.1.0", markers = "platform_python_implementation != 'CPython'"}
 exchange-calendars = "4.13.2"
 
 [tool.poetry.extras]
