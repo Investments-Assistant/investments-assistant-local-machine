@@ -47,6 +47,9 @@ class NewsEvidence:
     score: Decimal
     source: str
     model_version: str
+    # Declared effective replay time, not the wall clock of retrospective scoring
+    # or evidence of a model's training cutoff. Legacy synthetic fixtures may omit it.
+    score_available_at: datetime | None = None
 
 
 @dataclass(frozen=True)
@@ -159,10 +162,22 @@ def replay(
     for item in evidence:
         if (
             item.available_at.tzinfo is None
+            or item.available_at.utcoffset() is None
             or item.published_at.tzinfo is None
+            or item.published_at.utcoffset() is None
             or item.published_at > item.available_at
         ):
             raise ValueError("News needs publication and first availability timestamps")
+        if item.score_available_at is None:
+            if not fixture:
+                raise ValueError("Real news needs explicit score availability")
+        elif (
+            not isinstance(item.score_available_at, datetime)
+            or item.score_available_at.tzinfo is None
+            or item.score_available_at.utcoffset() is None
+            or item.score_available_at < item.available_at
+        ):
+            raise ValueError("Score availability must be timezone-aware and no earlier than news availability")
         if (
             not item.score.is_finite()
             or not -1 <= item.score <= 1
@@ -264,6 +279,7 @@ def replay(
                     for n in evidence
                     if n.symbol == bar.symbol
                     and n.available_at <= bar.close_at
+                    and (n.score_available_at or n.available_at) <= bar.close_at
                     and bar.close_at - n.available_at <= timedelta(days=3)
                 }
                 source_ids = sorted(known)
@@ -327,6 +343,13 @@ def replay(
             "annual_sessions": 252,
             "risk_free_rate": 0,
             "fill": "later session open",
+            "news_score_timing": (
+                "no supplied news scores"
+                if not evidence
+                else "legacy synthetic fixture: omitted score times use news availability; explicit times still apply"
+                if any(n.score_available_at is None for n in evidence)
+                else "explicit score availability and news availability must both precede or equal the signal close"
+            ),
             "costs": asdict(costs),
             "open_positions": "marked, not silently liquidated",
             "universe": (

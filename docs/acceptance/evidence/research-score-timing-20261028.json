@@ -1,0 +1,87 @@
+{
+  "status": "SYNTHETIC_SCORE_READINESS_REGRESSION_AND_40_RELATED_UNITS_PASS",
+  "verified_at": "2026-10-28T10:09:42.458646+00:00",
+  "base_head": "c037c8679717bcadc24d917000b1c90d5ced27ed",
+  "scope": "Daily news/model comparison; source work isolated from pending private-app restart plan",
+  "before": {
+    "expected_exit_code": 1,
+    "article_ready": "2026-01-03T16:00:00+00:00",
+    "score_ready": "2026-01-04T10:00:00+00:00",
+    "incorrect_old_fill": "2026-01-04T09:00:00+00:00",
+    "fixed_first_signal": "2026-01-04T17:00:00+00:00",
+    "fixed_first_fill": "2026-01-05T09:00:00+00:00"
+  },
+  "validation": [
+    {
+      "file": "focused-unit-pass.xml",
+      "tests": 20,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "file": "related-unit-pass.xml",
+      "tests": 40,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  ],
+  "counts_overlap": "20 focused cases are included in the 40 related cases; do not add executions",
+  "strict_non_fixture_news_requires_score_time": true,
+  "explicit_times_enforced_in_fixtures": true,
+  "legacy_fixture_compatibility_labelled": true,
+  "news_age_limit_unchanged": true,
+  "hash_includes_score_time": true,
+  "timestamps_independently_attested": false,
+  "original_private_pilot_replayed": false,
+  "provider_or_broker_calls": 0,
+  "private_data_access": false,
+  "database_or_model_started": false,
+  "operator_deployment": false,
+  "current_CI_or_new_image_verified": false,
+  "economic_research_acceptance": false,
+  "live_trading": "DISABLED",
+  "evidence_pins": [
+    {
+      "path": "src/research/replay.py",
+      "sha256": "c7ba13cc1fb7ed3b14ffdbf0a0328f4df2840376136e104ff9d388381a66153a"
+    },
+    {
+      "path": "tests/unit/research_replay_test.py",
+      "sha256": "29fbfd724f65f88821f16f9fb309954f03852c87e79069b99c0b073812102250"
+    },
+    {
+      "path": "docs/acceptance/REPLAY.md",
+      "sha256": "5120096e3a0a58cc5cc2e8cc4550d6dab6bcf7442420d0a3136f997259cad7bc"
+    },
+    {
+      "path": ".qa/research-score-timing-20261028/before-score-readiness.py",
+      "sha256": "88c7acb807bf51c61552464d40a9ca1fa1cd7c6b2f51d017d41d65a1c15d2daa"
+    },
+    {
+      "path": ".qa/research-score-timing-20261028/before-score-readiness.json",
+      "sha256": "fd6db2415e763e550484d8dd05459473698b5ebf4073faef7f37dd9d61036a32"
+    },
+    {
+      "path": ".qa/research-score-timing-20261028/before-score-readiness.log",
+      "sha256": "6341a3a47b19d9cae8d311d05a5ecf9981a7f47304fe9486ce56fa700f332107"
+    },
+    {
+      "path": ".qa/research-score-timing-20261028/focused-unit-pass.log",
+      "sha256": "467c7b8d8bd9e915997d1a060c124f768c1d68ab93fb71aece6ba08aafa8355e"
+    },
+    {
+      "path": ".qa/research-score-timing-20261028/focused-unit-pass.xml",
+      "sha256": "fad4fd1f92719d371040158a43102dc5e99e8313bd7afc9b7a31fabf9cc0a2a7"
+    },
+    {
+      "path": ".qa/research-score-timing-20261028/related-unit-pass.log",
+      "sha256": "5f44c64e33a374a03b3f719db5453cddaeb1fdec0c9a5079507e66b2c8043d55"
+    },
+    {
+      "path": ".qa/research-score-timing-20261028/related-unit-pass.xml",
+      "sha256": "fd1c9cb2009ea7bd4ec99cfedc7084ca853c4d50924ae6ed49a7696045e880f9"
+    }
+  ]
+}

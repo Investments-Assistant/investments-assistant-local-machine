@@ -55,3 +55,25 @@ real historical/news availability and forward observation are still required.
 [Proposed forward observation plan](FORWARD_OBSERVATION.md) specifies the paired
 comparisons, sample limitations, frozen versions, recovery and review rules. It
 is unapproved and grants no provider/account/order or live authority.
+
+## Model-score timing in the daily comparison
+
+`NewsEvidence.available_at` identifies article availability;
+`score_available_at` separately identifies when its model score is ready. A
+non-fixture news comparison requires both aware timestamps, with score readiness
+at or after article availability. Neither the article nor its score can influence
+a signal before the decision close. Later-session fill and existing article-age
+limits still apply. A newly completed score does not refresh an old article.
+
+For example, news received at 16:00 on 3 January cannot justify a 09:00 fill on
+4 January when the score only becomes ready at 10:00 that day. The earliest
+eligible daily signal is the 4 January close, followed by the 5 January open.
+The [timing regression and related accounting checks](evidence/research-score-timing-20261028.json)
+cover this case, exact boundaries, invalid or absent readiness and hash changes.
+
+The appended optional field preserves old synthetic constructor calls only when
+`fixture=True`; results explicitly label their assumed score timing. Explicit
+times are enforced even in fixtures. The timestamps remain supplied evidence or
+predeclared counterfactual assumptions, not independent proof of collection,
+training cutoff, licensing or investment value. Existing frozen pilot inputs and
+results are preserved; they are not rerun or relabelled as news/model research.
