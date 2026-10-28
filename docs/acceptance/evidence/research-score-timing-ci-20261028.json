@@ -1,0 +1,280 @@
+{
+  "status": "COMPLETED_CI_EXACT_SCM_ARTIFACTS_AND_CONFIGURED_SONAR_GATE_VERIFIED",
+  "head": "e12d731ee0bf14d8e279a7c97f513a8dff8b86a3",
+  "run_id": 40670062452,
+  "terminal_jobs": 4,
+  "terminal_jobs_success": true,
+  "test_tiers": {
+    "combined": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 1438
+    },
+    "integration": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 459
+    },
+    "unit": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 975
+    }
+  },
+  "overlap": "Unit/integration identities disjoint and contained in combined; executions not added",
+  "additional_combined_cases": [
+    [
+      "tests.smoke_test",
+      "test_app_imports"
+    ],
+    [
+      "tests.smoke_test",
+      "test_db_models_importable"
+    ],
+    [
+      "tests.smoke_test",
+      "test_settings_importable"
+    ],
+    [
+      "tests.smoke_test",
+      "test_tool_definitions_importable"
+    ]
+  ],
+  "browser_flows": 24,
+  "browser_console_errors": [],
+  "ingress_tls_wss_checks": 8,
+  "coverage": {
+    "all_browser_reportable_src_lines_covered_in_combined": true,
+    "browser_coverage_files": 2,
+    "browser_databases": [
+      {
+        "executed_line_entries": 343,
+        "file": ".coverage.browser.runnervmtai0g.pid5479.XIZdnlNx.HqAOMrd9oGbh",
+        "line_bit_rows": 5,
+        "measured_files": 147,
+        "sha256": "5aa335d66dbd6dfa557daddc91cefdac5275cef569e1913beee64ce98515b530",
+        "sqlite_mode": "read_only_immutable_query_only_no_extensions"
+      },
+      {
+        "executed_line_entries": 6956,
+        "file": ".coverage.browser.runnervmtai0g.pid5482.XOzMAVAx.HTBNLZB4mB0h",
+        "line_bit_rows": 126,
+        "measured_files": 148,
+        "sha256": "47021b85ae606852f3b31d37b8552fc1ff6cf5e2af18f352c4c6196af0dfbd70",
+        "sqlite_mode": "read_only_immutable_query_only_no_extensions"
+      }
+    ],
+    "browser_line_bit_rows": 131,
+    "browser_src_reportable_executed_lines": 4524,
+    "browser_src_unique_executed_lines": 6956,
+    "computed_percent": 84.4622461928934,
+    "covered": 10649,
+    "raw_browser_events_not_reported_as_executable_XML_statements": 2432,
+    "reported_rate": "0.8446",
+    "valid": 12608
+  },
+  "sonar": {
+    "commit": "e12d731ee0bf14d8e279a7c97f513a8dff8b86a3",
+    "evidence_lines": [
+      "2026-10-28T10:22:47.3179399Z 10:22:47.297 INFO  SCM revision ID 'e12d731ee0bf14d8e279a7c97f513a8dff8b86a3'",
+      "2026-10-28T10:22:56.6036928Z   scanMetadataReportFile: .scannerwork/report-task.txt",
+      "2026-10-28T10:22:57.3208856Z \u001b[32m\u2714 Quality Gate has PASSED.\u001b[0m"
+    ],
+    "job_id": 122757034443,
+    "log_format": "GitHub plugin decoded UTF-8 text",
+    "log_sha256": "bec40c478dcfd0804f575c4bf5978f35f2edb8772c11717089834d8ce062e0a1",
+    "neutral_uncomputed_checks_not_used": true,
+    "processing_task_lines": [
+      "2026-10-28T10:22:52.3976859Z 10:22:52.397 INFO  More about the report processing at https://sonarcloud.io/api/ce/task?id=AaGCCLl6LLmqMXKm9Tml"
+    ],
+    "report_task_file": ".scannerwork/report-task.txt",
+    "run_id": 40670062452,
+    "status": "CONFIGURED_PRIMARY_EXACT_SCM_SONAR_GATE_PASS"
+  },
+  "artifacts": [
+    {
+      "extracted_bytes": 328087,
+      "file_count": 1,
+      "id": 12807128674,
+      "name": "junit-unit",
+      "verification_sha256": "fa4ceb8460c8f0ac74be74144923cc5bdb946e774df08713d5907766104d811b",
+      "zip_bytes": 21078,
+      "zip_sha256": "7b5cc6a15d2c0a9852638858c67b4ca88d5f54fd181f5c8442df26df07bbd846"
+    },
+    {
+      "extracted_bytes": 148796,
+      "file_count": 1,
+      "id": 12807888030,
+      "name": "junit-integration",
+      "verification_sha256": "6af608adf1ac84f18d4ba692ce6fbcdc7dbda58b03c9d01119602ff332df1abc",
+      "zip_bytes": 12288,
+      "zip_sha256": "069d04f0cd27bcd6af70ed528e94ff94e314048b6f0d8890c7db4acf9f918c1b"
+    },
+    {
+      "extracted_bytes": 476977,
+      "file_count": 1,
+      "id": 12808267623,
+      "name": "junit-e2e",
+      "verification_sha256": "4bdd12e393a227318e1f1a6aa5e7965275496f0b543c4b999a97ef3819c5b31c",
+      "zip_bytes": 32905,
+      "zip_sha256": "c10e2c368aac6b2ce7f51c8a30aa2049918c85da6f8f71adae0c0b2b20207537"
+    },
+    {
+      "extracted_bytes": 476075,
+      "file_count": 1,
+      "id": 12808945634,
+      "name": "coverage-combined",
+      "verification_sha256": "4c6fec5287405ea5999a796ffa2181b488c3113a7bd9e1f13b7461ebbdff0e15",
+      "zip_bytes": 27364,
+      "zip_sha256": "6a2a53f5fc08e451328218fde4e04d7de65e0d7049e233d97e351c002cfb335b"
+    },
+    {
+      "extracted_bytes": 151552,
+      "file_count": 2,
+      "id": 12808316129,
+      "name": "coverage-browser",
+      "verification_sha256": "bad06bb62dc969a2f643d8fc895c2a77bc0acb13656f9870c04224659077d158",
+      "zip_bytes": 14912,
+      "zip_sha256": "15e376a3c1fce36026ecab62e1c2cb3eb9456f8390e69ceeebce79ecd6d8b54c"
+    },
+    {
+      "extracted_bytes": 2285681,
+      "file_count": 15,
+      "id": 12808625316,
+      "name": "browser-synthetic-evidence",
+      "verification_sha256": "0d1ec926861231e3df50f21fe282781855b7de32473483945fc6f43682d21ae2",
+      "zip_bytes": 2187068,
+      "zip_sha256": "1563f552ef744590ea3cf239e741c8a5860b61205413ec5e031d89eee12464e5"
+    }
+  ],
+  "raw_evidence": [
+    {
+      "path": ".qa/current-ci-e12d-20261028/junit-unit/junit-unit.xml",
+      "sha256": "f48643e4f715cce7ada5b5c7516c20fda52943bb298430abafe7f43d99ade766"
+    },
+    {
+      "path": ".qa/current-ci-e12d-20261028/junit-integration/junit-integration.xml",
+      "sha256": "38ccf00249785497de08b0ac8b39a12da6a74b6e2b5d0d39cb0ecde2925e7792"
+    },
+    {
+      "path": ".qa/current-ci-e12d-20261028/junit-e2e/junit-e2e.xml",
+      "sha256": "21470fdd5f702a0ef90642a040ed39a775341b64ae84d7574153ffa587aea572"
+    },
+    {
+      "path": ".qa/current-ci-e12d-20261028/browser-synthetic-evidence/docs/acceptance/evidence/browser-ci.txt",
+      "sha256": "34172750180c715c1584c62929f0554ec3c6b224d902fd93a8e328bc1cb3e3c5"
+    },
+    {
+      "path": ".qa/current-ci-e12d-20261028/browser-synthetic-evidence/docs/acceptance/evidence/nginx-ci.json",
+      "sha256": "ada6e2d25bfc470bfd8e60ce7bcb79da32bf9ad3c1e069add0116ff078c75997"
+    },
+    {
+      "path": ".qa/current-ci-e12d-20261028/coverage-combined/coverage-combined.xml",
+      "sha256": "f67c173c32a913f777524b1b4561bd85df83f0c5a7bf0c8d925e3fe97ba8b476"
+    },
+    {
+      "path": ".qa/current-ci-e12d-20261028/coverage-browser/.coverage.browser.runnervmtai0g.pid5479.XIZdnlNx.HqAOMrd9oGbh",
+      "sha256": "5aa335d66dbd6dfa557daddc91cefdac5275cef569e1913beee64ce98515b530"
+    },
+    {
+      "path": ".qa/current-ci-e12d-20261028/coverage-browser/.coverage.browser.runnervmtai0g.pid5482.XOzMAVAx.HTBNLZB4mB0h",
+      "sha256": "47021b85ae606852f3b31d37b8552fc1ff6cf5e2af18f352c4c6196af0dfbd70"
+    },
+    {
+      "bytes": 17590,
+      "path": ".qa/current-ci-e12d-20261028/terminal-run.json",
+      "sha256": "9b013be3c0863ee76eceae63edea46fb97ba341336da450ddd22ef8223734d82"
+    },
+    {
+      "bytes": 12129,
+      "path": ".qa/current-ci-e12d-20261028/terminal-jobs.json",
+      "sha256": "b5cb1e6e6b600e1c0cd7d8cf1d7271f579c44e371c35e4a4a8d86adc3acdceef"
+    },
+    {
+      "bytes": 6970,
+      "path": ".qa/current-ci-e12d-20261028/available-artifacts.json",
+      "sha256": "21574b8962303c1ea1ded4f9c81a34811f9e378f0d3745c3b227db5fd93b29d6"
+    },
+    {
+      "bytes": 635572,
+      "path": ".qa/current-ci-e12d-20261028/primary-sonar-job.log",
+      "sha256": "bec40c478dcfd0804f575c4bf5978f35f2edb8772c11717089834d8ce062e0a1"
+    },
+    {
+      "bytes": 906,
+      "path": ".qa/current-ci-e12d-20261028/sonar-exact-commit-verification.json",
+      "sha256": "e469498adfc78645ccc4ab258235c1854ab233243e74b26da0509aee2787fced"
+    },
+    {
+      "bytes": 6978,
+      "path": ".qa/current-ci-e12d-20261028/artifact-verification.json",
+      "sha256": "2527dc83819055015aa5efc47675411f905a1ba17587d2614cd7baca98e0cd34"
+    },
+    {
+      "bytes": 1563,
+      "path": ".qa/current-ci-e12d-20261028/artifact-operations-terminal.json",
+      "sha256": "5edc7b552867e86471d4f7eb6647847e0bafef882f2628c52b7244b9cff57a07"
+    },
+    {
+      "bytes": 6045,
+      "path": ".qa/current-ci-e12d-20261028/gh_fallback_once.py",
+      "sha256": "66cd3f05ef2ca5ee269d2aa61b575c813feed57502c2b12a2a55fa089f36356d"
+    },
+    {
+      "bytes": 10801,
+      "path": ".qa/current-ci-e12d-20261028/verify_artifacts.py",
+      "sha256": "b08dce9349580c720cb2b96d9fa1c9173ef1dac0dba3eb2f6adbff7c43988f11"
+    },
+    {
+      "bytes": 4456,
+      "path": ".qa/current-ci-e12d-20261028/finalize_audit.py",
+      "sha256": "2341b66807b74fa6cafa1cd2b0cde1571fa2689bdee3a283a1c889c69e5a5b1e"
+    },
+    {
+      "bytes": 21078,
+      "path": ".qa/current-ci-e12d-20261028/junit-unit.zip",
+      "sha256": "7b5cc6a15d2c0a9852638858c67b4ca88d5f54fd181f5c8442df26df07bbd846"
+    },
+    {
+      "bytes": 12288,
+      "path": ".qa/current-ci-e12d-20261028/junit-integration.zip",
+      "sha256": "069d04f0cd27bcd6af70ed528e94ff94e314048b6f0d8890c7db4acf9f918c1b"
+    },
+    {
+      "bytes": 32905,
+      "path": ".qa/current-ci-e12d-20261028/junit-e2e.zip",
+      "sha256": "c10e2c368aac6b2ce7f51c8a30aa2049918c85da6f8f71adae0c0b2b20207537"
+    },
+    {
+      "bytes": 27364,
+      "path": ".qa/current-ci-e12d-20261028/coverage-combined.zip",
+      "sha256": "6a2a53f5fc08e451328218fde4e04d7de65e0d7049e233d97e351c002cfb335b"
+    },
+    {
+      "bytes": 14912,
+      "path": ".qa/current-ci-e12d-20261028/coverage-browser.zip",
+      "sha256": "15e376a3c1fce36026ecab62e1c2cb3eb9456f8390e69ceeebce79ecd6d8b54c"
+    },
+    {
+      "bytes": 2187068,
+      "path": ".qa/current-ci-e12d-20261028/browser-synthetic-evidence.zip",
+      "sha256": "1563f552ef744590ea3cf239e741c8a5860b61205413ec5e031d89eee12464e5"
+    }
+  ],
+  "limitations": [
+    "Fixture listener ports, TLS certificate and exact proxy peer substituted.",
+    "No Docker/WSL forwarding, LAN firewall or external account proof.",
+    "Synthetic CI evidence only; no actual model, Paper, final host acceptance, or later certifi candidate validation."
+  ],
+  "root_independent_rehash": true,
+  "verified_at": "2026-10-28T10:32:51.515037+00:00",
+  "all_artifact_and_parser_operations_terminal": true,
+  "no_tests_rerun": true,
+  "operator_deployment": false,
+  "broker_reads_or_orders": 0,
+  "later_certifi_candidate_covered": false,
+  "live_trading": "DISABLED"
+}

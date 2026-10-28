@@ -1,0 +1,118 @@
+{
+  "status": "CERTIFICATE_MANIFESTS_AND_QA_BUNDLES_PASS_NEW_CONTAINER_AND_CI_PENDING",
+  "verified_at": "2026-10-28T10:33:54.002267+00:00",
+  "base_commit": "e12d731ee0bf14d8e279a7c97f513a8dff8b86a3",
+  "advisory": "GHSA-6q48-6c7w-9gw2",
+  "fixed_certifi": "2026.10.23",
+  "fixed_bootstrap_pip": "26.2.2",
+  "fixed_container_python": "3.12.16",
+  "fixed_container_ca_package": "20250419~deb12u2",
+  "official_python_manifest": "sha256:62ed8e07e544e8555c5d93748d5275015136b7f5c52b5e8679b4de339c3779d3",
+  "dated_signed_debian_snapshot": "20261028T000000Z",
+  "other_runtime_lock_records_byte_identical": 149,
+  "strict_wheel_only_bootstrap_dry_run": {
+    "packages": 47,
+    "installed": false,
+    "architecture": "linux-amd64",
+    "status": "PASS"
+  },
+  "qa_bundle_checks": {
+    "vulnerable_G3_before_present": true,
+    "after_certifi_absent": true,
+    "after_pip_vendored_absent": true,
+    "CERT_REQUIRED": true,
+    "check_hostname": true,
+    "real_network_requests": 0
+  },
+  "image_context_files": 187,
+  "image_context_sha256": "2fda1e393cfa369b2b74483aa04425d88cca1a87763d1b2a9293a6ead9e10367",
+  "container_build_pass_claimed": false,
+  "candidate_CI_pass_claimed": false,
+  "earlier_e12_CI": "975unit459PG1438overlap24browser8TLS84.46percent; exactSCMSonarPASS",
+  "earlier_CI_excludes_candidate": true,
+  "operator_or_global_environments_modified": false,
+  "private_data_access": false,
+  "broker_reads_or_orders": 0,
+  "model_pilot_or_soak_runs": 0,
+  "remote_alert_dismissals": false,
+  "residual": "diskcache5.6.3 unpatchedmedium; persistentllamacacheinactive",
+  "live_trading": "DISABLED",
+  "evidence_pins": [
+    {
+      "path": "Dockerfile",
+      "sha256": "a4ac9d0b82892c53828f52552b0d1fd2aab0fd7e0a05e6a82e2b21f07e86c624"
+    },
+    {
+      "path": "config/build/debian.sources",
+      "sha256": "23e6528e2ba0eba4c446e094e86e8925b3886b458a38076d9ee961a3dd64cd75"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "1e7a8f6302f7baeecb44be8f30d508d8dc6d40d8d30b2632ee6b26c7b34e1ba5"
+    },
+    {
+      "path": "poetry.lock",
+      "sha256": "92b5959ee5806f757d44429983d70a7d6b177acc5ab647a6222bde48d00e0601"
+    },
+    {
+      "path": "requirements-poetry.txt",
+      "sha256": "77672950cce65f59030e4be3fc8143800cda48edaf2002badae83343dd4e992d"
+    },
+    {
+      "path": "docs/acceptance/BUILD.md",
+      "sha256": "8499ea0f5e9a72ef57dbf9b80f3bfa21d3baecf27aa2f7c0dc31589f00720017"
+    },
+    {
+      "path": "docs/acceptance/DEPENDENCY_SECURITY.md",
+      "sha256": "86a7e9fb491fc7a9748d429b5204ff87b8ab93d9166b9eb35adf3401c28f2c19"
+    },
+    {
+      "path": "docs/acceptance/evidence/research-score-timing-ci-20261028.json",
+      "sha256": "948a4feef6dfcd101424564fea2eba3975e384e81b0f37739a044b4a5dfc207e"
+    },
+    {
+      "path": ".qa/certifi-remediation-20261028/manifest-verification.json",
+      "sha256": "24a248d07e560b7527a1fe2c3c18603a51ae0e80b603159764afdc7f111b0fd3"
+    },
+    {
+      "path": ".qa/certifi-remediation-20261028/dependency-diff-proof.json",
+      "sha256": "c976e9a8d6f1b4802a69f7bca906984b46de6c3382528871755cb7bb3d1841ab"
+    },
+    {
+      "path": ".qa/certifi-remediation-20261028/download-proof.json",
+      "sha256": "f432a65bd45114c68134f2f97ac7be4bf9a16c180d4cc5ad5816fac756559717"
+    },
+    {
+      "path": ".qa/certifi-remediation-20261028/pip-download-proof.json",
+      "sha256": "085be6d974c7b2069199f72a337a094feccb67bc2e03994f57dbfd5f594a140a"
+    },
+    {
+      "path": ".qa/certifi-remediation-20261028/poetry-update-result.json",
+      "sha256": "e34ea0a1bcaa2b07d509d51bd6f6d965de92c78106e8b48b5fa0744116ea3da8"
+    },
+    {
+      "path": ".qa/certifi-remediation-20261028/poetry-check-result.json",
+      "sha256": "4add692804ac2e6e1627d43915a186075b74d47f54f95dd6560a153d4407e105"
+    },
+    {
+      "path": ".qa/certifi-remediation-20261028/local-certifi-smoke.json",
+      "sha256": "461b26cf92ffa95a2f0f3ddc5e7a8ed84a95f992647a56e52c97d9aca3a05d33"
+    },
+    {
+      "path": ".qa/certifi-remediation-20261028/bootstrap-dry-run-proof.json",
+      "sha256": "44446aab886cad713e2ba2fc1f817e3a56abd5674aa8a6de3512f6d60f1e62dc"
+    },
+    {
+      "path": ".qa/certifi-remediation-20261028/bootstrap-dry-run-report.json",
+      "sha256": "cc03d04f95bda13466989dd659b70ecac287a0daac54c709a9d81943ab3d5b7e"
+    },
+    {
+      "path": ".qa/certifi-remediation-20261028/base-manifest.raw.json",
+      "sha256": "62ed8e07e544e8555c5d93748d5275015136b7f5c52b5e8679b4de339c3779d3"
+    },
+    {
+      "path": ".qa/certifi-remediation-20261028/base-manifest-verification.json",
+      "sha256": "2cf99a5d9e28d2b6c7552b0e3a40f27c188dc7eb92c7538845695cabaf487d09"
+    }
+  ]
+}

@@ -1,6 +1,28 @@
 # Build inputs and remaining validation
 
-The Python base, PostgreSQL and Nginx official multi-platform manifests are pinned
+## 28 October certificate remediation candidate
+
+The current candidate pins Python3.12.16-slim-bookworm to multi-platform digest
+`sha256:62ed8e07e544e8555c5d93748d5275015136b7f5c52b5e8679b4de339c3779d3`.
+The registry identifies Linux amd64 and arm64 images. Python's
+[3.12.16 release](https://www.python.org/downloads/release/python-31216/)
+adds rejection of the compromised eMudhra intermediate keys. The dated Debian
+repositories move to20261028T000000Z and ca-certificates is fixed at
+20250419~deb12u2, preserving archive signature verification. Runtime/bootstrap
+certifi is2026.10.23 and the hash-locked bootstrap adds pip26.2.2, following
+[Python's incident guidance](https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576).
+
+Poetry lock consistency and a47-package amd64 wheel-only bootstrap dry-run pass;
+other149 runtime package records remain byte-identical. A new clean image build
+and actual container certificate-store checks are still required. ARM64 execution
+and new ARM64 bootstrap resolution are not established by the amd64 checks.
+Existing host environments, private app and OS trust stores remain unmodified.
+See [dependency scope and residual risk](DEPENDENCY_SECURITY.md). The dated proofs
+below describe their original inputs and must not be treated as this new build.
+
+## Historical build verification
+
+The original Python base, PostgreSQL and Nginx multi-platform manifests were pinned
 by SHA256. The registry response bytes were hashed and matched to the registry
 digest; Linux amd64 and arm64 entries were verified. Evidence:
 `evidence/container-image-manifests-20261009.json`. Only small manifest documents
@@ -11,7 +33,7 @@ Poetry2.3.4 now matches the existing CI toolchain and installs the existing
 environment, models, reports, Git history, caches and disposable PostgreSQL data.
 Runtime models remain read-only mounts; they are not image build inputs.
 
-The pinned amd64 image now builds successfully on Docker Desktop's Linux engine.
+The earlier pinned amd64 image built successfully on Docker Desktop's Linux engine.
 `evidence/container-build-20261010-ad17fb8e.*` records the first successful build;
 `evidence/container-startup-build.txt/.exit` records the updated image after
 deferring unused market-data imports. See CONTAINERS.md for actual native-library,
@@ -31,7 +53,7 @@ review: https://docs.docker.com/build/building/best-practices/#pin-base-image-ve
 
 ## Hash-locked Poetry bootstrap (2026-10-10)
 
-`requirements-poetry.txt` pins all46 resolved packages and67 compatible wheel
+The original `requirements-poetry.txt` pinned46 resolved packages and67 compatible wheel
 hashes for CPython3.12 Linux amd64/arm64 with glibc at most2.36. Docker installs
 with `--require-hashes --only-binary=:all:`; missing or changed distributions fail
 closed. The context allowlist includes this lock file. Application `poetry.lock`
@@ -66,8 +88,9 @@ Reference: https://pip.pypa.io/en/stable/topics/secure-installs/
 
 ## Dated Debian repositories (2026-10-10)
 
-`config/build/debian.sources` fixes bookworm, bookworm-updates and bookworm-security
-to the20261009T000000Z archive. The Docker recipe replaces only the container's
+The original `config/build/debian.sources` fixed bookworm, bookworm-updates and bookworm-security
+to the20261009T000000Z archive; the current candidate deliberately advances it as
+described above. The Docker recipe replaces only the container's
 repository files; no host apt configuration was changed. Signature verification
 remains required through Debian's archive keyring. `Check-Valid-Until: no` applies
 only to these dated archives, as documented by Debian; it permits intentionally
@@ -100,6 +123,9 @@ generic `sonar.testExecutionReportPaths` importer, which requires a different
 XML schema. Producer filenames, YAML and shell syntax were checked in
 `evidence/ci-xunit-routing-review.json`; a retained actual pytest report has
 `testsuites`/`testcase` elements. This configuration verification is not a
-successful remote Sonar scan. Missing authorized SONAR_TOKEN still blocks it.
+successful remote Sonar scan by itself. Subsequent
+[exact c037c86 CI](https://github.com/Investments-Assistant/investments-assistant-local-machine/actions/runs/40607898664)
+and its configured primary Sonar gate pass. Authorization is available; the new
+certificate candidate still needs its own exact-commit checks after publication.
 Primary reference:
 https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/test-coverage/test-execution-parameters

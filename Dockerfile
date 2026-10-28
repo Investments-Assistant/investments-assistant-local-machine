@@ -1,7 +1,7 @@
 # Multi-architecture build for a local Docker host (x86_64 or ARM64).
 # Pin the multi-platform base manifest; update it through reviewed validation.
 # Apt snapshots are fixed too; see docs/acceptance/BUILD.md for validation limits.
-FROM python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258 AS base
+FROM python:3.12.16-slim-bookworm@sha256:62ed8e07e544e8555c5d93748d5275015136b7f5c52b5e8679b4de339c3779d3 AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -18,7 +18,7 @@ RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/* \
     && rm /tmp/ia-debian.sources \
     && apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    ca-certificates \
+    ca-certificates=20250419~deb12u2 \
     cmake \
     libopenblas-dev \
     libpq-dev \

@@ -1,14 +1,14 @@
 # Immutable build inputs; update alongside the base-image digest and validation.
 # Archive expiry is disabled only for these dated snapshots, not signature checks.
 Types: deb
-URIs: https://snapshot.debian.org/archive/debian/20261009T000000Z/
+URIs: https://snapshot.debian.org/archive/debian/20261028T000000Z/
 Suites: bookworm bookworm-updates
 Components: main
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 Check-Valid-Until: no
 
 Types: deb
-URIs: https://snapshot.debian.org/archive/debian-security/20261009T000000Z/
+URIs: https://snapshot.debian.org/archive/debian-security/20261028T000000Z/
 Suites: bookworm-security
 Components: main
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
